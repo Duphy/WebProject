@@ -55,7 +55,16 @@ function convert_byte_string_to_string($byte_string){
 
     return $result_string;
 }
+function convert_byte_to_string($byte_array){
 
+	$result_string = '';
+
+	for ($i = 0; $i < sizeof($byte_array); $i++){
+		$result_string .= chr($byte_array[$i]);
+	}
+
+	return $result_string;
+}
 // Used in unpack funciton
 // Convert an byte array of length 4 to an integer
 function convert_byte_string_to_int($byte_string){
@@ -70,7 +79,16 @@ function convert_byte_string_to_int($byte_string){
 
     return $result_int;
 }
+function convert_byte_to_int($byte_array){
 
+	$result_int = 0;
+
+	for ($i = 0; $i < sizeof($byte_array); $i++){
+		$result_int += $byte_array[$i] * pow(256, sizeof($byte_array) - $i - 1);
+	}
+
+	return $result_int;
+}
 // Helper function of the above two
 function convert_byte_string_to_int_array($byte_string){
 

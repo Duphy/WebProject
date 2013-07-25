@@ -1166,7 +1166,7 @@ function delete($mode, $uid, $target_id, $session_key){
 	}
 	return form_pack($pkg);
 }
-function no_name($uid, $event_id, $session_key){
+function quit($uid, $event_id, $session_key){
 	$length = HEADER_LENGTH +
 	4+
 	8;
