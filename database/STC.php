@@ -46,16 +46,11 @@ function extract_header($pack){
 	$pointer = 0;
 	$length=readBytes($pack,$pointer,2);
 	//byte 0 - 11 are reserved headers
-	$pointer += 4;
 	$session_key=readBytes($pack,$pointer,8);
-	$pointer += 8;
 	//byte 12 - 15 is user
 	$uid = readBytes($pack,$pointer,4);
-	$pointer+=4;
 	$pkg_type = readBytes($pack,$pointer,1);
-	$pointer+=1;
 	$pkg_subtype = readBytes($pack,$pointer,1);
-	$pointer+=1;
 	$header=array(
 				'length' => covert_byte_to_int($length),
 				'session_key' => covert_byte_to_string($session_key),
@@ -102,7 +97,6 @@ function process_reply($pack,&$pointer){
     */
 	$num_length =4;
 	$num_reply = covert_byte_to_int(readBytes($pack,$pointer,$num_length));
-	$pointer+=$num_length;
 	for($i=0;$i<$num_reply;$i++){
 		$reply = array();
 		$reply['rid'] = covert_byte_to_int(readBytes($pack,$pointer,RID_LENGTH));
@@ -120,7 +114,6 @@ function process_reply($pack,&$pointer){
 function process_tags($pack,&$pointer, $num_length){
 	$num_tags = covert_byte_to_int(readBytes($pack,$pointer,$num_length));
 	$tags = array();
-	$pointer+=$num_length;
 	for($i=0;$i<$num_tags;$i++){
 		$tag_length = covert_byte_to_int(readBytes($pack,$pointer,1));
 		$tags[]= covert_byte_to_string(readBytes($pack,$pointer,$tag_length));
@@ -130,7 +123,6 @@ function process_tags($pack,&$pointer, $num_length){
 function process_weighted_tags($pack,&$pointer, $num_length){
 	$num_tags = covert_byte_to_int(readBytes($pack,$pointer,$num_length));
 	$tags = array();
-	$pointer+=$num_length;
 	for($i=0;$i<$num_tags;$i++){
 		$tag_length = covert_byte_to_int(readBytes($pack,$pointer,1));
 		$tags['tags']= covert_byte_to_string(readBytes($pack,$pointer,$tag_length));
@@ -366,17 +358,14 @@ function unpack_create($pack,$subtype){
 	$pointer = HEADER_LENGTH;
 	$pkg = array();
 	$pkg['status'] = covert_byte_to_int(readBytes($pack,$pointer,1));
-	$pointer++;
 	switch ($subtype){
 		case 0://view user
 			switch ($pkg['status']){
 				case 0:
 					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-					$pointer+=UID_LENGTH;
 				break;
 				case 1:
 					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,1));
-					$pointer+=1;
 				break;
 			}
 		break;
@@ -384,11 +373,9 @@ function unpack_create($pack,$subtype){
 			switch ($pkg['status']){
 				case 0:
 					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
-					$pointer+=EVENTID_LENGTH;
 				break;
 				case 1:
 					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,1));
-					$pointer+=1;
 				break;
 			}		
 		break;
@@ -397,16 +384,12 @@ function unpack_create($pack,$subtype){
 				case 0:
 					$sets=array();
 					$sets['uid']=covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-					$pointer+=UID_LENGTH;
 					$sets['eid']=covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
-					$pointer+=EVENTID_LENGTH;
 					$sets['pid']=covert_byte_to_int(readBytes($pack,$pointer,POSTID_LENGTH));
-					$pointer+=POSTID_LENGTH;
 					$pkg["content"]=$sets;
 				break;
 				case 1:
 					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,1));
-					$pointer+=1;
 				break;
 			}	
 		break;
@@ -414,18 +397,14 @@ function unpack_create($pack,$subtype){
 			switch ($pkg['status']){
 				case 1:
 					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,1));
-					$pointer+=1;
 				break;
 			}
 		break;
 		case 17:
 			$sets=array();
 			$sets['uid']=covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-			$pointer+=UID_LENGTH;
 			$sets['eid']=covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
-			$pointer+=EVENTID_LENGTH;
 			$sets['sid']=covert_byte_to_int(readBytes($pack,$pointer,SID_LENGTH));
-			$pointer+=SID_LENGTH;
 			$pkg["content"]=$sets;
 		break;
 	}
