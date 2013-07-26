@@ -68,20 +68,16 @@ function extract_header($pack){
 function process_uidsets($pack,&$pointer){
 	$uid=array();
 	$num_uid = covert_byte_to_int(readBytes($pack,$pointer,4));
-	$pointer+=4;
 	for($i=0;i<$num_uid;$i++){
 		$uid[]=covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-		$pointer+=UID_LENGTH;
 	}
 	return $uid;
 }
 function process_eventsets($pack,&$pointer){
 	$events=array();
 	$num_events = covert_byte_to_int(readBytes($pack,$pointer,4));
-	$pointer+=4;
 	for($i=0;i<$num_friends;$i++){
 		$events[]=covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
-		$pointer+=EVENTID_LENGTH;
 	}
 	return $events;
 }
@@ -89,15 +85,11 @@ function process_eventsets($pack,&$pointer){
 function process_postsets($pack,&$pointer){
 	$postings=array();
 	$num_postings = covert_byte_to_int(readBytes($pack,$pointer,4));
-	$pointer+=4;
 	for($i=0;i<$num_postings;$i++){
 		$sets=array();
 		$sets['uid']=covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-		$pointer+=UID_LENGTH;
 		$sets['eid']=covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
-		$pointer+=EVENTID_LENGTH;
 		$sets['pid']=covert_byte_to_int(readBytes($pack,$pointer,POSTID_LENGTH));
-		$pointer+=POSTID_LENGTH;
 		$postings[]=$sets;
 	}
 	return $postings;
@@ -114,21 +106,13 @@ function process_reply($pack,&$pointer){
 	for($i=0;$i<$num_reply;$i++){
 		$reply = array();
 		$reply['rid'] = covert_byte_to_int(readBytes($pack,$pointer,RID_LENGTH));
-		$pointer+=RID_LENGTH;
 		$sets['replier_uid']=covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-		$pointer+=UID_LENGTH;
 		$sets['reply_to_uid']=covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-		$pointer+=UID_LENGTH;
 		$content_length = covert_byte_to_int(readBytes($pack,$pointer,1));
-		$pointer+=1;
 		$results['content'] = covert_byte_to_string(readBytes($pack,$pointer,$content_length));
-		$pointer+=$content_length;
 		$results['reply_date'] = process_to_date(covert_byte_to_int(readBytes($pack,$pointer,4)));
-		$pointer+=4;
 		$results['reply_time'] = process_to_time(covert_byte_to_int(readBytes($pack,$pointer,4)));
-		$pointer+=4;
 		$results['visibility'] = covert_byte_to_int(readBytes($pack,$pointer,1));
-		$pointer++;
 		$results[]=$reply;
 	}
 	return $results;
@@ -139,9 +123,7 @@ function process_tags($pack,&$pointer, $num_length){
 	$pointer+=$num_length;
 	for($i=0;$i<$num_tags;$i++){
 		$tag_length = covert_byte_to_int(readBytes($pack,$pointer,1));
-		$pointer++;
 		$tags[]= covert_byte_to_string(readBytes($pack,$pointer,$tag_length));
-		$pointer+=$tag_length;
 	}
 	return $tags;
 }
@@ -151,11 +133,8 @@ function process_weighted_tags($pack,&$pointer, $num_length){
 	$pointer+=$num_length;
 	for($i=0;$i<$num_tags;$i++){
 		$tag_length = covert_byte_to_int(readBytes($pack,$pointer,1));
-		$pointer++;
 		$tags['tags']= covert_byte_to_string(readBytes($pack,$pointer,$tag_length));
-		$pointer+=$tag_length;
 		$tags['weight'] = covert_byte_to_int(readBytes($pack,$pointer,8));
-		$pointer+=8;
 		
 	}
 	return $tags;
@@ -163,24 +142,15 @@ function process_weighted_tags($pack,&$pointer, $num_length){
 function process_user_simple_other_pack($pack,&$pointer){
 	$results=array();
 	$results['uid'] = covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-	$pointer+=UID_LENGTH;
 	$nickname_length = covert_byte_to_int(readBytes($pack,$pointer,4));
-	$pointer+=4;
 	$results['nickname'] = covert_byte_to_string(readBytes($pack,$pointer,$nickname_length));
-	$pointer+=$nickname_length;
 	$name_length = covert_byte_to_int(readBytes($pack,$pointer,4));
-	$pointer+=4;
 	$results['name'] = covert_byte_to_string(readBytes($pack,$pointer,$name_length));
-	$pointer+=$name_length;
 	$birthday = covert_byte_to_int(readBytes($pack,$pointer,4));
 	$results['birthday'] = process_to_date($birthday);
-	$pointer+=4;
 	$results['gender'] = covert_byte_to_int(readBytes($pack,$pointer,1));
-	$pointer+=1;
 	$city_length = covert_byte_to_int(readBytes($pack,$pointer,1));
-	$pointer+=1;
 	$results['city'] = covert_byte_to_string(readBytes($pack,$pointer,$city_length));
-	$pointer+=$city_length;
 
 	$results['tags']=process_tags($pack,$pointer,4);
 	
@@ -193,24 +163,15 @@ function process_user_simple_other_pack($pack,&$pointer){
 function process_event_simple_other_pack($pack,&$pointer){
 	$results=array();
 	$results['eid'] = covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
-	$pointer+=EVENTID_LENGTH;
 	$name_length = covert_byte_to_int(readBytes($pack,$pointer,4));
-	$pointer+=4;
 	$results['name'] = covert_byte_to_string(readBytes($pack,$pointer,$name_length));
-	$pointer+=$name_length;
 	$results['creater'] = covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-	$pointer+=UID_LENGTH;
 	$description_length = covert_byte_to_int(readBytes($pack,$pointer,1));
-	$pointer+=4;
 	$results['description'] = covert_byte_to_string(readBytes($pack,$pointer,$description_length));
-	$pointer+=$description_length;
 	$results['tags']=process_tags($pack,$pointer,4);
 	$city_length = covert_byte_to_int(readBytes($pack,$pointer,1));
-	$pointer+=1;
 	$results['city'] = covert_byte_to_string(readBytes($pack,$pointer,$city_length));
-	$pointer+=$city_length;
 	$results['ratings'] = covert_byte_to_int(readBytes($pack,$pointer,4));
-	$pointer+=4;
 	
 	//honors not done
 	
@@ -220,13 +181,10 @@ function process_setting_pack($pack,&$pointer){
 	$num_lenght =1;
 	$num_tags = covert_byte_to_int(readBytes($pack,$pointer,$num_length));
 	$pkg = array();
-	$pointer+=$num_length;
 	for($i=0;$i<$num_tags;$i++){
 		$setting = array();
 		$setting['index'] = covert_byte_to_int(readBytes($pack,$pointer,1));
-		$pointer++;
 		$tags['value']= covert_byte_to_int(readBytes($pack,$pointer,1));
-		$pointer++;
 		$pkg[]=$tags;
 	}
 	return $pkg;
@@ -243,29 +201,17 @@ function process_schedule_pack($pack,&$pointer){
 	*/
 	$results=array();
 	$results['uid'] = covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-	$pointer+=UID_LENGTH;
 	$results['eid'] = covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
-	$pointer+=EVENTID_LENGTH;
 	$results['sid'] = covert_byte_to_int(readBytes($pack,$pointer,SID_LENGTH));
-	$pointer+=SID_LENGTH;
 	$results['start_date'] = process_to_date(covert_byte_to_int(readBytes($pack,$pointer,4)));
-	$pointer+=4;
 	$results['start_time'] = process_to_time(covert_byte_to_int(readBytes($pack,$pointer,4)));
-	$pointer+=4;
 	$results['end_date'] = process_to_date(covert_byte_to_int(readBytes($pack,$pointer,4)));
-	$pointer+=4;
 	$results['end_time'] = process_to_time(covert_byte_to_int(readBytes($pack,$pointer,4)));
-	$pointer+=4;
 	$location_length = covert_byte_to_int(readBytes($pack,$pointer,1));
-	$pointer+=1;
 	$results['place'] = covert_byte_to_string(readBytes($pack,$pointer,$location_length));
-	$pointer+=$location_length;
 	$description_length = covert_byte_to_int(readBytes($pack,$pointer,1));
-	$pointer+=1;
 	$results['description'] = covert_byte_to_string(readBytes($pack,$pointer,$description_length));
-	$pointer+=$description_length;
 	$results['num_collaborators'] = covert_byte_to_int(readBytes($pack,$pointer,4));
-	$pointer+=4;
 	return $results;
 }
 
@@ -280,21 +226,13 @@ function process_posting_display_other_pack($pack,&$pointer){
 	*/
 	$results = array();
 	$results['pid'] = covert_byte_to_int(readBytes($pack,$pointer,POSTID_LENGTH));
-	$pointer+=POSTID_LENGTH;
 	$results['uid'] = covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-	$pointer+=UID_LENGTH;
 	$results['eid'] = covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
-	$pointer+=EVENTID_LENGTH;
 	$results['post_date'] = process_to_date(covert_byte_to_int(readBytes($pack,$pointer,4)));
-	$pointer+=4;
 	$results['post_time'] = process_to_time(covert_byte_to_int(readBytes($pack,$pointer,4)));
-	$pointer+=4;
 	$content_length = covert_byte_to_int(readBytes($pack,$pointer,2));
-	$pointer+=2;
 	$results['content'] = covert_byte_to_string(readBytes($pack,$pointer,$content_length));
-	$pointer+=$content_length;
 	$results['visibility'] = covert_byte_to_int(readBytes($pack,$pointer,1));
-	$pointer++;
 	$results['tags'] = process_tags($pack,$pointer,4);
 	$results['reply'] = process_reply($pack,$pointer);
 	
@@ -303,7 +241,6 @@ function process_posting_display_other_pack($pack,&$pointer){
 function process_circatag_pack($pack,&$pointer){
 	$pkg=array();
 	$pkg['opt']=covert_byte_to_int(readBytes($pack,$pointer,1));
-	$pointer++;
 	$pkg['tags'] = process_weighted_tags($pack,$pointer);
 	return $pkg;
 }
@@ -318,7 +255,6 @@ function process_to_time($ints){
 function process_viewself($pack, &$pointer){
 	$pkg = array();
 	$mode = covert_byte_to_int(readBytes($pack,$pointer,1));
-	$pointer++;
 	switch ($mode){
 		case 0:
 			$pkg["friends"]=process_uidsets($pack,$pointer);
@@ -351,9 +287,7 @@ function unpack_view($pack,$subtype){
 		case 0://view user
 			$viewee = covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
 			$pkg['viewee'] = $viewee; 
-			$pointer+=4;
 			$mode = covert_byte_to_int(readBytes($pack,$pointer,1));
-			$pointer+=1;
 			switch ($mode){
 				case 0:
 					$pkg["friends"]=process_uidsets($pack,$pointer);
@@ -375,9 +309,7 @@ function unpack_view($pack,$subtype){
 		case 1:
 			$eid = covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
 			$pkg['eid'] = $eid;
-			$pointer+=8;
 			$mode = covert_byte_to_int(readBytes($pack,$pointer,1));
-			$pointer+=1;
 			switch ($mode){
 				case 0:
 					$pkg["members"]=process_uidsets($pack,$pointer);
@@ -433,15 +365,68 @@ function unpack_search($pack,$subtype){
 function unpack_create($pack,$subtype){
 	$pointer = HEADER_LENGTH;
 	$pkg = array();
+	$pkg['status'] = covert_byte_to_int(readBytes($pack,$pointer,1));
+	$pointer++;
 	switch ($subtype){
 		case 0://view user
-			$pkg["friends"]=process_uidsets($pack,$pointer);
+			switch ($pkg['status']){
+				case 0:
+					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
+					$pointer+=UID_LENGTH;
+				break;
+				case 1:
+					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,1));
+					$pointer+=1;
+				break;
+			}
 		break;
 		case 1:
-			$pkg["events"]=process_eventsets($pack,$pointer);
+			switch ($pkg['status']){
+				case 0:
+					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
+					$pointer+=EVENTID_LENGTH;
+				break;
+				case 1:
+					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,1));
+					$pointer+=1;
+				break;
+			}		
 		break;
 		case 2:
-			$pkg["posts"]=process_postsets($pack,$pointer);
+			switch ($pkg['status']){
+				case 0:
+					$sets=array();
+					$sets['uid']=covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
+					$pointer+=UID_LENGTH;
+					$sets['eid']=covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
+					$pointer+=EVENTID_LENGTH;
+					$sets['pid']=covert_byte_to_int(readBytes($pack,$pointer,POSTID_LENGTH));
+					$pointer+=POSTID_LENGTH;
+					$pkg["content"]=$sets;
+				break;
+				case 1:
+					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,1));
+					$pointer+=1;
+				break;
+			}	
+		break;
+		case 3:
+			switch ($pkg['status']){
+				case 1:
+					$pkg["content"]=covert_byte_to_int(readBytes($pack,$pointer,1));
+					$pointer+=1;
+				break;
+			}
+		break;
+		case 17:
+			$sets=array();
+			$sets['uid']=covert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
+			$pointer+=UID_LENGTH;
+			$sets['eid']=covert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
+			$pointer+=EVENTID_LENGTH;
+			$sets['sid']=covert_byte_to_int(readBytes($pack,$pointer,SID_LENGTH));
+			$pointer+=SID_LENGTH;
+			$pkg["content"]=$sets;
 		break;
 	}
 	return $pkg;
@@ -474,10 +459,11 @@ function unpack_system_message($pack,$subtype){
 	$pointer = HEADER_LENGTH;
 	return $pkg;
 }
-function readBytes($array, $pointer, $length){
+function readBytes($array, &$pointer, $length){
 	$results=array();
 	for($i=$pointer;i<$pointer+$length;$i++){
 		$results[]=$array[$i];
 	}
+	$pointer+=$length;
 	return $results;
 }
