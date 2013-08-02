@@ -18,8 +18,8 @@ function create_new_user($email, $pwd, $nickName, $birthday, $gender, $city,
 	1+strlen($city) * 2+
 	1+strlen($state) * 2+
 	1+strlen($country) * 2+
-	1+ sizeof($tags) + $tag_array[[0]]+
-	1+ sizeof($hiddenTags) + $hiddenTag_array[[0]];
+	1+ sizeof($tags) + $tag_array[0]+
+	1+ sizeof($hiddenTags) + $hiddenTag_array[0];
 	
 	//content array
 	$pkg = array(
@@ -98,7 +98,7 @@ function create_new_user($email, $pwd, $nickName, $birthday, $gender, $city,
 			),
 			array(
 					 TYPE_TAG,
-					 $tag_array[[1]]
+					 $tag_array[1]
 			),
 			array(
 					 TYPE_ONE_BYTE_INT,
@@ -106,7 +106,7 @@ function create_new_user($email, $pwd, $nickName, $birthday, $gender, $city,
 			),
 			array(
 					 TYPE_TAG,
-					 $hiddenTag_array[[1]]
+					 $hiddenTag_array[1]
 			),
 	);
 

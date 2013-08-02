@@ -23,18 +23,19 @@
 		$request = login( LOG_IN_WITH_EMAIL, $_POST['email'], $_POST['password']);
 
 		$response = connect_to_server_and_send_message($request);
-
-		$log_in_response = unpack_package($response);
-
+		$pkg = unpack_pkg($response);
+		$log_in_response = $pkg[1];
+		echo '<br></br>';
+		print_r($pkg);
 		// TODO store these values to $_SESSION
-		$uid = $log_in_response['uid'];
-		$succeeded = $log_in_response['succeeded'];
-		$session_key = $log_in_response['session_key'];
-
-		$_SESSION['uid'] = $uid;
+		//$uid = $log_in_response[0];
+		$succeeded = $log_in_response[0];
+		$session_key = $log_in_response[1];
+		
+		//$_SESSION['uid'] = $uid;
 		$_SESSION['session_key'] = $session_key;
 
-		echo '<br></br>UID: ' . $uid;
+		//echo '<br></br>UID: ' . $uid;
 		echo '<br></br>succeeded: ' . $succeeded;
 		echo '<br></br>session_key: ' . $session_key;
 
