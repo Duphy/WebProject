@@ -1,4 +1,9 @@
 <?php
+
+require_once("constants.php");
+require_once("CTS.php");
+require_once("common_functions.php");
+require_once("STC.php");
 function connect_to_server_and_send_message( $msg ){
 
 	/* Turn on implicit output flushing so we see what we're getting
@@ -7,7 +12,7 @@ function connect_to_server_and_send_message( $msg ){
 	ob_implicit_flush(TRUE);
 
 	// set some variables
-	$host = "25.42.79.116";
+	$host = "25.40.107.250";
 	$port = 1992;
 
 	// If this is a server, it's also a good idea to use the set_time_limit() function

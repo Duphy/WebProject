@@ -1,6 +1,6 @@
 <?php 
 
-require_once('database/serverUtil.php');
+require_once('database/service.php');
 // if (session_status() != PHP_SESSION_ACTIVE){
 // 	// !isset($_SESSION['session_started']) ||	$_SESSION['session_started'] != TRUE 
 // 	session_start();

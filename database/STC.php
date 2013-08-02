@@ -1,10 +1,10 @@
 <?PHP
 
-require_once("serverUtil.php");
+require_once("service.php");
 require_once("common_functions.php");
 
 
-function unpack($raw_pkg){
+function unpack_pkg($raw_pkg){
 	$pack = convert_string_to_byte_array($raw_pkg);
 	$header = $extract_header($pack);
 	$pkg['header']=$header;

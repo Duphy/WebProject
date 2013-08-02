@@ -47,7 +47,8 @@
 
 		$response = connect_to_server_and_send_message($request);
 		
-		foreach(unpack($response) as $v) echo $v,"   ";
+		$results = unpack_pkg($response);
+		foreach($results as $v) echo $v,"   ";
 	?>
 
 

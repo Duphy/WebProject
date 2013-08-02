@@ -1,5 +1,5 @@
 <?PHP
-require_once("serverUtil.php");
+require_once("service.php");
 require_once("common_functions.php");
 
 function create_new_user($email, $pwd, $nickName, $birthday, $gender, $city,
