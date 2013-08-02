@@ -140,7 +140,7 @@ function _unichr($o) {
 
 /*
 *	Used for construction of headers
-*	If $session_key is null (when sign up and log in), then make it a string of eight '0'.
+*	If $session_key is null (when sign up and log in), then make it a string of eight 0.
 */
 function build_header_for_package($length, $type, $stype, $session_key = DUMB_SESSION_KEY)
 {	
@@ -186,56 +186,56 @@ function build_header_for_package($length, $type, $stype, $session_key = DUMB_SE
 function form_pack($param){
 	$result = array();
 	foreach ($param as $new){
-		echo '<br></br>New content: ' . print_r($new['content'], true) . ' and current result length is: ' . sizeof($result);
-		switch($new['type']){
+		echo '<br></br>New content: ' . print_r($new[1], true) . ' and current result length is: ' . sizeof($result);
+		switch($new[0]){
 			case TYPE_HEADER:{
-				$result = array_merge((array)$result, (array)$new['content']);
+				$result = array_merge((array)$result, (array)$new[1]);
 				echo '<br></br>After merge: <pre>' . print_r($result, true) . '</per>';
 				break;
 			}
 			case TYPE_STRING:{
-				if ($new['content'] != NULL){
-					echo '<br></br>TYPE_STRING, the size is: ' . sizeof(convert_string_to_byte_array($new['content']));
-					$result = array_merge($result, convert_string_to_byte_array($new['content']));
+				if ($new[1] != NULL){
+					echo '<br></br>TYPE_STRING, the size is: ' . sizeof(convert_string_to_byte_array($new[1]));
+					$result = array_merge($result, convert_string_to_byte_array($new[1]));
 				}
 				break;
 			}
 			case TYPE_ONE_BYTE_INT:{
-				$result[] = pack_to_unsigned_byte($new['content']);
+				$result[] = pack_to_unsigned_byte($new[1]);
 				break;
 			}
 			case TYPE_TWO_BYTE_INT:{
-				$result = array_merge($result, convert_int_to_byte_array($new['content'],2));
+				$result = array_merge($result, convert_int_to_byte_array($new[1],2));
 				break;
 			}
 			case TYPE_FOUR_BYTE_INT:{
-				$result = array_merge($result, convert_int_to_byte_array($new['content'],4));
+				$result = array_merge($result, convert_int_to_byte_array($new[1],4));
 				break;
 			}
 			case TYPE_EIGHT_BYTE_INT:{
-				$result = array_merge($result, convert_int_to_byte_array($new['content'],8));
+				$result = array_merge($result, convert_int_to_byte_array($new[1],8));
 				break;
 			}
 			case TYPE_TAG:{
-				if($new['content']!= NULL){
-				$result = array_merge($result, $new['content']);
+				if($new[1]!= NULL){
+				$result = array_merge($result, $new[1]);
 				}
 				break;
 			}
 			case TYPE_UIDS:{
-				if($new['content']!= NULL){
-					$result = array_merge($result, $new['content']);
+				if($new[1]!= NULL){
+					$result = array_merge($result, $new[1]);
 				}
 				break;
 			}
 			case TYPE_UPDATE:{
-				if($new['content']!= NULL){
-					$result = array_merge($result, $new['content']);
+				if($new[1]!= NULL){
+					$result = array_merge($result, $new[1]);
 				}
 				break;
 			}
 			default:{
-				echo 'Wrong type in param: ' . $new['type'];
+				echo 'Wrong type in param: ' . $new[0];
 			}
 		}
 	}
@@ -298,8 +298,8 @@ function build_tagArray($tags){
 		}
 	}
 	$output = array(
-			'total_length' => $length,
-			'tag_array' => $results
+			$length,
+			$results
 	);
 	return $output;
 }
@@ -314,8 +314,8 @@ function build_uidArray($uids){
 		}
 	}
 	$output = array(
-			'total_length' => $length,
-			'uid_array' => $results
+			$length,
+			$results
 	);
 	return $output;
 }
@@ -331,35 +331,35 @@ function build_updateArray($updates){
 	$skip=0;
 	if(sizeof($uids)>0){
 		foreach ($updates as $element){
-			switch ($element['type']){
+			switch ($element[0]){
 				case 0: case 1: case 2: case 5: case 6: case 7: case 8: case 9:
-					$content_length = 1+strlen($element['content']) * 2;
+					$content_length = 1+strlen($element[1]) * 2;
 					$length += $countent_length+1;
 					$results[] = pack_to_unsigned_byte($countent_length);
-					$results[] = convert_string_to_byte_array($element['content']);
+					$results[] = convert_string_to_byte_array($element[1]);
 					break;
 				case 3:
 					$length += 4;
-					$results[] = convert_int_to_byte_array($element['content'],4);
+					$results[] = convert_int_to_byte_array($element[1],4);
 					break;
 				case 4:
 					$length += 1;
-					$results[] = pack_to_unsigned_byte($element['content']);
+					$results[] = pack_to_unsigned_byte($element[1]);
 					break;
 				case 10:
 					$length += 2;
-					$results[] = convert_int_to_byte_array($element['content'],2);
+					$results[] = convert_int_to_byte_array($element[1],2);
 					break;
 				case 11: case 12:
 					$length += 4;
-					$results[] = convert_int_to_byte_array($element['content'],4);
+					$results[] = convert_int_to_byte_array($element[1],4);
 					break;
 			}
 		}
 	}
 	$output = array(
-			'total_length' => $length,
-			'uid_array' => $results
+			$length,
+			$results
 	);
 	return $output;
 }
