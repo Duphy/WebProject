@@ -18,95 +18,95 @@ function create_new_user($email, $pwd, $nickName, $birthday, $gender, $city,
 	1+strlen($city) * 2+
 	1+strlen($state) * 2+
 	1+strlen($country) * 2+
-	1+ sizeof($tags) + $tag_array['total_length']+
-	1+ sizeof($hiddenTags) + $hiddenTag_array['total_length'];
+	1+ sizeof($tags) + $tag_array[[0]]+
+	1+ sizeof($hiddenTags) + $hiddenTag_array[[0]];
 	
 	//content array
 	$pkg = array(
 			array(
-				'type' => TYPE_HEADER,	
-				'content' => build_header_for_package($length, 2, 0)
+				 TYPE_HEADER,	
+				 build_header_for_package($length, 2, 0)
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($email) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($email) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $email
+					 TYPE_STRING,
+					 $email
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($pwd) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($pwd) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $pwd
+					 TYPE_STRING,
+					 $pwd
 			),
 			//realname = null
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($realName) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($realName) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $realName
+					 TYPE_STRING,
+					 $realName
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($nickName) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($nickName) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $nickName
+					 TYPE_STRING,
+					 $nickName
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $birthday
+					 TYPE_FOUR_BYTE_INT,
+					 $birthday
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => $gender
+					 TYPE_ONE_BYTE_INT,
+					 $gender
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($city) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($city) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $city
+					 TYPE_STRING,
+					 $city
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($state) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($state) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $state
+					 TYPE_STRING,
+					 $state
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($country) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($country) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $country
+					 TYPE_STRING,
+					 $country
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => sizeof($tags)
+					 TYPE_ONE_BYTE_INT,
+					 sizeof($tags)
 			),
 			array(
-					'type' => TYPE_TAG,
-					'content' => $tag_array['tag_array']
+					 TYPE_TAG,
+					 $tag_array[[1]]
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => sizeof($hiddenTags)
+					 TYPE_ONE_BYTE_INT,
+					 sizeof($hiddenTags)
 			),
 			array(
-					'type' => TYPE_TAG,
-					'content' => $hiddenTag_array['tag_array']
+					 TYPE_TAG,
+					 $hiddenTag_array[[1]]
 			),
 	);
 
@@ -119,47 +119,47 @@ function create_event($event_name, $creator_id, $description, $city, $tags, $ses
 				4+
 				1+strlen($descripton) * 2+
 				1+strlen($city) * 2+
-				1+ sizeof($tags) + $tag_array['total_length'];
+				1+ sizeof($tags) + $tag_array[[0]];
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 2, 1,$session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 2, 1,$session_key)
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($event_name) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($event_name) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $event_name
+					 TYPE_STRING,
+					 $event_name
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $creator_id
+					 TYPE_FOUR_BYTE_INT,
+					 $creator_id
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($discription) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($discription) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $discription
+					 TYPE_STRING,
+					 $discription
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($city) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($city) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $city
+					 TYPE_STRING,
+					 $city
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => sizeof($tags)
+					 TYPE_ONE_BYTE_INT,
+					 sizeof($tags)
 			),
 			array(
-					'type' => TYPE_TAG,
-					'content' => $tag_array['tag_array']
+					 TYPE_TAG,
+					 $tag_array[[1]]
 			),
 	);
 	
@@ -173,39 +173,39 @@ function create_posting($creator_id, $event_id, $content, $visibility, $tags, $s
 	8+//event id
 	2+strlen($content) * 2+
 	1+//visibility
-	1+ sizeof($tags) + $tag_array['total_length'];
+	1+ sizeof($tags) + $tag_array[[0]];
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 2, 2,$session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 2, 2,$session_key)
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $creator_id
+					 TYPE_FOUR_BYTE_INT,
+					 $creator_id
 			),
 			array(
-					'type' => TYPE_EIGHT_BYTE_INT,
-					'content' => $event_id
+					 TYPE_EIGHT_BYTE_INT,
+					 $event_id
 			),
 			array(
-					'type' => TYPE_TWO_BYTE_INT,
-					'content' => strlen($content) * 2
+					 TYPE_TWO_BYTE_INT,
+					 strlen($content) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $content
+					 TYPE_STRING,
+					 $content
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => $visibility
+					 TYPE_ONE_BYTE_INT,
+					 $visibility
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => sizeof($tags)
+					 TYPE_ONE_BYTE_INT,
+					 sizeof($tags)
 			),
 			array(
-					'type' => TYPE_TAG,
-					'content' => $tag_array['tag_array']
+					 TYPE_TAG,
+					 $tag_array[[1]]
 			),
 	);
 	
@@ -221,28 +221,28 @@ function create_request($requester, $type, $target_user, $content, $session_key,
 			1+strlen($content) * 2;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 2, 3, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 2, 3, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $requester
+							 TYPE_FOUR_BYTE_INT,
+							 $requester
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $type
+							 TYPE_ONE_BYTE_INT,
+							 $type
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $target_user
+							 TYPE_FOUR_BYTE_INT,
+							 $target_user
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => strlen($content) * 2
+							 TYPE_ONE_BYTE_INT,
+							 strlen($content) * 2
 					),
 					array(
-							'type' => TYPE_STRING,
-							'content' => $content
+							 TYPE_STRING,
+							 $content
 					),
 			);
 		break;
@@ -253,28 +253,28 @@ function create_request($requester, $type, $target_user, $content, $session_key,
 			1+strlen($content) * 2;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 2, 3, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 2, 3, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $requester
+							 TYPE_FOUR_BYTE_INT,
+							 $requester
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $type
+							 TYPE_ONE_BYTE_INT,
+							 $type
 					),
 					array(
-							'type' => TYPE_EIGHT_BYTE_INT,
-							'content' => $target_user
+							 TYPE_EIGHT_BYTE_INT,
+							 $target_user
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => strlen($content) * 2
+							 TYPE_ONE_BYTE_INT,
+							 strlen($content) * 2
 					),
 					array(
-							'type' => TYPE_STRING,
-							'content' => $content
+							 TYPE_STRING,
+							 $content
 					),
 			);
 		break;
@@ -286,32 +286,32 @@ function create_request($requester, $type, $target_user, $content, $session_key,
 			1+strlen($content) * 2;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 2, 3, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 2, 3, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $requester
+							 TYPE_FOUR_BYTE_INT,
+							 $requester
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $type
+							 TYPE_ONE_BYTE_INT,
+							 $type
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $target_user
+							 TYPE_FOUR_BYTE_INT,
+							 $target_user
 					),
 					array(
-							'type' => TYPE_EIGHT_BYTE_INT,
-							'content' => $event_id
+							 TYPE_EIGHT_BYTE_INT,
+							 $event_id
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => strlen($content) * 2
+							 TYPE_ONE_BYTE_INT,
+							 strlen($content) * 2
 					),
 					array(
-							'type' => TYPE_STRING,
-							'content' => $content
+							 TYPE_STRING,
+							 $content
 					),
 			);
 		break;
@@ -329,59 +329,59 @@ function create_schedule($creator, $event_id, $start_date, $start_time, $end_dat
 	4+4+
 	1+strlen($place) * 2;
 	1+strlen($description) * 2+
-	4+ $uid_array['total_length'];
+	4+ $uid_array[[0]];
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 2, 17, $session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 2, 17, $session_key)
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $creator
+					 TYPE_FOUR_BYTE_INT,
+					 $creator
 			),
 			array(
-					'type' => TYPE_EIGHT_BYTE_INT,
-					'content' => $event_id
+					 TYPE_EIGHT_BYTE_INT,
+					 $event_id
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $start_date
+					 TYPE_FOUR_BYTE_INT,
+					 $start_date
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $start_time
+					 TYPE_FOUR_BYTE_INT,
+					 $start_time
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $end_date
+					 TYPE_FOUR_BYTE_INT,
+					 $end_date
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $end_time
+					 TYPE_FOUR_BYTE_INT,
+					 $end_time
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($place) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($place) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $place
+					 TYPE_STRING,
+					 $place
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($description) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($description) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $description
+					 TYPE_STRING,
+					 $description
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => sizeof($uids)
+					 TYPE_ONE_BYTE_INT,
+					 sizeof($uids)
 			),
 			array(
-					'type' => TYPE_UIDS,
-					'content' => $uid_array['uid_array']
+					 TYPE_UIDS,
+					 $uid_array[[1]]
 			),
 	);
 	return form_pack($pkg);
@@ -395,24 +395,24 @@ function login($loginMode, $account, $pwd){
 					  1+strlen($pwd) * 2;
 			$pkg = array(
 		  		array(
-		  			'type' => TYPE_HEADER,
-		  			'content' => build_header_for_package($length, 6, 0)
+		  			 TYPE_HEADER,
+		  			 build_header_for_package($length, 6, 0)
 		  		),
 				array(
-						'type' => TYPE_ONE_BYTE_INT,
-						'content' => $loginMode
+						 TYPE_ONE_BYTE_INT,
+						 $loginMode
 				),
 		  		array(
-		  				'type' => TYPE_FOUR_BYTE_INT,
-		  				'content' => $account
+		  				 TYPE_FOUR_BYTE_INT,
+		  				 $account
 		  		),
 		  		array(
-		  				'type' => TYPE_ONE_BYTE_INT,
-		  				'content' => strlen($pwd) * 2
+		  				 TYPE_ONE_BYTE_INT,
+		  				 strlen($pwd) * 2
 		  		),
 		  		array(
-		  				'type' => TYPE_STRING,
-		  				'content' => $pwd
+		  				 TYPE_STRING,
+		  				 $pwd
 		  		),
 		  	 );
 			break;
@@ -423,28 +423,28 @@ function login($loginMode, $account, $pwd){
 				1+strlen($pwd) * 2;
 				$pkg = array(
 			  		array(
-			  			'type' => TYPE_HEADER,
-			  			'content' => build_header_for_package($length, 6, 0)
+			  			 TYPE_HEADER,
+			  			 build_header_for_package($length, 6, 0)
 			  		),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $loginMode
+							 TYPE_ONE_BYTE_INT,
+							 $loginMode
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => strlen($account) *2
+							 TYPE_ONE_BYTE_INT,
+							 strlen($account) *2
 					),
 					array(
-							'type' => TYPE_STRING,
-							'content' => $account
+							 TYPE_STRING,
+							 $account
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => strlen($pwd) * 2
+							 TYPE_ONE_BYTE_INT,
+							 strlen($pwd) * 2
 					),
 					array(
-							'type' => TYPE_STRING,
-							'content' => $pwd
+							 TYPE_STRING,
+							 $pwd
 					),
 				);
 			break;
@@ -456,12 +456,12 @@ function logout($uid, $session_key){
 	4;
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 6, 16, $session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 6, 16, $session_key)
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $uid
+					 TYPE_FOUR_BYTE_INT,
+					 $uid
 			),
 	);
 	return form_pack($pkg);
@@ -476,20 +476,20 @@ function view_user($viewer, $viewee, $mode, $session_key, $post_pid=NULL){
 			1;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 0, 0, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 0, 0, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $viewer
+							 TYPE_FOUR_BYTE_INT,
+							 $viewer
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $viewee
+							 TYPE_FOUR_BYTE_INT,
+							 $viewee
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $mode
+							 TYPE_ONE_BYTE_INT,
+							 $mode
 					)
 			);
 			break;
@@ -501,24 +501,24 @@ function view_user($viewer, $viewee, $mode, $session_key, $post_pid=NULL){
 			8;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 0, 0, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 0, 0, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $viewer
+							 TYPE_FOUR_BYTE_INT,
+							 $viewer
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $viewee
+							 TYPE_FOUR_BYTE_INT,
+							 $viewee
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $mode
+							 TYPE_ONE_BYTE_INT,
+							 $mode
 					),
 					array(
-							'type' => TYPE_EIGHT_BYTE_INT,
-							'content' => $post_pid
+							 TYPE_EIGHT_BYTE_INT,
+							 $post_pid
 					)
 			);
 			break;
@@ -535,20 +535,20 @@ function view_event($viewer, $event_id, $mode, $session_key, $post_pid=NULL){
 			1;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 0, 1, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 0, 1, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $viewer
+							 TYPE_FOUR_BYTE_INT,
+							 $viewer
 					),
 					array(
-							'type' => TYPE_EIGHT_BYTE_INT,
-							'content' => $event_id
+							 TYPE_EIGHT_BYTE_INT,
+							 $event_id
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $mode
+							 TYPE_ONE_BYTE_INT,
+							 $mode
 					)
 			);
 			break;
@@ -560,24 +560,24 @@ function view_event($viewer, $event_id, $mode, $session_key, $post_pid=NULL){
 			8;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 0, 1, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 0, 1, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $viewer
+							 TYPE_FOUR_BYTE_INT,
+							 $viewer
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $event_id
+							 TYPE_FOUR_BYTE_INT,
+							 $event_id
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $mode
+							 TYPE_ONE_BYTE_INT,
+							 $mode
 					),
 					array(
-							'type' => TYPE_EIGHT_BYTE_INT,
-							'content' => $post_pid
+							 TYPE_EIGHT_BYTE_INT,
+							 $post_pid
 					)
 			);
 			break;
@@ -593,24 +593,24 @@ function view_posting($viewer, $post_uid, $post_eid, $post_pid, $session_key){
 	8;
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 0, 2, $session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 0, 2, $session_key)
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $viewer
+					 TYPE_FOUR_BYTE_INT,
+					 $viewer
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $post_uid
+					 TYPE_FOUR_BYTE_INT,
+					 $post_uid
 			),
 			array(
-					'type' => TYPE_EIGHT_BYTE_INT,
-					'content' => $post_eid
+					 TYPE_EIGHT_BYTE_INT,
+					 $post_eid
 			),
 			array(
-					'type' => TYPE_EIGHT_BYTE_INT,
-					'content' => $post_pid
+					 TYPE_EIGHT_BYTE_INT,
+					 $post_pid
 			),
 	);
 	return form_pack($pkg);
@@ -625,20 +625,20 @@ function mass_view_posting($viewer, $mode, $type, $session_key, $post_id=NULL){
 			1;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 0, 10, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 0, 10, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $viewer
+							 TYPE_FOUR_BYTE_INT,
+							 $viewer
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $mode
+							 TYPE_ONE_BYTE_INT,
+							 $mode
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $type
+							 TYPE_ONE_BYTE_INT,
+							 $type
 					)
 			);
 			break;
@@ -650,20 +650,20 @@ function mass_view_posting($viewer, $mode, $type, $session_key, $post_id=NULL){
 			8;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 0, 10, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 0, 10, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $viewer
+							 TYPE_FOUR_BYTE_INT,
+							 $viewer
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $mode
+							 TYPE_ONE_BYTE_INT,
+							 $mode
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $type
+							 TYPE_ONE_BYTE_INT,
+							 $type
 					),
 					
 			);
@@ -680,16 +680,16 @@ function retrieve_current_user_info($currentUserId, $mode, $session_key, $option
 			1;
 			$pkg = array(
 				array(
-						'type' => TYPE_HEADER,
-						'content' => build_header_for_package($length, 0, 11, $session_key)
+						 TYPE_HEADER,
+						 build_header_for_package($length, 0, 11, $session_key)
 				),
 				array(
-						'type' => TYPE_FOUR_BYTE_INT,
-						'content' => $currentUserId
+						 TYPE_FOUR_BYTE_INT,
+						 $currentUserId
 				),
 				array(
-						'type' => TYPE_ONE_BYTE_INT,
-						'content' => $mode
+						 TYPE_ONE_BYTE_INT,
+						 $mode
 				)
 		    );
 			break;
@@ -700,20 +700,20 @@ function retrieve_current_user_info($currentUserId, $mode, $session_key, $option
 				      8;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 0, 11, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 0, 11, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $currentUserId
+							 TYPE_FOUR_BYTE_INT,
+							 $currentUserId
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $mode
+							 TYPE_ONE_BYTE_INT,
+							 $mode
 					),
 					array(
-							'type' => TYPE_EIGHT_BYTE_INT,
-							'content' => 999999
+							 TYPE_EIGHT_BYTE_INT,
+							 999999
 					)
 			);
 			break;
@@ -724,20 +724,20 @@ function retrieve_current_user_info($currentUserId, $mode, $session_key, $option
 					  1;
 		    $pkg = array(
 		  		array(
-		  				'type' => TYPE_HEADER,
-		  				'content' => build_header_for_package($length, 0, 11, $session_key)
+		  				 TYPE_HEADER,
+		  				 build_header_for_package($length, 0, 11, $session_key)
 		  		),
 		  		array(
-		  				'type' => TYPE_FOUR_BYTE_INT,
-		  				'content' => $currentUserId
+		  				 TYPE_FOUR_BYTE_INT,
+		  				 $currentUserId
 		  		),
 		  		array(
-		  				'type' => TYPE_ONE_BYTE_INT,
-		  				'content' => $mode
+		  				 TYPE_ONE_BYTE_INT,
+		  				 $mode
 		  		),
 		        array(
-		    	    	'type' => TYPE_ONE_BYTE_INT,
-		    	    	'content' => $option
+		    	    	 TYPE_ONE_BYTE_INT,
+		    	    	 $option
 		        )
 		    );
 		        break;
@@ -761,40 +761,40 @@ function search($currentUserId, $search_type, $mode, $keys,
 						1;//gender
 					$pkg = array(
 							array(
-									'type' => TYPE_HEADER,
-									'content' => build_header_for_package($length, 1, 0, $session_key)
+									 TYPE_HEADER,
+									 build_header_for_package($length, 1, 0, $session_key)
 							),
 							array(
-									'type' => TYPE_FOUR_BYTE_INT,
-									'content' => $currentUserId
+									 TYPE_FOUR_BYTE_INT,
+									 $currentUserId
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => $mode
+									 TYPE_ONE_BYTE_INT,
+									 $mode
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => $option
+									 TYPE_ONE_BYTE_INT,
+									 $option
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => strlen($keys) * 2
+									 TYPE_ONE_BYTE_INT,
+									 strlen($keys) * 2
 							),
 							array(
-									'type' => TYPE_STRING,
-									'content' => $key
+									 TYPE_STRING,
+									 $key
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => $location
+									 TYPE_ONE_BYTE_INT,
+									 $location
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => $age
+									 TYPE_ONE_BYTE_INT,
+									 $age
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => $gender
+									 TYPE_ONE_BYTE_INT,
+									 $gender
 							),
 					);
 				break;
@@ -805,20 +805,20 @@ function search($currentUserId, $search_type, $mode, $keys,
 							  4;
 					$pkg = array(
 							array(
-									'type' => TYPE_HEADER,
-									'content' => build_header_for_package($length, 1, 0, $session_key)
+									 TYPE_HEADER,
+									 build_header_for_package($length, 1, 0, $session_key)
 							),
 							array(
-									'type' => TYPE_FOUR_BYTE_INT,
-									'content' => $currentUserId
+									 TYPE_FOUR_BYTE_INT,
+									 $currentUserId
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => $mode
+									 TYPE_ONE_BYTE_INT,
+									 $mode
 							),
 							array(
-									'type' => TYPE_FOUR_BYTE_INT,
-									'content' => $key
+									 TYPE_FOUR_BYTE_INT,
+									 $key
 							),
 					);
 				break;
@@ -829,24 +829,24 @@ function search($currentUserId, $search_type, $mode, $keys,
 					1+strlen($keys) * 2;//email
 					$pkg = array(
 							array(
-									'type' => TYPE_HEADER,
-									'content' => build_header_for_package($length, 1, 0, $session_key)
+									 TYPE_HEADER,
+									 build_header_for_package($length, 1, 0, $session_key)
 							),
 							array(
-									'type' => TYPE_FOUR_BYTE_INT,
-									'content' => $currentUserId
+									 TYPE_FOUR_BYTE_INT,
+									 $currentUserId
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => $mode
+									 TYPE_ONE_BYTE_INT,
+									 $mode
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => strlen($keys) * 2
+									 TYPE_ONE_BYTE_INT,
+									 strlen($keys) * 2
 							),
 							array(
-									'type' => TYPE_STRING,
-									'content' => $key
+									 TYPE_STRING,
+									 $key
 							),
 					);
 				break;
@@ -863,32 +863,32 @@ function search($currentUserId, $search_type, $mode, $keys,
 					1;//location
 					$pkg = array(
 							array(
-									'type' => TYPE_HEADER,
-									'content' => build_header_for_package($length, 1, 1, $session_key)
+									 TYPE_HEADER,
+									 build_header_for_package($length, 1, 1, $session_key)
 							),
 							array(
-									'type' => TYPE_FOUR_BYTE_INT,
-									'content' => $currentUserId
+									 TYPE_FOUR_BYTE_INT,
+									 $currentUserId
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => $mode
+									 TYPE_ONE_BYTE_INT,
+									 $mode
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => $option
+									 TYPE_ONE_BYTE_INT,
+									 $option
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => strlen($keys) * 2
+									 TYPE_ONE_BYTE_INT,
+									 strlen($keys) * 2
 							),
 							array(
-									'type' => TYPE_STRING,
-									'content' => $key
+									 TYPE_STRING,
+									 $key
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => $location
+									 TYPE_ONE_BYTE_INT,
+									 $location
 							),
 					);
 				break;
@@ -899,20 +899,20 @@ function search($currentUserId, $search_type, $mode, $keys,
 							    8;
 					$pkg = array(
 							array(
-									'type' => TYPE_HEADER,
-									'content' => build_header_for_package($length, 1, 1, $session_key)
+									 TYPE_HEADER,
+									 build_header_for_package($length, 1, 1, $session_key)
 							),
 							array(
-									'type' => TYPE_FOUR_BYTE_INT,
-									'content' => $currentUserId
+									 TYPE_FOUR_BYTE_INT,
+									 $currentUserId
 							),
 							array(
-									'type' => TYPE_ONE_BYTE_INT,
-									'content' => $mode
+									 TYPE_ONE_BYTE_INT,
+									 $mode
 							),
 							array(
-									'type' => TYPE_EIGHT_BYTE_INT,
-									'content' => $key
+									 TYPE_EIGHT_BYTE_INT,
+									 $key
 							),
 					);
 				break;
@@ -926,28 +926,28 @@ function search($currentUserId, $search_type, $mode, $keys,
 			1;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 1, 1, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 1, 1, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $currentUserId
+							 TYPE_FOUR_BYTE_INT,
+							 $currentUserId
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $mode
+							 TYPE_ONE_BYTE_INT,
+							 $mode
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => strlen($keys) * 2
+							 TYPE_ONE_BYTE_INT,
+							 strlen($keys) * 2
 					),
 					array(
-							'type' => TYPE_STRING,
-							'content' => $key
+							 TYPE_STRING,
+							 $key
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $location
+							 TYPE_ONE_BYTE_INT,
+							 $location
 					),
 			);
 		break;
@@ -959,24 +959,24 @@ function update_user($user, $updates, $session_key){
 	//count the content size
 	$length = HEADER_LENGTH +
 	4+
-	1+ $update_array['total_length'];
+	1+ $update_array[[0]];
 	//content array
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 3, 0, $session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 3, 0, $session_key)
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $user
+					 TYPE_FOUR_BYTE_INT,
+					 $user
 			),
 			array(
-			'type' => TYPE_ONE_BYTE_INT,
-			'content' => sizeof($updates)
+			 TYPE_ONE_BYTE_INT,
+			 sizeof($updates)
 			),
 			array(
-			'type' => TYPE_UPDATE,
-			'content' => $update_array['update_array']
+			 TYPE_UPDATE,
+			 $update_array[[1]]
 			),
 	);
 	return form_pack($pkg);
@@ -987,28 +987,28 @@ function update_event($user, $event_id, $updates, $session_key){
 	$length = HEADER_LENGTH +
 	4+
 	8+
-	1+ $update_array['total_length'];
+	1+ $update_array[[0]];
 	//content array
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 3, 0, $session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 3, 0, $session_key)
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $user
+					 TYPE_FOUR_BYTE_INT,
+					 $user
 			),
 			array(
-					'type' => TYPE_EIGHT_BYTE_INT,
-					'content' => $event_id
+					 TYPE_EIGHT_BYTE_INT,
+					 $event_id
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => sizeof($updates)
+					 TYPE_ONE_BYTE_INT,
+					 sizeof($updates)
 			),
 			array(
-					'type' => TYPE_UPDATE,
-					'content' => $update_array['update_array']
+					 TYPE_UPDATE,
+					 $update_array[[1]]
 			),
 	);
 	return form_pack($pkg);
@@ -1019,28 +1019,28 @@ function update_posting($user, $post_id, $updates, $session_key){
 	$length = HEADER_LENGTH +
 	4+
 	8+
-	1+ $update_array['total_length'];
+	1+ $update_array[[0]];
 	//content array
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 3, 0, $session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 3, 0, $session_key)
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $user
+					 TYPE_FOUR_BYTE_INT,
+					 $user
 			),
 			array(
-					'type' => TYPE_EIGHT_BYTE_INT,
-					'content' => $post_id
+					 TYPE_EIGHT_BYTE_INT,
+					 $post_id
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => sizeof($updates)
+					 TYPE_ONE_BYTE_INT,
+					 sizeof($updates)
 			),
 			array(
-					'type' => TYPE_UPDATE,
-					'content' => $update_array['update_array']
+					 TYPE_UPDATE,
+					 $update_array[[1]]
 			),
 	);
 	return form_pack($pkg);
@@ -1052,24 +1052,24 @@ function update_friend_commnet($uid, $friend_id, $comment, $session_key) {
 	1+strlen($comment) * 2;
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 3, 13, $session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 3, 13, $session_key)
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $uid
+					 TYPE_FOUR_BYTE_INT,
+					 $uid
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $friend_id
+					 TYPE_FOUR_BYTE_INT,
+					 $friend_id
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($comment) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($comment) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $comment
+					 TYPE_STRING,
+					 $comment
 			),
 	);
 	return form_pack($pkg);
@@ -1080,16 +1080,16 @@ function update_status($uid, $status, $session_key) {
 	1;
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 3, 14, $session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 3, 14, $session_key)
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $uid
+					 TYPE_FOUR_BYTE_INT,
+					 $uid
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => $status
+					 TYPE_ONE_BYTE_INT,
+					 $status
 			),
 	);
 	return form_pack($pkg);
@@ -1101,24 +1101,24 @@ function reply_posting($uid, $post_id, $content, $session_key) {
 	1+strlen($content) * 2;
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 4, 2, $session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 4, 2, $session_key)
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $uid
+					 TYPE_FOUR_BYTE_INT,
+					 $uid
 			),
 			array(
-					'type' => TYPE_EIGHT_BYTE_INT,
-					'content' => $post_id
+					 TYPE_EIGHT_BYTE_INT,
+					 $post_id
 			),
 			array(
-					'type' => TYPE_ONE_BYTE_INT,
-					'content' => strlen($content) * 2
+					 TYPE_ONE_BYTE_INT,
+					 strlen($content) * 2
 			),
 			array(
-					'type' => TYPE_STRING,
-					'content' => $content
+					 TYPE_STRING,
+					 $content
 			),
 	);
 	return form_pack($pkg);
@@ -1131,16 +1131,16 @@ function delete($mode, $uid, $target_id, $session_key){
 			4;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 5, $mode, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 5, $mode, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $uid
+							 TYPE_FOUR_BYTE_INT,
+							 $uid
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $target_id
+							 TYPE_FOUR_BYTE_INT,
+							 $target_id
 					),
 			);
 		break;
@@ -1150,16 +1150,16 @@ function delete($mode, $uid, $target_id, $session_key){
 			8;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 5, $mode, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 5, $mode, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $user
+							 TYPE_FOUR_BYTE_INT,
+							 $user
 					),
 					array(
-							'type' => TYPE_EIGHT_BYTE_INT,
-							'content' => $target_id
+							 TYPE_EIGHT_BYTE_INT,
+							 $target_id
 					),
 			);
 		break;
@@ -1172,16 +1172,16 @@ function quit($uid, $event_id, $session_key){
 	8;
 	$pkg = array(
 			array(
-					'type' => TYPE_HEADER,
-					'content' => build_header_for_package($length, 7, 1, $session_key)
+					 TYPE_HEADER,
+					 build_header_for_package($length, 7, 1, $session_key)
 			),
 			array(
-					'type' => TYPE_FOUR_BYTE_INT,
-					'content' => $uid
+					 TYPE_FOUR_BYTE_INT,
+					 $uid
 			),
 			array(
-					'type' => TYPE_EIGHT_BYTE_INT,
-					'content' => $event_id
+					 TYPE_EIGHT_BYTE_INT,
+					 $event_id
 			),
 	);
 	return form_pack($pkg);
@@ -1195,16 +1195,16 @@ function reply($mode, $uid, $status, $session_key,$seq_no=NULL){
 			1;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 15, 15, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 15, 15, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $uid
+							 TYPE_FOUR_BYTE_INT,
+							 $uid
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $status
+							 TYPE_ONE_BYTE_INT,
+							 $status
 					),
 			);
 		break;
@@ -1214,16 +1214,16 @@ function reply($mode, $uid, $status, $session_key,$seq_no=NULL){
 			1;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 15, 15, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 15, 15, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $uid
+							 TYPE_FOUR_BYTE_INT,
+							 $uid
 					),
 					array(
-							'type' => TYPE_ONE_BYTE_INT,
-							'content' => $status
+							 TYPE_ONE_BYTE_INT,
+							 $status
 					),
 			);
 			break;
@@ -1240,28 +1240,28 @@ function system_message($mode, $uid, $seq_no, $target_id, $content, $session_key
 			2+strlen($content) * 2;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 12, $mode, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 12, $mode, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $uid
+							 TYPE_FOUR_BYTE_INT,
+							 $uid
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $seq_no
+							 TYPE_FOUR_BYTE_INT,
+							 $seq_no
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $target_id
+							 TYPE_FOUR_BYTE_INT,
+							 $target_id
 					),
 					array(
-							'type' => TYPE_TWO_BYTE_INT,
-							'content' => strlen($content) * 2
+							 TYPE_TWO_BYTE_INT,
+							 strlen($content) * 2
 					),
 					array(
-							'type' => TYPE_STRING,
-							'content' => $content
+							 TYPE_STRING,
+							 $content
 					),
 			);
 			break;
@@ -1273,28 +1273,28 @@ function system_message($mode, $uid, $seq_no, $target_id, $content, $session_key
 			2+strlen($content) * 2;
 			$pkg = array(
 					array(
-							'type' => TYPE_HEADER,
-							'content' => build_header_for_package($length, 12, $mode, $session_key)
+							 TYPE_HEADER,
+							 build_header_for_package($length, 12, $mode, $session_key)
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $uid
+							 TYPE_FOUR_BYTE_INT,
+							 $uid
 					),
 					array(
-							'type' => TYPE_FOUR_BYTE_INT,
-							'content' => $seq_no
+							 TYPE_FOUR_BYTE_INT,
+							 $seq_no
 					),
 					array(
-							'type' => TYPE_EIGHT_BYTE_INT,
-							'content' => $target_id
+							 TYPE_EIGHT_BYTE_INT,
+							 $target_id
 					),
 					array(
-							'type' => TYPE_TWO_BYTE_INT,
-							'content' => strlen($content) * 2
+							 TYPE_TWO_BYTE_INT,
+							 strlen($content) * 2
 					),
 					array(
-							'type' => TYPE_STRING,
-							'content' => $content
+							 TYPE_STRING,
+							 $content
 					),
 			);
 			break;
