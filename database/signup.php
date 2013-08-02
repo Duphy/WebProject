@@ -38,15 +38,16 @@
 
 		// Need to convert birthday to an integer, e.g. 19911019
 		$birthday = (int)$_POST['birthday']; 
-
-		$request = create_new_user( $_POST['email_first'], $_POST['password_first'], $_POST['nick_name'], $birthday, $gender_code, $_POST['city']);
-
+ 		//original
+		//$request = create_new_user( $_POST['email_first'], $_POST['password_first'], $_POST['nick_name'], $birthday, $gender_code, $_POST['city']);
+		//test use 
+		$request = create_new_user( $_POST['email_first'], $_POST['password_first'], 
+				$_POST['nick_name'], $birthday, $gender_code, $_POST['city']);
 		// Server and socket is already running by the indluded header
 
 		$response = connect_to_server_and_send_message($request);
-
-		unpack_package($response);
 		
+		foreach(unpack($response) as $v) echo $v,"   ";
 	?>
 
 
