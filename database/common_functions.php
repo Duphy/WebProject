@@ -86,7 +86,8 @@ function convert_byte_to_int($byte_array){
 	for ($i = 0; $i < sizeof($byte_array); $i++){
 		$result_int += $byte_array[$i] * pow(256, sizeof($byte_array) - $i - 1);
 	}
-
+	echo "<br></br>";
+	echo $result_int;
 	return $result_int;
 }
 // Helper function of the above two

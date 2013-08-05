@@ -41,11 +41,11 @@
 
 
 		if ($succeeded == SUCCESSFUL){
-			$request = retrieve_current_user_info($uid, 4, $session_key);
-			$response = connect_to_server_and_send_message($request);
+		//	$request = retrieve_current_user_info($uid, 4, $session_key);
+		//	$response = connect_to_server_and_send_message($request);
 			
 			// User's information is contained in $retrived_response
-			$retrived_response = unpack_package($response);
+		//	$retrived_response = unpack_package($response);
 		}
 	?>
 

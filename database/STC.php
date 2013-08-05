@@ -6,6 +6,8 @@ require_once("common_functions.php");
 
 function unpack_pkg($raw_pkg){
 	$pack = convert_string_to_byte_array($raw_pkg);
+	echo "<br></br>";
+	echo "raw pack".$raw_pkg;
 	$header = extract_header($pack);
 	$package[0]=$header;
 	switch ($header[3]){
@@ -28,6 +30,7 @@ function unpack_pkg($raw_pkg){
 			$package[1] = unpack_delete($pack,$header[4]);
 		break;
 		case 6:
+			unpack_pkg($response);
 			$package[1] = unpack_validation($pack,$header[4]);
 		break;
 		case 7:
@@ -44,6 +47,8 @@ function unpack_pkg($raw_pkg){
 }
 function extract_header($pack){
 	$pointer = 0;
+	echo "<br></br>";
+	echo "extract header";
 	$length=readBytes($pack,$pointer,2);
 	//byte 0 - 11 are reserved headers
 	$session_key=readBytes($pack,$pointer,8);
@@ -58,6 +63,8 @@ function extract_header($pack){
 				convert_byte_to_int($pkg_type),
 				convert_byte_to_int($pkg_subtype),
 	);
+	echo "<br></br>";
+	print_r($header);
 	return $header;
 }
 
@@ -261,7 +268,6 @@ function unpack_delete($pack,$subtype){
 }
 function unpack_validation($pack,$subtype){
 	$pointer = HEADER_LENGTH;
-	echo "hello";
 	$pkg = array();
 	$pkg[0]=convert_byte_to_int(readBytes($pack,$pointer,1));
 	switch ($subtype){
