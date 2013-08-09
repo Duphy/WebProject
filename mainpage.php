@@ -8,7 +8,8 @@
 
 </head>
 <body>
-<?php include_once 'navigator.php';?>
+<?php //include_once 'navigator.php';?>
+
 <!-- header end -->
 <div id = "mainbody">
 	<div class = "post">

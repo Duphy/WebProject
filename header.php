@@ -1,9 +1,10 @@
 <?php 
-
 require_once('database/service.php');
 // if (session_status() != PHP_SESSION_ACTIVE){
 // 	// !isset($_SESSION['session_started']) ||	$_SESSION['session_started'] != TRUE 
-// 	session_start();
+    //session_save_path ("session");
+    //ini_set('session.gc_probability', 1);
+ 	session_start();
 // 	$_SESSION['session_started'] = TRUE;
 // 	echo '<br></br>Session Started!';
 // } else{

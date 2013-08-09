@@ -6,13 +6,26 @@
 </head>
 <body>
 <?php include_once 'navigator.php';?>
+<?php $request = retrieve_current_user_info($_SESSION['uid'], 4, $_SESSION['session_key']);
+		    $response = connect_to_server_and_send_message($request);
+			// User's information is contained in $retrived_response
+			$retrived_response = unpack_pkg($response);
+			//echo '<br>Recived pkg</br>'.$retrived_response[1][4];
+			//print_r($retrived_response[1]);
+			?>
+			
 <div id = "mainbody">
 	<div class ="basic">
 		<h2>Basic Information</h2>
 		<table>
 			<tr>
 				<td><p>Gender: </p></td>
-				<td><p>Male</p></td>
+				<td><p>
+				<?php if($retrived_response[1][4]==0)
+						echo "Male";
+					else
+						echo "Female";
+					?></p></td>
 			</tr>
 			<tr>
 				<td>Birthday: </td>
@@ -24,12 +37,8 @@
 		<h2>Places</h2>
 		<table>
 			<tr>
-				<td><p>Living: </p></td>
-				<td><p>Singapore</p></td>
-			</tr>
-			<tr>
-				<td><p>Hometown: </p></td>
-				<td><p>China</p></td>
+				<td><p>City: </p></td>
+				<td><p><?php echo $retrived_response[1][5];?></p></td>
 			</tr>
 		</table>
 	</div>

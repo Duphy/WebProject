@@ -9,7 +9,7 @@
 			<img src = "logo.jpg">
 		</div>
 		<div id ="login">
-			<a href="login.html">Login</a>
+			<a href="login.php">Login</a>
 		</div>
 	</div>
 
@@ -48,7 +48,6 @@
 		$response = connect_to_server_and_send_message($request);
 		
 		$results = unpack_pkg($response);
-		print_r($results);
 	?>
 
 

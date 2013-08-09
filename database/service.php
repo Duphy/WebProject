@@ -30,15 +30,13 @@ function connect_to_server_and_send_message( $msg ){
 	socket_connect($socket, $host, $port) or die("Could not connect to the socket");
 
 	// Write to socket:
-	echo '<br></br>';
-	echo 'Server Util is sending this package of length ' . strlen($msg) . ': ';
+	//echo '<br></br>';
+	//echo 'Server Util is sending this package of length ' . strlen($msg) . ': ';
 
 	$msg_array = str_split($msg);
-	foreach ($msg_array as $c)
-	{
+	/*foreach ($msg_array as $c)
 		echo ' ' . ord($c);
-	}
-
+*/
 	$result = socket_write($socket, $msg, strlen($msg)) or die("Could not write socket\n");
 
 	// start listening for connections
@@ -61,19 +59,19 @@ function connect_to_server_and_send_message( $msg ){
 
 	$length = convert_byte_string_to_int($length_string);
 
-	echo "<br></br>";
-	echo "Received length: " . $length;
+	//echo "<br></br>";
+	//echo "Received length: " . $length;
 
 	// read
 	$input = socket_read($socket, $length - NUM_OF_BYTES_IN_LENGTH) or die("Could not read content in input\n");
 
-	echo "<br></br>";
-	echo "Received content: ";
+	//echo "<br></br>";
+	//echo "Received content: ";
 
 	// Print out the content:
-	for ($i = 0; $i < $length - NUM_OF_BYTES_IN_LENGTH; $i++){
-		echo " " . ord(substr($input, $i, 1));
-	}
+	//for ($i = 0; $i < $length - NUM_OF_BYTES_IN_LENGTH; $i++)
+	//	echo " " . ord(substr($input, $i, 1));
+	//
 
 	socket_close($socket);
 

@@ -55,8 +55,8 @@ function convert_byte_string_to_string($byte_string){
 
     return $result_string;
 }
-function convert_byte_to_string($byte_array){
-
+function convert_byte_to_string($byte_string){
+	$byte_array = convert_byte_array_to_int_array($byte_string);
 	$result_string = '';
 
 	for ($i = 0; $i < sizeof($byte_array); $i++){
@@ -72,25 +72,38 @@ function convert_byte_string_to_int($byte_string){
     $byte_array = convert_byte_string_to_int_array($byte_string);
 
     $result_int = 0;
-    
     for ($i = 0; $i < sizeof($byte_array); $i++){
         $result_int += $byte_array[$i] * pow(256, sizeof($byte_array) - $i - 1); 
     }
 
     return $result_int;
 }
-function convert_byte_to_int($byte_array){
-
+function convert_byte_to_int($byte_string){
+	$byte_array = convert_byte_array_to_int_array($byte_string);
 	$result_int = 0;
 
 	for ($i = 0; $i < sizeof($byte_array); $i++){
-		$result_int += $byte_array[$i] * pow(256, sizeof($byte_array) - $i - 1);
+		//$result_int += $byte_array[$i] * pow(256, sizeof($byte_array) - $i - 1);
+		$result_int = $result_int*256+$byte_array[$i];
 	}
-	echo "<br></br>";
-	echo $result_int;
 	return $result_int;
 }
 // Helper function of the above two
+function convert_byte_array_to_int_array($byte_string){
+	$size = sizeof($byte_string);
+	if ($size == 0){
+		return array();
+	}
+
+	$byte_array = array();
+
+	for($i=0;$i<$size;$i++){
+		// ord: Return ASCII value of character
+		$byte_array[] = ord($byte_string[$i]);
+	}
+
+	return $byte_array;
+}
 function convert_byte_string_to_int_array($byte_string){
 
     if (strlen($byte_string) == 0){
@@ -156,11 +169,21 @@ function build_header_for_package($length, $type, $stype, $session_key = DUMB_SE
     
     // In the header, 8 bytes are for session key:
     $sKey = str_split($session_key);
+  
     for ($i = 0; $i < 8; $i++)
     {	
         $pkg[$counter + $i] = $sKey[$i];
     }
-
+    
+   // convert_and_append_int_to_byte_array($session_key, $pkg, $counter);
+  /* $k = $session_key;
+   if($session_key == DUMB_SESSION_KEY){
+   		$k = convert_int_to_byte_array(0,8);
+   }
+    for($i=0;$i<8;$i++){
+    	$pkg[]=$k[$i];
+    }
+    */
     $counter += 8;
 
     // In the header, 
@@ -187,17 +210,17 @@ function build_header_for_package($length, $type, $stype, $session_key = DUMB_SE
 function form_pack($param){
 	$result = array();
 	foreach ($param as $new){
-		echo '<br></br>New content: ' . print_r($new[1], true) . ' and current result length is: ' . sizeof($result);
+		//echo '<br></br>New content: ' . print_r($new[1], true) . ' and current result length is: ' . sizeof($result);
 		switch($new[0]){
 			case TYPE_HEADER:{
-				$result = array_merge((array)$result, (array)$new[1]);
-				echo '<br></br>After merge: <pre>' . print_r($result, true) . '</per>';
+				$result = merge_array((array)$result, (array)$new[1]);
+				//echo '<br></br>After merge: <pre>' . print_r($result, true) . '</per>';
 				break;
 			}
 			case TYPE_STRING:{
 				if ($new[1] != NULL){
-					echo '<br></br>TYPE_STRING, the size is: ' . sizeof(convert_string_to_byte_array($new[1]));
-					$result = array_merge($result, convert_string_to_byte_array($new[1]));
+					//echo '<br></br>TYPE_STRING, the size is: ' . sizeof(convert_string_to_byte_array($new[1]));
+					$result = merge_array($result, convert_string_to_byte_array($new[1]));
 				}
 				break;
 			}
@@ -206,32 +229,32 @@ function form_pack($param){
 				break;
 			}
 			case TYPE_TWO_BYTE_INT:{
-				$result = array_merge($result, convert_int_to_byte_array($new[1],2));
+				$result = merge_array($result, convert_int_to_byte_array($new[1],2));
 				break;
 			}
 			case TYPE_FOUR_BYTE_INT:{
-				$result = array_merge($result, convert_int_to_byte_array($new[1],4));
+				$result = merge_array($result, convert_int_to_byte_array($new[1],4));
 				break;
 			}
 			case TYPE_EIGHT_BYTE_INT:{
-				$result = array_merge($result, convert_int_to_byte_array($new[1],8));
+				$result = merge_array($result, convert_int_to_byte_array($new[1],8));
 				break;
 			}
 			case TYPE_TAG:{
 				if($new[1]!= NULL){
-				$result = array_merge($result, $new[1]);
+				$result = merge_array($result, $new[1]);
 				}
 				break;
 			}
 			case TYPE_UIDS:{
 				if($new[1]!= NULL){
-					$result = array_merge($result, $new[1]);
+					$result = merge_array($result, $new[1]);
 				}
 				break;
 			}
 			case TYPE_UPDATE:{
 				if($new[1]!= NULL){
-					$result = array_merge($result, $new[1]);
+					$result = merge_array($result, $new[1]);
 				}
 				break;
 			}
@@ -240,21 +263,25 @@ function form_pack($param){
 			}
 		}
 	}
-	return convert_byte_array_to_sting($result);
+	return convert_byte_array_to_string($result);
 }
 function convert_int_to_byte_array($source_int,$num_bytes){
 	$temp = 0;
 	$output_array = array();
-	echo 'asdf';
 	for ($i = $num_bytes-1; $i >= 0; $i--){
-		echo 'fdsa';
 		$temp = (int)($source_int % 256);
 		$source_int = (int)($source_int / 256);
 		$output_array[$i] = pack_to_unsigned_byte($temp);
 	}
 	return $output_array;
 }
-	
+function merge_array($result,$array){
+	//for($i=sizeof($array)-1;$i>=0;$i--){
+	for($i=0;$i<=sizeof($array)-1;$i++){
+	$result[] = $array[$i];
+	}
+	return $result;
+}
 function convert_string_to_byte_array($content){
 	$num_of_bytes = strlen($content) * 2;
 	if ($num_of_bytes == 0){
@@ -279,7 +306,7 @@ function convert_string_to_byte_array($content){
 	}
 	return $output_array;
 }
-function convert_byte_array_to_sting($pkg){
+function convert_byte_array_to_string($pkg){
 	$pkg_string = '';
 	foreach ($pkg as $c){
 		$pkg_string .= $c;
@@ -363,4 +390,10 @@ function build_updateArray($updates){
 			$results
 	);
 	return $output;
+}
+function print_byte_array($input,$length){
+	echo"<br></br>";
+	for ($i = 0; $i < $length; $i++){
+		echo " " . ord($input[$i]);
+	}
 }

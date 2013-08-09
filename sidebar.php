@@ -1,3 +1,9 @@
+<?php $request = retrieve_current_user_info($_SESSION['uid'], 0, $_SESSION['session_key']);
+		    $response = connect_to_server_and_send_message($request);
+			// User's information is contained in $retrived_response
+			$retrived_response = unpack_pkg($response);
+			$friend_list=$retrived_response[1];
+			$num_friends = sizeof($friend_list);?>
 <?php 
 echo '
 <script>
@@ -61,15 +67,22 @@ function controlSpan(param){
  	</div>
 	<div class = "friendlist">
 		<table>
-			<tr>
+			<tr>';
+				foreach ($friend_list as $friend){
+					$request = view_user($_SESSION['uid'],$friend, 4, $_SESSION['session_key']);
+					$response = connect_to_server_and_send_message($request);
+						// User's information is contained in $retrived_response
+					$retrived_response = unpack_pkg($response);
+					//print_r($retrived_response);
+					$friend_name = $retrived_response[1][1][2];
+				echo '
 				<td><img src = "1.jpg"></td>
-				<td><p>Alice</p></td>
+				<td><p>'.$friend_name.'</p></td>';
+			}
+			echo '
 			</tr>
-	
-	
 		</table>
 	
 	</div>
 </div>
-
 ';

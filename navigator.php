@@ -1,3 +1,8 @@
+<?php $request = retrieve_current_user_info($_SESSION['uid'], 4, $_SESSION['session_key']);
+		    $response = connect_to_server_and_send_message($request);
+			// User's information is contained in $retrived_response
+			$retrived_response = unpack_pkg($response);?>
+			
 <?php 
 echo '
 <div class = "header">
@@ -38,7 +43,7 @@ echo '
 			<a href="signup.php">Circa</a>
 		</div>
 		<div class = "headerTab" id = "user">
-			<a href="user_profile.php">Bob</a>
+			<a href="user_profile.php">';echo $retrived_response[1][2].'</a>
 		</div>
 		<div class = "links">
 			<div class = "headerTab" id = "naviActivity">
