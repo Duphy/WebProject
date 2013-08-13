@@ -21,7 +21,7 @@
 			<tr>
 				<td><p>Gender: </p></td>
 				<td><p>
-				<?php if($retrived_response[1][4]==0)
+				<?php if($retrived_response[1][8]==0)
 						echo "Male";
 					else
 						echo "Female";
@@ -38,12 +38,17 @@
 		<table>
 			<tr>
 				<td><p>City: </p></td>
-				<td><p><?php echo $retrived_response[1][5];?></p></td>
+				<td><p><?php echo $retrived_response[1][9];?></p></td>
+				<td><p>State: </p></td>
+				<td><p><?php echo $retrived_response[1][10];?></p></td>
+				<td><p>Country: </p></td>
+				<td><p><?php echo $retrived_response[1][11];?></p></td>
 			</tr>
 		</table>
 	</div>
 	<div class = "contact">
 		<h2>Contact Information</h2>
+		<a href = "setting_user_profile.php">setting</a>
 		<table>
 			<tr>
 				<td><p>Phone: </p></td>

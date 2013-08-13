@@ -3,27 +3,26 @@
 </head>
 <body>
 <?php include_once 'navigator.php';?>
-
+<?php $request = retrieve_current_user_info($_SESSION['uid'], 4, $_SESSION['session_key']);
+		    $response = connect_to_server_and_send_message($request);
+			// User's information is contained in $retrived_response
+			$retrived_response = unpack_pkg($response);
+			//echo '<br>Recived pkg</br>'.$retrived_response[1][4];
+			//print_r($retrived_response[1]);
+			?>
 	<div id = "form_area">
 
 		<h1>My Profile and Settings</h1>
 
-		<?php
-			require_once('database/serverUtil.php');
-			require_once('database/client_request.php');
-			$request = view_self();
-		?>
-
-		<form>
+		<form action = "database/backend_setting_user_profile.php" method = "post">
 			<fieldset>
 				<legend>Personalia</legend>
-
 				<label>Email</label>
 					<input type = "email" name = "email"><br>
 				<label>Nick Name</label>
-					<input type = "text" name = "nick_name"><br>
+					<input type = "text" name = "nickname"><br>
 				<label>Real Name</label>
-					<input type = "text" name = "real_name"><br>
+					<input type = "text" name = "name"><br>
 				<label>Birthday</label>
 					<input type = "text" name = "birthday"><br>
 				<label>Gender</label>
@@ -37,7 +36,7 @@
 				<label>City</label>
 					<input type = "text" name = "city"><br>
 				<label>State</label>
-					<input type = "text" name = "State"><br>
+					<input type = "text" name = "state"><br>
 				<label>Country</label>
 					<input type = "text" name = "country"><br>
 			</fieldset>

@@ -25,7 +25,7 @@
 
 		<h1>Sign Up</h1>
 
-		<form action = "database/signup.php" method = "post">
+		<form action = "database/backend_signup.php" method = "post">
 
 			<input type = "text" name = "nick_name" placeholder = "Nick Name" autofocus><br>
 			<input type = "email" name = "email_first" placeholder = "Your Email Address"><br>

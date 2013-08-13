@@ -400,8 +400,39 @@ function process_weighted_tags($pack,&$pointer, $num_length){
 	}
 	return $tags;
 }
+function process_honor($pack,$pointer){
+	$result = array();
+	$num_honor = convert_byte_to_int(readBytes($pack,$pointer,1));
+	for($i = 0; $i<$num_honor;$i++){
+		$result[]=convert_byte_to_int(readBytes($pack,$pointer,1));
+	}
+	return $result;
+}
+function process_user_simple_pack($pack,&$pointer){
+	$results = array();
+	$results[0] = convert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
+	$name_length = convert_byte_to_int(readBytes($pack,$pointer,1));
+	$results[1] = convert_byte_to_string(readBytes($pack,$pointer,$name_length));
+	$nickname_length = convert_byte_to_int(readBytes($pack,$pointer,1));
+	$results[2] = convert_byte_to_string(readBytes($pack,$pointer,$nickname_length));
+	$birthday = convert_byte_to_int(readBytes($pack,$pointer,4));
+	$results[3] = process_to_date($birthday);
+	$results[4]=process_tags($pack,$pointer,4);//tags
+	$results[5]=process_tags($pack,$pointer,4);//hidden tags
+	$results[6]=convert_byte_to_int($pack,$pointer,4);//rating
+	$results[7]=process_honor($pack,$pointer);
+	$results[8] = convert_byte_to_int(readBytes($pack,$pointer,1));//gender
+	$city_length = convert_byte_to_int(readBytes($pack,$pointer,1));
+	$results[9] = convert_byte_to_string(readBytes($pack,$pointer,$city_length));
+	$state_length = convert_byte_to_int(readBytes($pack,$pointer,1));
+	$results[10] = convert_byte_to_string(readBytes($pack,$pointer,$state_length));
+	$country_length = convert_byte_to_int(readBytes($pack,$pointer,1));
+	$results[11] = convert_byte_to_string(readBytes($pack,$pointer,$country_length));
+	//picture not done
+	return  $results;
+}
 function process_user_simple_other_pack($pack,&$pointer){
-	$results=array();
+	$results = array();
 	$results[0] = convert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
 	$nickname_length = convert_byte_to_int(readBytes($pack,$pointer,1));
 	$results[1] = convert_byte_to_string(readBytes($pack,$pointer,$nickname_length));
@@ -533,7 +564,7 @@ function process_viewself($pack, &$pointer){
 			$pkg=process_postsets($pack,$pointer);
 			break;
 		case 4:
-			$pkg=process_user_simple_other_pack($pack,$pointer);
+			$pkg=process_user_simple_pack($pack,$pointer);
 			break;
 		case 6:
 			$pkg=process_setting_pack($pack,$pointer);

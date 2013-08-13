@@ -959,7 +959,7 @@ function update_user($user, $updates, $session_key){
 	//count the content size
 	$length = HEADER_LENGTH +
 	4+
-	1+ $update_array[[0]];
+	1+ $update_array[0];
 	//content array
 	$pkg = array(
 			array(
@@ -976,7 +976,7 @@ function update_user($user, $updates, $session_key){
 			),
 			array(
 			 TYPE_UPDATE,
-			 $update_array[[1]]
+			 $update_array[1]
 			),
 	);
 	return form_pack($pkg);

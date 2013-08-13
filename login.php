@@ -11,7 +11,7 @@
 
 		<h1>Log In</h1>
 
-		<form action = "database/login.php" method = "post">
+		<form action = "database/backend_login.php" method = "post">
 
 			<input type = "text" name = "email" placeholder = "Email Address" autofocus><br>
 			<input type = "password" name = "password" placeholder = "Password"><a href = "">Forget Password</a><br>
