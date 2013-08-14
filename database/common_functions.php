@@ -322,8 +322,8 @@ function build_tagArray($tags){
 		foreach ($tags as $element){
 			$tag_length = strlen($element) *2;
 			$length += $tag_length;
-			$results[] = pack_to_unsigned_byte($tag_length);
-			$results[] = convert_string_to_byte_array($element);
+			$results = merge_array($results,pack_to_unsigned_byte($tag_length));
+			$results = merge_array($results,convert_string_to_byte_array($element));
 		}
 	}
 	$output = array(
@@ -339,7 +339,7 @@ function build_uidArray($uids){
 		foreach ($uids as $element){
 			$uid_length = 4;
 			$length += $uid_length;
-			$results[] = convert_int_to_byte_array($element, 4);
+			$results = merge_array($results,convert_int_to_byte_array($element, 4));
 		}
 	}
 	$output = array(
