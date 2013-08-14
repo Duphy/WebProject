@@ -26,10 +26,19 @@
 				array(6,$_POST['state']),
 				array(7,$_POST['country']),		
 		);	
+		$updates = array(
+				array(1,"Andy"),
+				array(2,"World"),
+				array(3,"19901111"),
+				array(4,"1"),
+				array(5,"Singapore"),
+				array(6,"Singapore"),
+				array(7,"Singapore"),
+		);
 		
 		$request = update_user( $_SESSION['uid'],$updates,$_SESSION['session_key']);
 		print_byte_array($request,sizeof($request));
-		//die() ;
+		die() ;
 		$response = connect_to_server_and_send_message($request);
 		//die() ;
 		$pkg = unpack_pkg($response);

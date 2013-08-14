@@ -960,6 +960,9 @@ function update_user($user, $updates, $session_key){
 	$length = HEADER_LENGTH +
 	4+
 	1+ $update_array[0];
+	
+	echo "Lenggg: " . $update_array[0];
+	
 	//content array
 	$pkg = array(
 			array(

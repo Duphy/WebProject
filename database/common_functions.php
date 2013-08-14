@@ -263,8 +263,8 @@ function form_pack($param){
 			}
 		}
 	}
-	return convert_byte_array_to_string($result);
-	//return $result;
+	//return convert_byte_array_to_string($result);
+	return $result;
 }
 function convert_int_to_byte_array($source_int,$num_bytes){
 	$temp = 0;
@@ -357,13 +357,18 @@ function build_uidArray($uids){
 function build_updateArray($updates){
 	$results=array();
 	$length=0;
-	$skip=0;
-	if(sizeof($updates)>0){
+	$num = sizeof($updates);
+	if($num>0){
 		foreach ($updates as $element){
+			$results [] =pack_to_unsigned_byte($element[0]);
+			$length++;
+			//echo "Element0 in the common functions: " .$element[0]."    ". "<br></br>";
+			
+				
 			switch ($element[0]){
 				case 0: case 1: case 2: case 5: case 6: case 7: case 8: case 9:
-					$content_length = 1+strlen($element[1]) * 2;
-					$length += $content_length+1;
+					$content_length = strlen($element[1]) * 2;
+					$length += 1 + $content_length;
 					$results = merge_array($results, pack_to_unsigned_byte($content_length));
 					$results = merge_array($results, convert_string_to_byte_array($element[1]));
 					break;
@@ -384,12 +389,14 @@ function build_updateArray($updates){
 					$results = merge_array($results,convert_int_to_byte_array($element[1],4));
 					break;
 			}
+			echo '<pre>' . print_r($results,true) . '</pre>';
+			print_byte_array($results,$length);
+			echo "Length in the common functions: " .$length."    ". "<br></br>";
+			
 		}
 	}
-	$output = array(
-			$length,
-			$results
-	);
+	echo '<pre>' . sizeof($results) . '</pre>';
+	$output=array($length,$results);
 	return $output;
 }
 function print_byte_array($input,$length){
