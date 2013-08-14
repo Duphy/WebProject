@@ -25,26 +25,21 @@
 				array(5,$_POST['city']),
 				array(6,$_POST['state']),
 				array(7,$_POST['country']),		
-		);
+		);	
 		
-	
-	
 		$request = update_user( $_SESSION['uid'],$updates,$_SESSION['session_key']);
-
+		print_byte_array($request,sizeof($request));
+		//die() ;
 		$response = connect_to_server_and_send_message($request);
+		//die() ;
 		$pkg = unpack_pkg($response);
 		
-		
+		echo "finish";
 		
 		$log_in_response = $pkg[1];
 		//echo '<br></br>';
 		//print_r($pkg);
-		$uid = $pkg[0][2];
-		$succeeded = $log_in_response[0];
-		$session_key = $log_in_response[1];
 		
-		$_SESSION['uid'] = $uid;
-		$_SESSION['session_key'] = $session_key;
 
 		//echo '<br></br>session_key: ' . $session_key;
 		

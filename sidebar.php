@@ -2,8 +2,7 @@
 		    $response = connect_to_server_and_send_message($request);
 			// User's information is contained in $retrived_response
 			$retrived_response = unpack_pkg($response);
-			$friend_list=$retrived_response[1];
-			$num_friends = sizeof($friend_list);?>
+			$friend_list=$retrived_response[1];?>
 <?php 
 echo '
 <script>
@@ -73,8 +72,9 @@ function controlSpan(param){
 					$response = connect_to_server_and_send_message($request);
 						// User's information is contained in $retrived_response
 					$retrived_response = unpack_pkg($response);
-					//print_r($retrived_response);
-					$friend_name = $retrived_response[1][1][2];
+					print_r($retrived_response);
+					$friend_name = $retrived_response[1][1][1];
+					echo $friend_name;
 				echo '
 				<td><img src = "1.jpg"></td>
 				<td><p>'.$friend_name.'</p></td>';

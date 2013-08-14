@@ -264,6 +264,7 @@ function form_pack($param){
 		}
 	}
 	return convert_byte_array_to_string($result);
+	//return $result;
 }
 function convert_int_to_byte_array($source_int,$num_bytes){
 	$temp = 0;
@@ -357,30 +358,30 @@ function build_updateArray($updates){
 	$results=array();
 	$length=0;
 	$skip=0;
-	if(sizeof($uids)>0){
+	if(sizeof($updates)>0){
 		foreach ($updates as $element){
 			switch ($element[0]){
 				case 0: case 1: case 2: case 5: case 6: case 7: case 8: case 9:
 					$content_length = 1+strlen($element[1]) * 2;
-					$length += $countent_length+1;
-					$results[] = pack_to_unsigned_byte($countent_length);
-					$results[] = convert_string_to_byte_array($element[1]);
+					$length += $content_length+1;
+					$results = merge_array($results, pack_to_unsigned_byte($content_length));
+					$results = merge_array($results, convert_string_to_byte_array($element[1]));
 					break;
 				case 3:
 					$length += 4;
-					$results[] = convert_int_to_byte_array($element[1],4);
+					$results = merge_array($results,convert_int_to_byte_array($element[1],4));
 					break;
 				case 4:
 					$length += 1;
-					$results[] = pack_to_unsigned_byte($element[1]);
+					$results = merge_array($results,pack_to_unsigned_byte($element[1]));
 					break;
 				case 10:
 					$length += 2;
-					$results[] = convert_int_to_byte_array($element[1],2);
+					$results = merge_array($results,convert_int_to_byte_array($element[1],2));
 					break;
 				case 11: case 12:
 					$length += 4;
-					$results[] = convert_int_to_byte_array($element[1],4);
+					$results = merge_array($results,convert_int_to_byte_array($element[1],4));
 					break;
 			}
 		}
