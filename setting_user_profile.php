@@ -26,11 +26,11 @@
 				<label>Birthday</label>
 					<input type = "text" name = "birthday"><br>
 				<label>Gender</label>
-					<input type = "radio" name = "gender" id = "female" value = "female" checked = "checked" />
+					<input type = "radio" name = "gender" id = "female" value = 1 checked = "checked" />
 					&nbsp;&nbsp;Female&nbsp;&nbsp;
-					<input type = "radio" name = "gender" id = "male" value = "male"/>
+					<input type = "radio" name = "gender" id = "male" value = 0/>
 					Male&nbsp;&nbsp;
-					<input type = "radio" name = "gender" id = "others" value = "others"/>
+					<input type = "radio" name = "gender" id = "others" value = 2/>
 					Others
 					<br>
 				<label>City</label>

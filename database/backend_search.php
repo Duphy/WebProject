@@ -1,8 +1,8 @@
-<?php //include_once 'header.php';?>
+<?php include_once 'header.php';?>
 <title>Search</title>
 </head>
 <body>
-	<?php //include_once 'navigator.php';?>
+	<?php include_once 'navigator.php';?>
 
 	<h3>Search</h3>
 
@@ -25,10 +25,43 @@
 			<br></br>
 			<input type="checkbox" name ="match_option" value = "name"/> &nbsp;&nbsp;Name&nbsp;&nbsp;
 			<input type="checkbox" name ="match_option" value = "tag"/> &nbsp;&nbsp;Tags&nbsp;&nbsp;
-	
 		</div>
 	</div>
+	
 	<h3>Search Results</h3>
+	<?php 
+	//search($currentUserId, $search_type, $mode, $keys,$session_key, $location=-1, $option = -1,  $age = -1, $gender=-1)
+	switch ($_POST("search_mode")){
+		case "id":
+			$mode = 1;
+			break;
+		case "filter":
+			$mode = 0;
+			break;
+		case "email":
+			$mode = 2;
+			break;
+	}
+	if ($_POST("match_option")=="name"){
+		$option = 1;
+	}
+	else if($_POST("match_option")=="tag"){
+		$option = 2;
+	}
+	else{
+		$option = 0;
+	}
+	
+	
+	$request = search();
+	
+	
+	
+	
+	?>
+
+
+
 
 	<div class="searchresults">
 

@@ -263,8 +263,8 @@ function form_pack($param){
 			}
 		}
 	}
-	//return convert_byte_array_to_string($result);
-	return $result;
+	return convert_byte_array_to_string($result);
+	//return $result;
 }
 function convert_int_to_byte_array($source_int,$num_bytes){
 	$temp = 0;
@@ -317,33 +317,28 @@ function convert_byte_array_to_string($pkg){
 
 function build_tagArray($tags){
 	$results=array();
-	$length=0;
 	if(sizeof($tags)>0){
 		foreach ($tags as $element){
 			$tag_length = strlen($element) *2;
-			$length += $tag_length;
 			$results = merge_array($results,pack_to_unsigned_byte($tag_length));
 			$results = merge_array($results,convert_string_to_byte_array($element));
 		}
 	}
 	$output = array(
-			$length,
+			sizeof($results),
 			$results
 	);
 	return $output;
 }
 function build_uidArray($uids){
 	$results=array();
-	$length=0;
 	if(sizeof($uids)>0){
 		foreach ($uids as $element){
-			$uid_length = 4;
-			$length += $uid_length;
 			$results = merge_array($results,convert_int_to_byte_array($element, 4));
 		}
 	}
 	$output = array(
-			$length,
+			sizeof($results),
 			$results
 	);
 	return $output;
@@ -356,47 +351,35 @@ function build_uidArray($uids){
 //			)
 function build_updateArray($updates){
 	$results=array();
-	$length=0;
 	$num = sizeof($updates);
 	if($num>0){
 		foreach ($updates as $element){
 			$results [] =pack_to_unsigned_byte($element[0]);
-			$length++;
 			//echo "Element0 in the common functions: " .$element[0]."    ". "<br></br>";
 			
 				
 			switch ($element[0]){
 				case 0: case 1: case 2: case 5: case 6: case 7: case 8: case 9:
 					$content_length = strlen($element[1]) * 2;
-					$length += 1 + $content_length;
 					$results = merge_array($results, pack_to_unsigned_byte($content_length));
 					$results = merge_array($results, convert_string_to_byte_array($element[1]));
 					break;
 				case 3:
-					$length += 4;
 					$results = merge_array($results,convert_int_to_byte_array($element[1],4));
 					break;
 				case 4:
-					$length += 1;
 					$results = merge_array($results,pack_to_unsigned_byte($element[1]));
 					break;
 				case 10:
-					$length += 2;
 					$results = merge_array($results,convert_int_to_byte_array($element[1],2));
 					break;
 				case 11: case 12:
-					$length += 4;
 					$results = merge_array($results,convert_int_to_byte_array($element[1],4));
 					break;
 			}
-			echo '<pre>' . print_r($results,true) . '</pre>';
-			print_byte_array($results,$length);
-			echo "Length in the common functions: " .$length."    ". "<br></br>";
-			
 		}
 	}
-	echo '<pre>' . sizeof($results) . '</pre>';
-	$output=array($length,$results);
+	$output=array(sizeof($results),$results);
 	return $output;
 }
 function print_byte_array($input,$length){
@@ -404,4 +387,48 @@ function print_byte_array($input,$length){
 	for ($i = 0; $i < $length; $i++){
 		echo " " . ord($input[$i]);
 	}
+}
+function print_array($input){
+	echo "<pre>".print_r($input,true)."</pre>";
+}
+function print_date($input){
+	switch ($input['month']){
+		case 1:
+			echo "Jan ";
+			break;
+		case 2:
+			echo "Feb ";
+			break;
+		case 3:
+			echo "Mar ";
+			break;
+		case 4:
+			echo "Apr ";
+			break;
+		case 5:
+			echo "May ";
+			break;
+		case 6:
+			echo "Jun ";
+			break;
+		case 7:
+			echo "Jul ";
+			break;
+		case 8:
+			echo "Aug ";
+			break;
+		case 9:
+			echo "Sep ";
+			break;
+		case 10:
+			echo "Oct ";
+			break;
+		case 11:
+			echo "Nov ";
+			break;
+		case 12:
+			echo "Dec ";
+			break;
+	}
+	echo $input['day'].", ".$input['year'];
 }

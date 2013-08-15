@@ -56,7 +56,6 @@ function connect_to_server_and_send_message( $msg ){
 	// PHP_NORMAL_READ in which reading stops at \n or \r (default in PHP <= 4.0.6)ext line of the PHP script.
 	//die("read here");
 	$length_string = socket_read($socket, NUM_OF_BYTES_IN_LENGTH) or die("Could not read length value in input\n");
-	die();
 	$length = convert_byte_string_to_int($length_string);
 
 	//echo "<br></br>";

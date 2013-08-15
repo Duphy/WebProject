@@ -57,7 +57,7 @@ function controlSpan(param){
 	<div class = "leftButton">
 	 <button onclick = "controlSpan(0);">left</button>
  	</div>
-	<div class = "setting">profile</div>
+	<div class = "setting"><a href = "setting_user_profile.php">profile settings</div>
 </div>
 
 <div class = "rightspan">

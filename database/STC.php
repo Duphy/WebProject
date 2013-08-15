@@ -14,34 +14,34 @@ function unpack_pkg($raw_pkg){
 	switch ($header[3]){
 		case 0:
 			$package[1] = unpack_view($pack,$header[4]);
-		break;
+			break;
 		case 1:
 			$package[1] = unpack_search($pack,$header[4]);
-		break;
+			break;
 		case 2:
 			$package[1] = unpack_create($pack,$header[4]);
-		break;
+			break;
 		case 3:
 			$package[1] = unpack_update($pack,$header[4]);
-		break;
+			break;
 		case 4:
 			$package[1] = unpack_reply($pack,$header[4]);
-		break;
+			break;
 		case 5:
 			$package[1] = unpack_delete($pack,$header[4]);
-		break;
+			break;
 		case 6:
 			$package[1] = unpack_validation($pack,$header[4]);
-		break;
+			break;
 		case 7:
 			$package[1] = unpack_quit($pack,$header[4]);
-		break;
+			break;
 		case 10:
 			$package[1] = unpack_suggestion($pack,$header[4]);
-		break;
+			break;
 		case 12:
 			$package[1] = unpack_system_message($pack,$header[4]);
-		break;
+			break;
 	}
 	return $package;
 }
@@ -57,11 +57,11 @@ function extract_header($pack){
 	$pkg_type = readBytes($pack,$pointer,1);
 	$pkg_subtype = readBytes($pack,$pointer,1);
 	$header=array(
-		        convert_byte_to_int($length),
-				convert_byte_to_string($session_key),
-				convert_byte_to_int($uid),
-				convert_byte_to_int($pkg_type),
-				convert_byte_to_int($pkg_subtype),
+			convert_byte_to_int($length),
+			convert_byte_to_string($session_key),
+			convert_byte_to_int($uid),
+			convert_byte_to_int($pkg_type),
+			convert_byte_to_int($pkg_subtype),
 	);
 	return $header;
 }
@@ -72,26 +72,26 @@ function unpack_view($pack,$subtype){
 	switch ($subtype){
 		case 0://view user
 			$viewee = convert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-			$pkg[0] = $viewee; 
+			$pkg[0] = $viewee;
 			$mode = convert_byte_to_int(readBytes($pack,$pointer,1));
 			switch ($mode){
 				case 0:
 					$pkg[1]=process_uidsets($pack,$pointer);
-				break;
+					break;
 				case 1:
-					$pkg[1]=process_eventsets($pack,$pointer);	
-				break;
+					$pkg[1]=process_eventsets($pack,$pointer);
+					break;
 				case 2:
 					$pkg[1]=process_postsets($pack,$pointer);
-				break;
+					break;
 				case 4:
 					$pkg[1]=process_user_simple_other_pack($pack,$pointer);
-				break;
+					break;
 				case 18:
 					$pkg[1]=process_circatag_pack($pack,$pointer);
-				break;
+					break;
 			}
-		break;
+			break;
 		case 1:
 			$eid = convert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
 			$pkg[0] = $eid;
@@ -99,36 +99,36 @@ function unpack_view($pack,$subtype){
 			switch ($mode){
 				case 0:
 					$pkg[1]=process_uidsets($pack,$pointer);
-				break;
+					break;
 				case 2:
 					$pkg[1]=process_postsets($pack,$pointer);
-				break;
+					break;
 				case 4:
 					$pkg[1]=process_event_simple_other_pack($pack,$pointer);
-				break;
+					break;
 				case 5:
 					$pkg[1]=process_uidsets($pack,$pointer);
-				break;
+					break;
 				case 6:
 					$pkg[1]=process_setting_pack($pack,$pointer);
-				break;
+					break;
 				case 4:
 					$pkg[1]=process_schedule_pack($pack,$pointer);
-				break;
+					break;
 				case 18:
 					$pkg[1]=process_circatag_pack($pack,$pointer);
-				break;
+					break;
 			}
-		break;
+			break;
 		case 2:
 			$pkg = process_posting_display_other_pack($pack,$pointer);
-		break;
+			break;
 		case 10:
 			$pkg = process_postsets($pack,$pointer);
-		break;
+			break;
 		case 11:
 			$pkg = process_viewself($pack, $pointer);
-		break;
+			break;
 	}
 	return $pkg;
 }
@@ -138,13 +138,13 @@ function unpack_search($pack,$subtype){
 	switch ($subtype){
 		case 0://view user
 			$pkg[0]=process_uidsets($pack,$pointer);
-		break;
+			break;
 		case 1:
 			$pkg[0]=process_eventsets($pack,$pointer);
-		break;
+			break;
 		case 2:
 			$pkg[0]=process_postsets($pack,$pointer);
-		break;
+			break;
 	}
 	return $pkg;
 }
@@ -157,22 +157,22 @@ function unpack_create($pack,$subtype){
 			switch ($pkg[0]){
 				case 0:
 					$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
-				break;
+					break;
 				case 1:
 					$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,1));
-				break;
+					break;
 			}
-		break;
+			break;
 		case 1:
 			switch ($pkg[0]){
 				case 0:
 					$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
-				break;
+					break;
 				case 1:
 					$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,1));
-				break;
-			}		
-		break;
+					break;
+			}
+			break;
 		case 2:
 			switch ($pkg[0]){
 				case 0:
@@ -181,19 +181,19 @@ function unpack_create($pack,$subtype){
 					$sets[1]=convert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
 					$sets[2]=convert_byte_to_int(readBytes($pack,$pointer,POSTID_LENGTH));
 					$pkg[1]=$sets;
-				break;
+					break;
 				case 1:
 					$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,1));
-				break;
-			}	
-		break;
+					break;
+			}
+			break;
 		case 3:
 			switch ($pkg[0]){
 				case 1:
 					$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,1));
-				break;
+					break;
 			}
-		break;
+			break;
 		case 17:
 			switch ($pkg[0]){
 				case 0:
@@ -202,12 +202,12 @@ function unpack_create($pack,$subtype){
 					$sets[1]=convert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
 					$sets[2]=convert_byte_to_int(readBytes($pack,$pointer,SID_LENGTH));
 					$pkg[1]=$sets;
-				break;
+					break;
 				case 1:
 					$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,1));
-				break;
+					break;
 			}
-		break;
+			break;
 	}
 	return $pkg;
 }
@@ -216,12 +216,12 @@ function unpack_update($pack,$subtype){
 	$pkg = array();
 	switch ($subtype){
 		case 0:
-			$pkg[0]=process_updates($pack,$pointer);
-		break;
+			$pkg=process_updates($pack,$pointer);
+			break;
 		case 1:
 			$pkg[0]=convert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
 			$pkg[1]=process_updates($pack,$pointer);
-		break;
+			break;
 	}
 	return $pkg;
 }
@@ -235,7 +235,7 @@ function unpack_reply($pack,$subtype){
 			$pkg[2]=convert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
 			$pkg[3]=convert_byte_to_int(readBytes($pack,$pointer,PID_LENGTH));
 			$pkg[4]=convert_byte_to_int(readBytes($pack,$pointer,1));
-		break;
+			break;
 	}
 	return $pkg;
 }
@@ -246,13 +246,13 @@ function unpack_delete($pack,$subtype){
 		case 0:
 			$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
 			$pkg[2]=convert_byte_to_int(readBytes($pack,$pointer,1));
-		break;
+			break;
 		case 2:
 			$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
 			$pkg[2]=convert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
 			$pkg[3]=convert_byte_to_int(readBytes($pack,$pointer,PID_LENGTH));
 			$pkg[4]=convert_byte_to_int(readBytes($pack,$pointer,1));
-		break;
+			break;
 		case 22:
 			$pkg[0]=convert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
 			//will update later
@@ -260,7 +260,7 @@ function unpack_delete($pack,$subtype){
 			$pkg[2]=convert_byte_to_int(readBytes($pack,$pointer,PID_LENGTH));
 			$pkg[3]=convert_byte_to_int(readBytes($pack,$pointer,RID_LENGTH));
 			$pkg[4]=convert_byte_to_int(readBytes($pack,$pointer,1));
-		break;
+			break;
 	}
 	return $pkg;
 }
@@ -273,29 +273,29 @@ function unpack_validation($pack,$subtype){
 			switch ($pkg[0]){
 				case 0:
 					$pkg[1]=convert_byte_to_string(readBytes($pack,$pointer,8));//session_key
-				break;
+					break;
 				case 1:
 					$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,1));
-				break;
+					break;
 			}
-		break;
+			break;
 		case 16:
 			switch ($pkg[0]){
 				case 0:
 					$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
-				break;
+					break;
 				case 1:
 					$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,1));
-				break;
+					break;
 			}
-		break;
+			break;
 		case 20: case 21:
 			switch ($pkg[0]){
 				case 1:
 					$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,1));
-				break;
+					break;
 			}
-		break;
+			break;
 	}
 	return $pkg;
 }
@@ -391,20 +391,24 @@ function process_tags($pack,&$pointer, $num_length){
 function process_weighted_tags($pack,&$pointer, $num_length){
 	$num_tags = convert_byte_to_int(readBytes($pack,$pointer,$num_length));
 	$tags = array();
-	for($i=0;$i<$num_tags;$i++){
-		$temp = array();
-		$tag_length = convert_byte_to_int(readBytes($pack,$pointer,1));
-		$temp[0]= convert_byte_to_string(readBytes($pack,$pointer,$tag_length));
-		$temp[1] = convert_byte_to_int(readBytes($pack,$pointer,8));
-		$tags[] = $temp; 
+	if($num_tags>0){
+		for($i=0;$i<$num_tags;$i++){
+			$temp = array();
+			$tag_length = convert_byte_to_int(readBytes($pack,$pointer,1));
+			$temp[0]= convert_byte_to_string(readBytes($pack,$pointer,$tag_length));
+			$temp[1] = convert_byte_to_int(readBytes($pack,$pointer,8));
+			$tags[] = $temp;
+		}
 	}
 	return $tags;
 }
-function process_honor($pack,$pointer){
+function process_honor($pack,&$pointer){
 	$result = array();
 	$num_honor = convert_byte_to_int(readBytes($pack,$pointer,1));
-	for($i = 0; $i<$num_honor;$i++){
-		$result[]=convert_byte_to_int(readBytes($pack,$pointer,1));
+	if($num_honor>0){
+		for($i = 0; $i<$num_honor;$i++){
+			$result[]=convert_byte_to_int(readBytes($pack,$pointer,1));
+		}
 	}
 	return $result;
 }
@@ -419,7 +423,7 @@ function process_user_simple_pack($pack,&$pointer){
 	$results[3] = process_to_date($birthday);
 	$results[4]=process_tags($pack,$pointer,4);//tags
 	$results[5]=process_tags($pack,$pointer,4);//hidden tags
-	$results[6]=convert_byte_to_int($pack,$pointer,4);//rating
+	$results[6]=convert_byte_to_int(readBytes($pack,$pointer,4));//rating
 	$results[7]=process_honor($pack,$pointer);
 	$results[8] = convert_byte_to_int(readBytes($pack,$pointer,1));//gender
 	$city_length = convert_byte_to_int(readBytes($pack,$pointer,1));
@@ -428,6 +432,7 @@ function process_user_simple_pack($pack,&$pointer){
 	$results[10] = convert_byte_to_string(readBytes($pack,$pointer,$state_length));
 	$country_length = convert_byte_to_int(readBytes($pack,$pointer,1));
 	$results[11] = convert_byte_to_string(readBytes($pack,$pointer,$country_length));
+
 	//picture not done
 	return  $results;
 }
@@ -537,16 +542,16 @@ function process_circatag_pack($pack,&$pointer){
 	return $pkg;
 }
 function process_to_date($ints){
-	$date['year'] = $ints / 10000;
+	$date['year'] = (int)($ints / 10000);
 	$ints %= 10000;
-	$date['month'] = $ints / 100;
+	$date['month'] = (int)($ints / 100);
 	$date['day'] = $ints % 100;
 	return $date;
 }
 function process_to_time($ints){
-	$time['hour'] = $ints / 10000;
+	$time['hour'] = (int)($ints / 10000);
 	$int %= 10000;
-	$time['minute'] = $ints / 100;
+	$time['minute'] = (int)($ints / 100);
 	$time['second'] = $ints % 100;
 	return $time;
 }
@@ -581,11 +586,11 @@ function process_viewself($pack, &$pointer){
 function process_updates($pack, &$pointer){
 	$num_length=1;
 	$num_tags = convert_byte_to_int(readBytes($pack,$pointer,$num_length));
-	$result = array();	
+	$result = array();
 	for($i=0;$i<$num_tags;$i++){
 		$tags = array();
-		$tags[0]= convert_byte_to_string(readBytes($pack,$pointer,1));
-		$tags[1] = convert_byte_to_int(readBytes($pack,$pointer,8));
+		$tags[0]= convert_byte_to_int(readBytes($pack,$pointer,1));
+		$tags[1] = convert_byte_to_int(readBytes($pack,$pointer,1));
 		$result[] = $tags;
 	}
 	return $result;

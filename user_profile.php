@@ -11,8 +11,7 @@
 			// User's information is contained in $retrived_response
 			$retrived_response = unpack_pkg($response);
 			//echo '<br>Recived pkg</br>'.$retrived_response[1][4];
-			//print_r($retrived_response[1]);
-			?>
+?>
 			
 <div id = "mainbody">
 	<div class ="basic">
@@ -29,7 +28,9 @@
 			</tr>
 			<tr>
 				<td>Birthday: </td>
-				<td><p>May 26, 1980</p></td>
+				<td><p><?php 
+				print_date($retrived_response[1][3]);
+				?>
 			</tr>
 		</table>
 	</div>
@@ -37,18 +38,21 @@
 		<h2>Places</h2>
 		<table>
 			<tr>
-				<td><p>City: </p></td>
+				<td><p>City:    </p></td>
 				<td><p><?php echo $retrived_response[1][9];?></p></td>
-				<td><p>State: </p></td>
+			</tr>
+			<tr>
+				<td><p>State:    </p></td>
 				<td><p><?php echo $retrived_response[1][10];?></p></td>
-				<td><p>Country: </p></td>
+			</tr>
+			<tr>
+				<td><p>Country:    </p></td>
 				<td><p><?php echo $retrived_response[1][11];?></p></td>
 			</tr>
 		</table>
 	</div>
 	<div class = "contact">
 		<h2>Contact Information</h2>
-		<a href = "setting_user_profile.php">setting</a>
 		<table>
 			<tr>
 				<td><p>Phone: </p></td>
