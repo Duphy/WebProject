@@ -76,6 +76,13 @@
 	if($flag)
 		echo "<br></br> You have successfully update your profiles. <br></br>";
 	
+	
+	
+	//$request = retrieve_current_user_info($_SESSION['uid'], 4, $_SESSION['session_key']);
+	//$response = connect_to_server_and_send_message($request);
+	// User's information is contained in $retrived_response
+	//$retrived_response = unpack_pkg($response);
+	//print_array($retrived_response);
 	?>
 
 

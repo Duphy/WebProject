@@ -1,8 +1,8 @@
-<?php include_once 'header.php';?>
+<?php// include_once 'header.php';?>
 <title>Search</title>
 </head>
 <body>
-	<?php include_once 'navigator.php';?>
+	<?php //include_once 'navigator.php';?>
 
 	<h3>Search</h3>
 
@@ -31,7 +31,8 @@
 	<h3>Search Results</h3>
 	<?php 
 	//search($currentUserId, $search_type, $mode, $keys,$session_key, $location=-1, $option = -1,  $age = -1, $gender=-1)
-	switch ($_POST("search_mode")){
+	$flag_all =false;
+	switch ($_POST["search_mode"]){
 		case "id":
 			$mode = 1;
 			break;
@@ -42,18 +43,38 @@
 			$mode = 2;
 			break;
 	}
-	if ($_POST("match_option")=="name"){
-		$option = 1;
-	}
-	else if($_POST("match_option")=="tag"){
-		$option = 2;
-	}
-	else{
+	if (isset($_POST["match_option_name"]) && isset($_POST["match_option_tag"])){
 		$option = 0;
 	}
-	
-	
-	$request = search();
+	else if(isset($_POST["match_option_name"])){
+		$option = 1;
+	}
+	else if(isset($_POST["match_option_tag"])){
+		$option = 2;
+	}
+	if (isset($_POST["match_option_name"]) && isset($_POST["match_option_tag"])){
+		$option = 0;
+	}
+	else if(isset($_POST["match_option_name"])){
+		$option = 1;
+	}
+	else if(isset($_POST["match_option_tag"])){
+		$option = 2;
+	}
+	$location = $_POST["location"];
+	if(isset($_POST["search_people"])){
+		$search_type = 0;
+		$request = search($_POST['uid'], $search_type, 
+					$mode, $_POST['search_content'],$_POST['session_key'], 
+					$locatio, $option,  $_POST['age_filter'], $gender);
+	}
+	if(isset($_POST["search_event"])){
+		$search_type = 1;
+	}
+	if(isset($_POST["search_post"])){
+		$search_type = 2;
+	}
+
 	
 	
 	

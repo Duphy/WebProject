@@ -57,7 +57,7 @@ function controlSpan(param){
 	<div class = "leftButton">
 	 <button onclick = "controlSpan(0);">left</button>
  	</div>
-	<div class = "setting"><a href = "setting_user_profile.php">profile settings</div>
+	<div class = "setting"><a href = "setting_user_profile.php">profile settings</a></div>
 </div>
 
 <div class = "rightspan">
@@ -72,9 +72,9 @@ function controlSpan(param){
 					$response = connect_to_server_and_send_message($request);
 						// User's information is contained in $retrived_response
 					$retrived_response = unpack_pkg($response);
-					print_r($retrived_response);
-					$friend_name = $retrived_response[1][1][1];
-					echo $friend_name;
+					//print_r($retrived_response);
+					$friend_name = $retrived_response[1][1][2];
+					//echo $friend_name;
 				echo '
 				<td><img src = "1.jpg"></td>
 				<td><p>'.$friend_name.'</p></td>';
