@@ -745,7 +745,7 @@ function retrieve_current_user_info($currentUserId, $mode, $session_key, $option
 	return form_pack($pkg);
 }
 function search($currentUserId, $search_type, $mode, $keys,
-		$session_key, $location=-1, $option = -1,  $age = -1, $gender=-1){
+		$session_key, $location=-1, $option = -1,  $age_lower_bound = -1, $age_upper_bound=-1,$gender=-1){
 	$pkg = array();
 	switch ($search_type){
 		case 0://search user
@@ -757,7 +757,7 @@ function search($currentUserId, $search_type, $mode, $keys,
 					1+//option
 					1+strlen($keys) * 2+//filter length
 					1+//location
-					1+//age
+					2+//age
 					1;//gender
 					$pkg = array(
 							array(
@@ -790,7 +790,11 @@ function search($currentUserId, $search_type, $mode, $keys,
 							),
 							array(
 									TYPE_ONE_BYTE_INT,
-									$age
+									$age_lower_bound
+							),
+							array(
+									TYPE_ONE_BYTE_INT,
+									$age_upper_bound
 							),
 							array(
 									TYPE_ONE_BYTE_INT,
@@ -818,7 +822,7 @@ function search($currentUserId, $search_type, $mode, $keys,
 							),
 							array(
 									TYPE_FOUR_BYTE_INT,
-									$key
+									$keys
 							),
 					);
 					break;
@@ -846,7 +850,7 @@ function search($currentUserId, $search_type, $mode, $keys,
 							),
 							array(
 									TYPE_STRING,
-									$key
+									$keys
 							),
 					);
 					break;
@@ -884,7 +888,7 @@ function search($currentUserId, $search_type, $mode, $keys,
 							),
 							array(
 									TYPE_STRING,
-									$key
+									$keys
 							),
 							array(
 									TYPE_ONE_BYTE_INT,
@@ -912,7 +916,7 @@ function search($currentUserId, $search_type, $mode, $keys,
 							),
 							array(
 									TYPE_EIGHT_BYTE_INT,
-									$key
+									$keys
 							),
 					);
 					break;

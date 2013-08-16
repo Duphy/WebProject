@@ -45,7 +45,10 @@
 	else if(isset($_POST["match_option_tag"]) || isset($_POST["match_option_post"])){
 		$option = 2;
 	}
-	if (isset($_POST["gender_male"]) && isset($_POST["gender_female"]) && isset($_POST["gender_other"])){
+	else 
+	$option =-1;
+	//if (isset($_POST["gender_male"]) && isset($_POST["gender_female"]) && isset($_POST["gender_other"])){
+	if (isset($_POST["gender_male"]) && isset($_POST["gender_female"])){
 		$gender = 2;
 	}
 	else if(isset($_POST["gender_male"])){
@@ -57,12 +60,13 @@
 	else if(isset($_POST["gender_other"])){
 		$gender = 3;
 	}
+
 	$location = $_POST["match_location"];
 	if(isset($_POST["search_people"])){
 		$search_type = 0;
 		$request = search($_SESSION['uid'], $search_type, 
 					$mode, $_POST['search_content'],$_SESSION['session_key'], 
-					$location, $option, $_POST['age_filter'], $gender);
+					$location, $option, $_POST['age_lower_bound'],$_POST['age_upper_bound'], $gender);
 	}
 	if(isset($_POST["search_event"])){
 		$search_type = 1;
@@ -79,7 +83,8 @@
 	print_request($request);
 	//die();
 	$response = connect_to_server_and_send_message($request);
-	//print_byte_array($response,sizeof($response));
+	print_byte_array($response,30);
+	//print_request($response);
 	$pkg = unpack_pkg($response);
 	print_array($pkg);
 	

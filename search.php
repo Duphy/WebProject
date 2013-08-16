@@ -28,10 +28,13 @@
 			<input type="checkbox" name ="match_option_user" value = "user"  /> &nbsp;&nbsp;User&nbsp;&nbsp;
 			<input type="checkbox" name ="match_option_event" value = "event" /> &nbsp;&nbsp;Event&nbsp;&nbsp;
 			<br></br>
-			<input type="text" name ="age_filter" value = 100000 placeholder = "dont seach below ages"/><br />
+			<p>From age:</p>
+			<input type="text" name ="age_lower_bound" /><br />
+			<p>To:</p>
+			<input type="text" name ="age_upper_bound" /><br />
 			<input type="checkbox" name ="gender_male" value = "male" checked/> &nbsp;&nbsp;Male&nbsp;&nbsp;
 			<input type="checkbox" name ="gender_female" value = "female" checked/> &nbsp;&nbsp;Female&nbsp;&nbsp;
-			<input type="checkbox" name ="gender_female" value = "other" checked/> &nbsp;&nbsp;Other&nbsp;&nbsp;
+			<input type="checkbox" name ="gender_other" value = "other" checked/> &nbsp;&nbsp;Other&nbsp;&nbsp;
 			<br></br>
 			<input type="radio" name ="match_location" value = 0 checked/> &nbsp;&nbsp;Local&nbsp;&nbsp;
 			<input type="radio" name ="match_location" value = 1 /> &nbsp;&nbsp;Global&nbsp;&nbsp;
