@@ -437,3 +437,11 @@ function print_date($input){
 	}
 	echo $input['day'].", ".$input['year'];
 }
+function print_request($request){
+	$pointer=0;
+	$length=convert_byte_to_int(readBytes($request,$pointer,4));
+	echo"<br></br>";
+	for ($i = $length-18; $i < $length; $i++){
+		echo " " . ord($request[$i]);
+	}
+}

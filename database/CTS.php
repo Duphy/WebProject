@@ -782,7 +782,7 @@ function search($currentUserId, $search_type, $mode, $keys,
 							),
 							array(
 									TYPE_STRING,
-									$key
+									$keys
 							),
 							array(
 									TYPE_ONE_BYTE_INT,

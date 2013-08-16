@@ -1,8 +1,8 @@
-<?php// include_once 'header.php';?>
+<?php include_once '../header.php';?>
 <title>Search</title>
 </head>
 <body>
-	<?php //include_once 'navigator.php';?>
+	<?php //include_once '../navigator.php';?>
 
 	<h3>Search</h3>
 
@@ -31,52 +31,57 @@
 	<h3>Search Results</h3>
 	<?php 
 	//search($currentUserId, $search_type, $mode, $keys,$session_key, $location=-1, $option = -1,  $age = -1, $gender=-1)
+	
 	$flag_all =false;
-	switch ($_POST["search_mode"]){
-		case "id":
-			$mode = 1;
-			break;
-		case "filter":
-			$mode = 0;
-			break;
-		case "email":
-			$mode = 2;
-			break;
-	}
-	if (isset($_POST["match_option_name"]) && isset($_POST["match_option_tag"])){
+    $mode = $_POST["search_mode"];
+    
+	if ((isset($_POST["match_option_name"]) && isset($_POST["match_option_tag"])) ||
+		(isset($_POST["match_option_user"]) && isset($_POST["match_option_post"]))){
 		$option = 0;
 	}
-	else if(isset($_POST["match_option_name"])){
+	else if(isset($_POST["match_option_name"]) || isset($_POST["match_option_user"])){
 		$option = 1;
 	}
-	else if(isset($_POST["match_option_tag"])){
+	else if(isset($_POST["match_option_tag"]) || isset($_POST["match_option_post"])){
 		$option = 2;
 	}
-	if (isset($_POST["match_option_name"]) && isset($_POST["match_option_tag"])){
-		$option = 0;
+	if (isset($_POST["gender_male"]) && isset($_POST["gender_female"]) && isset($_POST["gender_other"])){
+		$gender = 2;
 	}
-	else if(isset($_POST["match_option_name"])){
-		$option = 1;
+	else if(isset($_POST["gender_male"])){
+		$gender = 1;
 	}
-	else if(isset($_POST["match_option_tag"])){
-		$option = 2;
+	else if(isset($_POST["gender_female"])){
+		$gender = 0;
 	}
-	$location = $_POST["location"];
+	else if(isset($_POST["gender_other"])){
+		$gender = 3;
+	}
+	$location = $_POST["match_location"];
 	if(isset($_POST["search_people"])){
 		$search_type = 0;
-		$request = search($_POST['uid'], $search_type, 
-					$mode, $_POST['search_content'],$_POST['session_key'], 
-					$locatio, $option,  $_POST['age_filter'], $gender);
+		$request = search($_SESSION['uid'], $search_type, 
+					$mode, $_POST['search_content'],$_SESSION['session_key'], 
+					$location, $option, $_POST['age_filter'], $gender);
 	}
 	if(isset($_POST["search_event"])){
 		$search_type = 1;
+		$request = search($_SESSION['uid'], $search_type,
+				$mode, $_POST['search_content'],$_SESSION['session_key'],
+				$location);
 	}
 	if(isset($_POST["search_post"])){
 		$search_type = 2;
+		$request = search($_SESSION['uid'], $search_type,
+				$mode, $_POST['search_content'],$_SESSION['session_key'],
+				$location, $option);
 	}
-
-	
-	
+	print_request($request);
+	//die();
+	$response = connect_to_server_and_send_message($request);
+	//print_byte_array($response,sizeof($response));
+	$pkg = unpack_pkg($response);
+	print_array($pkg);
 	
 	
 	?>
@@ -102,7 +107,7 @@
 		</div>
 
 	</div>
-	<?php include_once 'sidebar.php';?>
+	<?php include_once '../sidebar.php';?>
 </body>
 
 <footer> </footer>

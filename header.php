@@ -17,7 +17,7 @@ echo '
 <html lang = "en">
 <head>
 
-	<meta charset="utf-16" />
+	<meta charset="utf-8" />
 	<link rel="stylesheet" href="css/style.css"/>
 
 	<!--[if lt IE 9]>

@@ -12,26 +12,31 @@
 				enctype="multipart/form-datd">
 				<input type="text" name="search_content" placeholder="search" /><br />
 				<input name="search_button" id="search_button" type="submit" />
-			</form>
-		</div>
+			
 		<div class="search_option">
-			<input type="checkbox" name="search_people" value= "people"/> &nbsp;&nbsp;People&nbsp;&nbsp;
-			<input type="checkbox" name="search_post" value= "post"/> &nbsp;&nbsp;Posts&nbsp;&nbsp;
-			<input type="checkbox" name="search_event" value= "event"/> &nbsp;&nbsp;Events&nbsp;&nbsp;
+			<input type="checkbox" name="search_people" value= "people" checked /> &nbsp;&nbsp;People&nbsp;&nbsp;
+			<input type="checkbox" name="search_post" value= "post" /> &nbsp;&nbsp;Posts&nbsp;&nbsp;
+			<input type="checkbox" name="search_event" value= "event" /> &nbsp;&nbsp;Events&nbsp;&nbsp;
 			<br></br>
-			<input type="radio" name ="search_mode" value = "filter " checked/> &nbsp;&nbsp;By Keywords&nbsp;&nbsp;
-			<input type="radio" name ="search_mode" value = "id" > &nbsp;&nbsp;By id&nbsp;&nbsp;
-			<input type="radio" name ="search_mode" value = "email"/> &nbsp;&nbsp;By email&nbsp;&nbsp;
+			<input type="radio" name ="search_mode" value = 0 checked/> &nbsp;&nbsp;By Keywords&nbsp;&nbsp;
+			<input type="radio" name ="search_mode" value = 1 /> &nbsp;&nbsp;By id&nbsp;&nbsp;
+			<input type="radio" name ="search_mode" value = 2/> &nbsp;&nbsp;By email&nbsp;&nbsp;
 			<br></br>
-			<input type="checkbox" name ="match_option_name" value = "name"/> &nbsp;&nbsp;Name&nbsp;&nbsp;
-			<input type="checkbox" name ="match_option_tag" value = "tag"/> &nbsp;&nbsp;Tags&nbsp;&nbsp;
+			<input type="checkbox" name ="match_option_name" value = "name" checked /> &nbsp;&nbsp;Name&nbsp;&nbsp;
+			<input type="checkbox" name ="match_option_tag" value = "tag" checked /> &nbsp;&nbsp;Tags&nbsp;&nbsp;
 			<br></br>
-			<input type="text" name ="age_filter" placeholder = "dont seach below ages"/><br />
+			<input type="checkbox" name ="match_option_user" value = "user"  /> &nbsp;&nbsp;User&nbsp;&nbsp;
+			<input type="checkbox" name ="match_option_event" value = "event" /> &nbsp;&nbsp;Event&nbsp;&nbsp;
+			<br></br>
+			<input type="text" name ="age_filter" value = 100000 placeholder = "dont seach below ages"/><br />
 			<input type="checkbox" name ="gender_male" value = "male" checked/> &nbsp;&nbsp;Male&nbsp;&nbsp;
 			<input type="checkbox" name ="gender_female" value = "female" checked/> &nbsp;&nbsp;Female&nbsp;&nbsp;
+			<input type="checkbox" name ="gender_female" value = "other" checked/> &nbsp;&nbsp;Other&nbsp;&nbsp;
 			<br></br>
-			<input type="radio" name ="match_location" value = "local" checked/> &nbsp;&nbsp;Local&nbsp;&nbsp;
-			<input type="radio" name ="match_location" value = "global"/> &nbsp;&nbsp;Global&nbsp;&nbsp;
+			<input type="radio" name ="match_location" value = 0 checked/> &nbsp;&nbsp;Local&nbsp;&nbsp;
+			<input type="radio" name ="match_location" value = 1 /> &nbsp;&nbsp;Global&nbsp;&nbsp;
+		</div>
+		</form>
 		</div>
 	</div>
 	
