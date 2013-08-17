@@ -8,26 +8,43 @@
 
 	<div class="search_field">
 		<div class="search_bar">
-			<form action="database/backend_search.php" method="post"
+					<form action="backend_search.php" method="post"
 				enctype="multipart/form-datd">
-				<input type="text" name="default_search" placeholder="search" /><br />
+				<input type="text" name="search_content" placeholder="search" /><br />
 				<input name="search_button" id="search_button" type="submit" />
-			</form>
-		</div>
+			
 		<div class="search_option">
-			<input type="checkbox" name="search_content" value= "people"/> &nbsp;&nbsp;People&nbsp;&nbsp;
-			<input type="checkbox" name="search_content" value= "post"/> &nbsp;&nbsp;Posts&nbsp;&nbsp;
-			<input type="checkbox" name="search_content" value= "event"/> &nbsp;&nbsp;Events&nbsp;&nbsp;
+			<input type="checkbox" name="search_people" value= "people" checked /> &nbsp;&nbsp;People&nbsp;&nbsp;
+			<input type="checkbox" name="search_post" value= "post" /> &nbsp;&nbsp;Posts&nbsp;&nbsp;
+			<input type="checkbox" name="search_event" value= "event" /> &nbsp;&nbsp;Events&nbsp;&nbsp;
 			<br></br>
-			<input type="radio" name ="search_mode" value = "id"> &nbsp;&nbsp;By id&nbsp;&nbsp;
-			<input type="radio" name ="search_mode" value = "filter"/> &nbsp;&nbsp;By Keywords&nbsp;&nbsp;
-			<input type="radio" name ="search_mode" value = "email"/> &nbsp;&nbsp;By email&nbsp;&nbsp;
+			<input type="radio" name ="search_mode" value = 0 checked/> &nbsp;&nbsp;By Keywords&nbsp;&nbsp;
+			<input type="radio" name ="search_mode" value = 1 /> &nbsp;&nbsp;By id&nbsp;&nbsp;
+			<input type="radio" name ="search_mode" value = 2/> &nbsp;&nbsp;By email&nbsp;&nbsp;
+			<p>For User and Event</p>
 			<br></br>
-			<input type="checkbox" name ="match_option" value = "name"/> &nbsp;&nbsp;Name&nbsp;&nbsp;
-			<input type="checkbox" name ="match_option" value = "tag"/> &nbsp;&nbsp;Tags&nbsp;&nbsp;
+			<input type="checkbox" name ="match_option_name" value = "name" checked /> &nbsp;&nbsp;Name&nbsp;&nbsp;
+			<input type="checkbox" name ="match_option_tag" value = "tag" checked /> &nbsp;&nbsp;Tags&nbsp;&nbsp;
+			<p>For User and Event</p>
+			<br></br>
+			<input type="checkbox" name ="match_option_user" value = "user"  /> &nbsp;&nbsp;User&nbsp;&nbsp;
+			<input type="checkbox" name ="match_option_event" value = "event" /> &nbsp;&nbsp;Event&nbsp;&nbsp;
+			<p>For Posting</p>
+			<br></br>
+			<p>From age:</p>
+			<input type="text" name ="age_lower_bound" /><br />
+			<p>To:</p>
+			<input type="text" name ="age_upper_bound" /><br />
+			<input type="checkbox" name ="gender_male" value = "male" checked/> &nbsp;&nbsp;Male&nbsp;&nbsp;
+			<input type="checkbox" name ="gender_female" value = "female" checked/> &nbsp;&nbsp;Female&nbsp;&nbsp;
+			<input type="checkbox" name ="gender_other" value = "other" checked/> &nbsp;&nbsp;Other&nbsp;&nbsp;
+			<br></br>
+			<input type="radio" name ="match_location" value = 0 checked/> &nbsp;&nbsp;Local&nbsp;&nbsp;
+			<input type="radio" name ="match_location" value = 1 /> &nbsp;&nbsp;Global&nbsp;&nbsp;
 		</div>
+		</form>
 	</div>
-	
+	</div>
 	<h3>Search Results</h3>
 	<?php 
 	//search($currentUserId, $search_type, $mode, $keys,$session_key, $location=-1, $option = -1,  $age = -1, $gender=-1)
@@ -72,18 +89,18 @@
 		$search_type = 1;
 		$request = search($_SESSION['uid'], $search_type,
 				$mode, $_POST['search_content'],$_SESSION['session_key'],
-				$location);
+				$location,$option);
 	}
 	if(isset($_POST["search_post"])){
 		$search_type = 2;
 		$request = search($_SESSION['uid'], $search_type,
 				$mode, $_POST['search_content'],$_SESSION['session_key'],
-				$location, $option);
+				$location,$option);
 	}
-	print_request($request);
+	//print_request($request);
 	//die();
 	$response = connect_to_server_and_send_message($request);
-	print_byte_array($response,30);
+	//print_byte_array($response,25);
 	//print_request($response);
 	$pkg = unpack_pkg($response);
 	print_array($pkg);

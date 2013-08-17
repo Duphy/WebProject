@@ -21,12 +21,15 @@
 			<input type="radio" name ="search_mode" value = 0 checked/> &nbsp;&nbsp;By Keywords&nbsp;&nbsp;
 			<input type="radio" name ="search_mode" value = 1 /> &nbsp;&nbsp;By id&nbsp;&nbsp;
 			<input type="radio" name ="search_mode" value = 2/> &nbsp;&nbsp;By email&nbsp;&nbsp;
+			<p>For User and Event</p>
 			<br></br>
 			<input type="checkbox" name ="match_option_name" value = "name" checked /> &nbsp;&nbsp;Name&nbsp;&nbsp;
 			<input type="checkbox" name ="match_option_tag" value = "tag" checked /> &nbsp;&nbsp;Tags&nbsp;&nbsp;
+			<p>For User and Event</p>
 			<br></br>
 			<input type="checkbox" name ="match_option_user" value = "user"  /> &nbsp;&nbsp;User&nbsp;&nbsp;
 			<input type="checkbox" name ="match_option_event" value = "event" /> &nbsp;&nbsp;Event&nbsp;&nbsp;
+			<p>For Posting</p>
 			<br></br>
 			<p>From age:</p>
 			<input type="text" name ="age_lower_bound" /><br />

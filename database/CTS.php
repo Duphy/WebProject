@@ -927,11 +927,12 @@ function search($currentUserId, $search_type, $mode, $keys,
 			4+
 			1+
 			1+strlen($keys) * 2+//filter
+			1+
 			1;
 			$pkg = array(
 					array(
 							TYPE_HEADER,
-							build_header_for_package($length, 1, 1, $session_key)
+							build_header_for_package($length, 1, 2, $session_key)
 					),
 					array(
 							TYPE_FOUR_BYTE_INT,
@@ -939,7 +940,7 @@ function search($currentUserId, $search_type, $mode, $keys,
 					),
 					array(
 							TYPE_ONE_BYTE_INT,
-							$mode
+							0
 					),
 					array(
 							TYPE_ONE_BYTE_INT,
@@ -947,11 +948,15 @@ function search($currentUserId, $search_type, $mode, $keys,
 					),
 					array(
 							TYPE_STRING,
-							$key
+							$keys
 					),
 					array(
 							TYPE_ONE_BYTE_INT,
 							$location
+					),
+					array(
+							TYPE_ONE_BYTE_INT,
+							$option
 					),
 			);
 			break;
