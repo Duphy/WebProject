@@ -32,6 +32,12 @@
 				print_date($retrived_response[1][3]);
 				?>
 			</tr>
+			<tr>
+				<td>UID: </td>
+				<td><p><?php 
+				print_date($retrived_response[1][3]);
+				?>
+			</tr>
 		</table>
 	</div>
 	<div class = "place">

@@ -538,7 +538,7 @@ function process_posting_display_other_pack($pack,&$pointer){
 function process_circatag_pack($pack,&$pointer){
 	$pkg=array();
 	$pkg[0]=convert_byte_to_int(readBytes($pack,$pointer,1));
-	$pkg[1] = process_weighted_tags($pack,$pointer);
+	$pkg[1] = process_tags($pack,$pointer,1);
 	return $pkg;
 }
 function process_to_date($ints){

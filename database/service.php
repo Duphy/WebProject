@@ -17,7 +17,7 @@ function connect_to_server_and_send_message( $msg ){
 
 	// If this is a server, it's also a good idea to use the set_time_limit() function
 	// to ensure that PHP doesn't time out and die() while waiting for incoming client connections.
-	set_time_limit(100);
+	set_time_limit(20);
 
 	// create socket
 	$socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\n");

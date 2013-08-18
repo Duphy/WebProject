@@ -452,7 +452,7 @@ function connect_view_user($viewee, $view_option){
 	// User's information is contained in $retrived_response
 	return unpack_pkg($response);
 }
-function connect_view_user_post_pic($viewee, $view_option,$view_content1, $view_content2){
+function connect_view_user_post_pic($viewee, $view_option,$view_content1, $view_content2=NULL){
 	//for case 2, 23,24 view posting and pic_large,pic_small
 	$request = view_user($_SESSION['uid'],$viewee, $view_option, $_SESSION['session_key'],$view_content1, $view_content2);
 	$response = connect_to_server_and_send_message($request);
