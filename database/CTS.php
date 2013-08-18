@@ -466,7 +466,7 @@ function logout($uid, $session_key){
 	);
 	return form_pack($pkg);
 }
-function view_user($viewer, $viewee, $mode, $session_key, $post_pid=NULL){
+function view_user($viewer, $viewee, $mode, $session_key, $pid_localdate=NULL, $localtime =NULL){
 	$pkg = array();
 	switch ($mode){
 		case 0: case 1: case 4: case 18:
@@ -518,10 +518,43 @@ function view_user($viewer, $viewee, $mode, $session_key, $post_pid=NULL){
 					),
 					array(
 							TYPE_EIGHT_BYTE_INT,
-							$post_pid
+							$pid_localdate
 					)
 			);
 			break;
+			case 23: case 24:
+				$length = HEADER_LENGTH +
+				4+
+				4+
+				1+
+				8;
+				$pkg = array(
+						array(
+								TYPE_HEADER,
+								build_header_for_package($length, 0, 0, $session_key)
+						),
+						array(
+								TYPE_FOUR_BYTE_INT,
+								$viewer
+						),
+						array(
+								TYPE_FOUR_BYTE_INT,
+								$viewee
+						),
+						array(
+								TYPE_ONE_BYTE_INT,
+								$mode
+						),
+						array(
+								TYPE_FOUR_BYTE_INT,
+								$pid_localdate
+						),
+						array(
+								TYPE_FOUR_BYTE_INT,
+								$localtime
+						)
+				);
+				break;
 	}
 	return form_pack($pkg);
 }

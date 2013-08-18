@@ -13,10 +13,7 @@
 $str = $_SERVER["QUERY_STRING"];
 
 parse_str($str);
-$request = view_user($_SESSION['uid'],$uid, 4, $_SESSION['session_key']);
-					$response = connect_to_server_and_send_message($request);
-						// User's information is contained in $retrived_response
-					$user_info = unpack_pkg($response);
+		$user_info = connect_view_user($uid,4);
 $request = view_user($_SESSION['uid'],$uid, 4, $_SESSION['session_key']);
 					$response = connect_to_server_and_send_message($request);
 					// User's information is contained in $retrived_response
