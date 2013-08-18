@@ -445,10 +445,10 @@ function print_request($request){
 		echo " " . ord($request[$i]);
 	}
 }
-function connect_view_user($viewee, $view_option){
+function connect_view_user($viewee, $view_option, $socket = NULL){
 	//for case 0,1,4,18
 	$request = view_user($_SESSION['uid'],$viewee, $view_option, $_SESSION['session_key']);
-	$response = connect_to_server_and_send_message($request);
+	$response = connect_to_server_and_send_message($request, $socket);
 	// User's information is contained in $retrived_response
 	return unpack_pkg($response);
 }

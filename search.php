@@ -104,20 +104,29 @@
 			}
 			//print_request($request);
 			//die();
-			$response = connect_to_server_and_send_message($request);
+			$socket = connect_to_server_and_return_socket();
+
+			$response = connect_to_server_and_send_message($request, $socket);
+
 			//print_byte_array($response,25);
 			//print_request($response);
 			$pkg = unpack_pkg($response);
-			//print_array($pkg);
-			echo "
-			<div class = 'search_results>
-				<table>";
 
-						foreach ($friend_id_list as $pkg[1][0]){
-							$request = view_user($_SESSION['uid'],$friend, 4, $_SESSION['session_key']);
-							$response = connect_to_server_and_send_message($request);
-								// User's information is contained in $retrived_response
-							$retrived_response = unpack_pkg($response)
+			//print_array($pkg);
+			echo '
+			<div class = "search_results">
+				<table>';
+
+						$i = 0;
+
+						foreach ($pkg[1][0] as $friend_id){
+							
+							$time_pre = microtime(true);
+							
+							if ($i++ >= 5)
+								break;
+							
+							$retrived_response = connect_view_user($friend_id, 4, $socket);
 							$friend_info = $retrived_response[1][1];
 							//print_r($retrived_response);
 
@@ -130,14 +139,22 @@
 							$tag_set = $friend_info[6];
 							$common_friend_set = $friend_info[7];
 
+
 							echo '
-							<tr><a href = "user_page.php?uid='.$id.'"></p></td>';
+							<tr><a href = "user_page.php?uid='.$friend_id.'"><p>' . $friend_id . '</p></tr>';
+
+							$time_post = microtime(true);
+							$exec_time = $time_post - $time_pre;
+							echo '<br></br>' . 'Time: ' . $exec_time;
+							
 					}
 					echo '
 
 				</table>
 			
-			</div>";
+			</div>';
+
+			socket_close($socket);
 				
 		}
 	?>

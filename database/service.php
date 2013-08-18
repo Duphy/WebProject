@@ -4,31 +4,24 @@ require_once("constants.php");
 require_once("CTS.php");
 require_once("common_functions.php");
 require_once("STC.php");
-function connect_to_server_and_send_message( $msg ){
+function connect_to_server_and_send_message($msg, $socket = NULL){
 
-	/* Turn on implicit output flushing so we see what we're getting
-	 * as it comes in.
-	*/
-	ob_implicit_flush(TRUE);
+	$should_close_socket = TRUE;
 
-	// set some variables
-	$host = "25.40.107.250";
-	$port = 1992;
-
-	// If this is a server, it's also a good idea to use the set_time_limit() function
-	// to ensure that PHP doesn't time out and die() while waiting for incoming client connections.
-	set_time_limit(100);
-
-	// create socket
-	$socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\n");
-
-	// bind socket to the specified address and port
-	// Only useful if this is the server
-	// $result = socket_bind($socket, $host, $port) or die("Could not bind to socket\n");
-
-	// Only need to connect:
-	socket_connect($socket, $host, $port) or die("Could not connect to the socket");
-
+	if ($socket == NULL){
+		// Socket is not passed in, meaning that it's used once only. 
+		// So we create one, and close it after use
+		$socket = connect_to_server_and_return_socket();
+		$should_close_socket = TRUE;
+		echo 'Created new socket<br></br>';
+	}
+	else{
+		// Socket is passed in, meaning that it will be used in the future.
+		// So se don't need a new one. And don't close it after use.
+		echo 'Reused old socket<br></br>';
+		$should_close_socket = FALSE;
+	}
+	
 	// Write to socket:
 	//echo '<br></br>';
 	//echo 'Server Util is sending this package of length ' . strlen($msg) . ': ';
@@ -72,8 +65,41 @@ function connect_to_server_and_send_message( $msg ){
 	//	echo " " . ord(substr($input, $i, 1));
 	//
 
-	socket_close($socket);
-
+	if ($should_close_socket){
+		socket_close($socket);
+		//echo 'Socket closed' . '<br></br>';
+	} else{
+		//echo 'Socket remain open' . '<br></br>';
+	}
 
 	return $input;
+}
+
+
+function connect_to_server_and_return_socket(){
+	
+	/* Turn on implicit output flushing so we see what we're getting
+	 * as it comes in.
+	*/
+	ob_implicit_flush(TRUE);
+
+	// set some variables
+	$host = "25.40.107.250";
+	$port = 1992;
+
+	// If this is a server, it's also a good idea to use the set_time_limit() function
+	// to ensure that PHP doesn't time out and die() while waiting for incoming client connections.
+	set_time_limit(10);
+
+	// create socket
+	$socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\n");
+
+	// bind socket to the specified address and port
+	// Only useful if this is the server
+	// $result = socket_bind($socket, $host, $port) or die("Could not bind to socket\n");
+
+	// Only need to connect:
+	socket_connect($socket, $host, $port) or die("Could not connect to the socket");
+
+	return $socket;
 }
