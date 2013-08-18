@@ -108,8 +108,36 @@
 			//print_byte_array($response,25);
 			//print_request($response);
 			$pkg = unpack_pkg($response);
-			print_array($pkg);
+			//print_array($pkg);
+			echo "
+			<div class = 'search_results>
+				<table>";
+
+						foreach ($friend_id_list as $pkg[1][0]){
+							$request = view_user($_SESSION['uid'],$friend, 4, $_SESSION['session_key']);
+							$response = connect_to_server_and_send_message($request);
+								// User's information is contained in $retrived_response
+							$retrived_response = unpack_pkg($response)
+							$friend_info = $retrived_response[1][1];
+							//print_r($retrived_response);
+
+							$id = $friend_info[0];
+							$nick_name = $friend_info[1];
+							$name = $friend_info[2];
+							$birthday = $friend_info[3];
+							$gender = $friend_info[4];
+							$city = $friend_info[5];
+							$tag_set = $friend_info[6];
+							$common_friend_set = $friend_info[7];
+
+							echo '
+							<tr><a href = "user_page.php?uid='.$id.'"></p></td>';
+					}
+					echo '
+
+				</table>
 			
+			</div>";
 				
 		}
 	?>
