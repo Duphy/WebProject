@@ -28,3 +28,5 @@ define('TYPE_EIGHT_BYTE_INT', 7);
 define('TYPE_HEADER', 8);
 define('TYPE_UPDATE', 9);
 //PHP_INT_MAX
+
+define('MAX_EIGHT_BIT_INT', 2^63 - 1);
