@@ -77,7 +77,7 @@ function controlSpan(param){
 					//echo $friend_name;
 				echo '
 				<td><img src = "1.jpg"></td>
-				<td><p>'.$friend_name.'</p></td>';
+				<td><a href = "user_page.php?uid='.$retrived_response[1][1][0].'">'.$friend_name.'</p></td>';
 			}
 			echo '
 			</tr>
