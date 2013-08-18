@@ -445,8 +445,16 @@ function print_request($request){
 		echo " " . ord($request[$i]);
 	}
 }
-function connect_view_user($viewee, $view_option, $view_content=NULL){
+function connect_view_user($viewee, $view_option){
+	//for case 0,1,4,18
 	$request = view_user($_SESSION['uid'],$viewee, $view_option, $_SESSION['session_key']);
+	$response = connect_to_server_and_send_message($request);
+	// User's information is contained in $retrived_response
+	return unpack_pkg($response);
+}
+function connect_view_user_post_pic($viewee, $view_option,$view_content1, $view_content2){
+	//for case 2, 23,24 view posting and pic_large,pic_small
+	$request = view_user($_SESSION['uid'],$viewee, $view_option, $_SESSION['session_key'],$view_content1, $view_content2);
 	$response = connect_to_server_and_send_message($request);
 	// User's information is contained in $retrived_response
 	return unpack_pkg($response);
