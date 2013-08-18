@@ -445,3 +445,9 @@ function print_request($request){
 		echo " " . ord($request[$i]);
 	}
 }
+function connect_view_user($viewee, $view_option, $view_content=NULL){
+	$request = view_user($_SESSION['uid'],$viewee, $view_option, $_SESSION['session_key']);
+	$response = connect_to_server_and_send_message($request);
+	// User's information is contained in $retrived_response
+	return unpack_pkg($response);
+}
