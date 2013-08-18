@@ -123,9 +123,10 @@
 							
 							$time_pre = microtime(true);
 							
-							if ($i++ >= 5)
+							if ($i++ >= 5){
 								break;
-							
+							}
+
 							$retrived_response = connect_view_user($friend_id, 4, $socket);
 							$friend_info = $retrived_response[1][1];
 							//print_r($retrived_response);
@@ -139,9 +140,32 @@
 							$tag_set = $friend_info[6];
 							$common_friend_set = $friend_info[7];
 
+							$tag_string = '';
+							foreach ($tag_set as $new_tag){
+								$tag_string .= $new_tag . ' ';
+							}
+
 
 							echo '
-							<tr><a href = "user_page.php?uid='.$friend_id.'"><p>' . $friend_id . '</p></tr>';
+							<tr>
+								<td>
+									<a href = "user_page.php?uid='.$friend_id.'" target="_blank"><p>' . $name . '</p>
+								</td>
+								<td>
+									Birthday: TODO
+								</td>
+								<td>
+									Gender: ' . $gender . '
+								</td>
+								<td>
+									City: ' . $city . '
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Tags: ' . $tag_string . '
+								</td>
+							</tr>';
 
 							$time_post = microtime(true);
 							$exec_time = $time_post - $time_pre;

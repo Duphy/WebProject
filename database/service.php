@@ -13,12 +13,12 @@ function connect_to_server_and_send_message($msg, $socket = NULL){
 		// So we create one, and close it after use
 		$socket = connect_to_server_and_return_socket();
 		$should_close_socket = TRUE;
-		echo 'Created new socket<br></br>';
+		//echo 'Created new socket<br></br>';
 	}
 	else{
 		// Socket is passed in, meaning that it will be used in the future.
 		// So se don't need a new one. And don't close it after use.
-		echo 'Reused old socket<br></br>';
+		//echo 'Reused old socket<br></br>';
 		$should_close_socket = FALSE;
 	}
 	
