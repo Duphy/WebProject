@@ -459,3 +459,27 @@ function connect_view_user_post_pic($viewee, $view_option,$view_content1, $view_
 	// User's information is contained in $retrived_response
 	return unpack_pkg($response);
 }
+function print_tags($tags){
+	$flag_first=true;
+	foreach ($tags as $tag){
+		if($flag_first){
+			echo '
+					<ul>
+					<a href="#">#'.$tag.'</a>
+							<ul>';
+			$flag_first = false;
+		}else
+			echo '<li><a href="#">#'.$tag.'</a></li>';
+	}
+	echo'
+			</ul>
+			</li>
+			</ul>';
+}
+function print_gender($gender){
+	if($gender==1)
+		echo "Male";
+	else if($gender==0)
+		echo "Female";
+	else echo "Other";
+}

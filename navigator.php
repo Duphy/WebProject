@@ -64,7 +64,9 @@ echo '
 			<input name = "search_button" id = "search_button" type = "submit"/>
 		</form>
 	</div>
-
+	<div class = "headerTab" id = "advance">
+		<a href = "search.php">Advanced</a>
+	</div>
 	<div class = "tagbar">
 		<div class = "tagLinks">
 			<div class = "headerTab" id = "tagbarAll">

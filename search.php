@@ -33,15 +33,15 @@
 			<p>For Posting</p>
 			<br></br>
 			<p>From age:</p>
-			<input type="text" name ="age_lower_bound" /><br />
+			<input type="text" name ="age_lower_bound" value =0 /><br />
 			<p>To:</p>
-			<input type="text" name ="age_upper_bound" /><br />
+			<input type="text" name ="age_upper_bound" value= 100 /><br />
 			<input type="checkbox" name ="gender_male" value = "male" checked/> &nbsp;&nbsp;Male&nbsp;&nbsp;
 			<input type="checkbox" name ="gender_female" value = "female" checked/> &nbsp;&nbsp;Female&nbsp;&nbsp;
 			<input type="checkbox" name ="gender_other" value = "other" checked/> &nbsp;&nbsp;Other&nbsp;&nbsp;
 			<br></br>
-			<input type="radio" name ="match_location" value = 0 checked/> &nbsp;&nbsp;Local&nbsp;&nbsp;
-			<input type="radio" name ="match_location" value = 1 /> &nbsp;&nbsp;Global&nbsp;&nbsp;
+			<input type="radio" name ="match_location" value = 0 /> &nbsp;&nbsp;Local&nbsp;&nbsp;
+			<input type="radio" name ="match_location" value = 1 checked/> &nbsp;&nbsp;Global&nbsp;&nbsp;
 		</div>
 		</form>
 		</div>
@@ -140,22 +140,20 @@
 							$tag_set = $friend_info[6];
 							$common_friend_set = $friend_info[7];
 
-							$tag_string = '';
-							foreach ($tag_set as $new_tag){
-								$tag_string .= $new_tag . ' ';
-							}
-
-
 							echo '
 							<tr>
 								<td>
 									<a href = "user_page.php?uid='.$friend_id.'" target="_blank"><p>' . $name . '</p>
 								</td>
 								<td>
-									Birthday: TODO
+									Birthday:';
+								print_date($birthday);
+								echo'
 								</td>
 								<td>
-									Gender: ' . $gender . '
+									Gender: ' ;
+								print_gender($gender);
+								echo'
 								</td>
 								<td>
 									City: ' . $city . '
@@ -163,7 +161,9 @@
 							</tr>
 							<tr>
 								<td>
-									Tags: ' . $tag_string . '
+									Tags: ';
+								print_tags($tag_set);
+								echo'
 								</td>
 							</tr>';
 

@@ -20,11 +20,7 @@
 			<tr>
 				<td><p>Gender: </p></td>
 				<td><p>
-				<?php if($retrived_response[1][8]==0)
-						echo "Male";
-					else
-						echo "Female";
-					?></p></td>
+			<?php print_gender($retrived_response[1][8]);?></p></td>
 			</tr>
 			<tr>
 				<td>Birthday: </td>
