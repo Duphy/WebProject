@@ -396,6 +396,22 @@ function print_byte_array($input,$length){
 function print_array($input){
 	echo "<pre>".print_r($input,true)."</pre>";
 }
+function print_time($input){
+	if($input['hour']>9){
+		echo $input['hour'];}
+	else
+		echo "0".$input['hour'];
+	echo ": ";
+	if($input['minute']>9){
+		echo $input['minute'];}
+	else
+		echo "0".$input['minute'];
+		echo ": ";
+	if($input['second']>9){
+		echo $input['second'];}
+	else
+		echo "0".$input['second'];
+}
 function print_date($input){
 	switch ($input['month']){
 		case 1:
@@ -456,6 +472,14 @@ function connect_view_user_post_pic($viewee, $view_option,$view_content1, $view_
 	//for case 2, 23,24 view posting and pic_large,pic_small
 	$request = view_user($_SESSION['uid'],$viewee, $view_option, $_SESSION['session_key'],$view_content1, $view_content2);
 	$response = connect_to_server_and_send_message($request);
+	// User's information is contained in $retrived_response
+	return unpack_pkg($response);
+}
+//view_posting($viewer, $post_uid, $post_eid, $post_pid, $session_key);
+function connect_view_post($post_uid, $post_eid, $post_pid, $socket = NULL){
+	//for case 0,1,4,18
+	$request = view_posting($_SESSION['uid'],$post_uid, $post_eid, $post_pid, $_SESSION['session_key']);
+	$response = connect_to_server_and_send_message($request, $socket);
 	// User's information is contained in $retrived_response
 	return unpack_pkg($response);
 }

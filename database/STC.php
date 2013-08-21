@@ -346,11 +346,13 @@ function process_eventsets($pack,&$pointer){
 function process_postsets($pack,&$pointer){
 	$postings=array();
 	$num_postings = convert_byte_to_int(readBytes($pack,$pointer,4));
+	
 	for($i=0;$i<$num_postings;$i++){
 		$sets=array();
 		$sets[0]=convert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
 		$sets[1]=convert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
 		$sets[2]=convert_byte_to_int(readBytes($pack,$pointer,POSTID_LENGTH));
+		print_array($sets);
 		$postings[]=$sets;
 	}
 	return $postings;
@@ -370,9 +372,13 @@ function process_reply($pack,&$pointer){
 		$reply[2]=convert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
 		$content_length = convert_byte_to_int(readBytes($pack,$pointer,1));
 		$reply[3] = convert_byte_to_string(readBytes($pack,$pointer,$content_length));
-		$reply[4] = process_to_date(convert_byte_to_int(readBytes($pack,$pointer,4)));
-		$reply[5] = process_to_time(convert_byte_to_int(readBytes($pack,$pointer,4)));
-		$reply[6] = convert_byte_to_int(readBytes($pack,$pointer,1));
+		$content_length = convert_byte_to_int(readBytes($pack,$pointer,1));
+		$reply[4] = convert_byte_to_string(readBytes($pack,$pointer,$content_length));
+		$content_length = convert_byte_to_int(readBytes($pack,$pointer,1));
+		$reply[5] = convert_byte_to_string(readBytes($pack,$pointer,$content_length));
+		$reply[6] = process_to_date(convert_byte_to_int(readBytes($pack,$pointer,4)));
+		$reply[7] = process_to_time(convert_byte_to_int(readBytes($pack,$pointer,4)));
+		$reply[8] = convert_byte_to_int(readBytes($pack,$pointer,1));
 		$results[]=$reply;
 	}
 	return $results;
@@ -550,7 +556,7 @@ function process_to_date($ints){
 }
 function process_to_time($ints){
 	$time['hour'] = (int)($ints / 10000);
-	$int %= 10000;
+	$ints %= 10000;
 	$time['minute'] = (int)($ints / 100);
 	$time['second'] = $ints % 100;
 	return $time;

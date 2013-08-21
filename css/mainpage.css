@@ -9,7 +9,7 @@
 		position:absolute;
 		float:left;
 		left:40%;
-		height:400px;
+ 		height:1600px; 
 		width:300px;
 	}
 		.userpanel{
@@ -19,8 +19,14 @@
 			margin-right:10px;
 		}
 		.date{
-			position:relative;
+			position:absolute;
 			float:right;
+			right:5px;
+		}
+		.time{
+			position:absolute;
+			float:right;
+			top:15px;
 			right:5px;
 		}
 		.postTag{
@@ -47,11 +53,17 @@
 			float:left;
 			left:40px;}
 		.content{
-			position:relative;
+			position:absolute;
 			top:100px;
 			display:inline;
 		}
+		.reply{
+			position:absolute;
+			left:30%;
+			top:12%;
+		}
 		.comment{
-			position:relative;
+			position:absolute;
 			left:30%;
 			top:70%;
+		}
