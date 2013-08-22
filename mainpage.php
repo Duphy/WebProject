@@ -14,12 +14,12 @@
 <div id = "mainbody">
 	<div class = "post">
 	<?php 
-		//$post_uid=1235770;
-		//$post_eid=0;
-		//$post_pid=20;
-		$post_uid=1235767;
+		$post_uid=1235770;
 		$post_eid=0;
-		$post_pid=13;
+		$post_pid=20;
+		//$post_uid=1235767;
+		//$post_eid=0;
+		//$post_pid=13;
 		//die();
 		$response = connect_view_post($post_uid, $post_eid, $post_pid);
 	//print_array($response);

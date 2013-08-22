@@ -483,6 +483,14 @@ function connect_view_post($post_uid, $post_eid, $post_pid, $socket = NULL){
 	// User's information is contained in $retrived_response
 	return unpack_pkg($response);
 }
+//create_request($requester, $type, $target_user, $content, $session_key, $event_id=NULL)
+function connect_request($type, $target, $content,$event_id=NULL,$socket = NULL){
+	$request = create_request($_SESSION['uid'],$type, $target, $content, $_SESSION['session_key'],$event_id=NULL);
+	$response = connect_to_server_and_send_message($request, $socket);
+	// User's information is contained in $retrived_response
+	return unpack_pkg($response);
+	
+}
 function print_tags($tags){
 	$flag_first=true;
 	foreach ($tags as $tag){

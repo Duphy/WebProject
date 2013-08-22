@@ -165,8 +165,10 @@
 								print_tags($tag_set);
 								echo'
 								</td>
-							</tr>';
-
+							</tr>
+								<div id="add_friend">
+									
+								<a href="database/backend_addfriend.php?uid='.$id.'">Add Friend</a></div>';
 							$time_post = microtime(true);
 							$exec_time = $time_post - $time_pre;
 							echo '<br></br>' . 'Time: ' . $exec_time;
