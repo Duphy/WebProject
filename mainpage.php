@@ -6,6 +6,12 @@
 	@import url("css/mainpage.css")
 </style>
 
+<script>
+	$(document).ready(function(){
+		
+	});	
+</script>
+	
 </head>
 <body>
 <?php include_once 'navigator.php';?>
