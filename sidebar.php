@@ -16,7 +16,7 @@ function controlSpan(param){
 			if(left_flag==false){
 				left_flag=true;
 				div.animate({
-					left: "+=150px",
+					left: "+=100px",
 				},
 					500
 				);
@@ -24,7 +24,7 @@ function controlSpan(param){
 			else if(left_flag==true){
 				left_flag=false;
 				div.animate({
-					left: "-=150px",
+					left: "-=100px",
 				},
 					500
 				);
@@ -36,7 +36,7 @@ function controlSpan(param){
 				right_flag=true;
 				$(".friendlist").show();
 				div.animate({
-					right: "+=150px",
+					right: "+=100px",
 				},
 					500
 				);
@@ -44,7 +44,7 @@ function controlSpan(param){
 			else if(right_flag==true){
 				right_flag=false;
 				div.animate({
-					right: "-=150px",
+					right: "-=100px",
 				},
 					500
 				);
@@ -53,18 +53,21 @@ function controlSpan(param){
 		}
 }
 </script>
-<div class = "leftspan">
+<div class = "leftspan" style = "margin-left:0px;margin-top:40px;">
 	<div class = "leftButton">
 	 <button onclick = "controlSpan(0);">left</button>
  	</div>
-	<div class = "setting"><a href = "setting_user_profile.php">profile settings</a></div>
+	<div class = "setting">
+		<a style = "margin-left:50px;" href = "#">Setting</a>
+	</div>
 </div>
 
-<div class = "rightspan">
+<div class = "rightspan" style = "margin-top:40px;">
 	<div class = "rightButton">
 		<button onclick = "controlSpan(1);">right</button>
  	</div>
 	<div class = "friendlist">
+		<a href = "#">FriendList</a>
 		<table>
 			<tr>';
 				foreach ($friend_list as $friend){

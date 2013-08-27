@@ -30,6 +30,7 @@ echo '
 	<![endif]-->
 	<link href = "css/bootstrap-responsive.min.css" rel = "stylesheet">
 	<link href = "css/bootstrap.min.css" rel = "stylesheet">
+	<link href=\'http://fonts.googleapis.com/css?family=Petit+Formal+Script\' rel=\'stylesheet\' type=\'text/css\'>
 	<script src = "javascript/jquery-1.10.1.min.js"></script>
 	<script src = "javascript/bootstrap.min.js"></script>	
 	';

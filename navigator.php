@@ -85,35 +85,31 @@ $retrived_response = unpack_pkg($response);
 echo '
 	<div class="navbar navbar-fixed-top">
 	  <div class="navbar-inner">
-	    <a class="brand" href="#"><strong style = "margin-left:20px;">Circa</strong></a>
-	    <ul class = "nav" style = "margin-left:5%">
-	    	<li><a href="user_profile.php">';echo $retrived_response[1][2].'</a></li>
+	    <a class="brand" href="#"><strong style = "margin-left:20px;font-family: \'Petit Formal Script\', cursive;font-size:23px;">Circa</strong></a>
+	    <ul class = "nav" style = "margin-left:5%;font-size:18px;">
+	    	<li><a href="user_profile.php"><strong>';echo $retrived_response[1][2].'</strong></a></li>
 	    </ul>
-		<ul class="nav" style = "margin-left:25%;">
-		   <li><a href="#">Activity</a></li>
-		   <li><a href="#">Event</a></li>
+		<ul class="nav" style = "margin-left:25%;font-size:18px;">
+		   <li><a href="#"><strong>Activity</strong></a></li>
+		   <li><a href="#"><strong>Event</strong></a></li>
 		</ul>
-		<button class="btn" style = "margin-left:20%;"><i class="icon-warning-sign"></i></Button>
+		<button class="btn btn-primary" style = "margin-left:20%;"><i class="icon-warning-sign icon-white"></i></Button>
 		<form class="navbar-search pull-right" style ="margin-right:40px;">
 	        <input type="text" class = "search-query span2" placeholder="Search" data-provide = "typeahead">
 	    </form> 
 	  </div>
 	</div>
 	
-	<div class="navbar" style = "margin-top:40px;background-color:#6699FF">
-	  <div class="navbar-inner">
-	    <a class="brand" href="#"><strong style = "margin-left:20px;">Circa</strong></a>
-	    <ul class = "nav" style = "margin-left:5%">
-	    	<li><a href="user_profile.php">';echo $retrived_response[1][2].'</a></li>
-	    </ul>
-		<ul class="nav" style = "margin-left:25%;">
-		   <li><a href="#">Activity</a></li>
-		   <li><a href="#">Event</a></li>
+	<div class="navbar" style = "margin-top:40px;font-size:16px;font-weight:200;">
+	  <div class="navbar-inner" style = "background: linear-gradient(to bottom, rgba(222,239,255,1) 0%,rgba(152,190,222,1) 100%);">
+		<ul class="nav" style = "margin-left:33%;">
+			<li><a href="#">All</a></li>
+			<li><a href="#">Friends</a></li>
+			<li><a href="#">NUS</a></li>
+			<li><a href="#">Swimming</a></li>
+		   <li><a href="#">CS3248</a></li>
+		   <li><a href="#">Game</a></li>
 		</ul>
-		<button class="btn" style = "margin-left:20%;"><i class="icon-warning-sign"></i></Button>
-		<form class="navbar-search pull-right" style ="margin-right:40px;">
-	        <input type="text" class = "search-query span2" placeholder="Search" data-provide = "typeahead">
-	    </form> 
 	  </div>
 	</div>
 
