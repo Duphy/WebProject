@@ -62,8 +62,8 @@
 		?>
 		</div>
 		<div class = "comment">
-		<form action = "fake.php" method = "post" enctype = "multipart/form-datd">
-			<input type = "text" name = "default_search" placeholder = "Want to say something?"/><br/>
+		<form action = "database/backend_reply_post.php" method = "post" enctype = "multipart/form-datd">
+			<input type = "text" name = "reply" placeholder = "Want to say something?"/><br/>
 			<input name = "search_button" id = "search_button" type = "submit" value = "comment"/>
 		</form>
 	</div>

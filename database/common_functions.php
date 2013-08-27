@@ -457,7 +457,8 @@ function print_request($request){
 	$pointer=0;
 	$length=convert_byte_to_int(readBytes($request,$pointer,4));
 	echo"<br></br>";
-	for ($i = $length-18; $i < $length; $i++){
+	echo "length is ".$length." ";
+	for ($i = 0; $i < $length; $i++){
 		echo " " . ord($request[$i]);
 	}
 }
@@ -490,6 +491,26 @@ function connect_request($type, $target, $content,$event_id=NULL,$socket = NULL)
 	// User's information is contained in $retrived_response
 	return unpack_pkg($response);
 	
+}
+//create_posting($creator_id, $event_id, $content, $visibility, $tags, $session_key)
+function connect_create_post($event_id, $content, $visibility, $tags,$socket = NULL){
+	$request = create_posting($_SESSION['uid'], $event_id, $content, $visibility, $tags,$_SESSION['session_key']);
+	print_request($request);
+	die();
+	$response = connect_to_server_and_send_message($request, $socket);
+	return unpack_pkg($response);
+}
+//reply_posting($uid, $poster_id, $target_uid, 
+//					$eid, $pid, $uid_name, $reply_target_name,
+//					$content, $visibility, $session_key) {
+function connect_reply_posting($poster_id, $target_uid, 
+					$eid, $pid, $uid_name, $reply_target_name,
+					$content, $visibility,$socket = NULL){
+	$request = reply_posting($_SESSION['uid'], $poster_id,$target_uid,$eid,$pid, $uid_name,$reply_target_name, $content, $visibility,$_SESSION['session_key']);
+	//print_request($request);
+	//die();
+	$response = connect_to_server_and_send_message($request, $socket);
+	return unpack_pkg($response);
 }
 function print_tags($tags){
 	$flag_first=true;

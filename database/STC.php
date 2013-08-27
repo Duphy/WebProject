@@ -233,7 +233,7 @@ function unpack_reply($pack,$subtype){
 			$pkg[0]=convert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
 			$pkg[1]=convert_byte_to_int(readBytes($pack,$pointer,UID_LENGTH));
 			$pkg[2]=convert_byte_to_int(readBytes($pack,$pointer,EVENTID_LENGTH));
-			$pkg[3]=convert_byte_to_int(readBytes($pack,$pointer,PID_LENGTH));
+			$pkg[3]=convert_byte_to_int(readBytes($pack,$pointer,POSTID_LENGTH));
 			$pkg[4]=convert_byte_to_int(readBytes($pack,$pointer,1));
 			break;
 	}

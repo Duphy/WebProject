@@ -119,7 +119,7 @@ function create_event($event_name, $creator_id, $description, $city, $tags, $ses
 	4+
 	1+strlen($descripton) * 2+
 	1+strlen($city) * 2+
-	1+ sizeof($tags) + $tag_array[[0]];
+	1+ sizeof($tags) + $tag_array[0];
 	$pkg = array(
 			array(
 					TYPE_HEADER,
@@ -159,7 +159,7 @@ function create_event($event_name, $creator_id, $description, $city, $tags, $ses
 			),
 			array(
 					TYPE_TAG,
-					$tag_array[[1]]
+					$tag_array[1]
 			),
 	);
 
@@ -173,7 +173,9 @@ function create_posting($creator_id, $event_id, $content, $visibility, $tags, $s
 	8+//event id
 	2+strlen($content) * 2+
 	1+//visibility
-	1+ sizeof($tags) + $tag_array[[0]];
+	1+ sizeof($tags) + $tag_array[0];
+	echo 'size is'.(strlen($content) * 2).' '.$tag_array[0];
+	
 	$pkg = array(
 			array(
 					TYPE_HEADER,
@@ -205,7 +207,7 @@ function create_posting($creator_id, $event_id, $content, $visibility, $tags, $s
 			),
 			array(
 					TYPE_TAG,
-					$tag_array[[1]]
+					$tag_array[1]
 			),
 	);
 
@@ -1136,11 +1138,23 @@ function update_status($uid, $status, $session_key) {
 	);
 	return form_pack($pkg);
 }
-function reply_posting($uid, $post_id, $content, $session_key) {
+//Reply Posting: 4 replier uid, 4 poster_uid,  4 reply_to_uid, 
+//				8 eid, 8 pid, 1 replyer_name_len, ?replyer_name,
+//				1 reply_to_name_len, ? reply_to_name, 1 content len, ? content,
+//				 1 visibility
+function reply_posting($uid, $poster_id, $target_uid, 
+					$eid, $pid, $uid_name, $reply_target_name,
+					$content, $visibility, $session_key) {
 	$length = HEADER_LENGTH +
 	4+
+	4+
+	4+
 	8+
-	1+strlen($content) * 2;
+	8+
+	1+strlen($uid_name) * 2+
+	1+strlen($reply_target_name) * 2+
+	1+strlen($content) * 2+
+	1;
 	$pkg = array(
 			array(
 					TYPE_HEADER,
@@ -1151,8 +1165,36 @@ function reply_posting($uid, $post_id, $content, $session_key) {
 					$uid
 			),
 			array(
+					TYPE_FOUR_BYTE_INT,
+					$poster_id
+			),
+			array(
+					TYPE_FOUR_BYTE_INT,
+					$target_uid
+			),
+			array(
 					TYPE_EIGHT_BYTE_INT,
-					$post_id
+					$eid
+			),
+			array(
+					TYPE_EIGHT_BYTE_INT,
+					$pid
+			),
+			array(
+					TYPE_ONE_BYTE_INT,
+					strlen($uid_name) * 2
+			),
+			array(
+					TYPE_STRING,
+					$uid_name
+			),
+			array(
+					TYPE_ONE_BYTE_INT,
+					strlen($reply_target_name) * 2
+			),
+			array(
+					TYPE_STRING,
+					$reply_target_name
 			),
 			array(
 					TYPE_ONE_BYTE_INT,
@@ -1161,6 +1203,10 @@ function reply_posting($uid, $post_id, $content, $session_key) {
 			array(
 					TYPE_STRING,
 					$content
+			),
+			array(
+					TYPE_ONE_BYTE_INT,
+					$visibility
 			),
 	);
 	return form_pack($pkg);
