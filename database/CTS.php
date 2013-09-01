@@ -331,7 +331,7 @@ function create_schedule($creator, $event_id, $start_date, $start_time, $end_dat
 	4+4+
 	1+strlen($place) * 2;
 	1+strlen($description) * 2+
-	4+ $uid_array[[0]];
+	4+ $uid_array[0];
 	$pkg = array(
 			array(
 					TYPE_HEADER,
@@ -383,7 +383,7 @@ function create_schedule($creator, $event_id, $start_date, $start_time, $end_dat
 			),
 			array(
 					TYPE_UIDS,
-					$uid_array[[1]]
+					$uid_array[1]
 			),
 	);
 	return form_pack($pkg);
@@ -1031,7 +1031,7 @@ function update_event($user, $event_id, $updates, $session_key){
 	$length = HEADER_LENGTH +
 	4+
 	8+
-	1+ $update_array[[0]];
+	1+ $update_array[0];
 	//content array
 	$pkg = array(
 			array(
@@ -1052,7 +1052,7 @@ function update_event($user, $event_id, $updates, $session_key){
 			),
 			array(
 					TYPE_UPDATE,
-					$update_array[[1]]
+					$update_array[1]
 			),
 	);
 	return form_pack($pkg);
@@ -1063,7 +1063,7 @@ function update_posting($user, $post_id, $updates, $session_key){
 	$length = HEADER_LENGTH +
 	4+
 	8+
-	1+ $update_array[[0]];
+	1+ $update_array[0];
 	//content array
 	$pkg = array(
 			array(
@@ -1084,7 +1084,7 @@ function update_posting($user, $post_id, $updates, $session_key){
 			),
 			array(
 					TYPE_UPDATE,
-					$update_array[[1]]
+					$update_array[1]
 			),
 	);
 	return form_pack($pkg);

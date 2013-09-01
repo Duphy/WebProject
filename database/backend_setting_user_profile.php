@@ -76,7 +76,10 @@
 	if($flag)
 		echo "<br></br> You have successfully update your profiles. <br></br>";
 	
-	
+	//TODO:echo json
+	//$arr = array('a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5);
+
+	//echo json_encode($arr);
 	
 	//$request = retrieve_current_user_info($_SESSION['uid'], 4, $_SESSION['session_key']);
 	//$response = connect_to_server_and_send_message($request);

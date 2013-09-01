@@ -93,7 +93,7 @@ echo '
 		   <li><a href="#"><strong>Activity</strong></a></li>
 		   <li><a href="#"><strong>Event</strong></a></li>
 		</ul>
-		<button class="btn btn-primary" style = "margin-left:20%;"><i class="icon-warning-sign icon-white"></i></Button>
+		<button id = "test" href = "#myModal" data-toggle="modal" class="btn" style = "margin-left:20%;"><i class="icon-warning-sign icon-white-reverse"></i></Button>
 		<form class="navbar-search pull-right" style ="margin-right:40px;">
 	        <input type="text" class = "search-query span2" placeholder="Search" data-provide = "typeahead">
 	    </form> 
