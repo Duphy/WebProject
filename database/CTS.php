@@ -173,7 +173,7 @@ function create_posting($creator_id, $event_id, $content, $visibility, $tags, $s
 	8+//event id
 	2+strlen($content) * 2+
 	1+//visibility
-	1+ sizeof($tags) + $tag_array[0];
+	1+$tag_array[0];
 	echo 'size is'.(strlen($content) * 2).' '.$tag_array[0];
 	
 	$pkg = array(
