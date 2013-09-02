@@ -2,7 +2,7 @@
   "targets": [
     {
       "target_name": "lib",
-      "sources": [ "lib.cpp" ]
+      "sources": [ "common.cpp","resolv.cpp","create.cpp" ]
     }
   ]
 }
