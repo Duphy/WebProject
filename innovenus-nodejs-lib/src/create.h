@@ -10,6 +10,10 @@
 
 #include "common.h"
 DeclareJSFunction(createLoginPack)
-DeclareJSFunction(createRetrieveCurrentUserInfoPack)
+DeclareJSFunction(createViewSelfPack)
+DeclareJSFunction(createViewUserPack)
+DeclareJSFunction(createViewEventPack)
+DeclareJSFunction(createViewPostingPack)
+DeclareJSFunction(createMassViewPack)
 
 #endif /* CREATE_H_ */

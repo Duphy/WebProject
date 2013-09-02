@@ -8,13 +8,15 @@
 #include "resolv.h"
 #include "create.h"
 
+#define ExportJSFunction(x) exports->Set(sym("x"),FunctionTemplate::New(x)->GetFunction());
 void init(Handle<Object> exports) {
-	exports->Set(sym("createLoginPack"),
-			FunctionTemplate::New(createLoginPack)->GetFunction());
-	exports->Set(sym("resolvPack"),
-			FunctionTemplate::New(resolvPack)->GetFunction());
-	exports->Set(sym("createRetrieveCurrentUserInfoPack"),
-			FunctionTemplate::New(createRetrieveCurrentUserInfoPack)->GetFunction());
+	ExportJSFunction(createViewUserPack);
+	ExportJSFunction(createLoginPack);
+	ExportJSFunction(createViewSelfPack);
+	ExportJSFunction(createViewEventPack)
+	ExportJSFunction(createViewPostingPack)
+	ExportJSFunction(createMassViewPack)
+	ExportJSFunction(resolvPack);
 }
 
 NODE_MODULE(lib, init)

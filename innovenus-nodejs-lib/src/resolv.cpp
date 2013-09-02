@@ -156,20 +156,23 @@ Local<Array> resolvTags(char *pack, int &pointer) {
 Local<Array> resolvReplies(char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	uint32_t length;
-	uint32_t replyer_name_len,reply_to_name_len,reply_content_len;
+	uint32_t replyer_name_len, reply_to_name_len, reply_content_len;
 	Local<Array> ans = Array::New(num);
 	for (uint32_t i = 0; i < num; i++) {
-		ans->Set(sym("rid"), JSreadInteger(pack, pointer, 4));
-		ans->Set(sym("replier_uid"), JSreadInteger(pack, pointer, 4));
-		ans->Set(sym("reply_to_uid"), JSreadInteger(pack, pointer, 4));
-		replyer_name_len= readInteger(pack,pointer,1);
-		ans->Set(sym("replyer_name"), JSreadInteger(pack, pointer, replyer_name_len));	
-		reply_to_name_len= readInteger(pack,pointer,1);
-		ans->Set(sym("reply_to_name"), JSreadInteger(pack, pointer, reply_to_name_len));
-		reply_content_len= readInteger(pack,pointer,1);
-		ans->Set(sym("reply_content"), JSreadInteger(pack, pointer, replyer_name_len));
-		ans->Set(sym("reply_date"), JSreadInteger(pack, pointer, 4));	
-		ans->Set(sym("reply_time"), JSreadInteger(pack, pointer, 4));	 
+		ans->Set(sym("rid"), JSreadInteger(pack, pointer, RID_LENGTH));
+		ans->Set(sym("replier_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(sym("reply_to_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+		replyer_name_len = readInteger(pack, pointer, 1);
+		ans->Set(sym("replyer_name"),
+				JSreadString(pack, pointer, replyer_name_len));
+		reply_to_name_len = readInteger(pack, pointer, 1);
+		ans->Set(sym("reply_to_name"),
+				JSreadString(pack, pointer, reply_to_name_len));
+		reply_content_len = readInteger(pack, pointer, 1);
+		ans->Set(sym("reply_content"),
+				JSreadString(pack, pointer, reply_content_len));
+		ans->Set(sym("reply_date"), JSreadInteger(pack, pointer, 4));
+		ans->Set(sym("reply_time"), JSreadInteger(pack, pointer, 4));
 		ans->Set(sym("visibility"), JSreadInteger(pack, pointer, 1));
 	}
 	return ans;
@@ -368,16 +371,17 @@ Local<Object> resolvViewPack(char *pack, int subtype) {
 		break;
 	case 2: //View posting
 		int content_len;
-		ans->Set(sym("posting_uid"), JSreadInteger(pack, pointer, 8));
-		ans->Set(sym("poster_uid"), JSreadInteger(pack, pointer, 4));
-		ans->Set(sym("event_eid"), JSreadInteger(pack, pointer, 8));
+		ans->Set(sym("pid"), JSreadAsciiString(pack, pointer, POSTID_LENGTH));
+		ans->Set(sym("poster_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(sym("event_eid"),
+				JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 		ans->Set(sym("post_date"), JSreadInteger(pack, pointer, 4));
 		ans->Set(sym("post_time"), JSreadInteger(pack, pointer, 4));
 		content_len = readInteger(pack, pointer, 2);
-		ans->Set(sym("content"), JSreadInteger(pack, pointer, content_len));
+		ans->Set(sym("content"), JSreadString(pack, pointer, content_len));
 		ans->Set(sym("visibility"), JSreadInteger(pack, pointer, 1));
-		ans->Set(sym("tags"), resolvTags(pack,pointer));
-		ans->Set(sym("replies"), resolvReplies(pack,pointer));
+		ans->Set(sym("tags"), resolvTags(pack, pointer));
+		ans->Set(sym("replies"), resolvReplies(pack, pointer));
 		break;
 	case 11: //View self
 		mode = readInteger(pack, pointer, 1);
