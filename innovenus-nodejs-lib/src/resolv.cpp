@@ -156,7 +156,7 @@ Local<Array> resolvTags(char *pack, int &pointer) {
 Local<Array> resolvReplies(char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	uint32_t length;
-	uint32_t replayer_name_len,reply_to_name_len,reply_content_len;
+	uint32_t replyer_name_len,reply_to_name_len,reply_content_len;
 	Local<Array> ans = Array::New(num);
 	for (uint32_t i = 0; i < num; i++) {
 		ans->Set(sym("rid"), JSreadInteger(pack, pointer, 4));
