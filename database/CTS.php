@@ -18,8 +18,8 @@ function create_new_user($email, $pwd, $nickName, $birthday, $gender, $city,
 	1+strlen($city) * 2+
 	1+strlen($state) * 2+
 	1+strlen($country) * 2+
-	1+ sizeof($tags) + $tag_array[0]+
-	1+ sizeof($hiddenTags) + $hiddenTag_array[0];
+	1 + $tag_array[0]+
+	1+  $hiddenTag_array[0];
 
 	//content array
 	$pkg = array(
@@ -119,7 +119,7 @@ function create_event($event_name, $creator_id, $description, $city, $tags, $ses
 	4+
 	1+strlen($descripton) * 2+
 	1+strlen($city) * 2+
-	1+ sizeof($tags) + $tag_array[0];
+	1 + $tag_array[0];
 	$pkg = array(
 			array(
 					TYPE_HEADER,
