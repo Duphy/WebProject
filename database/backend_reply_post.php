@@ -12,4 +12,5 @@ $response = connect_reply_posting($poster_uid, $poster_uid,
 $_POST['reply'], 0);
 
 print_array($response);
+
 ?>

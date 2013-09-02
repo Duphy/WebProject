@@ -496,7 +496,7 @@ function connect_request($type, $target, $content,$event_id=NULL,$socket = NULL)
 function connect_create_post($event_id, $content, $visibility, $tags,$socket = NULL){
 	$request = create_posting($_SESSION['uid'], $event_id, $content, $visibility, $tags,$_SESSION['session_key']);
 	print_request($request);
-	die();
+	//die();
 	$response = connect_to_server_and_send_message($request, $socket);
 	return unpack_pkg($response);
 }
