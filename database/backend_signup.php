@@ -9,7 +9,7 @@
 			<img src = "logo.jpg">
 		</div>
 		<div id ="login">
-			<a href="login.php">Login</a>
+			<a href="../login.php">Login</a>
 		</div>
 	</div>
 

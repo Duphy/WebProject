@@ -36,37 +36,37 @@
 		if($e[1]==1){
 			switch ($e[0]){
 				case 0:
-					echo "Password is failed to update.<br></br>";
+					echo json_encode("Password is failed to update.");
 					break;
 				case 1:
-					echo "Name is failed to update.<br></br>";
+					echo json_encode("Name is failed to update.");
 					break;
 				case 2:
-					echo "Nickname is failed to update.<br></br>";
+					echo json_encode("Nickname is failed to update.");
 					break;
 				case 3:
-					echo "Birthday is failed to update.<br></br>";
+					echo json_encode("Birthday is failed to update.");
 					break;
 				case 4:
-					echo "Gender is failed to update.<br></br>";
+					echo json_encode("Gender is failed to update.");
 					break;
 				case 5:
-					echo "City is failed to update.<br></br>";
+					echo json_encode("City is failed to update.");
 					break;
 				case 6:
-					echo "State is failed to update.<br></br>";
+					echo json_encode("State is failed to update.");
 					break;
 				case 7:
-					echo "Country is failed to update.<br></br>";
+					echo json_encode("Country is failed to update.");
 					break;
 				case 8:
-					echo "Tags are failed to add.<br></br>";
+					echo json_encode("Tags are failed to add.");
 					break;
 				case 9:
-					echo "Tags are failed to delete.<br></br>";
+					echo json_encode("Tags are failed to delete.");
 					break;
 				case 10:
-					echo "Setting is failed to update.<br></br>";
+					echo json_encode("Setting is failed to update.");
 					break;
 			}
 		}
@@ -74,7 +74,7 @@
 			$flag = true;
 	}
 	if($flag)
-		echo "<br></br> You have successfully update your profiles. <br></br>";
+		echo json_encode("You have successfully update your profiles.");
 	
 	//TODO:echo json
 	//$arr = array('a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5);
