@@ -365,9 +365,113 @@ Handle<Value> createMassViewPack(const Arguments &args) {
 				TCPack(TYPE_HEADER,
 						HeaderPack(length, 0, 1, args[2]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToString()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[1]->ToInteger()));
 		pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
+		break;
+	}
+	HandleScope scope;
+	return scope.Close(String::New(pkg.codec().data()));
+}
+
+/*1 0 Search user: 4 searcher, 1 search-mode {0 for by filter, 1 for by id, 2 for by email}
+ *		when (search-mode=0): 1 match-option {0 for both name and tags, 1 for name only, 2 for tags only}
+ *				1 filter_len, ? filter, 1 local-or-global { 0 for local, 1 for global},
+ *				age_constraints{1 from 1 to}, 1 gender {0 for female, 1 for male, 2 for all}
+ *		when (search-mode=1): 4 uid
+ *		when (search-mode=2): 1 email-len, ? email.*/
+// args[0]: search_mode
+// args[1]: session_key
+// args[2]: searcher_uid
+Handle<Value> createSearchUserPack(const Arguments &args) {
+	PackList pkg;
+	uint32_t length;
+	switch (args[0]->Uint32Value()) {
+	case 0:
+		// args[3]: match_option
+		// args[4]: filter
+		// args[5]: local_or_global
+		// args[6]: age_lower_bound
+		// args[7]: age_upper_bound
+		// args[8]: gender
+		length = HEADER_LENGTH + UID_LENGTH + 1 + 1 + 1
+				+ args[4]->ToString()->Length() * 2 + 1 + 1 + 1 + 1;
+		pkg.add(
+				TCPack(TYPE_HEADER,
+						HeaderPack(length, 1, 0, args[1]->ToString())));
+		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[4]->ToString()->Length() * 2));
+		pkg.add(TCPack(TYPE_STRING, args[4]->ToString()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[5]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[6]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[7]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[8]->ToInteger()));
+		break;
+	case 1:
+		// args[3]: uid_to_search
+		length = HEADER_LENGTH + UID_LENGTH + 1 + UID_LENGTH;
+		pkg.add(
+				TCPack(TYPE_HEADER,
+						HeaderPack(length, 1, 0, args[1]->ToString())));
+		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
+		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
+		break;
+	case 2:
+		// args[3]: email
+		length = HEADER_LENGTH + UID_LENGTH + 1 + 1
+				+ args[3]->ToString()->Length() * 2;
+		pkg.add(
+				TCPack(TYPE_HEADER,
+						HeaderPack(length, 1, 0, args[1]->ToString())));
+		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToString()->Length() * 2));
+		pkg.add(TCPack(TYPE_STRING, args[3]->ToString()));
+		break;
+	}
+	HandleScope scope;
+	return scope.Close(String::New(pkg.codec().data()));
+}
+
+/*1 1 Search Event: 4 searcher, 1 search-mode {0 for by filter, 1 for by id}
+ *		when (search-mode=0): match-option {0 for both name and tags, 1 for name only, 2 for tags only}
+ *				1 filter_len, ? filter, 1 local-or-global { 0 for local, 1 for global}
+ *		when (search-mode=1): 8 eid*/
+// args[0]: search_mode
+// args[1]: session_key
+// args[2]: searcher_uid
+Handle<Value> createSearchEventPack(const Arguments &args) {
+	PackList pkg;
+	uint32_t length;
+	switch (args[0]->Uint32Value()) {
+	case 0:
+		// args[3]: match_option
+		// args[4]: filter
+		// args[5]: local_or_global
+		length = HEADER_LENGTH + UID_LENGTH + 1 + 1 + 1
+				+ args[4]->ToString()->Length() * 2 + 1;
+		pkg.add(
+				TCPack(TYPE_HEADER,
+						HeaderPack(length, 1, 1, args[1]->ToString())));
+		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[4]->ToString()->Length() * 2));
+		pkg.add(TCPack(TYPE_STRING, args[4]->ToString()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[5]->ToInteger()));
+		break;
+	case 1:
+		// args[3]: event_id
+		length = HEADER_LENGTH + UID_LENGTH + 1 + EVENTID_LENGTH;
+		pkg.add(
+				TCPack(TYPE_HEADER,
+						HeaderPack(length, 1, 1, args[1]->ToString())));
+		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
+		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
 		break;
 	}
 	HandleScope scope;
