@@ -303,6 +303,19 @@ Local<Array> resolvSchedules(char *pack, int &pointer) {
 		ans->Set(i, resolvSchedule(pack, pointer));
 	return ans;
 }
+Local<Object> resolvUpdate(char *pack, int &pointer) {
+	Local<Object> ans = Object::New();
+	ans->Set(sym("attribute"), JSreadInteger(pack, pointer, 1));
+	ans->Set(sym("success"), JSreadBool(pack, pointer, 1));
+	return ans;
+}
+Local<Array> resolvUpdates(char *pack, int &pointer) {
+	uint32_t num = readInteger(pack, pointer, 1);
+	Local<Array> ans = Array::New(num);
+	for (uint32_t i = 0; i < num; i++)
+		ans->Set(i, resolvUpdate(pack, pointer));		
+	return ans;
+}
 Local<Object> resolvViewPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2, mode;
 	Local<Object> ans = Object::New();
@@ -373,8 +386,7 @@ Local<Object> resolvViewPack(char *pack, int subtype) {
 		int content_len;
 		ans->Set(sym("pid"), JSreadAsciiString(pack, pointer, POSTID_LENGTH));
 		ans->Set(sym("poster_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-		ans->Set(sym("event_eid"),
-				JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(sym("event_eid"),JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 		ans->Set(sym("post_date"), JSreadInteger(pack, pointer, 4));
 		ans->Set(sym("post_time"), JSreadInteger(pack, pointer, 4));
 		content_len = readInteger(pack, pointer, 2);
@@ -382,6 +394,9 @@ Local<Object> resolvViewPack(char *pack, int subtype) {
 		ans->Set(sym("visibility"), JSreadInteger(pack, pointer, 1));
 		ans->Set(sym("tags"), resolvTags(pack, pointer));
 		ans->Set(sym("replies"), resolvReplies(pack, pointer));
+		break;
+	case 10://View user's posting
+		ans->Set(sym("postings"), resolvPostings(pack, pointer));
 		break;
 	case 11: //View self
 		mode = readInteger(pack, pointer, 1);
@@ -418,6 +433,166 @@ Local<Object> resolvViewPack(char *pack, int subtype) {
 	}
 	return ans;
 }
+Local<Object> resolvSearch(char *pack, int subtype) {
+	int pointer = HEADER_LENGTH * 2, mode;
+	Local<Object> ans = Object::New();
+	switch (subtype) {
+	case 0://Search User
+		ans->Set(sym("members"), resolvUIDs(pack, pointer));
+		break;
+	case 1://Search Event
+		ans->Set(sym("events"), resolvEventIDs(pack, pointer));
+		break;
+	case 2://Search Posting
+		ans->Set(sym("postings"), resolvPostings(pack, pointer));
+		break;
+	}
+	return ans;
+}
+Local<Object> resolvCreate(char *pack, int subtype) {
+	int pointer = HEADER_LENGTH * 2;
+	bool succ = readBool(pack, pointer);
+	ans->Set(sym("success"), Boolean::New(succ));
+	Local<Object> ans = Object::New();
+	switch (subtype) {
+	case 0: //Create User
+	        if (succ)
+		{
+			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+		}else{
+			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+		}
+		break;
+	case 1: //Create Event
+		if (succ)
+		{
+			ans->Set(sym("uid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+		}else{
+			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+		}
+		break;
+	case 2: //Create Posting
+		if (succ)
+		{
+			ans->Set(sym("posting"), resolvPosting(pack, pointer));
+		}else{
+			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+		}
+		break;
+	case 3: //Create Request
+		//TODO CTS-without-requester
+		if (succ)
+		{
+		}else {
+			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+		}
+		break;
+	case 17: //Create Schedule
+		if (succ)
+		{
+			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+			ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+			ans->Set(sym("sid"), JSreadInteger(pack, pointer, 4));	
+		}else{
+			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+		}
+		break;
+	}
+	return ans;
+}
+Local<Object> resolvUpdatePack(char *pack, int subtype) {
+	int pointer = HEADER_LENGTH * 2, mode;
+	bool succ;
+	Local<Object> ans = Object::New();
+	switch (subtype) {
+	case 0: //updates
+		ans->Set(sym("updates"), resolvUpdates(pack,pointer));
+		break;
+	case 1: //event updates
+		ans->Set(sym("eid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(sym("updates"), resolvUpdates(pack,pointer));
+		break;
+	case 23://avarta
+		mode=readInteger(pack, pointer, 1);
+		switch (mode){
+		case 0: //User
+			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+			break;
+		case 1: //User and Event
+			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+			ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+			break;
+		}
+		succ = readBool(pack, pointer);
+		ans->Set(sym("success"), Boolean::New(succ));
+		if (succ)
+		{
+			ans->Set(sym("version_date"), JSreadInteger(pack, pointer, 4));
+			ans->Set(sym("version_time"), JSreadInteger(pack, pointer, 4));					}
+		break;
+	
+	case 24://avarta
+		mode=readInteger(pack, pointer, 1);
+		switch (mode){
+		case 0: //User
+			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+			break;
+		case 1: //User and Event
+			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+			ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+			break;
+		}
+		succ = readBool(pack, pointer);
+		ans->Set(sym("success"), Boolean::New(succ));
+		if (succ)
+		{
+			ans->Set(sym("version_date"), JSreadInteger(pack, pointer, 4));
+			ans->Set(sym("version_time"), JSreadInteger(pack, pointer, 4));					}
+		break;
+	
+	return ans;
+}
+Local<Object> resolvReply(char *pack, int subtype) {
+	int pointer = HEADER_LENGTH * 2, mode;
+	ans->Set(sym("poster_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+	ans->Set(sym("reply_to_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+	ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+	ans->Set(sym("pid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+	ans->Set(sym("acknowledgement"), JSreadInteger(pack, pointer, 1));
+	return ans;
+}			
+Local<Object> resolvDelete(char *pack, int subtype) {
+	int pointer = HEADER_LENGTH * 2;
+	Local<Object> ans = Object::New();
+	switch (subtype){
+	case 0: //delete friends
+		ans->Set(sym("friend_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(sym("success"), JSreadBool(pack, pointer, 1));
+		break;
+	case 2: //delete posting
+		ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(sym("pid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(sym("success"), JSreadBool(pack, pointer, 1));
+		break;
+	case 17://delete schedule
+		ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(sym("sid"), JSreadInteger(pack, pointer, 4));
+		ans->Set(sym("success"), JSreadBool(pack, pointer, 1));
+		break;
+	case 22://delete replies
+		ans->Set(sym("your_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(sym("pid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(sym("rid"), JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(sym("success"), JSreadBool(pack, pointer, 1));
+		break;		
+	}
+	return ans;
+}	
+						
 Local<Object> resolvValidationPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
 	Local<Object> ans = Object::New();
@@ -465,25 +640,21 @@ Handle<Value> resolvPack(const Arguments& args) {
 	package->Set(sym("header"), formJSHeader(&header));
 	switch (header.type) {
 	case 0:
-		package->Set(sym("resolved"), resolvViewPack(pack, header.subtype));
+		package->Set(sym("resolved"),resolvViewPack(pack, header.subtype));
 		break;
-		/*	 case 1:
-		 package->Set(sym("resolved"),
-		 unpack_search(pack, header.subtype));
-		 break;
-		 case 2:
-		 package->Set(sym("resolved"),
-		 unpack_create(pack, header.subtype));
-		 break;
-		 case 3:
-		 package->Set(sym("resolved"),
-		 unpack_update(pack, header.subtype));
-		 break;
-		 case 4:
-		 package->Set(sym("resolved"),
-		 unpack_reply(pack, header.subtype));
-		 break;
-		 case 5:
+        case 1:
+		package->Set(sym("resolved"),resolvSearch(pack, header.subtype));
+		break;
+	case 2:
+   		package->Set(sym("resolved"),resolvCreate(pack, header.subtype));
+		break;
+	case 3:
+		package->Set(sym("resolved"),resolvUpdatePack(pack, header.subtype));
+		break;
+	case 4: //Replu Posting
+		package->Set(sym("resolved"),resolvReply(pack, header.subtype));
+		break;
+		/* case 5:
 		 package->Set(sym("resolved"),
 		 unpack_delete(pack, header.subtype));
 		 break;*/
