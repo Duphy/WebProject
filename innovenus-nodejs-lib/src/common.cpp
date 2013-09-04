@@ -16,6 +16,8 @@ void init(Handle<Object> exports) {
 	ExportJSFunction(createViewEventPack)
 	ExportJSFunction(createViewPostingPack)
 	ExportJSFunction(createMassViewPack)
+	ExportJSFunction(createSearchUserPack)
+	ExportJSFunction(createSearchEventPack)
 	ExportJSFunction(resolvPack);
 }
 
