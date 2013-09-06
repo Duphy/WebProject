@@ -17,5 +17,8 @@ DeclareJSFunction(createViewPostingPack)
 DeclareJSFunction(createMassViewPack)
 DeclareJSFunction(createSearchUserPack)
 DeclareJSFunction(createSearchEventPack)
+DeclareJSFunction(createSearchPostingPack)
+DeclareJSFunction(createCreateUserPack)
+DeclareJSFunction(createCreateEventPack)
 
 #endif /* CREATE_H_ */

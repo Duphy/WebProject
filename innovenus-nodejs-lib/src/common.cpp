@@ -8,7 +8,7 @@
 #include "resolv.h"
 #include "create.h"
 
-#define ExportJSFunction(x) exports->Set(sym("x"),FunctionTemplate::New(x)->GetFunction());
+#define ExportJSFunction(x) exports->Set(sym(#x),FunctionTemplate::New(x)->GetFunction());
 void init(Handle<Object> exports) {
 	ExportJSFunction(createViewUserPack);
 	ExportJSFunction(createLoginPack);
@@ -18,6 +18,9 @@ void init(Handle<Object> exports) {
 	ExportJSFunction(createMassViewPack)
 	ExportJSFunction(createSearchUserPack)
 	ExportJSFunction(createSearchEventPack)
+	ExportJSFunction(createSearchPostingPack)
+	ExportJSFunction(createCreateUserPack)
+	ExportJSFunction(createCreateEventPack)
 	ExportJSFunction(resolvPack);
 }
 

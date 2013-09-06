@@ -4,8 +4,22 @@
 #include <string>
 #include "common.h"
 
+#define TYPE_STRING				1
+#define TYPE_TAG				2
+#define TYPE_UIDS  				3
+#define TYPE_ONE_BYTE_INT  		4
+#define TYPE_TWO_BYTE_INT  		5
+#define TYPE_FOUR_BYTE_INT  	6
+#define TYPE_EIGHT_BYTE_INT  	7
+#define TYPE_HEADER  			8
+#define TYPE_UPDATE  			9
+#define TYPE_ASCII_STRING		10
+#define TYPE_TAGS				11
+
 std::string convert_int_to_hex_string(int64_t a, unsigned int length);
 
+#define arg(x) args->Get(sym(#x))
+#define PrepareArgs() const Local<Object> args = arg_ori[0]->ToObject()
 inline char formHexBit(int a) {
 	return a > 9 ? 'a' + a - 10 : '0' + a;
 }
@@ -67,11 +81,18 @@ public:
 	TCPack(int type, Handle<Integer> a);
 	TCPack(int type, int64_t a);
 	TCPack(int type, Package a);
+	TCPack(int type, Handle<Object> a);
 };
 class PackList: public Package {
 public:
 	inline void add(Package a) {
 		code += a.codec();
+	}
+	inline void setHeader(HeaderPack a) {
+		code = a.codec() + code;
+	}
+	inline uint32_t length() {
+		return code.length() / 2;
 	}
 };
 HeaderPack::HeaderPack(int length, int type, int subtype,
@@ -115,9 +136,6 @@ TCPack::TCPack(int type, Handle<String> a) {
 TCPack::TCPack(int type, Package a) {
 	switch (type) {
 	case TYPE_HEADER:
-	case TYPE_TAG:
-	case TYPE_UIDS:
-	case TYPE_UPDATE:
 		code = a.codec();
 		break;
 	};
@@ -138,21 +156,35 @@ TCPack::TCPack(int type, int64_t a) {
 		break;
 	}
 }
+TCPack::TCPack(int type, Handle<Object> a) {
+	uint32_t num, i;
+	PackList tmp;
+	Local<String> cur;
+	switch (type) {
+	case TYPE_TAGS:
+		for (num = 0; !(a->Get(num)->IsUndefined()); num++)
+			;
+		tmp.add(TCPack(TYPE_ONE_BYTE_INT, num));
+		for (i = 0; i < num; i++) {
+			cur = a->Get(i)->ToString();
+			tmp.add(TCPack(TYPE_ONE_BYTE_INT, cur->Length() * 2));
+			tmp.add(TCPack(TYPE_STRING, cur));
+		}
+		code = tmp.codec();
+		break;
+	}
+}
 
 /*6 0: user (login) validation: 1 uid_or_email
  *		when (uid_or_email = 0): 4 uid, 1 password_len, ? password
  *		when (uid_or_email = 1): 1 email_len, ? email, 1 passord_len, ? password*/
 // args[0]: login_type
 Handle<Value> createLoginPack(const Arguments& args) {
-	HandleScope scope;
 	PackList pkg;
-	int length;
 	switch (args[0]->Uint32Value()) {
 	case 0:
 		// args[1]: uid
 		// args[2]: password
-		length = HEADER_LENGTH + 1 + 4 + 1 + args[2]->ToString()->Length() * 2;
-		pkg.add(TCPack(TYPE_HEADER, HeaderPack(length, 6, 0)));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[2]->ToString()->Length() * 2));
@@ -161,9 +193,6 @@ Handle<Value> createLoginPack(const Arguments& args) {
 	case 1:
 		// args[1]: email
 		// args[2]: password
-		length = HEADER_LENGTH + 1 + 1 + args[1]->ToString()->Length() * 2 + 1
-				+ args[2]->ToString()->Length() * 2;
-		pkg.add(TCPack(TYPE_HEADER, HeaderPack(length, 6, 0)));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[1]->ToString()->Length() * 2));
 		pkg.add(TCPack(TYPE_STRING, args[1]->ToString()));
@@ -171,6 +200,8 @@ Handle<Value> createLoginPack(const Arguments& args) {
 		pkg.add(TCPack(TYPE_STRING, args[2]->ToString()));
 		break;
 	}
+	pkg.setHeader(HeaderPack(pkg.length() + HEADER_LENGTH, 6, 0));
+	HandleScope scope;
 	return scope.Close(String::New(pkg.codec().data()));
 }
 
@@ -186,35 +217,21 @@ Handle<Value> createLoginPack(const Arguments& args) {
 // args[2]: current_uid
 Handle<Value> createViewSelfPack(const Arguments& args) {
 	PackList pkg;
-	int64_t option;
-	unsigned length;
 	switch (args[0]->Uint32Value()) {
 	case 0:
 	case 1:
 	case 4:
 	case 6:
-		length = HEADER_LENGTH + 4 + 1;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 0, 11, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		break;
 	case 2: // args[3]: pid
-		length = HEADER_LENGTH + 4 + 1 + 8;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 0, 11, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
 		break;
 	case 17:
 	case 18: // args[3]: option
-		length = HEADER_LENGTH + 4 + 1 + 1;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 0, 11, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToInteger()));
@@ -224,6 +241,9 @@ Handle<Value> createViewSelfPack(const Arguments& args) {
 		//TODO avarta
 		break;
 	}
+	pkg.setHeader(
+			HeaderPack(pkg.length() + HEADER_LENGTH, 0, 11,
+					args[1]->ToString()));
 	HandleScope scope;
 	return scope.Close(String::New(pkg.codec().data()));
 }
@@ -238,26 +258,17 @@ Handle<Value> createViewSelfPack(const Arguments& args) {
 // args[3]: viewee_uid
 Handle<Value> createViewUserPack(const Arguments &args) {
 	PackList pkg;
-	uint32_t length;
 	switch (args[0]->Uint32Value()) {
 	case 0:
 	case 1:
 	case 4:
 	case 18:
-		length = HEADER_LENGTH + UID_LENGTH + UID_LENGTH + 1;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 0, 0, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		break;
 	case 2:
 		// args[4]: postid
-		length = HEADER_LENGTH + UID_LENGTH + UID_LENGTH + 1 + POSTID_LENGTH;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 0, 0, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
@@ -268,6 +279,9 @@ Handle<Value> createViewUserPack(const Arguments &args) {
 		// TODO avarta
 		break;
 	}
+	pkg.add(
+			HeaderPack(pkg.length() + HEADER_LENGTH, 0, 0,
+					args[1]->ToString()));
 	HandleScope scope;
 	return scope.Close(String::New(pkg.codec().data()));
 }
@@ -282,28 +296,18 @@ Handle<Value> createViewUserPack(const Arguments &args) {
 // args[3]: eventid
 Handle<Value> createViewEventPack(const Arguments &args) {
 	PackList pkg;
-	uint32_t length;
 	switch (args[0]->Uint32Value()) {
 	case 0:
 	case 4:
 	case 5:
 	case 17:
 	case 18:
-		length = HEADER_LENGTH + UID_LENGTH + EVENTID_LENGTH + 1;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 0, 1, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		break;
 	case 2:
 		// args[4]: pid
-		length = HEADER_LENGTH + UID_LENGTH + EVENTID_LENGTH + 1
-				+ EVENTID_LENGTH;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 0, 1, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
@@ -314,6 +318,9 @@ Handle<Value> createViewEventPack(const Arguments &args) {
 		//TODO avarta
 		break;
 	}
+	pkg.setHeader(
+			HeaderPack(pkg.length() + HEADER_LENGTH, 0, 1,
+					args[1]->ToString()));
 	HandleScope scope;
 	return scope.Close(String::New(pkg.codec().data()));
 }
@@ -326,13 +333,13 @@ Handle<Value> createViewEventPack(const Arguments &args) {
 // args[4]: posting_pid
 Handle<Value> createViewPostingPack(const Arguments &args) {
 	PackList pkg;
-	uint32_t length = HEADER_LENGTH + UID_LENGTH + UID_LENGTH + EVENTID_LENGTH
-			+ POSTID_LENGTH;
-	pkg.add(TCPack(TYPE_HEADER, HeaderPack(length, 0, 2, args[0]->ToString())));
 	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
 	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 	pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
 	pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
+	pkg.setHeader(
+			HeaderPack(pkg.length() + HEADER_LENGTH, 0, 2,
+					args[0]->ToString()));
 	HandleScope scope;
 	return scope.Close(String::New(pkg.codec().data()));
 }
@@ -347,29 +354,23 @@ Handle<Value> createViewPostingPack(const Arguments &args) {
 // args[3]: viewer_uid
 Handle<Value> createMassViewPack(const Arguments &args) {
 	PackList pkg;
-	uint32_t length;
 	switch (args[0]->Uint32Value()) {
 	case 0:
-		length = HEADER_LENGTH + UID_LENGTH + 1 + 1;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 0, 10, args[2]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[1]->ToInteger()));
 		break;
 	case 1:
 		// args[4]: pid
-		length = HEADER_LENGTH + UID_LENGTH + 1 + 1 + POSTID_LENGTH;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 0, 1, args[2]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[1]->ToInteger()));
 		pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
 		break;
 	}
+	pkg.setHeader(
+			HeaderPack(pkg.length() + HEADER_LENGTH, 0, 10,
+					args[2]->ToString()));
 	HandleScope scope;
 	return scope.Close(String::New(pkg.codec().data()));
 }
@@ -385,7 +386,6 @@ Handle<Value> createMassViewPack(const Arguments &args) {
 // args[2]: searcher_uid
 Handle<Value> createSearchUserPack(const Arguments &args) {
 	PackList pkg;
-	uint32_t length;
 	switch (args[0]->Uint32Value()) {
 	case 0:
 		// args[3]: match_option
@@ -394,11 +394,6 @@ Handle<Value> createSearchUserPack(const Arguments &args) {
 		// args[6]: age_lower_bound
 		// args[7]: age_upper_bound
 		// args[8]: gender
-		length = HEADER_LENGTH + UID_LENGTH + 1 + 1 + 1
-				+ args[4]->ToString()->Length() * 2 + 1 + 1 + 1 + 1;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 1, 0, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToInteger()));
@@ -411,27 +406,21 @@ Handle<Value> createSearchUserPack(const Arguments &args) {
 		break;
 	case 1:
 		// args[3]: uid_to_search
-		length = HEADER_LENGTH + UID_LENGTH + 1 + UID_LENGTH;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 1, 0, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
 		break;
 	case 2:
 		// args[3]: email
-		length = HEADER_LENGTH + UID_LENGTH + 1 + 1
-				+ args[3]->ToString()->Length() * 2;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 1, 0, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToString()->Length() * 2));
 		pkg.add(TCPack(TYPE_STRING, args[3]->ToString()));
 		break;
 	}
+	pkg.setHeader(
+			HeaderPack(pkg.length() + HEADER_LENGTH, 1, 0,
+					args[1]->ToString()));
 	HandleScope scope;
 	return scope.Close(String::New(pkg.codec().data()));
 }
@@ -445,17 +434,11 @@ Handle<Value> createSearchUserPack(const Arguments &args) {
 // args[2]: searcher_uid
 Handle<Value> createSearchEventPack(const Arguments &args) {
 	PackList pkg;
-	uint32_t length;
 	switch (args[0]->Uint32Value()) {
 	case 0:
 		// args[3]: match_option
 		// args[4]: filter
 		// args[5]: local_or_global
-		length = HEADER_LENGTH + UID_LENGTH + 1 + 1 + 1
-				+ args[4]->ToString()->Length() * 2 + 1;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 1, 1, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToInteger()));
@@ -465,15 +448,92 @@ Handle<Value> createSearchEventPack(const Arguments &args) {
 		break;
 	case 1:
 		// args[3]: event_id
-		length = HEADER_LENGTH + UID_LENGTH + 1 + EVENTID_LENGTH;
-		pkg.add(
-				TCPack(TYPE_HEADER,
-						HeaderPack(length, 1, 1, args[1]->ToString())));
 		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
 		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
 		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
 		break;
 	}
+	pkg.setHeader(
+			HeaderPack(pkg.length() + HEADER_LENGTH, 1, 1,
+					args[1]->ToString()));
+	HandleScope scope;
+	return scope.Close(String::New(pkg.codec().data()));
+}
+
+/*1 2 Search Posting: 4 searcher, 1 search-mode {always 0}, 1 filter_len, ? filter,
+ *			1 local-or-global {0 for local, 1 for global}, 1 option {0 for both, 1 for user-posting only, 2 for event-posting only}*/
+// args[0]: session_key
+// args[1]: searcher_uid
+// args[2]: search_mode
+// args[3]: filter
+// args[4]: local_or_global
+// args[5]: option
+Handle<Value> createSearchPostingPack(const Arguments &args) {
+	PackList pkg;
+	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[2]->ToInteger()));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_STRING, args[3]->ToString()));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[4]->ToInteger()));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[5]->ToInteger()));
+	pkg.setHeader(
+			HeaderPack(pkg.length() + HEADER_LENGTH, 1, 2,
+					args[0]->ToString()));
+	HandleScope scope;
+	return scope.Close(String::New(pkg.codec().data()));
+}
+
+/*2 0 Create User: 1 email len, ? email, 1 password_len, ? password, 1 name len, ? name, 1 nickname len, ? nickname,
+ *				   4 birthday, 1 gender,
+ *				   1 city len, ? city, 1 state len, ? state, 1 country len, ? country,
+ *				   1 # visible tags, <visible tags{1 len, ?tag}>,
+ *				   1 # hidden tags, <hidden tags{1 len, ?tag}>*/
+Handle<Value> createCreateUserPack(const Arguments &arg_ori) {
+	PackList pkg;
+	PrepareArgs();
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(email)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_STRING, arg(email)->ToString()));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(password)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_STRING, arg(password)->ToString()));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(name)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_STRING, arg(name)->ToString()));
+	pkg.add(
+			TCPack(TYPE_ONE_BYTE_INT,
+					arg(nick_name)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_STRING, arg(nick_name)->ToString()));
+	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, arg(birthday)->ToInteger()));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(gender)->ToInteger()));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(city)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_STRING, arg(city)->ToString()));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(state)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_STRING, arg(state)->ToString()));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(country)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_STRING, arg(country)->ToString()));
+	pkg.add(TCPack(TYPE_TAGS, arg(tags)->ToObject()));
+	pkg.add(TCPack(TYPE_TAGS, arg(hidden_tags)->ToObject()));
+	pkg.setHeader(
+			HeaderPack(pkg.length() + HEADER_LENGTH, 2, 0,
+					arg(session_key)->ToString()));
+	HandleScope scope;
+	return scope.Close(String::New(pkg.codec().data()));
+}
+
+/*2 1 Create Event: 1 name_len, ? name, 4 creater id, 1 description len, ? description, 1 city_len, ? city
+ *					1 # tags, <tags{1 len, ?tag}>*/
+Handle<Value> createCreateEventPack(const Arguments &arg_ori) {
+	PackList pkg;
+	PrepareArgs();
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(name)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_STRING, arg(name)->ToString()));
+	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, arg(creater_uid)->ToString()));
+	pkg.add(
+			TCPack(TYPE_ONE_BYTE_INT,
+					arg(description)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_STRING, arg(description)->ToString()));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(city)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_STRING, arg(city)->ToString()));
+	pkg.add(TCPack(TYPE_TAGS, arg(tags)->ToObject()));
+	pkg.setHeader(HeaderPack(pkg.length(), 2, 1, arg(session_key)->ToString()));
 	HandleScope scope;
 	return scope.Close(String::New(pkg.codec().data()));
 }
