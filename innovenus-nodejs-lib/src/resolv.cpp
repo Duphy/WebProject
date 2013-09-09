@@ -83,7 +83,7 @@ Local<Integer> JSreadInteger(char *buf, int &pointer, int length) {
 	}
 	if (length == 8) {
 		char tmp[40];
-		std::sprintf(tmp, LLD, ans);
+		sprintf(tmp, LLD, ans);
 		Local<Value> value = Script::Compile(String::New(tmp))->Run();
 		return value->ToInteger();
 	} else
@@ -115,6 +115,8 @@ Local<Object> formJSHeader(response_header *header) {
 	ans->Set(sym("subtype"), Integer::New(header->subtype));
 	return ans;
 }
+
+/* Array: uid (int32) */
 Local<Array> resolvUIDs(char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
@@ -122,6 +124,8 @@ Local<Array> resolvUIDs(char *pack, int &pointer) {
 		ans->Set(i, JSreadInteger(pack, pointer, UID_LENGTH));
 	return ans;
 }
+
+/* Array: EventID (string) */
 Local<Array> resolvEventIDs(char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
@@ -129,13 +133,19 @@ Local<Array> resolvEventIDs(char *pack, int &pointer) {
 		ans->Set(i, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 	return ans;
 }
+
+/* 0: uid (int32)
+ * 1: eventid (string)
+ * 2: postid (string) */
 Local<Object> resolvPosting(char *pack, int &pointer) {
-	Local<Object> ans = Object::New();
-	ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-	ans->Set(sym("eventid"), JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
-	ans->Set(sym("postid"), JSreadInteger(pack, pointer, POSTID_LENGTH));
+	Local<Array> ans = Array::New(3);
+	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
+	ans->Set(1, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
+	ans->Set(2, JSreadAsciiString(pack, pointer, POSTID_LENGTH));
 	return ans;
 }
+
+/* Array: Posting */
 Local<Array> resolvPostings(char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
@@ -143,6 +153,8 @@ Local<Array> resolvPostings(char *pack, int &pointer) {
 		ans->Set(i, resolvPosting(pack, pointer));
 	return ans;
 }
+
+/* Array: tag_string (string) */
 Local<Array> resolvTags(char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	uint32_t length;
@@ -153,53 +165,81 @@ Local<Array> resolvTags(char *pack, int &pointer) {
 	}
 	return ans;
 }
-Local<Array> resolvReplies(char *pack, int &pointer) {
-	uint32_t num = readInteger(pack, pointer, 4);
+
+/* 0: rid (int32)
+ * 1: replier_uid (int32)
+ * 2: reply_to_uid (int32)
+ * 3: replyer_name (string)
+ * 4: reply_to_name (string)
+ * 5: reply_content (string)
+ * 6: reply_date (int32)
+ * 7: reply_time (int32)
+ * 8: visibility (int8) */
+Local<Array> resolvReply(char *pack, int &pointer) {
+	Local<Array> ans = Array::New(9);
 	uint32_t replyer_name_len, reply_to_name_len, reply_content_len;
-	Local<Array> ans = Array::New(num);
-	for (uint32_t i = 0; i < num; i++) {
-		ans->Set(sym("rid"), JSreadInteger(pack, pointer, RID_LENGTH));
-		ans->Set(sym("replier_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-		ans->Set(sym("reply_to_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-		replyer_name_len = readInteger(pack, pointer, 1);
-		ans->Set(sym("replyer_name"),
-				JSreadString(pack, pointer, replyer_name_len));
-		reply_to_name_len = readInteger(pack, pointer, 1);
-		ans->Set(sym("reply_to_name"),
-				JSreadString(pack, pointer, reply_to_name_len));
-		reply_content_len = readInteger(pack, pointer, 1);
-		ans->Set(sym("reply_content"),
-				JSreadString(pack, pointer, reply_content_len));
-		ans->Set(sym("reply_date"), JSreadInteger(pack, pointer, 4));
-		ans->Set(sym("reply_time"), JSreadInteger(pack, pointer, 4));
-		ans->Set(sym("visibility"), JSreadInteger(pack, pointer, 1));
-	}
+	ans->Set(0, JSreadInteger(pack, pointer, RID_LENGTH));
+	ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
+	ans->Set(2, JSreadInteger(pack, pointer, UID_LENGTH));
+	replyer_name_len = readInteger(pack, pointer, 1);
+	ans->Set(3, JSreadString(pack, pointer, replyer_name_len));
+	reply_to_name_len = readInteger(pack, pointer, 1);
+	ans->Set(4, JSreadString(pack, pointer, reply_to_name_len));
+	reply_content_len = readInteger(pack, pointer, 1);
+	ans->Set(5, JSreadString(pack, pointer, reply_content_len));
+	ans->Set(6, JSreadInteger(pack, pointer, 4));
+	ans->Set(7, JSreadInteger(pack, pointer, 4));
+	ans->Set(8, JSreadInteger(pack, pointer, 1));
 	return ans;
 }
-Local<Object> resolvUserSimpleOtherPack(char *pack, int &pointer) {
-	Local<Object> ans = Object::New();
-	ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+
+/* Array: Reply */
+Local<Array> resolvReplies(char *pack, int &pointer) {
+	uint32_t num = readInteger(pack, pointer, 4);
+	Local<Array> ans = Array::New(num);
+	for (uint32_t i = 0; i < num; i++)
+		ans->Set(i, resolvReply(pack, pointer));
+	return ans;
+}
+
+/* 0: uid (int32)
+ * 1: nick_name (string)
+ * 2: name (string)
+ * 3: birthday (int32)
+ * 4: gender (int8)
+ * 5: city (string)
+ * 6: tags (Tags)
+ * 7: friends (UIDs) */
+Local<Array> resolvUserSimpleOtherPack(char *pack, int &pointer) {
+	Local<Array> ans = Array::New(8);
+	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	uint32_t length;
 	length = readInteger(pack, pointer, 4);
-	ans->Set(sym("nick_name"), JSreadString(pack, pointer, length));
+	ans->Set(1, JSreadString(pack, pointer, length));
 	length = readInteger(pack, pointer, 4);
-	ans->Set(sym("name"), JSreadString(pack, pointer, length));
-	ans->Set(sym("birthday"), JSreadInteger(pack, pointer, 4));
-	ans->Set(sym("gender"), JSreadInteger(pack, pointer, 1));
+	ans->Set(2, JSreadString(pack, pointer, length));
+	ans->Set(3, JSreadInteger(pack, pointer, 4));
+	ans->Set(4, JSreadInteger(pack, pointer, 1));
 	length = readInteger(pack, pointer, 1);
-	ans->Set(sym("city"), JSreadString(pack, pointer, length));
-	ans->Set(sym("tags"), resolvTags(pack, pointer));
-	ans->Set(sym("friends"), resolvUIDs(pack, pointer));
+	ans->Set(5, JSreadString(pack, pointer, length));
+	ans->Set(6, resolvTags(pack, pointer));
+	ans->Set(7, resolvUIDs(pack, pointer));
 	//TODO Profile picture
 	return ans;
 }
-Local<Object> resolvWeightedTag(char *pack, int &pointer) {
-	Local<Object> ans = Object::New();
+
+/* 0: text (string)
+ * 1: weight (int64)
+ * TODO: int64 */
+Local<Array> resolvWeightedTag(char *pack, int &pointer) {
+	Local<Array> ans = Array::New(2);
 	uint32_t length = readInteger(pack, pointer, 1);
-	ans->Set(sym("text"), JSreadString(pack, pointer, length));
-	ans->Set(sym("weight"), JSreadInteger(pack, pointer, 8));
+	ans->Set(0, JSreadString(pack, pointer, length));
+	ans->Set(1, JSreadInteger(pack, pointer, 8));
 	return ans;
 }
+
+/* Array: WeightedTag */
 Local<Array> resolvWeightedTags(char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
@@ -207,6 +247,8 @@ Local<Array> resolvWeightedTags(char *pack, int &pointer) {
 		ans->Set(i, resolvWeightedTag(pack, pointer));
 	return ans;
 }
+
+/* Array: honor (int8) */
 Local<Array> resolvHonors(char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 1);
 	Local<Array> ans = Array::New(num);
@@ -214,87 +256,107 @@ Local<Array> resolvHonors(char *pack, int &pointer) {
 		ans->Set(i, JSreadInteger(pack, pointer, 1));
 	return ans;
 }
-Local<Object> resolvEventSimpleOtherPack(char *pack, int &pointer) {
-	Local<Object> ans = Object::New();
-	ans->Set(sym("eventid"), JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
+
+/* 0: eventid (string)
+ * 1: name (string)
+ * 2: creator_uid (int32)
+ * 3: description (string)
+ * 4: tags (Tags)
+ * 5: city (string)
+ * 6: rating (int32)
+ * 7: honors (Honors) */
+Local<Array> resolvEventSimpleOtherPack(char *pack, int &pointer) {
+	Local<Array> ans = Array::New(8);
+	ans->Set(0, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 	uint32_t length = readInteger(pack, pointer, 1);
-	ans->Set(sym("name"), JSreadString(pack, pointer, length));
-	ans->Set(sym("creator"), JSreadInteger(pack, pointer, UID_LENGTH));
+	ans->Set(1, JSreadString(pack, pointer, length));
+	ans->Set(2, JSreadInteger(pack, pointer, UID_LENGTH));
 	length = readInteger(pack, pointer, 1);
-	ans->Set(sym("description"), JSreadString(pack, pointer, length));
-	ans->Set(sym("tags"), resolvTags(pack, pointer));
+	ans->Set(3, JSreadString(pack, pointer, length));
+	ans->Set(4, resolvTags(pack, pointer));
 	length = readInteger(pack, pointer, 1);
-	ans->Set(sym("city"), JSreadString(pack, pointer, length));
-	ans->Set(sym("rating"), JSreadInteger(pack, pointer, 4));
-	ans->Set(sym("honors"), resolvHonors(pack, pointer));
+	ans->Set(5, JSreadString(pack, pointer, length));
+	ans->Set(6, JSreadInteger(pack, pointer, 4));
+	ans->Set(7, resolvHonors(pack, pointer));
 	return ans;
 }
-Local<Object> resolvUserSimplePack(char *pack, int &pointer) {
-	Local<Object> ans = Object::New();
-	ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+
+/* 0: uid (int32)
+ * 1: name (string)
+ * 2: nick_name (string)
+ * 3: birthday (int32)
+ * 4: tags (Tags)
+ * 5: hidden_tags (Tags)
+ * 6: honors (Honors)
+ * 7: gender (int8)
+ * 8: city (string)
+ * 9: state (string)
+ * 10: country (string) */
+Local<Array> resolvUserSimplePack(char *pack, int &pointer) {
+	Local<Array> ans = Array::New(11);
+	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	uint32_t length = readInteger(pack, pointer, 1);
-	ans->Set(sym("name"), JSreadString(pack, pointer, length));
+	ans->Set(1, JSreadString(pack, pointer, length));
 	length = readInteger(pack, pointer, 1);
-	ans->Set(sym("nick_name"), JSreadString(pack, pointer, length));
-	ans->Set(sym("birthday"), JSreadInteger(pack, pointer, 4));
-	ans->Set(sym("tags"), resolvTags(pack, pointer));
-	ans->Set(sym("hidden_tags"), resolvTags(pack, pointer));
-	ans->Set(sym("honors"), resolvHonors(pack, pointer));
-	ans->Set(sym("gender"), JSreadInteger(pack, pointer, 1));
+	ans->Set(2, JSreadString(pack, pointer, length));
+	ans->Set(3, JSreadInteger(pack, pointer, 4));
+	ans->Set(4, resolvTags(pack, pointer));
+	ans->Set(5, resolvTags(pack, pointer));
+	ans->Set(6, resolvHonors(pack, pointer));
+	ans->Set(7, JSreadInteger(pack, pointer, 1));
 	length = readInteger(pack, pointer, 1);
-	ans->Set(sym("city"), JSreadString(pack, pointer, length));
+	ans->Set(8, JSreadString(pack, pointer, length));
 	length = readInteger(pack, pointer, 1);
-	ans->Set(sym("state"), JSreadString(pack, pointer, length));
+	ans->Set(9, JSreadString(pack, pointer, length));
 	length = readInteger(pack, pointer, 1);
-	ans->Set(sym("country"), JSreadString(pack, pointer, length));
+	ans->Set(10, JSreadString(pack, pointer, length));
 	//TODO Profile picture
 	return ans;
 }
-Local<Object> resolvUserSettingPack(char *pack, int &pointer) {
+
+/* 0: news_visibility (int8)
+ * 1: friend_request_setting (int8)
+ * 2: event_invitation_setting (int8)
+ * 3: message_notification_setting (int8)
+ * 4: strangers_message_setting (int8) */
+Local<Array> resolvUserSettingPack(char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 1);
-	Local<Object> ans = Object::New();
+	Local<Array> ans = Array::New();
 	for (uint32_t i = 0; i < num; i++) {
 		uint32_t type = readInteger(pack, pointer, 1);
-		switch (type) {
-		case 0:
-			ans->Set(sym("news_visibility"), JSreadInteger(pack, pointer, 1));
-			break;
-		case 1:
-			ans->Set(sym("friend_request_setting"),
-					JSreadInteger(pack, pointer, 1));
-			break;
-		case 2:
-			ans->Set(sym("event_invitation_setting"),
-					JSreadInteger(pack, pointer, 1));
-			break;
-		case 3:
-			ans->Set(sym("message_notification_setting"),
-					JSreadInteger(pack, pointer, 1));
-			break;
-		case 4:
-			ans->Set(sym("strangers_message_setting"),
-					JSreadInteger(pack, pointer, 1));
-			break;
-		}
+		ans->Set(type, JSreadInteger(pack, pointer, 1));
 	}
 	return ans;
 }
-Local<Object> resolvSchedule(char *pack, int &pointer) {
-	Local<Object> ans = Object::New();
-	ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-	ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-	ans->Set(sym("sid"), JSreadInteger(pack, pointer, 4));
-	ans->Set(sym("start_date"), JSreadInteger(pack, pointer, 4));
-	ans->Set(sym("start_time"), JSreadInteger(pack, pointer, 4));
-	ans->Set(sym("end_date"), JSreadInteger(pack, pointer, 4));
-	ans->Set(sym("end_time"), JSreadInteger(pack, pointer, 4));
+
+/* 0: uid (int32)
+ * 1: eventid (string)
+ * 2: sid (int32)
+ * 3: start_date (int32)
+ * 4: start_time (int32)
+ * 5: end_date (int32)
+ * 6: end_time (int32)
+ * 7: place (string)
+ * 8: description (string)
+ * 9: with_users (UIDs) */
+Local<Array> resolvSchedule(char *pack, int &pointer) {
+	Local<Array> ans = Array::New(10);
+	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
+	ans->Set(1, JSreadString(pack, pointer, EVENTID_LENGTH));
+	ans->Set(2, JSreadInteger(pack, pointer, 4));
+	ans->Set(3, JSreadInteger(pack, pointer, 4));
+	ans->Set(4, JSreadInteger(pack, pointer, 4));
+	ans->Set(5, JSreadInteger(pack, pointer, 4));
+	ans->Set(6, JSreadInteger(pack, pointer, 4));
 	uint32_t length = readInteger(pack, pointer, 1);
-	ans->Set(sym("place"), JSreadString(pack, pointer, length));
+	ans->Set(7, JSreadString(pack, pointer, length));
 	length = readInteger(pack, pointer, 1);
-	ans->Set(sym("description"), JSreadString(pack, pointer, length));
-	ans->Set(sym("with_users"), resolvUIDs(pack, pointer));
+	ans->Set(8, JSreadString(pack, pointer, length));
+	ans->Set(9, resolvUIDs(pack, pointer));
 	return ans;
 }
+
+/* Array: Schedules */
 Local<Array> resolvSchedules(char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
@@ -302,10 +364,13 @@ Local<Array> resolvSchedules(char *pack, int &pointer) {
 		ans->Set(i, resolvSchedule(pack, pointer));
 	return ans;
 }
-Local<Object> resolvUpdate(char *pack, int &pointer) {
-	Local<Object> ans = Object::New();
-	ans->Set(sym("attribute"), JSreadInteger(pack, pointer, 1));
-	ans->Set(sym("success"), JSreadBool(pack, pointer));
+
+/* 0: attribute (int8)
+ * 1: success (bool) */
+Local<Array> resolvUpdate(char *pack, int &pointer) {
+	Local<Array> ans = Array::New(2);
+	ans->Set(0, JSreadInteger(pack, pointer, 1));
+	ans->Set(1, JSreadBool(pack, pointer));
 	return ans;
 }
 Local<Array> resolvUpdates(char *pack, int &pointer) {
@@ -454,7 +519,7 @@ Local<Object> resolvViewPack(char *pack, int subtype) {
 	}
 	return ans;
 }
-Local<Object> resolvSearch(char *pack, int subtype) {
+Local<Object> resolvSearchPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
 	Local<Object> ans = Object::New();
 	switch (subtype) {
@@ -470,7 +535,7 @@ Local<Object> resolvSearch(char *pack, int subtype) {
 	}
 	return ans;
 }
-Local<Object> resolvCreate(char *pack, int subtype) {
+Local<Object> resolvCreatePack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
 	bool succ = readBool(pack, pointer);
 	Local<Object> ans = Object::New();
@@ -571,7 +636,7 @@ Local<Object> resolvUpdatePack(char *pack, int subtype) {
 	}
 	return ans;
 }
-Local<Object> resolvReply(char *pack, int subtype) {
+Local<Object> resolvReplyPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2, mode;
 	Local<Object> ans = Object::New();
 	ans->Set(sym("poster_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
@@ -581,7 +646,7 @@ Local<Object> resolvReply(char *pack, int subtype) {
 	ans->Set(sym("acknowledgement"), JSreadInteger(pack, pointer, 1));
 	return ans;
 }
-Local<Object> resolvDelete(char *pack, int subtype) {
+Local<Object> resolvDeletePack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
 	Local<Object> ans = Object::New();
 	switch (subtype) {
@@ -651,7 +716,7 @@ Local<Object> resolvValidationPack(char *pack, int subtype) {
 	}
 	return ans;
 }
-Local<Object> resolvQuit(char *pack, int subtype) {
+Local<Object> resolvQuitPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
 	Local<Object> ans = Object::New();
 	switch (subtype) {
@@ -663,7 +728,7 @@ Local<Object> resolvQuit(char *pack, int subtype) {
 	}
 	return ans;
 }
-Local<Object> resolvSuggestion(char *pack, int subtype) {
+Local<Object> resolvSuggestionPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
 	Local<Object> ans = Object::New();
 	switch (subtype) {
@@ -683,7 +748,7 @@ Local<Object> resolvSuggestion(char *pack, int subtype) {
 	}
 	return ans;
 }
-Local<Object> resolvMessage(char *pack, int subtype) {
+Local<Object> resolvMessagePack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2, content_len;
 	Local<Object> ans = Object::New();
 	uint32_t direction = readInteger(pack, pointer, 1);
@@ -715,33 +780,34 @@ Handle<Value> resolvPack(const Arguments& args) {
 		package->Set(sym("resolved"), resolvViewPack(pack, header.subtype));
 		break;
 	case 1:
-		package->Set(sym("resolved"), resolvSearch(pack, header.subtype));
+		package->Set(sym("resolved"), resolvSearchPack(pack, header.subtype));
 		break;
 	case 2:
-		package->Set(sym("resolved"), resolvCreate(pack, header.subtype));
+		package->Set(sym("resolved"), resolvCreatePack(pack, header.subtype));
 		break;
 	case 3:
 		package->Set(sym("resolved"), resolvUpdatePack(pack, header.subtype));
 		break;
 	case 4: //Reply Posting
-		package->Set(sym("resolved"), resolvReply(pack, header.subtype));
+		package->Set(sym("resolved"), resolvReplyPack(pack, header.subtype));
 		break;
 	case 5:
-		package->Set(sym("resolved"), resolvDelete(pack, header.subtype));
+		package->Set(sym("resolved"), resolvDeletePack(pack, header.subtype));
 		break;
 	case 6:
 		package->Set(sym("resolved"),
 				resolvValidationPack(pack, header.subtype));
 		break;
 	case 7:
-		package->Set(sym("resolved"), resolvQuit(pack, header.subtype));
+		package->Set(sym("resolved"), resolvQuitPack(pack, header.subtype));
 		break;
 	case 10:
-		package->Set(sym("resolved"), resolvSuggestion(pack, header.subtype));
+		package->Set(sym("resolved"),
+				resolvSuggestionPack(pack, header.subtype));
 		break;
 	case 12:
-		package->Set(sym("resolved"), resolvMessage(pack, header.subtype));
+		package->Set(sym("resolved"), resolvMessagePack(pack, header.subtype));
 		break;
-}
-return package;
+	}
+	return package;
 }
