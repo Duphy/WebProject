@@ -380,17 +380,24 @@ Local<Array> resolvUpdates(char *pack, int &pointer) {
 		ans->Set(i, resolvUpdate(pack, pointer));
 	return ans;
 }
-Local<Object> resolvNotification(char *pack, int &pointer) {
-	Local<Object> ans = Object::New();
+/* 0: subtype2 (int8)
+ * 1: seqNo (int32)
+ * 2: uid (int32)
+ * 3: eventid (string)
+ * 4: pid (string)
+ * 5: action (int8)
+ * 6: msg (string)*/
+Local<Array> resolvNotification(char *pack, int &pointer) {
+	Local<Object> ans = Array::New(7);
 	uint32_t msg_len;
-	ans->Set(sym("subtype2"), JSreadInteger(pack, pointer, 1));
-	ans->Set(sym("seqNo"), JSreadInteger(pack, pointer, 4));
-	ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-	ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-	ans->Set(sym("pid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-	ans->Set(sym("action"), JSreadInteger(pack, pointer, 1));
+	ans->Set(0, JSreadInteger(pack, pointer, 1));
+	ans->Set(1, JSreadInteger(pack, pointer, 4));
+	ans->Set(2, JSreadInteger(pack, pointer, UID_LENGTH));
+	ans->Set(3, JSreadString(pack, pointer, EVENTID_LENGTH));
+	ans->Set(4, JSreadString(pack, pointer, EVENTID_LENGTH));
+	ans->Set(5, JSreadInteger(pack, pointer, 1));
 	msg_len = readInteger(pack, pointer, 1);
-	ans->Set(sym("msg"), JSreadString(pack, pointer, msg_len));
+	ans->Set(6, JSreadString(pack, pointer, msg_len));
 	return ans;
 
 }
@@ -401,30 +408,99 @@ Local<Array> resolvNotifications(char *pack, int &pointer) {
 		ans->Set(i, resolvNotification(pack, pointer));
 	return ans;
 }
-Local<Object> resolvViewPack(char *pack, int subtype) {
+
+/*case 0
+ * 0: viewee_uid (int32)
+ * 1: mode (int8)
+ 	* case 0
+	* 2: friends (resolvUIDs)
+	* case 1	
+	* 2: events (resolvEventIDs)
+	* case 2
+	* 2: postings (resolvPostings)
+	* case 4
+	* 2: info (resolvUseSimpleOtherPack)
+	* case 23
+	* case 24*/
+
+/* case 1
+ * 0: eventid (asciistring)
+ * 1: mode (int8)
+ 	* case 0
+	* 2: members (resolvUIDs)
+	* case 2
+	* 2: postings (resolvPostings)
+	* case 4
+	* 2: info (resolvEventSimpleOtherPack)
+	* case 5
+	* 2: managers (resolvUIDs)
+	* case 6
+	* case 17
+	* 2: schedules (resolvSchedules)
+	* case 18
+	* 2: opt (int8)
+	* 3: circatags (resolvWeightedTags)
+	* case 23
+	* case 24*/
+
+/* case 2
+ * 0: pid (asciistring)
+ * 1: poster_uid (int32)
+ * 2: event_eid (asciistring)
+ * 3: post_date (int32)
+ * 4: post_time (int32)
+ * 5: content (string)
+ * 6: visibility (int8)
+ * 7: tags (resolvTags)
+ * 8: replies (resolvReplies)*/
+
+/* case 10
+ * 0: postings (resolvPostings)*/
+
+/* case 11
+ * 0: mode (int8)
+ 	* case 0
+	* 1: friends (resolvUIDs)
+	* case 1
+	* 1: events (resolvEventIDs)
+	* case 2
+	* 1: postings (resolvPostings)
+	* case 4
+	* 1: info (resolvUserSimplePack)
+	* case 6
+	* 1: settings (resolvUserSettingPack)
+	* case 17
+	* 1: schedules (resolvSchedules)
+	* case 18
+	* 1: opt (int8)
+	* 2: circatags (resolvWeightedTags)
+	* case 23
+	* case 24*/
+
+Local<Array> resolvViewPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2, mode;
-	Local<Object> ans = Object::New();
+	Local<Array> ans = Array::New(9);
 	switch (subtype) {
 	case 0: //View user
-		ans->Set(sym("viewee_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 		mode = readInteger(pack, pointer, 1);
-		ans->Set(sym("mode"), Integer::New(mode));
+		ans->Set(1, Integer::New(mode));
 		switch (mode) {
 		case 0: //View user's friends
-			ans->Set(sym("friends"), resolvUIDs(pack, pointer));
+			ans->Set(2, resolvUIDs(pack, pointer));
 			break;
 		case 1: //View user's events
-			ans->Set(sym("events"), resolvEventIDs(pack, pointer));
+			ans->Set(2, resolvEventIDs(pack, pointer));
 			break;
 		case 2: //View user's posting
-			ans->Set(sym("postings"), resolvPostings(pack, pointer));
+			ans->Set(2, resolvPostings(pack, pointer));
 			break;
 		case 4: //View user's info
-			ans->Set(sym("info"), resolvUserSimpleOtherPack(pack, pointer));
+			ans->Set(2, resolvUserSimpleOtherPack(pack, pointer));
 			break;
 		case 18: //View user's circatag
-			ans->Set(sym("opt"), JSreadInteger(pack, pointer, 1));
-			ans->Set(sym("circatags"), resolvWeightedTags(pack, pointer));
+			ans->Set(2, JSreadInteger(pack, pointer, 1));
+			ans->Set(3, resolvWeightedTags(pack, pointer));
 			break;
 		case 23: //View user's avarta big
 			//TODO avarta
@@ -433,32 +509,33 @@ Local<Object> resolvViewPack(char *pack, int subtype) {
 			break;
 		}
 		break;
+
 	case 1: //View event
-		ans->Set(sym("eventid"),
+		ans->Set(sym(0),
 				JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 		mode = readInteger(pack, pointer, 1);
-		ans->Set(sym("mode"), Integer::New(mode));
+		ans->Set(1, Integer::New(mode));
 		switch (mode) {
 		case 0: //View member event
-			ans->Set(sym("members"), resolvUIDs(pack, pointer));
+			ans->Set(2, resolvUIDs(pack, pointer));
 			break;
 		case 2: //View posting event
-			ans->Set(sym("postings"), resolvPostings(pack, pointer));
+			ans->Set(2, resolvPostings(pack, pointer));
 			break;
 		case 4: //View event's info
-			ans->Set(sym("info"), resolvEventSimpleOtherPack(pack, pointer));
+			ans->Set(2, resolvEventSimpleOtherPack(pack, pointer));
 			break;
 		case 5: //View managers event
-			ans->Set(sym("managers"), resolvUIDs(pack, pointer));
+			ans->Set(2, resolvUIDs(pack, pointer));
 			break;
 		case 6: //TODO View event's setting pack
 			break;
 		case 17: //View schedule event
-			ans->Set(sym("schedules"), resolvSchedules(pack, pointer));
+			ans->Set(2, resolvSchedules(pack, pointer));
 			break;
 		case 18: //View Circatag_Pack
-			ans->Set(sym("opt"), JSreadInteger(pack, pointer, 1));
-			ans->Set(sym("circatags"), resolvWeightedTags(pack, pointer));
+			ans->Set(2, JSreadInteger(pack, pointer, 1));
+			ans->Set(3, resolvWeightedTags(pack, pointer));
 			break;
 		case 23: //View user's avarta big
 			//TODO avarta
@@ -467,48 +544,49 @@ Local<Object> resolvViewPack(char *pack, int subtype) {
 			break;
 		}
 		break;
+
 	case 2: //View posting
 		int content_len;
-		ans->Set(sym("pid"), JSreadAsciiString(pack, pointer, POSTID_LENGTH));
-		ans->Set(sym("poster_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-		ans->Set(sym("event_eid"),
+		ans->Set(0, JSreadAsciiString(pack, pointer, POSTID_LENGTH));
+		ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(2,
 				JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
-		ans->Set(sym("post_date"), JSreadInteger(pack, pointer, 4));
-		ans->Set(sym("post_time"), JSreadInteger(pack, pointer, 4));
+		ans->Set(3, JSreadInteger(pack, pointer, 4));
+		ans->Set(4, JSreadInteger(pack, pointer, 4));
 		content_len = readInteger(pack, pointer, 2);
-		ans->Set(sym("content"), JSreadString(pack, pointer, content_len));
-		ans->Set(sym("visibility"), JSreadInteger(pack, pointer, 1));
-		ans->Set(sym("tags"), resolvTags(pack, pointer));
-		ans->Set(sym("replies"), resolvReplies(pack, pointer));
+		ans->Set(5, JSreadString(pack, pointer, content_len));
+		ans->Set(6, JSreadInteger(pack, pointer, 1));
+		ans->Set(7, resolvTags(pack, pointer));
+		ans->Set(8, resolvReplies(pack, pointer));
 		break;
 	case 10: //View user's posting
-		ans->Set(sym("postings"), resolvPostings(pack, pointer));
+		ans->Set(0, resolvPostings(pack, pointer));
 		break;
 	case 11: //View self
 		mode = readInteger(pack, pointer, 1);
-		ans->Set(sym("mode"), Integer::New(mode));
+		ans->Set(0), Integer::New(mode));
 		switch (mode) {
 		case 0: //View self's friends
-			ans->Set(sym("friends"), resolvUIDs(pack, pointer));
+			ans->Set(1), resolvUIDs(pack, pointer));
 			break;
 		case 1: //View self's events
-			ans->Set(sym("events"), resolvEventIDs(pack, pointer));
+			ans->Set(1), resolvEventIDs(pack, pointer));
 			break;
 		case 2: //View self's posting
-			ans->Set(sym("postings"), resolvPostings(pack, pointer));
+			ans->Set(1), resolvPostings(pack, pointer));
 			break;
 		case 4: //View self's info
-			ans->Set(sym("info"), resolvUserSimplePack(pack, pointer));
+			ans->Set(1), resolvUserSimplePack(pack, pointer));
 			break;
 		case 6:
-			ans->Set(sym("settings"), resolvUserSettingPack(pack, pointer));
+			ans->Set(1), resolvUserSettingPack(pack, pointer));
 			break;
 		case 17:
-			ans->Set(sym("schedules"), resolvSchedules(pack, pointer));
+			ans->Set(1), resolvSchedules(pack, pointer));
 			break;
 		case 18: //View self's circatag
-			ans->Set(sym("opt"), JSreadInteger(pack, pointer, 1));
-			ans->Set(sym("circatags"), resolvWeightedTags(pack, pointer));
+			ans->Set(1, JSreadInteger(pack, pointer, 1));
+			ans->Set(2, resolvWeightedTags(pack, pointer));
 			break;
 		case 23: //View user's avarta big
 			//TODO avarta
@@ -519,6 +597,16 @@ Local<Object> resolvViewPack(char *pack, int subtype) {
 	}
 	return ans;
 }
+
+/* case 0
+ * 0: members (resolvUIDs)*/
+
+/*case 1
+ * 0: events (resolvEventIDs)*/
+
+/*case 2
+ * 0: postings (resolvPostings)*/
+
 Local<Object> resolvSearchPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
 	Local<Object> ans = Object::New();
@@ -535,31 +623,62 @@ Local<Object> resolvSearchPack(char *pack, int subtype) {
 	}
 	return ans;
 }
-Local<Object> resolvCreatePack(char *pack, int subtype) {
+
+/* case 0
+ * 0: succ (bool)
+	if succ
+	* 1: uid (int32)
+	else 
+	* 1: reason (int8)*/
+
+/* case 1
+ * 0: succ (bool)
+	if succ
+	* 1: eventid (string)
+	else 
+	* 1: reason (int8)*/
+
+/* case 2
+ * 0: succ (bool)
+	if succ
+	* 1: posting (posting)
+	else 
+	* 1: reason (int8)*/	
+
+/* case 17
+ * 0: succ (bool)
+	if succ
+	* 1: uid (int32)
+	* 2: eventid (string)
+	* 3: sid (int32)
+	else 
+	* 1: reason (int8)*/
+
+Local<Array> resolvCreatePack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
 	bool succ = readBool(pack, pointer);
-	Local<Object> ans = Object::New();
-	ans->Set(sym("success"), Boolean::New(succ));
+	Local<Array> ans = Array::New(4);
+	ans->Set(0, Boolean::New(succ));
 	switch (subtype) {
 	case 0: //Create User
 		if (succ) {
-			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+			ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
 		} else {
-			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+			ans->Set(1, JSreadInteger(pack, pointer, 1));
 		}
 		break;
 	case 1: //Create Event
 		if (succ) {
-			ans->Set(sym("uid"), JSreadString(pack, pointer, EVENTID_LENGTH));
+			ans->Set(1, JSreadString(pack, pointer, EVENTID_LENGTH));
 		} else {
-			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+			ans->Set(1, JSreadInteger(pack, pointer, 1));
 		}
 		break;
 	case 2: //Create Posting
 		if (succ) {
-			ans->Set(sym("posting"), resolvPosting(pack, pointer));
+			ans->Set(1, resolvPosting(pack, pointer));
 		} else {
-			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+			ans->Set(1, JSreadInteger(pack, pointer, 1));
 		}
 		break;
 	case 3: //Create Request
@@ -571,137 +690,244 @@ Local<Object> resolvCreatePack(char *pack, int subtype) {
 		break;
 	case 17: //Create Schedule
 		if (succ) {
-			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-			ans->Set(sym("eventid"),
+			ans->Set(sym(1), JSreadInteger(pack, pointer, UID_LENGTH));
+			ans->Set(sym(2),
 					JSreadString(pack, pointer, EVENTID_LENGTH));
-			ans->Set(sym("sid"), JSreadInteger(pack, pointer, 4));
+			ans->Set(sym(3), JSreadInteger(pack, pointer, 4));
 		} else {
-			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+			ans->Set(sym(1), JSreadInteger(pack, pointer, 1));
 		}
 		break;
 	}
 	return ans;
 }
-Local<Object> resolvUpdatePack(char *pack, int subtype) {
+
+/* case 0
+ * 0: updates (numbers of updates)*/
+
+/* case 1
+ * 0: eid (string)
+ * 1: updates (numbers of updates)*/
+
+/* case 23
+ 	* case 0
+	* 0: uid (int32)
+	* 1: succ (boolean)
+		if succ
+		* 2: version_date (int32)
+		* 3: version_time (int32)
+		
+   	* case 1
+	* 0: uid (int32)
+	* 1: eventid (string)
+	* 2: succ (boolean)
+		if succ
+		* 3: version_date (int32)
+		* 4: version_time (int32)*/
+
+/* case 24
+ 	* case 0
+	* 0: uid (int32)
+	* 1: succ (boolean)
+		if succ
+		* 2: version_date (int32)
+		* 3: version_time (int32)
+		
+   	* case 1
+	* 0: uid (int32)
+	* 1: eventid (string)
+	* 2: succ (boolean)
+		if succ
+		* 3: version_date (int32)
+		* 4: version_time (int32)*/
+
+Local<Array> resolvUpdatePack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2, mode;
 	bool succ;
-	Local<Object> ans = Object::New();
+	Local<Array> ans = Array::New(5);
 	switch (subtype) {
 	case 0: //updates
-		ans->Set(sym("updates"), resolvUpdates(pack, pointer));
+		ans->Set(0, resolvUpdates(pack, pointer));
 		break;
 	case 1: //event updates
-		ans->Set(sym("eid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-		ans->Set(sym("updates"), resolvUpdates(pack, pointer));
+		ans->Set(0, JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(1, resolvUpdates(pack, pointer));
 		break;
 	case 23: //avarta
 		mode = readInteger(pack, pointer, 1);
 		switch (mode) {
 		case 0: //User
-			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+			ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
+			succ = readBool(pack, pointer);
+			ans->Set(1, Boolean::New(succ));
+			if (succ) {
+				ans->Set(2, JSreadInteger(pack, pointer, 4));
+				ans->Set(3, JSreadInteger(pack, pointer, 4));
+			}	
 			break;
 		case 1: //User and Event
-			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-			ans->Set(sym("eventid"),
+			ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
+			ans->Set(1,
 					JSreadString(pack, pointer, EVENTID_LENGTH));
+			succ = readBool(pack, pointer);
+			ans->Set(2, Boolean::New(succ));
+			if (succ) {
+				ans->Set(3, JSreadInteger(pack, pointer, 4));
+				ans->Set(4, JSreadInteger(pack, pointer, 4));
+			}
 			break;
 		}
-		succ = readBool(pack, pointer);
-		ans->Set(sym("success"), Boolean::New(succ));
-		if (succ) {
-			ans->Set(sym("version_date"), JSreadInteger(pack, pointer, 4));
-			ans->Set(sym("version_time"), JSreadInteger(pack, pointer, 4));
-		}
+		
 		break;
 
 	case 24: //avarta
 		mode = readInteger(pack, pointer, 1);
 		switch (mode) {
 		case 0: //User
-			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
+			ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
+			succ = readBool(pack, pointer);
+			ans->Set(1, Boolean::New(succ));
+			if (succ) {
+				ans->Set(2, JSreadInteger(pack, pointer, 4));
+				ans->Set(3, JSreadInteger(pack, pointer, 4));
+			}	
 			break;
 		case 1: //User and Event
-			ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-			ans->Set(sym("eventid"),
+			ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
+			ans->Set(1,
 					JSreadString(pack, pointer, EVENTID_LENGTH));
+			succ = readBool(pack, pointer);
+			ans->Set(2, Boolean::New(succ));
+			if (succ) {
+				ans->Set(3, JSreadInteger(pack, pointer, 4));
+				ans->Set(4, JSreadInteger(pack, pointer, 4));
+			}
 			break;
 		}
-		succ = readBool(pack, pointer);
-		ans->Set(sym("success"), Boolean::New(succ));
-		if (succ) {
-			ans->Set(sym("version_date"), JSreadInteger(pack, pointer, 4));
-			ans->Set(sym("version_time"), JSreadInteger(pack, pointer, 4));
-		}
+		
 		break;
-	}
 	return ans;
 }
-Local<Object> resolvReplyPack(char *pack, int subtype) {
+
+/* 0: poster_uid (int32)
+ * 1: reply_to_uid (int32)
+ * 2: eventid (string)
+ * 3: pid (string)
+ * 4: acknowledgement (int8)*/
+
+Local<Array> resolvReplyPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2, mode;
-	Local<Object> ans = Object::New();
-	ans->Set(sym("poster_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-	ans->Set(sym("reply_to_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-	ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-	ans->Set(sym("pid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-	ans->Set(sym("acknowledgement"), JSreadInteger(pack, pointer, 1));
+	Local<Array> ans = Object::Array(5);
+	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
+	ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
+	ans->Set(2, JSreadString(pack, pointer, EVENTID_LENGTH));
+	ans->Set(3, JSreadString(pack, pointer, EVENTID_LENGTH));
+	ans->Set(4, JSreadInteger(pack, pointer, 1));
 	return ans;
 }
-Local<Object> resolvDeletePack(char *pack, int subtype) {
+/* case 0
+ * 0: friend_uid (int32)
+ * 1: succ (boolean)*/
+
+/* case 2
+ * 0: uid (int32)
+ * 1: eventid (string)
+ * 2: pid (string)
+ * 3: succ (boolean)*/
+
+/*case 17
+ * 0: uid (int32)
+ * 1: eventid (string)
+ * 2: sid (int32)
+ * 3: succ (boolean)*/
+
+/*case 22
+ *0: your_uid (int32)
+ *1: uid (int32)
+ *2: eventid (string)
+ *3: pid (string)
+ *4: rid (int32)
+ *5: succ (boolean)*/
+Local<Array> resolvDeletePack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
-	Local<Object> ans = Object::New();
+	Local<Array> ans = Object::Array(6);
 	switch (subtype) {
 	case 0: //delete friends
-		ans->Set(sym("friend_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-		ans->Set(sym("success"), JSreadBool(pack, pointer));
+		ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(1, JSreadBool(pack, pointer));
 		break;
 	case 2: //delete posting
-		ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-		ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-		ans->Set(sym("pid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-		ans->Set(sym("success"), JSreadBool(pack, pointer));
+		ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(1, JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(2, JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(3, JSreadBool(pack, pointer));
 		break;
 	case 17: //delete schedule
-		ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-		ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-		ans->Set(sym("sid"), JSreadInteger(pack, pointer, 4));
-		ans->Set(sym("success"), JSreadBool(pack, pointer));
+		ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(1, JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(2, JSreadInteger(pack, pointer, 4));
+		ans->Set(3, JSreadBool(pack, pointer));
 		break;
 	case 22: //delete replies
-		ans->Set(sym("your_uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-		ans->Set(sym("uid"), JSreadInteger(pack, pointer, UID_LENGTH));
-		ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-		ans->Set(sym("pid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-		ans->Set(sym("rid"), JSreadInteger(pack, pointer, UID_LENGTH));
-		ans->Set(sym("success"), JSreadBool(pack, pointer));
+		ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(2, JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(3, JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(4, JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(5, JSreadBool(pack, pointer));
 		break;
 	}
 	return ans;
 }
 
-Local<Object> resolvValidationPack(char *pack, int subtype) {
+/* case 0
+ * 0: succ (boolean 1:success 0:fail)
+	* case succ true
+	* 1:eventid (asciistring)
+	
+	* case succ false
+	* 1:reason (int8)*/
+
+/* case 16
+ * 0: succ (boolean 1:success 0:fail)
+	* case succ true:
+	* 1:eventid (string)
+	
+	* case succ false:
+	* 1:reason (int8)*/
+
+/* case 20*/
+
+/* case 21
+ * 0: succ (boolean 1:success 0:fail)
+	* case succ false:
+	* 1:reason (int8)*/
+
+
+Local<Array> resolvValidationPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
-	Local<Object> ans = Object::New();
+	Local<Array> ans = Array::New(2);
 	bool succ = readBool(pack, pointer);
-	ans->Set(sym("success"), Boolean::New(succ));
+	ans->Set(0, Boolean::New(succ));
 	switch (subtype) {
 	case 0: //Login
 		switch (succ) {
 		case true:
-			ans->Set(sym("session_key"), JSreadAsciiString(pack, pointer, 8));
+			ans->Set(1, JSreadAsciiString(pack, pointer, 8));
 			break;
 		case false:
-			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+			ans->Set(1, JSreadInteger(pack, pointer, 1));
 			break;
 		}
 		break;
 	case 16: //Logout
 		switch (succ) {
 		case true:
-			ans->Set(sym("eventid"),
+			ans->Set(1,
 					JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 			break;
 		case false:
-			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+			ans->Set(1, JSreadInteger(pack, pointer, 1));
 			break;
 		}
 		break;
@@ -709,28 +935,33 @@ Local<Object> resolvValidationPack(char *pack, int subtype) {
 	case 21: //Identification_code validation
 		switch (succ) {
 		case false:
-			ans->Set(sym("reason"), JSreadInteger(pack, pointer, 1));
+			ans->Set(1, JSreadInteger(pack, pointer, 1));
 			break;
 		}
 		break;
 	}
 	return ans;
 }
-Local<Object> resolvQuitPack(char *pack, int subtype) {
+/* case 1
+ * 0: eventid (string)
+ * 1: success (bool 1:success 0:fail)*/
+
+Local<Array> resolvQuitPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
-	Local<Object> ans = Object::New();
+	Local<Array> ans = Array::New(2);
 	switch (subtype) {
 	case 1: //Quit
-		ans->Set(sym("eventid"),
-				JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
-		ans->Set(sym("success"), JSreadBool(pack, pointer));
+		ans->Set(0, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(1, JSreadBool(pack, pointer));
 		break;
 	}
 	return ans;
 }
-Local<Object> resolvSuggestionPack(char *pack, int subtype) {
+/* case 5(subtype=5)
+ * 0: notifications (Numbers of notifications)*/
+Local<Array> resolvSuggestionPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
-	Local<Object> ans = Object::New();
+	Local<Array> ans = Array::New(1);
 	switch (subtype) {
 	case 0: //TODO friend suggestion
 		break;
@@ -739,7 +970,7 @@ Local<Object> resolvSuggestionPack(char *pack, int subtype) {
 	case 4: //TODO tag suggestion
 		break;
 	case 5: //notification
-		ans->Set(sym("notifications"), resolvNotifications(pack, pointer));
+		ans->Set(0, resolvNotifications(pack, pointer));
 		break;
 	case 6: //TODO new feature suggestion
 		break;
@@ -748,22 +979,33 @@ Local<Object> resolvSuggestionPack(char *pack, int subtype) {
 	}
 	return ans;
 }
+/* case 1(direction=1)
+ * 0: seqNo (int32)
+ * 1: status (int8)*/
+
+/* case 2(direction=2) 
+ * 0: eventid (string)
+ * 1: sender_uid (string)
+ * 2: content (string)
+ * 3: send_date (int32)
+ * 4: send_time (int32)*/
+
 Local<Object> resolvMessagePack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2, content_len;
-	Local<Object> ans = Object::New();
+	Local<Array> ans = Array::New(7);
 	uint32_t direction = readInteger(pack, pointer, 1);
 	switch (direction) {
 	case 1: //for send
-		ans->Set(sym("seqNo"), JSreadInteger(pack, pointer, 4));
-		ans->Set(sym("status"), JSreadInteger(pack, pointer, 1));
+		ans->Set(0, JSreadInteger(pack, pointer, 4));
+		ans->Set(1, JSreadInteger(pack, pointer, 1));
 		break;
 	case 2: //for receive
-		ans->Set(sym("eventid"), JSreadString(pack, pointer, EVENTID_LENGTH));
-		ans->Set(sym("sender_uid"), JSreadString(pack, pointer, UID_LENGTH));
+		ans->Set(0, JSreadString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(1, JSreadString(pack, pointer, UID_LENGTH));
 		content_len = readInteger(pack, pointer, 2);
-		ans->Set(sym("content"), JSreadString(pack, pointer, content_len));
-		ans->Set(sym("send_date"), JSreadInteger(pack, pointer, 4));
-		ans->Set(sym("send_time"), JSreadInteger(pack, pointer, 4));
+		ans->Set(2, JSreadString(pack, pointer, content_len));
+		ans->Set(3, JSreadInteger(pack, pointer, 4));
+		ans->Set(4, JSreadInteger(pack, pointer, 4));
 		break;
 	}
 	return ans;
