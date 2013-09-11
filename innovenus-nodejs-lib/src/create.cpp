@@ -16,14 +16,14 @@
 #define TYPE_ASCII_STRING		10
 #define TYPE_TAGS				11
 
-std::string convert_int_to_hex_string(int64_t a, unsigned int length);
+static std::string convert_int_to_hex_string(int64_t a, unsigned int length);
 
 #define arg(x) args->Get(sym(#x))
 #define PrepareArgs() const Local<Object> args = arg_ori[0]->ToObject()
-inline char formHexBit(int a) {
+static inline char formHexBit(int a) {
 	return a > 9 ? 'a' + a - 10 : '0' + a;
 }
-std::string convert_int_to_hex_string(int64_t a, unsigned int length) {
+static std::string convert_int_to_hex_string(int64_t a, unsigned int length) {
 	char tmp[17] = { '\0' };
 	for (unsigned int i = 0; i < length; i++) {
 		tmp[(length - i - 1) * 2 + 1] = formHexBit(a & 0xF);
@@ -33,7 +33,7 @@ std::string convert_int_to_hex_string(int64_t a, unsigned int length) {
 	}
 	return std::string(tmp);
 }
-std::string convert_string_to_hex_string(Handle<String> src) {
+static std::string convert_string_to_hex_string(Handle<String> src) {
 	int length = src->Length();
 	char *tmp = new char[length * 4 + 1];
 	src->Write((uint16_t*) tmp, 0, length);
@@ -48,7 +48,7 @@ std::string convert_string_to_hex_string(Handle<String> src) {
 	delete[] tmp;
 	return ans;
 }
-std::string convert_ascii_string_to_hex_string(Handle<String> src) {
+static std::string convert_ascii_string_to_hex_string(Handle<String> src) {
 	int length = src->Length();
 	char *tmp = new char[length * 2 + 1];
 	src->WriteAscii(tmp, 0, length);
@@ -62,7 +62,7 @@ std::string convert_ascii_string_to_hex_string(Handle<String> src) {
 	return ans;
 }
 
-class Package {
+static class Package {
 protected:
 	std::string code;
 public:
@@ -70,12 +70,12 @@ public:
 		return code;
 	}
 };
-class HeaderPack: public Package {
+static class HeaderPack: public Package {
 public:
 	HeaderPack::HeaderPack(int length, int type, int subtype,
 			Handle<String> session_key);
 };
-class TCPack: public Package {
+static class TCPack: public Package {
 public:
 	TCPack(int type, Handle<String> a);
 	TCPack(int type, Handle<Integer> a);
@@ -83,7 +83,7 @@ public:
 	TCPack(int type, Package a);
 	TCPack(int type, Handle<Object> a);
 };
-class PackList: public Package {
+static class PackList: public Package {
 public:
 	inline void add(Package a) {
 		code += a.codec();
@@ -175,6 +175,15 @@ TCPack::TCPack(int type, Handle<Object> a) {
 	}
 }
 
+/**
+ * - \b "6 0 Login"
+ * - for UID login
+ * 		- createLoginPack(0, uid, password)
+ * - for Email login
+ * 		- createLoginPack(1, email, password)
+ * \see ::resolvValidationPack
+ */
+
 /*6 0: user (login) validation: 1 uid_or_email
  *		when (uid_or_email = 0): 4 uid, 1 password_len, ? password
  *		when (uid_or_email = 1): 1 email_len, ? email, 1 passord_len, ? password*/
@@ -205,9 +214,43 @@ Handle<Value> createLoginPack(const Arguments& args) {
 	return scope.Close(String::New(pkg.codec().data()));
 }
 
+/**
+ * - \b "0 11 View self"
+ * - for view self's friends
+ * 		- createViewSelfPack(0, session_key, current_uid)
+ * - for view self's events
+ * 		- createViewSelfPack(1, session_key, current_uid)
+ * - for view self's posting
+ * 		- createViewSelfPack(2, session_key, current_uid, max_pid)
+ * - for view self's info
+ * 		- createViewSelfPack(4, session_key, current_uid)
+ * - for view self's settings
+ * 		- createViewSelfPack(6, session_key, current_uid)
+ * - for view self's schedules
+ * 		- createViewSelfPack(17, session_key, current_uid, option)
+ * 		- option:
+ * 			- 0=personal schedule
+ * 			- 1=event schedule
+ * 			- 2=both
+ * - for view self's circatags
+ * 		- createViewSelfPack(18, session_key, current_uid, option)
+ * 		- option:
+ * 			- 0=for personal
+ * 			- 1=for city
+ * 			- 2=for friends
+ * 			- 3=for city-user
+ * 			- 4=for city-events
+ * 			- 5=for city-posting
+ * - for view self's big avarta
+ * 		- createViewSelfPack(23, session_key, current_uid, local_version_date, local_version_time)
+ * - for view self's small avarta
+ * 		- createViewSelfPack(24, session_key, current_uid, local_version_date, local_version_time)
+ * 	\see ::resolvViewPack
+ */
+
 /*0 11 View Self: 4 viewer,
  * 1 subtype2 {0 for friends, 1 for event, 2 for posting, 4 for info, 6 settings,
- *	 	 	 	 17 for schedule, 18 for circatag, , 23 for avarta large, 24 for avarta small}
+ *	 	 	 	 17 for schedule, 18 for circatag, 23 for avarta large, 24 for avarta small}
  *		when (subtype2==2): 8 max_pid
  *		when (subtype2==17): 1 option {0 for personal schedule, 1 for event schedules, 2 for both}
  *		when (subtype2==18): 1 option {0 for personal, 1 for city, 2 for friends. 3 for city-user, 4 for city-events, 5 for city-posting}
@@ -238,7 +281,12 @@ Handle<Value> createViewSelfPack(const Arguments& args) {
 		break;
 	case 23:
 	case 24:
-		//TODO avarta
+		// args[3]: local_version_date
+		// args[4]: local_version_time
+		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
+		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
+		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
+		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[4]->ToInteger()));
 		break;
 	}
 	pkg.setHeader(
@@ -248,6 +296,23 @@ Handle<Value> createViewSelfPack(const Arguments& args) {
 	return scope.Close(String::New(pkg.codec().data()));
 }
 
+/**
+ * - \b "0 0 View user"
+ * - for view user's friends
+ * 		- createViewUserPack(0, session_key, viewer_uid, viewee_uid)
+ * - for view user's events
+ * 		- createViewUserPack(1, session_key, viewer_uid, viewee_uid)
+ * - for view user's postings
+ * 		- createViewUserPack(2, session_key, viewer_uid, viewee_uid, max_pid)
+ * - for view user's info
+ * 		- createViewUserPack(4, session_key, viewer_uid, viewee_uid)
+ * - for view user's circatags
+ * 		- createViewUserPack(18, session_key, viewer_uid, viewee_uid)
+ * - for view user's big avarta
+ * 		- createViewUserPack(23, session_key, viewer_uid, viewee_uid, local_version_date, local_version_time)
+ * - for view user's small avarta
+ * 		- createViewUserPack(24, session_key, viewer_uid, viewee_uid, local_version_date, local_version_time)
+ */
 /*View User: 4 viewer, 4 viewee,
  *	1 subtype2 {0 for friends, 1 for event, 2 for posting, 4 for info, 18 for circatag, 23 for avarta large, 24 for avarta small}
  *			when (subtyp2 = 2): 8 max_pid
@@ -497,9 +562,8 @@ Handle<Value> createCreateUserPack(const Arguments &arg_ori) {
 	pkg.add(TCPack(TYPE_STRING, arg(password)->ToString()));
 	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(name)->ToString()->Length() * 2));
 	pkg.add(TCPack(TYPE_STRING, arg(name)->ToString()));
-	pkg.add(
-			TCPack(TYPE_ONE_BYTE_INT,
-					arg(nick_name)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT,
+	arg(nick_name)->ToString()->Length() * 2));
 	pkg.add(TCPack(TYPE_STRING, arg(nick_name)->ToString()));
 	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, arg(birthday)->ToInteger()));
 	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(gender)->ToInteger()));
@@ -511,9 +575,8 @@ Handle<Value> createCreateUserPack(const Arguments &arg_ori) {
 	pkg.add(TCPack(TYPE_STRING, arg(country)->ToString()));
 	pkg.add(TCPack(TYPE_TAGS, arg(tags)->ToObject()));
 	pkg.add(TCPack(TYPE_TAGS, arg(hidden_tags)->ToObject()));
-	pkg.setHeader(
-			HeaderPack(pkg.length() + HEADER_LENGTH, 2, 0,
-					arg(session_key)->ToString()));
+	pkg.setHeader(HeaderPack(pkg.length() + HEADER_LENGTH, 2, 0,
+	arg(session_key)->ToString()));
 	HandleScope scope;
 	return scope.Close(String::New(pkg.codec().data()));
 }
@@ -526,9 +589,8 @@ Handle<Value> createCreateEventPack(const Arguments &arg_ori) {
 	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(name)->ToString()->Length() * 2));
 	pkg.add(TCPack(TYPE_STRING, arg(name)->ToString()));
 	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, arg(creater_uid)->ToString()));
-	pkg.add(
-			TCPack(TYPE_ONE_BYTE_INT,
-					arg(description)->ToString()->Length() * 2));
+	pkg.add(TCPack(TYPE_ONE_BYTE_INT,
+	arg(description)->ToString()->Length() * 2));
 	pkg.add(TCPack(TYPE_STRING, arg(description)->ToString()));
 	pkg.add(TCPack(TYPE_ONE_BYTE_INT, arg(city)->ToString()->Length() * 2));
 	pkg.add(TCPack(TYPE_STRING, arg(city)->ToString()));
