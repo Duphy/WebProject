@@ -100,19 +100,20 @@ static Handle<Boolean> JSreadBool(char *buf, int &pointer) {
 static void extract_header(char *buf, response_header* ans) {
 	ans->length = 0;
 	int pointer = 0;
+	ans->length = readInteger(buf, pointer, 4);
 	readAsciiString(ans->session_key, buf, pointer, SESSION_KEY_LENGTH);
 	readBytes(NULL, buf, pointer, 4);
 	ans->uid = readInteger(buf, pointer, UID_LENGTH);
 	ans->type = readInteger(buf, pointer, 1);
 	ans->subtype = readInteger(buf, pointer, 1);
 }
-static Local<Object> formJSHeader(response_header *header) {
-	Local<Object> ans = Object::New();
-	ans->Set(sym("session_key"),
-			String::New(header->session_key, SESSION_KEY_LENGTH));
-	ans->Set(sym("uid"), Integer::New(header->uid));
-	ans->Set(sym("type"), Integer::New(header->type));
-	ans->Set(sym("subtype"), Integer::New(header->subtype));
+static Local<Array> formJSHeader(response_header *header) {
+	Local<Array> ans = Array::New(5);
+	ans->Set(0, Integer::New(header->length));
+	ans->Set(1, String::New(header->session_key, SESSION_KEY_LENGTH));
+	ans->Set(2, Integer::New(header->uid));
+	ans->Set(3, Integer::New(header->type));
+	ans->Set(4, Integer::New(header->subtype));
 	return ans;
 }
 
@@ -429,7 +430,7 @@ Local<Array> resolvUpdates(char *pack, int &pointer) {
  * - 6: msg (string)
  */
 Local<Array> resolvNotification(char *pack, int &pointer) {
-	Local<Object> ans = Array::New(7);
+	Local<Array> ans = Array::New(7);
 	uint32_t msg_len;
 	ans->Set(0, JSreadInteger(pack, pointer, 1));
 	ans->Set(1, JSreadInteger(pack, pointer, 4));
@@ -665,7 +666,7 @@ Local<Array> resolvViewPack(char *pack, int subtype) {
  * - \b "1 2 Search posting"
  * 		- Array: posting (::resolvPosting)
  */
-Local<Array> resolvSearchPack(char *pack, int subtype) {
+Handle<Value> resolvSearchPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
 	switch (subtype) {
 	case 0:			//Search User
@@ -811,7 +812,7 @@ Local<Array> resolvCreatePack(char *pack, int subtype) {
 
 /**
  * - \b "3 0 Update user"
- * 		- 0: updates (::resolvUpdates)
+ * 		- Array: updates (::resolvUpdates)
  */
 
 /**
@@ -861,7 +862,7 @@ Local<Array> resolvUpdatePack(char *pack, int subtype) {
 	Local<Array> ans;
 	switch (subtype) {
 	case 0: //updates
-		return resolvUpdates(pack, pointer));
+		return resolvUpdates(pack, pointer);
 		break;
 	case 1: //event updates
 		ans = Array::New(2);
@@ -1085,7 +1086,7 @@ Local<Array> resolvQuitPack(char *pack, int subtype) {
  * - \todo \b "10 6 New feature suggestion"
  * - \todo \b "10 15 System polling"
  */
-Local<Array> resolvSuggestionPack(char *pack, int subtype) {
+Handle<Value> resolvSuggestionPack(char *pack, int subtype) {
 	int pointer = HEADER_LENGTH * 2;
 	switch (subtype) {
 	case 0: //TODO friend suggestion
@@ -1173,16 +1174,23 @@ Local<Object> resolvMessagePack(char *pack, int subtype) {
 }
 
 /**
- * - \b "0 View" (::resolvViewPack)
- * - \b "1 Search" (::resolvSearchPack)
- * - \b "2 Create" (::resolvCreatePack)
- * - \b "3 Update" (::resolvUpdatePack)
- * - \b "4 Reply" (::resolvReplyPack)
- * - \b "5 Delete" (::resolvDeletePack)
- * - \b "6 Validation" (::resolvValidationPack)
- * - \b "7 Quit" (::resolvQuitPack)
- * - \b "10 Suggestion" (::resolvSuggestionPack)
- * - \b "12 Message" (::resolvMessagePack)
+ * - 0: header
+ * 		- 0: length
+ * 		- 1: session_key
+ * 		- 2: uid
+ * 		- 3: type
+ * 		- 4: subtype
+ * - 1: resolved_package
+ * 		- \b "0 View" (::resolvViewPack)
+ * 		- \b "1 Search" (::resolvSearchPack)
+ * 		- \b "2 Create" (::resolvCreatePack)
+ * 		- \b "3 Update" (::resolvUpdatePack)
+ * 		- \b "4 Reply" (::resolvReplyPack)
+ * 		- \b "5 Delete" (::resolvDeletePack)
+ * 		- \b "6 Validation" (::resolvValidationPack)
+ * 		- \b "7 Quit" (::resolvQuitPack)
+ * 		- \b "10 Suggestion" (::resolvSuggestionPack)
+ * 		- \b "12 Message" (::resolvMessagePack)
  */
 Handle<Value> resolvPack(const Arguments& args) {
 	char* pack = new char[args[0]->ToString()->Length()];
