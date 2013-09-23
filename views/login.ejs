@@ -1,26 +1,29 @@
 <% include header %>
+  <script src = "/js/login.js"></script>
   </head>
   <body>
 	<form class="form-horizontal" style = "margin-top:10%;margin-left:30%;width:400px;">
 		<legend style = "font-family: 'Raleway', sans-serif;font-size:50px;">Circa</legend>
-	  <div class="control-group">
+	  <div class="control-group" id = "emailGroup">
 	    <label class="control-label" for="inputEmail">Email</label>
 	    <div class="controls">
 	      <input type="text" id="inputEmail" placeholder="Email">
+	      <span class="help-inline" id = "emailWarning" style = "display:none;">Email should not be empty.</span>
 	    </div>
 	  </div>
-	  <div class="control-group">
+	  <div class="control-group" id = "passwordGroup">  
 	    <label class="control-label" for="inputPassword">Password</label>
 	    <div class="controls">
 	      <input type="password" id="inputPassword" placeholder="Password">
+	      <span class="help-inline" id = "passwordWarning" style = "display:none;">password should not be empty.</span>
 	    </div>
 	  </div>
-	  <div class="control-group">
+	  <div class="control-group" id = "rememberCheckBox">
 	    <div class="controls">
 	      <label class="checkbox">
 	        <input type="checkbox"> Remember me
 	      </label>
-	      <button type="submit" class="btn btn-primary pull-right">Login</button>
+	      <button id = "LoginButton" class="btn btn-primary pull-right">Login</button>
 	    </div>
 	  </div>
 	</form>
