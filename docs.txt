@@ -1,0 +1,36 @@
+resolv header
+
+Handle<Value> resolvPack(const Arguments& args)
+
+createViewUserPack
+createViewEventPack 
+createViewPostingPack 
+createMassViewPack 
+createViewSelfPack 
+ createSearchUserPack 
+ createSearchEventPack 
+  createSearchPostingPack 
+  createCreateUserPack 
+  createCreateEventPack 
+  createCreatePostingPack 
+  createCreateRequestPack 
+  createCreateSchedulePack 
+  createUpdateUserPack 
+  createUpdateEventPack 
+  createUpdatePostingPack 
+  createUpdateFriendCommentsPack 
+  createUpdateStatusPack 
+  createUpdateAvartaBig 
+  createUpdateAvartaSmall 
+  createReplyPostingPack 
+  createDeleteFriendPack 
+  createDeletePostingPack 
+  createDeleteSchedulePack 
+  createDeleteReplyPack 
+  createLoginPack 
+  createLogoutPack 
+  createEmailValidationPack 
+  createIdentificationCodeValidationPack 
+  createQuitEventPack 
+  createMessageToUserPack 
+  createMessageToEventPack 
