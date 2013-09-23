@@ -1,7 +1,9 @@
 $(document).ready(function(){
 	$('#LoginButton').click(function(){
 		var proceed = true;
-		if($('#inputEmail').val() == ""){
+		var email = $('#inputEmail').val();
+		var password = $('#inputPassword').val();
+		if(email == ""){
 			proceed = false;
 			$('#emailGroup').addClass('error');
 			$('#emailWarning').show();
@@ -10,7 +12,7 @@ $(document).ready(function(){
 			$('#emailGroup').removeClass('error');
 			$('#emailWarning').hide();
 		}
-		if($('#inputPassword').val() == ""){
+		if(password == ""){
 			proceed = false;
 			$('#passwordGroup').addClass('error');
 			$('#passwordWarning').show();
@@ -21,6 +23,14 @@ $(document).ready(function(){
 		}
 		if(proceed){
 			//Do send the post request
+			$.ajax({
+				url:"/doLogin",
+				data:{"email":email,"password":password},
+				type:"POST",
+				success:function(data){
+					//do something
+				}
+			});
 		}
 		return false;
 	});
