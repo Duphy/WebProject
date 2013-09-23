@@ -22,7 +22,7 @@ app.use(express.methodOverride());
 app.use(express.cookieParser('your secret here'));
 app.use(express.session());
 app.use(app.router);
-app.use(require('stylus').middleware(__dirname + '/public'));
+//app.use(require('stylus').middleware(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
@@ -30,7 +30,11 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
+if('production' == app.get('env')){
+	//do something in production version
+}
+
+app.get('/', routes.login);
 app.get('/users', user.list);
 
 http.createServer(app).listen(app.get('port'), function(){
