@@ -1,0 +1,85 @@
+<% include header.html %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="zh-CN">
+<meta name="generator" content="editplus">
+<meta name="author" content="">
+<meta name="keywords" content="">
+<meta name="description" content="">
+</head>
+<body>
+</body></html>
+<title>Home page</title>
+</head>
+<body>
+<% include navigator.html %>
+
+<!-- header end -->
+<div id = "mainbody" style="margin-left: auto; margin-right:auto; width:80%; margin-top:45px">
+	<div class="hero-unit" id="post">
+		<div id="post_header">
+			<h1>
+				<div class ="userpanel inline">
+					<a>
+						<img src= "a.jpg">
+						<?php $retrived_response = connect_view_user($post_uid,4);
+							$friend_name = $retrived_response[1][1][2];
+							echo $friend_name;
+							?>
+						friend_name
+					</a>
+				</div>
+				<small class="text-right">
+					<ul class="inline">
+						<li>post_date</li>
+						<li>post_time</li>				
+					</ul>
+				</small>
+			</h1>
+			<ul class="inline">
+				<li><div class = "postTag" style="display:inline">
+					<em class="muted">Tags: </em><?php print_tags($response[1][7]);?>
+				</div></li>
+				<li><div class = "status" style="display:inline">
+					<em class="muted">Status: </em>share or post
+				</div></li>
+			</ul>
+		</div>
+		<div class = "content">
+			<strong style="padding-left: 10%"><?php echo $response[1][5]?></strong>
+		</div>
+	</div>
+	<div class = "reply" style="margin-left: auto; margin-right:auto; width:90%;">
+		<?php 
+		foreach ($response[1][8] as $reply){
+			echo '<div class="hero-unit" style="padding:40px">';
+			if($reply[2]==$response[1][1])
+				echo '<h4><a href = "user_page.php?uid='.$reply[1].'" target="_blank"><p>'.$reply[3].'</a> says: </p></h4>';
+			else 
+				echo '<h4><a href = "user_page.php?uid='.$reply[1].'" target="_blank"><p>'.$reply[3].
+					'</a> replies <a href = "user_page.php?uid='.$reply[2].'" target="_blank">'
+					.$reply[4].'</a>: </p></h4>';
+			echo '<strong style="padding-left:10%">'.$reply[5].'</strong>';
+			echo "<br></br>";
+			echo '<blockquote class="text-right"><small><ul class="inline" style="display:inline"><li>';
+			print_date($reply[6]);
+			echo '</li><li>';
+			print_time($reply[7]);
+			echo '</li></blockquote></small></div>';
+		}
+		?>
+		<div class = "hero-unit comment">
+			<form action = "database/backend_reply_post.php" method = "post" enctype = "multipart/form-datd">
+				<div class="input-append">
+					<input id="appendedInputButton" type = "text" name = "reply" placeholder = "Want to say something?"/>
+					<button class="btn" name = "search_button" id = "search_button" type = "submit">comment</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<?php include_once 'sidebar.php';?>
+</body>
+</html>

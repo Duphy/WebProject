@@ -1,0 +1,98 @@
+//Explaination of resolv.cpp
+
+//This source file includes the basic functions of resolving the packs.
+
+//Structure:
+
+resovPack (const Arguments& args)    //args[0] is the pack
+
+Local<Object>	resolvViewPack(pack,subtype) //pack is the pack which we are dealing with. Subtype 					     //is the subtype of the pack, is a int. Local<Object> 					     //is the type of the result of resolving the pack
+
+Local<Object>	resolvSearch(pack,subtype)
+
+Local<Object>	resolvCreate(pack,subtype)
+	
+Local<Object>	resolvUpdatePack(pack,subtype)
+
+Local<Object>	resolvReply(pack,subtype)
+
+Local<Object>	resolvDelete(pack,subtype)
+
+Local<Object>	resolvValidationPack(pack,subtype)
+
+Local<Object>	resolvQuit(pack,subtype)
+
+Local<Object>	resolvSuggestion(pack,subtype)
+
+Local<Object>	resolvMessage(pack,subtype)
+
+//Other basic functions used to read:
+
+resolvHexbit(char a) //change the char a to int
+
+readBytes(char *dist, char *buf, int& pointer, int length) 
+
+Local<Array> JSreadBytes(char *buf, int &pointer, int length) //the functions which begins with 							      	      //Local means it would be 							      		      //transferred to the type which 							     		      //javascript can directly use
+
+void readAsciiString(char *dist, char *buf, int& pointer, int length)
+
+Local<String> JSreadAsciiString(char *buf, int &pointer, int length) 
+
+void readString(uint16_t *dist, char *buf, int &pointer, int length)
+
+Local<String> JSreadString(char *buf, int &pointer, int length)
+
+int64_t readInteger(char *buf, int& pointer, int length)
+
+Local<Integer> JSreadInteger(char *buf, int &pointer, int length)
+
+bool readBool(char *buf, int &pointer)
+
+
+//The functions which are used to resolve some specific cases
+
+Handle<Boolean> JSreadBool(char *buf, int &pointer) 
+
+void extract_header(char *buf, response_header* ans)
+
+Local<Object> formJSHeader(response_header *header)   //used to form the header by pack in resolvPack
+
+Local<Array> resolvUIDs(char *pack, int &pointer)     //used to resolve more than one UIDs, pack is the pack which we are resovling now, pointer refers to the address of the pack which we are at.
+
+Local<Array> resolvEventIDs(char *pack, int &pointer) //used to resolve more than one EventIDs
+
+Local<Object> resolvPosting(char *pack, int &pointer) //used to resolve posting
+
+Local<Array> resolvPostings(char *pack, int &pointer) //used to resolve more than one postings
+
+Local<Array> resolvTags(char *pack, int &pointer)     //used to resolve more than one tags
+
+Local<Array> resolvReplies(char *pack, int &pointer)  //used to resolve more than one replies
+
+Local<Object> resolvUserSimpleOtherPack(char *pack, int &pointer) 
+
+Local<Object> resolvWeightedTag(char *pack, int &pointer)
+
+Local<Array> resolvWeightedTags(char *pack, int &pointer)
+
+Local<Array> resolvHonors(char *pack, int &pointer) 
+
+Local<Object> resolvEventSimpleOtherPack(char *pack, int &pointer)
+
+Local<Object> resolvUserSimplePack(char *pack, int &pointer) 
+
+Local<Object> resolvUserSettingPack(char *pack, int &pointer)
+
+//the seven functions above are all used to resolve some special cases
+
+Local<Object> resolvSchedule(char *pack, int &pointer)	//used to resolve Schedule
+
+Local<Array> resolvSchedules(char *pack, int &pointer)  //used to resolve more than one Schedules
+
+Local<Object> resolvUpdate(char *pack, int &pointer)	//used to resolve Update
+
+Local<Array> resolvUpdates(char *pack, int &pointer)	//used to resolve more than one Updaes
+
+
+
+//Done
