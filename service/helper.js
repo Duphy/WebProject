@@ -7,7 +7,10 @@ exports.doLogin = function(req, res) {
     var lib = require("../node_modules/lib");
     var service = require("./service");
     const LOG_IN_MODE = 0;
+    console.log("email:",req.body.email);
+    console.log("password:",req.body.password);
     var pack = lib.createLoginPack(LOG_IN_MODE, req.body.email,req.body.password);
+    console.log(pack);
     service.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	if (pkg.resolved.success) {
