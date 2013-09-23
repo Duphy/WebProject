@@ -17,18 +17,27 @@ $(document).ready(function(){
 			$('#passwordGroup').addClass('error');
 			$('#passwordWarning').show();
 		}else{
-			proceed = false;
+			proceed = true;
 			$('#passwordGroup').removeClass('error');
 			$('#passwordWarning').hide();
 		}
+		console.log("email:" + email);
+		console.log("password:" + password);
 		if(proceed){
 			//Do send the post request
+			data = {};
+			data.email = email;
+			data.password = password;
 			$.ajax({
 				url:"/doLogin",
-				data:{"email":email,"password":password},
+				data:JSON.stringify(data),
 				type:"POST",
+				contentType: 'application/json',
 				success:function(data){
 					//do something
+					alert("yeah!");
+					console.log('reach inside');
+					console.log(data);
 				}
 			});
 		}
