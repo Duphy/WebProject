@@ -16,7 +16,7 @@
 #define TYPE_ASCII_STRING		10
 #define TYPE_TAGS				11
 
-#define SetHeadAndReturn(_session_key_index, _type, _subtype) pkg.add(\
+#define SetHeadAndReturn(_session_key_index, _type, _subtype) pkg.setHeader(\
 		HeaderPack(pkg.length() + HEADER_LENGTH,\
 					_type, _subtype, _session_key_index==-1?String::New(DUMB_SESSION_KEY):args[_session_key_index]->ToString()));\
 		HandleScope scope;\
@@ -103,7 +103,7 @@ HeaderPack::HeaderPack(int length, int type, int subtype,
 		Handle<String> session_key = String::New("00000000")) {
 	PackList tmp;
 	tmp.add(TCPack(TYPE_FOUR_BYTE_INT, length));
-	tmp.add(TCPack(TYPE_STRING, session_key));
+	tmp.add(TCPack(TYPE_ASCII_STRING, session_key));
 	tmp.add(TCPack(TYPE_ONE_BYTE_INT, 1));
 	tmp.add(TCPack(TYPE_TWO_BYTE_INT, 0));
 	tmp.add(TCPack(TYPE_ONE_BYTE_INT, 0));
