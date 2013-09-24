@@ -4,6 +4,7 @@
 #include <string>
 #include "common.h"
 
+#define HEADER_LENGTH			18
 #define TYPE_STRING				1
 #define TYPE_TAG				2
 #define TYPE_UIDS  				3
@@ -73,8 +74,7 @@ public:
 };
 static class HeaderPack: public Package {
 public:
-	HeaderPack::HeaderPack(int length, int type, int subtype,
-			Handle<String> session_key);
+	HeaderPack(int length, int type, int subtype, Handle<String> session_key);
 };
 static class TCPack: public Package {
 public:

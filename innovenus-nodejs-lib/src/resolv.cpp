@@ -3,6 +3,7 @@
 #include <cstdio>
 #include "common.h"
 
+#define HEADER_LENGTH	22
 typedef struct s_response_header {
 	uint32_t length;
 	char session_key[SESSION_KEY_LENGTH];
@@ -92,7 +93,7 @@ static Local<Integer> JSreadInteger(char *buf, int &pointer, int length) {
 static bool readBool(char *buf, int &pointer) {
 	char tmp;
 	tmp = readInteger(buf, pointer, 1);
-	return tmp == 0;
+	return (tmp == 0);
 }
 static Handle<Boolean> JSreadBool(char *buf, int &pointer) {
 	return Boolean::New(readBool(buf, pointer));

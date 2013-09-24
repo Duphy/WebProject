@@ -15,7 +15,6 @@
 #endif
 using namespace v8;
 
-#define HEADER_LENGTH			18
 #define UID_LENGTH				4
 #define EVENTID_LENGTH			8
 #define SID_LENGTH				4
