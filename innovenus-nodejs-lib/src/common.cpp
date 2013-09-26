@@ -9,6 +9,7 @@
 #include "create.h"
 
 #define ExportJSFunction(x) exports->Set(sym(#x),FunctionTemplate::New(x)->GetFunction());
+
 void init(Handle<Object> exports) {
 	ExportJSFunction(createViewUserPack);
 	ExportJSFunction(createViewEventPack)

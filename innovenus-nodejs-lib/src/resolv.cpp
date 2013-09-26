@@ -1019,6 +1019,7 @@ Local<Array> resolvDeletePack(char *pack, int subtype) {
 /**
  * - \b "6 0 Validation"
  * 		- 0: success (boolean)
+ * 			- 1: session_key (string)
  * 		- \b "if not success"
  * 			- 1: reason (int8)
  */
@@ -1050,6 +1051,11 @@ Local<Array> resolvValidationPack(char *pack, int subtype) {
 	ans->Set(0, Boolean::New(succ));
 	switch (subtype) {
 	case 0: //Login
+		if (succ)
+			ans->Set(1, JSreadAsciiString(pack, pointer, 8));
+		else
+			ans->Set(1, JSreadInteger(pack, pointer, 1));
+		break;
 	case 16: //Logout
 	case 20: //Email validation
 	case 21: //Identification_code validation

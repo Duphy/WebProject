@@ -2,26 +2,73 @@
 #include <node.h>
 #include <cstdio>
 #include <string>
+#include <exception>
 #include "common.h"
 
-#define HEADER_LENGTH			18
-#define TYPE_STRING				1
-#define TYPE_TAG				2
-#define TYPE_UIDS  				3
-#define TYPE_ONE_BYTE_INT  		4
-#define TYPE_TWO_BYTE_INT  		5
-#define TYPE_FOUR_BYTE_INT  	6
-#define TYPE_EIGHT_BYTE_INT  	7
-#define TYPE_HEADER  			8
-#define TYPE_UPDATES  			9
-#define TYPE_ASCII_STRING		10
-#define TYPE_TAGS				11
+#define TYPE_CHECK
 
-#define SetHeadAndReturn(_session_key_index, _type, _subtype) pkg.setHeader(\
-		HeaderPack(pkg.length() + HEADER_LENGTH,\
-					_type, _subtype, _session_key_index==-1?String::New(DUMB_SESSION_KEY):args[_session_key_index]->ToString()));\
-		HandleScope scope;\
-		return scope.Close(String::New(pkg.codec().data()))
+#define HEADER_LENGTH			18
+
+#define SPECIAL_MASK			0x000F
+#define INT_MASK				0x0100
+#define STRING_MASK				0x0200
+#define ASCIISTRING_MASK		0x0400
+#define ARRAY_MASK				0x0800
+#define BYTES_MASK				0x1000
+
+#define TYPE_ONE_BYTE_INT  		(INT_MASK | 0x1)
+#define TYPE_TWO_BYTE_INT  		(INT_MASK | 0x2)
+#define TYPE_FOUR_BYTE_INT  	(INT_MASK | 0x4)
+#define TYPE_EIGHT_BYTE_INT  	(INT_MASK | 0x8)
+
+#define TYPE_STRING			(STRING_MASK)
+#define TYPE_ASCII_STRING		(ASCIISTRING_MASK)
+
+#define TYPE_UIDS  				(ARRAY_MASK | 0x1)
+#define TYPE_UPDATES  			(ARRAY_MASK | 0x2)
+#define TYPE_TAGS				(ARRAY_MASK | 0x3)
+
+#define TYPE_BYTES				(BYTES_MASK)
+
+#define ONE_BYTE_FOR_LENGTH		1
+#define TWO_BYTE_FOR_LENGTH		2
+#define FOUR_BYTE_FOR_LENGTH	4
+
+static const std::string eundef(" is undefined");
+static const std::string enull(" is null");
+static const std::string enotint(" isn't integer");
+static const std::string enotstr(" isn't string");
+static const std::string enotarr(" isn't array");
+static const std::string elength("'s length error");
+static const std::string eelem("element of ");
+
+#define SetHeadAndReturn(_session_key_index, _type, _subtype) {std::string tmp(""); \
+	tmp += convert_int_to_hex_string(code.length() / 2 + HEADER_LENGTH, 4); \
+	if (_session_key_index != -1) { \
+		if (args[_session_key_index]->IsUndefined()) \
+			throw std::exception(("session_key" + eundef).data()); \
+		if (args[_session_key_index]->IsNull()) \
+			throw std::exception(("session_key" + enull).data()); \
+		if (!(args[_session_key_index]->IsString())) \
+			throw std::exception(("session_key" + enotstr).data()); \
+		tmp += convert_ascii_string_to_hex_string(args[_session_key_index]->ToString()); \
+	} else \
+		tmp += convert_ascii_string_to_hex_string(String::New(DUMB_SESSION_KEY)); \
+	tmp += convert_int_to_hex_string(1, 1); \
+	tmp += convert_int_to_hex_string(0, 3); \
+	tmp += convert_int_to_hex_string(_type, 1); \
+	tmp += convert_int_to_hex_string(_subtype, 1); \
+	code = tmp + code; \
+	HandleScope scope; \
+	return scope.Close(String::New(code.data())); \
+	}
+
+#define BEGIN try{
+#define END } catch (std::exception &e){ \
+		return ThrowException(Exception::Error(String::New(e.what()))); \
+	} \
+	return Undefined();
+
 static inline char formHexBit(int a) {
 	return a > 9 ? 'a' + a - 10 : '0' + a;
 }
@@ -64,163 +111,335 @@ static std::string convert_ascii_string_to_hex_string(Handle<String> src) {
 	return ans;
 }
 
-static class Package {
-protected:
-	std::string code;
-public:
-	inline std::string codec() const {
-		return code;
-	}
-};
-static class HeaderPack: public Package {
-public:
-	HeaderPack(int length, int type, int subtype, Handle<String> session_key);
-};
-static class TCPack: public Package {
-public:
-	TCPack(int type, Handle<String> a);
-	TCPack(int type, Handle<Integer> a);
-	TCPack(int type, int64_t a);
-	TCPack(int type, Package a);
-	TCPack(int type, Handle<Object> a);
-};
-static class PackList: public Package {
-public:
-	inline void add(Package a) {
-		code += a.codec();
-	}
-	inline void prepend(Package a) {
-		code = a.codec() + code;
-	}
-	inline void setHeader(HeaderPack a) {
-		code = a.codec() + code;
-	}
-	inline uint32_t length() {
-		return code.length() / 2;
-	}
-};
-HeaderPack::HeaderPack(int length, int type, int subtype,
-		Handle<String> session_key = String::New("00000000")) {
-	PackList tmp;
-	tmp.add(TCPack(TYPE_FOUR_BYTE_INT, length));
-	tmp.add(TCPack(TYPE_ASCII_STRING, session_key));
-	tmp.add(TCPack(TYPE_ONE_BYTE_INT, 1));
-	tmp.add(TCPack(TYPE_TWO_BYTE_INT, 0));
-	tmp.add(TCPack(TYPE_ONE_BYTE_INT, 0));
-	tmp.add(TCPack(TYPE_ONE_BYTE_INT, type));
-	tmp.add(TCPack(TYPE_ONE_BYTE_INT, subtype));
-	code = tmp.codec();
-}
-TCPack::TCPack(int type, Handle<Integer> a) {
-	switch (type) {
-	case TYPE_ONE_BYTE_INT:
-		code = convert_int_to_hex_string(a->Value(), 1);
-		break;
-	case TYPE_TWO_BYTE_INT:
-		code = convert_int_to_hex_string(a->Value(), 2);
-		break;
-	case TYPE_FOUR_BYTE_INT:
-		code = convert_int_to_hex_string(a->Value(), 4);
-		break;
-	case TYPE_EIGHT_BYTE_INT:
-		code = convert_int_to_hex_string(a->Value(), 8);
-		break;
-	}
-}
-TCPack::TCPack(int type, Handle<String> a) {
-	switch (type) {
-	case TYPE_STRING:
-		code = convert_string_to_hex_string(a);
-		break;
-	case TYPE_ASCII_STRING:
-		code = convert_ascii_string_to_hex_string(a);
-		break;
-	}
-}
-TCPack::TCPack(int type, Package a) {
-	switch (type) {
-	case TYPE_HEADER:
-		code = a.codec();
-		break;
-	};
-}
-TCPack::TCPack(int type, int64_t a) {
-	switch (type) {
-	case TYPE_ONE_BYTE_INT:
-		code = convert_int_to_hex_string(a, 1);
-		break;
-	case TYPE_TWO_BYTE_INT:
-		code = convert_int_to_hex_string(a, 2);
-		break;
-	case TYPE_FOUR_BYTE_INT:
-		code = convert_int_to_hex_string(a, 4);
-		break;
-	case TYPE_EIGHT_BYTE_INT:
-		code = convert_int_to_hex_string(a, 8);
-		break;
-	}
-}
-TCPack::TCPack(int type, Handle<Object> a) {
-	uint32_t i, type2;
-	PackList tmp;
-	Local<String> cur2;
-	Local<Object> cur3;
-	Local<Value> cur;
-	switch (type) {
-	case TYPE_TAGS:
-		cur = a->Get(i = 0);
-		while (!cur->IsUndefined()) {
-			cur2 = cur->ToString();
-			tmp.add(TCPack(TYPE_ONE_BYTE_INT, cur2->Length() * 2));
-			tmp.add(TCPack(TYPE_STRING, cur2));
-			cur = a->Get(i++);
-		}
-		tmp.prepend(TCPack(TYPE_ONE_BYTE_INT, Integer::New(i)));
-		code = tmp.codec();
-		break;
-	case TYPE_UPDATES:
-		cur = a->Get(i = 0);
-		while (!cur->IsUndefined()) {
-			cur3 = cur->ToObject();
-			type2 = cur3->Get(0)->Uint32Value();
-			tmp.add(TCPack(TYPE_ONE_BYTE_INT, type2));
-			switch (type2) {
-			case 0: //password
-			case 1: //name
-			case 2: //nickname
-			case 5: //city
-			case 6: //state
-			case 7: //country
-			case 8: //add tag
-			case 9: //del tag
-				tmp.add(
-						TCPack(TYPE_ONE_BYTE_INT,
-								cur3->Get(1)->ToString()->Length() * 2));
-				tmp.add(TCPack(TYPE_STRING, cur3->Get(1)->ToString()));
-				break;
-			case 3: //birthday
-				tmp.add(TCPack(TYPE_FOUR_BYTE_INT, cur3->Get(1)->ToInteger()));
-				break;
-			case 4: //gender
-				tmp.add(TCPack(TYPE_ONE_BYTE_INT, cur3->Get(1)->ToInteger()));
-				break;
-			case 10: //setting
-				tmp.add(TCPack(TYPE_ONE_BYTE_INT, cur3->Get(1)->ToInteger()));
-				tmp.add(TCPack(TYPE_ONE_BYTE_INT, cur3->Get(2)->ToInteger()));
-				break;
-			case 11: //add manager
-			case 12: //del manager
-			case 13: //del member
-				tmp.add(TCPack(TYPE_FOUR_BYTE_INT, cur3->Get(1)->ToInteger()));
-				break;
+static inline void Add(std::string& code, const int type,
+		const Local<Value>& value, const char* name) {
+	if (type & ARRAY_MASK) {
+#ifdef TYPE_CHECK
+		if (value->IsUndefined())
+			throw std::exception((name + eundef).data());
+		if (value->IsNull())
+			throw std::exception((name + enull).data());
+		if (!(value->IsArray()))
+			throw std::exception((name + enotarr).data());
+#endif
+		Local<Object> tmp = value->ToObject();
+		Local<Value> cur;
+		Local<String> cur2;
+		Local<Object> cur3;
+		std::string tmpstr("");
+		unsigned int i;
+		int type2;
+		switch (type) {
+		case TYPE_TAGS:
+			cur = tmp->Get(i = 0);
+			while (!cur->IsUndefined()) {
+#ifdef TYPE_CHECK
+				if (value->IsNull())
+					throw std::exception((eelem + name + enull).data());
+				if (!(cur->IsString()))
+					throw std::exception((eelem + name + enotstr).data());
+#endif
+				cur2 = cur->ToString();
+				tmpstr += convert_int_to_hex_string(cur2->Length() * 2, 1);
+				tmpstr += convert_string_to_hex_string(cur2);
+				cur = tmp->Get(i++);
 			}
-			cur = a->Get(i++);
+			code += convert_int_to_hex_string(i, 1) + tmpstr;
+			break;
+		case TYPE_UPDATES:
+			cur = tmp->Get(i = 0);
+			while (!cur->IsUndefined()) {
+#ifdef TYPE_CHECK
+				if (value->IsNull())
+					throw std::exception((eelem + name + enull).data());
+				if (!(cur->IsArray()))
+					throw std::exception((eelem + name + enotarr).data());
+#endif
+				cur3 = cur->ToObject();
+#ifdef TYPE_CHECK
+				if (cur3->Get(0)->IsNull())
+					throw std::exception((eelem + eelem + name + enull).data());
+				if (!(cur3->Get(0)->IsInt32()))
+					throw std::exception(
+							(eelem + eelem + name + enotint).data());
+#endif
+				type2 = cur3->Get(0)->Uint32Value();
+				tmpstr += convert_int_to_hex_string(type2, 1);
+				switch (type2) {
+				case 0: //password
+				case 1: //name
+				case 2: //nickname
+				case 5: //city
+				case 6: //state
+				case 7: //country
+				case 8: //add tag
+				case 9: //del tag
+#ifdef TYPE_CHECK
+					if (cur3->Get(1)->IsNull())
+						throw std::exception(
+								(eelem + eelem + name + enull).data());
+					if (!(cur3->Get(1)->IsString()))
+						throw std::exception(
+								(eelem + eelem + name + enotstr).data());
+#endif
+					tmpstr += convert_int_to_hex_string(
+							cur3->Get(1)->ToString()->Length() * 2, 1);
+					tmpstr += convert_string_to_hex_string(
+							cur3->Get(1)->ToString());
+					break;
+				case 3: //birthday
+				case 11: //add manager
+				case 12: //del manager
+				case 13: //del member
+#ifdef TYPE_CHECK
+					if (cur3->Get(1)->IsNull())
+						throw std::exception(
+								(eelem + eelem + name + enull).data());
+					if (!(cur3->Get(1)->IsInt32()))
+						throw std::exception(
+								(eelem + eelem + name + enotint).data());
+#endif
+					tmpstr += convert_int_to_hex_string(
+							cur3->Get(1)->IntegerValue(), 4);
+					break;
+				case 4: //gender
+#ifdef TYPE_CHECK
+					if (cur3->Get(1)->IsNull())
+						throw std::exception(
+								(eelem + eelem + name + enull).data());
+					if (!(cur3->Get(1)->IsInt32()))
+						throw std::exception(
+								(eelem + eelem + name + enotint).data());
+#endif
+					tmpstr += convert_int_to_hex_string(
+							cur3->Get(1)->IntegerValue(), 1);
+					break;
+				case 10: //setting
+#ifdef TYPE_CHECK
+					if (cur3->Get(1)->IsNull())
+						throw std::exception(
+								(eelem + eelem + name + enull).data());
+					if (!(cur3->Get(1)->IsInt32()))
+						throw std::exception(
+								(eelem + eelem + name + enotint).data());
+					if (cur3->Get(2)->IsNull())
+						throw std::exception(
+								(eelem + eelem + name + enull).data());
+					if (!(cur3->Get(2)->IsInt32()))
+						throw std::exception(
+								(eelem + eelem + name + enotint).data());
+#endif
+					tmpstr += convert_int_to_hex_string(
+							cur3->Get(1)->IntegerValue(), 1);
+					tmpstr += convert_int_to_hex_string(
+							cur3->Get(2)->IntegerValue(), 1);
+					break;
+				}
+				cur = tmp->Get(i++);
+			}
+			code += convert_int_to_hex_string(i, 1) + tmpstr;
+			break;
+		case TYPE_UIDS:
+			cur = tmp->Get(i = 0);
+			while (!cur->IsUndefined()) {
+#ifdef TYPE_CHECK
+				if (cur->IsNull())
+					throw std::exception((eelem + name + enull).data());
+				if (!(cur->IsInt32()))
+					throw std::exception((eelem + name + enotint).data());
+#endif
+				tmpstr += convert_int_to_hex_string(cur->IntegerValue(), 4);
+				cur = tmp->Get(i++);
+			}
+			code += convert_int_to_hex_string(i, 4) + tmpstr;
+			break;
 		}
-		tmp.prepend(TCPack(TYPE_ONE_BYTE_INT, Integer::New(i)));
-		code = tmp.codec();
-		break;
+	} else if (type & INT_MASK) {
+#ifdef TYPE_CHECK
+		if (value->IsUndefined())
+			throw std::exception((name + eundef).data());
+		if (value->IsNull())
+			throw std::exception((name + enull).data());
+		if (!(value->IsInt32()))
+			throw std::exception((name + enotint).data());
+#endif
+		code += convert_int_to_hex_string(value->IntegerValue(),
+				type & SPECIAL_MASK);
+	} else if (type & STRING_MASK) {
+#ifdef TYPE_CHECK
+		if (value->IsUndefined())
+			throw std::exception((name + eundef).data());
+		if (value->IsNull())
+			throw std::exception((name + enull).data());
+		if (!(value->IsString()))
+			throw std::exception((name + enotstr).data());
+#endif
+		if ((type & 0xF) == 0)
+			throw std::exception("Wrong strlen_length");
+		code += convert_int_to_hex_string(value->ToString()->Length() * 2,
+				type & SPECIAL_MASK);
+		code += convert_string_to_hex_string(value->ToString());
+	} else if (type & ASCIISTRING_MASK) {
+#ifdef TYPE_CHECK
+		if (value->IsUndefined())
+			throw std::exception((name + eundef).data());
+		if (value->IsNull())
+			throw std::exception((name + enull).data());
+		if (!(value->IsString()))
+			throw std::exception((name + enotstr).data());
+		if (((type & SPECIAL_MASK) != 0)
+				&& (value->ToString()->Length() != (type & SPECIAL_MASK)))
+			throw std::exception((name + elength).data());
+#endif
+		code += convert_ascii_string_to_hex_string(value->ToString());
+	} else if (type & BYTES_MASK) {
+#ifdef TYPE_CHECK
+		if (value->IsUndefined())
+			throw std::exception((name + eundef).data());
+		if (value->IsNull())
+			throw std::exception((name + enull).data());
+		if (!(value->IsString()))
+			throw std::exception((name + enotstr).data());
+#endif
+		code += convert_int_to_hex_string(value->ToString()->Length(),
+				type & SPECIAL_MASK);
+		code += convert_ascii_string_to_hex_string(value->ToString());
 	}
 }
+//static inline void Prepend(std::string& code, const int type,
+//		Local<Value>& value, const std::string& name) {
+//	if (type & ARRAY_MASK) {
+//#ifdef TYPE_CHECK
+//		if (value->IsUndefined())
+//			throw std::exception((name + eundef).data();
+//		if (value->IsNull())
+//			throw std::exception((name + enull).data();
+//		if (!(value->IsArray()))
+//			throw std::exception((name + enotarr).data();
+//#endif
+//		Local<Object> tmp = value->ToObject();
+//		Local<Value> cur;
+//		Local<String> cur2;
+//		Local<Object> cur3;
+//		std::string tmpstr("");
+//		unsigned int i;
+//		int type2;
+//		switch (type) {
+//		case TYPE_TAGS:
+//			cur = tmp->Get(i = 0);
+//			while (!cur->IsUndefined()) {
+//#ifdef TYPE_CHECK
+//				if (!(cur->IsString()))
+//					throw std::exception((eelem + name + enotstr).data();
+//#endif
+//				cur2 = cur->ToString();
+//				tmpstr += convert_int_to_hex_string(cur2->Length() * 2, 1);
+//				tmpstr += convert_string_to_hex_string(cur2);
+//				cur = tmp->Get(i++);
+//			}
+//			code += convert_int_to_hex_string(i, 1) + tmpstr;
+//			break;
+//		case TYPE_UPDATES:
+//			cur = tmp->Get(i = 0);
+//			while (!cur->IsUndefined()) {
+//#ifdef TYPE_CHECK
+//				if (!(cur->IsArray()))
+//					throw std::exception((eelem + name + enotarr).data();
+//#endif
+//				cur3 = cur->ToObject();
+//				type2 = cur3->Get(0)->Uint32Value();
+//				tmpstr += convert_int_to_hex_string(type2, 1);
+//				switch (type2) {
+//				case 0: //password
+//				case 1: //name
+//				case 2: //nickname
+//				case 5: //city
+//				case 6: //state
+//				case 7: //country
+//				case 8: //add tag
+//				case 9: //del tag
+//					tmpstr += convert_int_to_hex_string(
+//							cur3->Get(1)->ToString()->Length() * 2, 1);
+//					tmpstr += convert_string_to_hex_string(
+//							cur3->Get(1)->ToString();
+//					break;
+//				case 3: //birthday
+//				case 11: //add manager
+//				case 12: //del manager
+//				case 13: //del member
+//					tmpstr += convert_int_to_hex_string(
+//							cur3->Get(1)->IntegerValue(), 4);
+//					break;
+//				case 4: //gender
+//					tmpstr += convert_int_to_hex_string(
+//							cur3->Get(1)->IntegerValue(), 1);
+//					break;
+//				case 10: //setting
+//					tmpstr += convert_int_to_hex_string(
+//							cur3->Get(1)->IntegerValue(), 1);
+//					tmpstr += convert_int_to_hex_string(
+//							cur3->Get(2)->IntegerValue(), 1);
+//					break;
+//				}
+//				cur = tmp->Get(i++);
+//			}
+//			code = convert_int_to_hex_string(i, 1) + tmpstr + code;
+//			break;
+//		case TYPE_UIDS:
+//			cur = tmp->Get(i = 0);
+//			while (!cur->IsUndefined()) {
+//#ifdef TYPE_CHECK
+//				if (!(cur->IsString()))
+//					throw std::exception((eelem + name + enotstr).data();
+//#endif
+//				tmpstr += convert_int_to_hex_string(cur->IntegerValue(), 4);
+//				cur = tmp->Get(i++);
+//			}
+//			code = convert_int_to_hex_string(i, 4) + tmpstr + code;
+//			break;
+//		}
+//	} else if (type & INT_MASK) {
+//#ifdef TYPE_CHECK
+//		if (value->IsUndefined())
+//			throw std::exception((name + eundef).data();
+//		if (value->IsNull())
+//			throw std::exception((name + enull).data();
+//		if (!(value->IsInt32()))
+//			throw std::exception((name + enotint).data();
+//#endif
+//		switch (type) {
+//		case TYPE_ONE_BYTE_INT:
+//			code = convert_int_to_hex_string(value->IntegerValue(), 1) + code;
+//			break;
+//		case TYPE_TWO_BYTE_INT:
+//			code = convert_int_to_hex_string(value->IntegerValue(), 2) + code;
+//			break;
+//		case TYPE_FOUR_BYTE_INT:
+//			code = convert_int_to_hex_string(value->IntegerValue(), 4) + code;
+//			break;
+//		case TYPE_EIGHT_BYTE_INT:
+//			code = convert_int_to_hex_string(value->IntegerValue(), 8) + code;
+//			break;
+//		}
+//	} else if (type & STRING_MASK) {
+//#ifdef TYPE_CHECK
+//		if (value->IsUndefined())
+//			throw std::exception((name + eundef).data();
+//		if (value->IsNull())
+//			throw std::exception((name + enull).data();
+//		if (!(value->IsString()))
+//			throw std::exception((name + enotstr).data();
+//#endif
+//		switch (type) {
+//		case TYPE_STRING:
+//			code = convert_string_to_hex_string(value->ToString()) + code;
+//			break;
+//		case TYPE_ASCII_STRING:
+//			code = convert_ascii_string_to_hex_string(value->ToString()) + code;
+//			break;
+//		}
+//	}
+//}
 
 /**
  * - \b "0 0 View user"
@@ -250,35 +469,30 @@ TCPack::TCPack(int type, Handle<Object> a) {
 // args[2]: viewer_uid
 // args[3]: viewee_uid
 Handle<Value> createViewUserPack(const Arguments &args) {
-	PackList pkg;
-	switch (args[0]->Uint32Value()) {
-	case 0:
-	case 1:
-	case 4:
-	case 18:
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		break;
-	case 2:
-		// args[4]: postid
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
-		break;
-	case 23:
-	case 24:
-		// args[4]: local_version_date
-		// args[5]: local_version_time
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[4]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[5]->ToInteger()));
-		break;
-	}
-	SetHeadAndReturn(1, 0, 0);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "viewer_uid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[3], "viewee_uid");
+		Add(code, TYPE_ONE_BYTE_INT, args[0], "subtype");
+		switch (args[0]->Uint32Value()) {
+		case 0:
+		case 1:
+		case 4:
+		case 18:
+			break;
+		case 2:
+			// args[4]: postid
+			Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "postid");
+			break;
+		case 23:
+		case 24:
+			// args[4]: local_version_date
+			// args[5]: local_version_time
+			Add(code, TYPE_FOUR_BYTE_INT, args[4], "local_version_date");
+			Add(code, TYPE_FOUR_BYTE_INT, args[5], "local_version_time");
+			break;
+		}
+		SetHeadAndReturn(1, 0, 0);END
 }
 
 /**
@@ -311,36 +525,31 @@ Handle<Value> createViewUserPack(const Arguments &args) {
 // args[2]: viewer_uid
 // args[3]: eventid
 Handle<Value> createViewEventPack(const Arguments &args) {
-	PackList pkg;
-	switch (args[0]->Uint32Value()) {
-	case 0:
-	case 4:
-	case 5:
-	case 17:
-	case 18:
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		break;
-	case 2:
-		// args[4]: pid
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
-		break;
-	case 23:
-	case 24:
-		// args[4]: local_version_date
-		// args[5]: local_version_time
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[4]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[5]->ToInteger()));
-		break;
-	}
-	SetHeadAndReturn(1, 0, 1);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "viewer_uid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "eventid");
+		Add(code, TYPE_ONE_BYTE_INT, args[0], "subtype");
+		switch (args[0]->Uint32Value()) {
+		case 0:
+		case 4:
+		case 5:
+		case 17:
+		case 18:
+			break;
+		case 2:
+			// args[4]: pid
+			Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "pid");
+			break;
+		case 23:
+		case 24:
+			// args[4]: local_version_date
+			// args[5]: local_version_time
+			Add(code, TYPE_FOUR_BYTE_INT, args[4], "local_version_date");
+			Add(code, TYPE_FOUR_BYTE_INT, args[5], "local_version_time");
+			break;
+		}
+		SetHeadAndReturn(1, 0, 1);END
 }
 
 /**
@@ -356,12 +565,13 @@ Handle<Value> createViewEventPack(const Arguments &args) {
 // args[3]: posting_eid
 // args[4]: posting_pid
 Handle<Value> createViewPostingPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
-	SetHeadAndReturn(0, 0, 2);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "viewer_uid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "posting_uid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "posting_eid");
+		Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "posting_pid");
+		SetHeadAndReturn(0, 0, 2);END
 }
 
 /**
@@ -385,22 +595,20 @@ Handle<Value> createViewPostingPack(const Arguments &args) {
 // args[2]: session_key
 // args[3]: viewer_uid
 Handle<Value> createMassViewPack(const Arguments &args) {
-	PackList pkg;
-	switch (args[0]->Uint32Value()) {
-	case 0:
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[1]->ToInteger()));
-		break;
-	case 1:
-		// args[4]: pid
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[1]->ToInteger()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
-		break;
-	}
-	SetHeadAndReturn(2, 0, 10);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[3], "viewer_uid");
+		Add(code, TYPE_ONE_BYTE_INT, args[0], "subtype2");
+		Add(code, TYPE_ONE_BYTE_INT, args[1], "subtype3");
+		switch (args[0]->Uint32Value()) {
+		case 0:
+			break;
+		case 1:
+			// args[4]: pid
+			Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "pid");
+			break;
+		}
+		SetHeadAndReturn(2, 0, 10);END
 }
 
 /**
@@ -448,37 +656,32 @@ Handle<Value> createMassViewPack(const Arguments &args) {
 // args[1]: session_key
 // args[2]: current_uid
 Handle<Value> createViewSelfPack(const Arguments& args) {
-	PackList pkg;
-	switch (args[0]->Uint32Value()) {
-	case 0:
-	case 1:
-	case 4:
-	case 6:
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		break;
-	case 2: // args[3]: pid
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-		break;
-	case 17:
-	case 18: // args[3]: option
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToInteger()));
-		break;
-	case 23:
-	case 24:
-		// args[3]: local_version_date
-		// args[4]: local_version_time
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[4]->ToInteger()));
-		break;
-	}
-	SetHeadAndReturn(1, 0, 11);
+	std::string code;
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "current_uid");
+		Add(code, TYPE_ONE_BYTE_INT, args[0], "mode");
+		switch (args[0]->Uint32Value()) {
+		case 0:
+		case 1:
+		case 4:
+		case 6:
+			break;
+		case 2: // args[3]: pid
+			Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[3], "pid");
+			break;
+		case 17:
+		case 18: // args[3]: option
+			Add(code, TYPE_ONE_BYTE_INT, args[3], "option");
+			break;
+		case 23:
+		case 24:
+			// args[3]: local_version_date
+			// args[4]: local_version_time
+			Add(code, TYPE_FOUR_BYTE_INT, args[3], "local_version_date");
+			Add(code, TYPE_FOUR_BYTE_INT, args[4], "local_version_time");
+			break;
+		}
+		SetHeadAndReturn(1, 0, 11);END
 }
 
 /**
@@ -514,40 +717,37 @@ Handle<Value> createViewSelfPack(const Arguments& args) {
 // args[1]: session_key
 // args[2]: searcher_uid
 Handle<Value> createSearchUserPack(const Arguments &args) {
-	PackList pkg;
-	switch (args[0]->Uint32Value()) {
-	case 0:
-		// args[3]: match_option
-		// args[4]: filter
-		// args[5]: local_or_global
-		// args[6]: age_lower_bound
-		// args[7]: age_upper_bound
-		// args[8]: gender
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[4]->ToString()->Length() * 2));
-		pkg.add(TCPack(TYPE_STRING, args[4]->ToString()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[5]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[6]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[7]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[8]->ToInteger()));
-		break;
-	case 1:
-		// args[3]: uid_to_search
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-		break;
-	case 2:
-		// args[3]: email
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToString()->Length() * 2));
-		pkg.add(TCPack(TYPE_STRING, args[3]->ToString()));
-		break;
-	}
-	SetHeadAndReturn(1, 1, 0);
+	std::string code("");
+	BEGIN
+		Add(code,
+		TYPE_FOUR_BYTE_INT, args[2], "searcher_uid");
+		Add(code,
+		TYPE_ONE_BYTE_INT, args[0], "search_mode");
+		switch (args[0]->Uint32Value()) {
+		case 0:
+			// args[3]: match_option
+			// args[4]: filter
+			// args[5]: local_or_global
+			// args[6]: age_lower_bound
+			// args[7]: age_upper_bound
+			// args[8]: gender
+			Add(code, TYPE_ONE_BYTE_INT, args[3], "match_option");
+			Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[4], "filter");
+			Add(code, TYPE_ONE_BYTE_INT, args[5], "local_or_global");
+			Add(code, TYPE_ONE_BYTE_INT, args[6], "age_lower_bound");
+			Add(code, TYPE_ONE_BYTE_INT, args[7], "age_upper_bound");
+			Add(code, TYPE_ONE_BYTE_INT, args[8], "gender");
+			break;
+		case 1:
+			// args[3]: uid_to_search
+			Add(code, TYPE_FOUR_BYTE_INT, args[3], "uid_to_search");
+			break;
+		case 2:
+			// args[3]: email
+			Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[3], "email");
+			break;
+		}
+		SetHeadAndReturn(1, 1, 0);END
 }
 
 /**
@@ -574,27 +774,25 @@ Handle<Value> createSearchUserPack(const Arguments &args) {
 // args[1]: session_key
 // args[2]: searcher_uid
 Handle<Value> createSearchEventPack(const Arguments &args) {
-	PackList pkg;
-	switch (args[0]->Uint32Value()) {
-	case 0:
-		// args[3]: match_option
-		// args[4]: filter
-		// args[5]: local_or_global
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[4]->ToString()->Length() * 2));
-		pkg.add(TCPack(TYPE_STRING, args[4]->ToString()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[5]->ToInteger()));
-		break;
-	case 1:
-		// args[3]: event_id
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-		break;
-	}
-	SetHeadAndReturn(1, 1, 1);
+	BEGIN
+		std::string code("");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "searcher_uid");
+		Add(code, TYPE_ONE_BYTE_INT, args[0], "search_mode");
+		switch (args[0]->Uint32Value()) {
+		case 0:
+// args[3]: match_option
+// args[4]: filter
+// args[5]: local_or_global
+			Add(code, TYPE_ONE_BYTE_INT, args[3], "match_option");
+			Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[4], "filter");
+			Add(code, TYPE_ONE_BYTE_INT, args[5], "local_or_global");
+			break;
+		case 1:
+// args[3]: event_id
+			Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "event_id");
+			break;
+		}
+		SetHeadAndReturn(1, 1, 1);END
 }
 
 /**
@@ -618,14 +816,14 @@ Handle<Value> createSearchEventPack(const Arguments &args) {
 // args[3]: local_or_global
 // args[4]: option
 Handle<Value> createSearchPostingPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, Integer::New(0)));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[2]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[2]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToInteger()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[4]->ToInteger()));
-	SetHeadAndReturn(0, 1, 2);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "searcher_uid");
+		Add(code, TYPE_ONE_BYTE_INT, Integer::New(0), "search_mode");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[2], "filter");
+		Add(code, TYPE_ONE_BYTE_INT, args[3], "local_or_global");
+		Add(code, TYPE_ONE_BYTE_INT, args[4], "option");
+		SetHeadAndReturn(0, 1, 2);END
 }
 
 /**
@@ -653,26 +851,20 @@ Handle<Value> createSearchPostingPack(const Arguments &args) {
 // args[9]: visible_tags
 // args[10]: hidden_tags
 Handle<Value> createCreateUserPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[0]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[1]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[1]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[2]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[2]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[3]->ToString()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[4]->ToInteger()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[5]->ToInteger()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[6]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[6]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[7]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[7]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[8]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[8]->ToString()));
-	pkg.add(TCPack(TYPE_TAGS, args[9]->ToObject()));
-	pkg.add(TCPack(TYPE_TAGS, args[10]->ToObject()));
-	SetHeadAndReturn(-1, 2, 0);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[0], "email");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[1], "password");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[2], "name");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[3], "nick_name");
+		Add(code, TYPE_FOUR_BYTE_INT, args[4], "birthday");
+		Add(code, TYPE_ONE_BYTE_INT, args[5], "gender");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[6], "city");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[7], "state");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[8], "country");
+		Add(code, TYPE_TAGS, args[9], "visible_tags");
+		Add(code, TYPE_TAGS, args[10], "hidden_tags");
+		SetHeadAndReturn(-1, 2, 0);END
 }
 
 /**
@@ -691,16 +883,19 @@ Handle<Value> createCreateUserPack(const Arguments &args) {
 // args[4]: city
 // args[5]: tags
 Handle<Value> createCreateEventPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[1]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[1]->ToString()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[3]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[4]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[4]->ToString()));
-	pkg.add(TCPack(TYPE_TAGS, args[5]->ToObject()));
-	SetHeadAndReturn(0, 2, 1);
+	std::string code("");
+	BEGIN
+		Add(code,
+		TYPE_STRING | 1, args[1], "name");
+		Add(code,
+		TYPE_FOUR_BYTE_INT, args[2], "creater_uid");
+		Add(code,
+		TYPE_STRING | 1, args[3], "description");
+		Add(code,
+		TYPE_STRING | 1, args[4], "city");
+		Add(code,
+		TYPE_TAGS, args[5], "tags");
+		SetHeadAndReturn(0, 2, 1);END
 }
 
 /**
@@ -720,14 +915,14 @@ Handle<Value> createCreateEventPack(const Arguments &args) {
 // args[4]: visibility
 // args[5]: tags
 Handle<Value> createCreatePostingPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[2]->ToString()));
-	pkg.add(TCPack(TYPE_TWO_BYTE_INT, args[3]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[3]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[4]->ToInteger()));
-	pkg.add(TCPack(TYPE_TAG, args[5]->ToObject()));
-	SetHeadAndReturn(0, 2, 2);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "creater_uid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[2], "eventid");
+		Add(code, TYPE_STRING | TWO_BYTE_FOR_LENGTH, args[3], "content");
+		Add(code, TYPE_ONE_BYTE_INT, args[4], "visibility");
+		Add(code, TYPE_TAGS, args[5], "tags");
+		SetHeadAndReturn(0, 2, 2);END
 }
 
 /**
@@ -749,35 +944,35 @@ Handle<Value> createCreatePostingPack(const Arguments &args) {
 // args[1]: session_key
 // args[2]: requester
 Handle<Value> createCreateRequestPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-	switch (args[0]->Uint32Value()) {
-	case 0:
-		// args[3]: user_receiver_uid
-		// args[4]: msg
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[4]->ToString()->Length()));
-		pkg.add(TCPack(TYPE_STRING, args[4]->ToString()));
-		break;
-	case 1:
-		// args[3]: event_receiver_eid
-		// args[4]: msg
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[4]->ToString()->Length()));
-		pkg.add(TCPack(TYPE_STRING, args[4]->ToString()));
-		break;
-	case 2:
-		// args[3]: user_receiver_uid
-		// args[4]: event_receiver_eid
-		// args[5]: msg
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[5]->ToString()->Length()));
-		pkg.add(TCPack(TYPE_STRING, args[5]->ToString()));
-		break;
-	}
-	SetHeadAndReturn(1, 2, 3);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "requester");
+		Add(code, TYPE_ONE_BYTE_INT, args[0], "type");
+		switch (args[0]->Uint32Value()) {
+		case 0:
+			// args[3]: user_receiver_uid
+			// args[4]: msg
+			Add(code, TYPE_FOUR_BYTE_INT, args[3], "user_receiver_uid");
+			Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[4], "msg");
+			break;
+		case 1:
+			// args[3]: event_receiver_eid
+			// args[4]: msg
+			Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3],
+					"event_receiver_eid");
+			Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[4], "msg");
+			break;
+		case 2:
+			// args[3]: user_receiver_uid
+			// args[4]: event_receiver_eid
+			// args[5]: msg
+			Add(code, TYPE_FOUR_BYTE_INT, args[3], "user_receiver_uid");
+			Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[4],
+					"event_receiver_eid");
+			Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[5], "msg");
+			break;
+		}
+		SetHeadAndReturn(1, 2, 3);END
 }
 
 /**
@@ -802,19 +997,18 @@ Handle<Value> createCreateRequestPack(const Arguments &args) {
 // args[8]: description
 // args[9]: members
 Handle<Value> createCreateSchedulePack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[2]->ToString()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[4]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[5]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[6]->ToInteger()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[7]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[7]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[8]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[8]->ToString()));
-	pkg.add(TCPack(TYPE_UIDS, args[9]->ToObject()));
-	SetHeadAndReturn(0, 2, 17);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "creater_uid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[2], "eid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[3], "start_date");
+		Add(code, TYPE_FOUR_BYTE_INT, args[4], "start_time");
+		Add(code, TYPE_FOUR_BYTE_INT, args[5], "end_date");
+		Add(code, TYPE_FOUR_BYTE_INT, args[6], "end_time");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[7], "place");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[8], "description");
+		Add(code, TYPE_UIDS, args[9], "members");
+		SetHeadAndReturn(0, 2, 17);END
 }
 
 /**
@@ -843,10 +1037,11 @@ Handle<Value> createCreateSchedulePack(const Arguments &args) {
 // args[1]: uid
 // args[2]: Array of Update_User_Pack
 Handle<Value> createUpdateUserPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_UPDATES, args[2]->ToObject()));
-	SetHeadAndReturn(0, 3, 0);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "uid");
+		Add(code, TYPE_UPDATES, args[2], "updates");
+		SetHeadAndReturn(0, 3, 0);END
 }
 
 /**
@@ -873,11 +1068,12 @@ Handle<Value> createUpdateUserPack(const Arguments &args) {
 // args[2]: eventid
 // args[3]: updates
 Handle<Value> createUpdateEventPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[2]->ToString()));
-	pkg.add(TCPack(TYPE_UPDATES, args[3]->ToObject()));
-	SetHeadAndReturn(0, 3, 1);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "manager_uid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[2], "eventid");
+		Add(code, TYPE_UPDATES, args[3], "updates");
+		SetHeadAndReturn(0, 3, 1);END
 }
 
 /**
@@ -898,18 +1094,19 @@ Handle<Value> createUpdatePostingPack(const Arguments &args) {
  * 		- createUpdateFriendCommentsPack(session_key, uid, friend_uid, comment)
  * \see ::resolvUpdatePack
  */
+
 /*3 13 Update Friend Comments: 4 uid, 4 friend_uid, 1 comment_len, ? comment.*/
 // args[0]: session_key
 // args[1]: uid
 // args[2]: friend_uid
 // args[3]: comment
 Handle<Value> createUpdateFriendCommentsPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[3]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[3]->ToString()));
-	SetHeadAndReturn(0, 3, 13);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "uid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "friend_uid");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[3], "comment");
+		SetHeadAndReturn(0, 3, 13);END
 }
 
 /**
@@ -927,10 +1124,11 @@ Handle<Value> createUpdateFriendCommentsPack(const Arguments &args) {
 // args[1]: uid
 // args[2]: status
 Handle<Value> createUpdateStatusPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[2]->ToInteger()));
-	SetHeadAndReturn(0, 3, 14);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "uid");
+		Add(code, TYPE_ONE_BYTE_INT, args[2], "status");
+		SetHeadAndReturn(0, 3, 14);END
 }
 
 /**
@@ -948,27 +1146,26 @@ Handle<Value> createUpdateStatusPack(const Arguments &args) {
 // args[0]: type
 // args[1]: session_key
 Handle<Value> createUpdateAvartaBig(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-	switch (args[0]->Uint32Value()) {
-	case 0:
-		// args[2]: uid
-		// args[3]: content
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToString()->Length()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-		break;
-	case 1:
-		// args[2]: uid
-		// args[3]: eventid
-		// args[4]: content
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[4]->ToString()->Length()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
-		break;
-	}
-	SetHeadAndReturn(1, 3, 23);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_ONE_BYTE_INT, args[0], "type");
+		switch (args[0]->Uint32Value()) {
+		case 0:
+			// args[2]: uid
+			// args[3]: content
+			Add(code, TYPE_FOUR_BYTE_INT, args[2], "uid");
+			Add(code, TYPE_BYTES | FOUR_BYTE_FOR_LENGTH, args[3], "content");
+			break;
+		case 1:
+			// args[2]: uid
+			// args[3]: eventid
+			// args[4]: content
+			Add(code, TYPE_FOUR_BYTE_INT, args[2], "uid");
+			Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "eventid");
+			Add(code, TYPE_BYTES | FOUR_BYTE_FOR_LENGTH, args[4], "content");
+			break;
+		}
+		SetHeadAndReturn(1, 3, 23);END
 }
 
 /**
@@ -986,27 +1183,26 @@ Handle<Value> createUpdateAvartaBig(const Arguments &args) {
 // args[0]: type
 // args[1]: session_key
 Handle<Value> createUpdateAvartaSmall(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-	switch (args[0]->Uint32Value()) {
-	case 0:
-		// args[2]: uid
-		// args[3]: content
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToString()->Length()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-		break;
-	case 1:
-		// args[2]: uid
-		// args[3]: eventid
-		// args[4]: content
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[4]->ToString()->Length()));
-		pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
-		break;
-	}
-	SetHeadAndReturn(1, 3, 24);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_ONE_BYTE_INT, args[0], "type");
+		switch (args[0]->Uint32Value()) {
+		case 0:
+			// args[2]: uid
+			// args[3]: content
+			Add(code, TYPE_FOUR_BYTE_INT, args[2], "uid");
+			Add(code, TYPE_BYTES | FOUR_BYTE_FOR_LENGTH, args[3], "content");
+			break;
+		case 1:
+			// args[2]: uid
+			// args[3]: eventid
+			// args[4]: content
+			Add(code, TYPE_FOUR_BYTE_INT, args[2], "uid");
+			Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "eventid");
+			Add(code, TYPE_BYTES | FOUR_BYTE_FOR_LENGTH, args[4], "content");
+			break;
+		}
+		SetHeadAndReturn(1, 3, 24);END
 }
 
 /**
@@ -1029,20 +1225,18 @@ Handle<Value> createUpdateAvartaSmall(const Arguments &args) {
 // args[8]: content
 // args[9]: visibility
 Handle<Value> createReplyPostingPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[5]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[6]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[6]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[7]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[7]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[8]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[8]->ToString()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[9]->ToInteger()));
-	SetHeadAndReturn(0, 4, 2);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "replier_uid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "poster_uid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[3], "reply_to_uid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[4], "eid");
+		Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[5], "pid");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[6], "replyer_name");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[7], "reply_to_name");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[8], "content");
+		Add(code, TYPE_ONE_BYTE_INT, args[9], "visibility");
+		SetHeadAndReturn(0, 4, 2);END
 }
 
 /**
@@ -1056,10 +1250,11 @@ Handle<Value> createReplyPostingPack(const Arguments &args) {
 // args[1]: uid
 // args[2]: friend_uid
 Handle<Value> createDeleteFriendPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-	SetHeadAndReturn(0, 5, 0);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "uid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "friend_uid");
+		SetHeadAndReturn(0, 5, 0);END
 }
 
 /**
@@ -1075,12 +1270,13 @@ Handle<Value> createDeleteFriendPack(const Arguments &args) {
 // args[3]: eid
 // args[4]: pid
 Handle<Value> createDeletePostingPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
-	SetHeadAndReturn(0, 5, 2);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "uid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "eid");
+		Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "pid");
+		SetHeadAndReturn(0, 5, 2);END
 }
 
 /**
@@ -1096,12 +1292,13 @@ Handle<Value> createDeletePostingPack(const Arguments &args) {
 // args[3]: eid
 // args[4]: sid
 Handle<Value> createDeleteSchedulePack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[4]->ToInteger()));
-	SetHeadAndReturn(0, 5, 17);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "uid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "eid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[4], "sid");
+		SetHeadAndReturn(0, 5, 17);END
 }
 
 /**
@@ -1118,13 +1315,14 @@ Handle<Value> createDeleteSchedulePack(const Arguments &args) {
 // args[4]: pid
 // args[5]: rid
 Handle<Value> createDeleteReplyPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[4]->ToString()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[5]->ToInteger()));
-	SetHeadAndReturn(0, 5, 22);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "uid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "eid");
+		Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "pid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[5], "rid");
+		SetHeadAndReturn(0, 5, 22);END
 }
 
 /**
@@ -1141,27 +1339,24 @@ Handle<Value> createDeleteReplyPack(const Arguments &args) {
  *		when (uid_or_email = 1): 1 email_len, ? email, 1 passord_len, ? password*/
 // args[0]: login_type
 Handle<Value> createLoginPack(const Arguments& args) {
-	PackList pkg;
-	switch (args[0]->Uint32Value()) {
-	case 0:
-		// args[1]: uid
-		// args[2]: password
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[2]->ToString()->Length() * 2));
-		pkg.add(TCPack(TYPE_STRING, args[2]->ToString()));
-		break;
-	case 1:
-		// args[1]: email
-		// args[2]: password
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToInteger()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[1]->ToString()->Length() * 2));
-		pkg.add(TCPack(TYPE_STRING, args[1]->ToString()));
-		pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[2]->ToString()->Length() * 2));
-		pkg.add(TCPack(TYPE_STRING, args[2]->ToString()));
-		break;
-	}
-	SetHeadAndReturn(-1, 6, 0);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_ONE_BYTE_INT, args[0], "login_type");
+		switch (args[0]->Uint32Value()) {
+		case 0:
+			// args[1]: uid
+			// args[2]: password
+			Add(code, TYPE_FOUR_BYTE_INT, args[1], "uid");
+			Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[2], "password");
+			break;
+		case 1:
+			// args[1]: email
+			// args[2]: password
+			Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[1], "email");
+			Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[2], "password");
+			break;
+		}
+		SetHeadAndReturn(-1, 6, 0);END
 }
 
 /**
@@ -1174,9 +1369,10 @@ Handle<Value> createLoginPack(const Arguments& args) {
 // args[0]: session_key
 // args[1]: uid
 Handle<Value> createLogoutPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	SetHeadAndReturn(0, 6, 16);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "uid");
+		SetHeadAndReturn(0, 6, 16);END
 }
 
 /**
@@ -1188,10 +1384,10 @@ Handle<Value> createLogoutPack(const Arguments &args) {
 /*6 20: email validation: 1 email_len, ? email*/
 // args[0]: email
 Handle<Value> createEmailValidationPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[0]->ToString()));
-	SetHeadAndReturn(-1, 6, 20);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[0], "email");
+		SetHeadAndReturn(-1, 6, 20);END
 }
 
 /**
@@ -1205,13 +1401,12 @@ Handle<Value> createEmailValidationPack(const Arguments &args) {
 // args[1]: code_1
 // args[2]: code_2
 Handle<Value> createIdentificationCodeValidationPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[0]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[0]->ToString()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_ONE_BYTE_INT, args[2]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[2]->ToString()));
-	SetHeadAndReturn(-1, 6, 21);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[0], "email");
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "code_1");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[2], "code_2");
+		SetHeadAndReturn(-1, 6, 21);END
 }
 
 /**
@@ -1225,10 +1420,11 @@ Handle<Value> createIdentificationCodeValidationPack(const Arguments &args) {
 // args[1]: uid
 // args[2]: eventid
 Handle<Value> createQuitEventPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[2]->ToString()));
-	SetHeadAndReturn(0, 7, 1);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "uid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[2], "eventid");
+		SetHeadAndReturn(0, 7, 1);END
 }
 
 /**
@@ -1244,13 +1440,13 @@ Handle<Value> createQuitEventPack(const Arguments &args) {
 // args[3]: other_uid
 // args[4]: content
 Handle<Value> createMessageToUserPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[3]->ToInteger()));
-	pkg.add(TCPack(TYPE_TWO_BYTE_INT, args[4]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[4]->ToString()));
-	SetHeadAndReturn(0, 12, 0);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "seqNo");
+		Add(code, TYPE_FOUR_BYTE_INT, args[3], "other_uid");
+		Add(code, TYPE_STRING | TWO_BYTE_FOR_LENGTH, args[4], "content");
+		SetHeadAndReturn(0, 12, 0);END
 }
 
 /*12 1 message to event: 4 your_uid, 4 seqNo, 8 event-eid, 2 conent_en, ? content*/
@@ -1260,11 +1456,11 @@ Handle<Value> createMessageToUserPack(const Arguments &args) {
 // args[3]: eventid
 // args[4]: content
 Handle<Value> createMessageToEventPack(const Arguments &args) {
-	PackList pkg;
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[1]->ToInteger()));
-	pkg.add(TCPack(TYPE_FOUR_BYTE_INT, args[2]->ToInteger()));
-	pkg.add(TCPack(TYPE_ASCII_STRING, args[3]->ToString()));
-	pkg.add(TCPack(TYPE_TWO_BYTE_INT, args[4]->ToString()->Length() * 2));
-	pkg.add(TCPack(TYPE_STRING, args[4]->ToString()));
-	SetHeadAndReturn(0, 12, 1);
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "seqNo");
+		Add(code, TYPE_ASCII_STRING, args[3], "eventid");
+		Add(code, TYPE_STRING | TWO_BYTE_FOR_LENGTH, args[4], "content");
+		SetHeadAndReturn(0, 12, 1);END
 }
