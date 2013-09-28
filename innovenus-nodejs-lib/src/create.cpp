@@ -2,7 +2,6 @@
 #include <node.h>
 #include <cstdio>
 #include <string>
-#include <exception>
 #include "common.h"
 
 #define TYPE_CHECK
@@ -46,11 +45,11 @@ static const std::string eelem("element of ");
 	tmp += convert_int_to_hex_string(code.length() / 2 + HEADER_LENGTH, 4); \
 	if (_session_key_index != -1) { \
 		if (args[_session_key_index]->IsUndefined()) \
-			throw std::exception(("session_key" + eundef).data()); \
+			throw myerr(("session_key" + eundef).data()); \
 		if (args[_session_key_index]->IsNull()) \
-			throw std::exception(("session_key" + enull).data()); \
+			throw myerr(("session_key" + enull).data()); \
 		if (!(args[_session_key_index]->IsString())) \
-			throw std::exception(("session_key" + enotstr).data()); \
+			throw myerr(("session_key" + enotstr).data()); \
 		tmp += convert_ascii_string_to_hex_string(args[_session_key_index]->ToString()); \
 	} else \
 		tmp += convert_ascii_string_to_hex_string(String::New(DUMB_SESSION_KEY)); \
@@ -64,11 +63,22 @@ static const std::string eelem("element of ");
 	}
 
 #define BEGIN try{
-#define END } catch (std::exception &e){ \
+#define END } catch (myerr &e){ \
 		return ThrowException(Exception::Error(String::New(e.what()))); \
 	} \
 	return Undefined();
 
+class myerr {
+private:
+	const char * _what;
+public:
+	myerr(const char* what) :
+			_what(what) {
+	}
+	const char *what() const {
+		return _what;
+	}
+};
 static inline char formHexBit(int a) {
 	return a > 9 ? 'a' + a - 10 : '0' + a;
 }
@@ -116,11 +126,11 @@ static inline void Add(std::string& code, const int type,
 	if (type & ARRAY_MASK) {
 #ifdef TYPE_CHECK
 		if (value->IsUndefined())
-			throw std::exception((name + eundef).data());
+			throw myerr((name + eundef).data());
 		if (value->IsNull())
-			throw std::exception((name + enull).data());
+			throw myerr((name + enull).data());
 		if (!(value->IsArray()))
-			throw std::exception((name + enotarr).data());
+			throw myerr((name + enotarr).data());
 #endif
 		Local<Object> tmp = value->ToObject();
 		Local<Value> cur;
@@ -135,9 +145,9 @@ static inline void Add(std::string& code, const int type,
 			while (!cur->IsUndefined()) {
 #ifdef TYPE_CHECK
 				if (value->IsNull())
-					throw std::exception((eelem + name + enull).data());
+					throw myerr((eelem + name + enull).data());
 				if (!(cur->IsString()))
-					throw std::exception((eelem + name + enotstr).data());
+					throw myerr((eelem + name + enotstr).data());
 #endif
 				cur2 = cur->ToString();
 				tmpstr += convert_int_to_hex_string(cur2->Length() * 2, 1);
@@ -151,17 +161,16 @@ static inline void Add(std::string& code, const int type,
 			while (!cur->IsUndefined()) {
 #ifdef TYPE_CHECK
 				if (value->IsNull())
-					throw std::exception((eelem + name + enull).data());
+					throw myerr((eelem + name + enull).data());
 				if (!(cur->IsArray()))
-					throw std::exception((eelem + name + enotarr).data());
+					throw myerr((eelem + name + enotarr).data());
 #endif
 				cur3 = cur->ToObject();
 #ifdef TYPE_CHECK
 				if (cur3->Get(0)->IsNull())
-					throw std::exception((eelem + eelem + name + enull).data());
+					throw myerr((eelem + eelem + name + enull).data());
 				if (!(cur3->Get(0)->IsInt32()))
-					throw std::exception(
-							(eelem + eelem + name + enotint).data());
+					throw myerr((eelem + eelem + name + enotint).data());
 #endif
 				type2 = cur3->Get(0)->Uint32Value();
 				tmpstr += convert_int_to_hex_string(type2, 1);
@@ -176,11 +185,9 @@ static inline void Add(std::string& code, const int type,
 				case 9: //del tag
 #ifdef TYPE_CHECK
 					if (cur3->Get(1)->IsNull())
-						throw std::exception(
-								(eelem + eelem + name + enull).data());
+						throw myerr((eelem + eelem + name + enull).data());
 					if (!(cur3->Get(1)->IsString()))
-						throw std::exception(
-								(eelem + eelem + name + enotstr).data());
+						throw myerr((eelem + eelem + name + enotstr).data());
 #endif
 					tmpstr += convert_int_to_hex_string(
 							cur3->Get(1)->ToString()->Length() * 2, 1);
@@ -193,11 +200,9 @@ static inline void Add(std::string& code, const int type,
 				case 13: //del member
 #ifdef TYPE_CHECK
 					if (cur3->Get(1)->IsNull())
-						throw std::exception(
-								(eelem + eelem + name + enull).data());
+						throw myerr((eelem + eelem + name + enull).data());
 					if (!(cur3->Get(1)->IsInt32()))
-						throw std::exception(
-								(eelem + eelem + name + enotint).data());
+						throw myerr((eelem + eelem + name + enotint).data());
 #endif
 					tmpstr += convert_int_to_hex_string(
 							cur3->Get(1)->IntegerValue(), 4);
@@ -205,11 +210,9 @@ static inline void Add(std::string& code, const int type,
 				case 4: //gender
 #ifdef TYPE_CHECK
 					if (cur3->Get(1)->IsNull())
-						throw std::exception(
-								(eelem + eelem + name + enull).data());
+						throw myerr((eelem + eelem + name + enull).data());
 					if (!(cur3->Get(1)->IsInt32()))
-						throw std::exception(
-								(eelem + eelem + name + enotint).data());
+						throw myerr((eelem + eelem + name + enotint).data());
 #endif
 					tmpstr += convert_int_to_hex_string(
 							cur3->Get(1)->IntegerValue(), 1);
@@ -217,17 +220,13 @@ static inline void Add(std::string& code, const int type,
 				case 10: //setting
 #ifdef TYPE_CHECK
 					if (cur3->Get(1)->IsNull())
-						throw std::exception(
-								(eelem + eelem + name + enull).data());
+						throw myerr((eelem + eelem + name + enull).data());
 					if (!(cur3->Get(1)->IsInt32()))
-						throw std::exception(
-								(eelem + eelem + name + enotint).data());
+						throw myerr((eelem + eelem + name + enotint).data());
 					if (cur3->Get(2)->IsNull())
-						throw std::exception(
-								(eelem + eelem + name + enull).data());
+						throw myerr((eelem + eelem + name + enull).data());
 					if (!(cur3->Get(2)->IsInt32()))
-						throw std::exception(
-								(eelem + eelem + name + enotint).data());
+						throw myerr((eelem + eelem + name + enotint).data());
 #endif
 					tmpstr += convert_int_to_hex_string(
 							cur3->Get(1)->IntegerValue(), 1);
@@ -244,9 +243,9 @@ static inline void Add(std::string& code, const int type,
 			while (!cur->IsUndefined()) {
 #ifdef TYPE_CHECK
 				if (cur->IsNull())
-					throw std::exception((eelem + name + enull).data());
+					throw myerr((eelem + name + enull).data());
 				if (!(cur->IsInt32()))
-					throw std::exception((eelem + name + enotint).data());
+					throw myerr((eelem + name + enotint).data());
 #endif
 				tmpstr += convert_int_to_hex_string(cur->IntegerValue(), 4);
 				cur = tmp->Get(i++);
@@ -257,49 +256,49 @@ static inline void Add(std::string& code, const int type,
 	} else if (type & INT_MASK) {
 #ifdef TYPE_CHECK
 		if (value->IsUndefined())
-			throw std::exception((name + eundef).data());
+			throw myerr((name + eundef).data());
 		if (value->IsNull())
-			throw std::exception((name + enull).data());
+			throw myerr((name + enull).data());
 		if (!(value->IsInt32()))
-			throw std::exception((name + enotint).data());
+			throw myerr((name + enotint).data());
 #endif
 		code += convert_int_to_hex_string(value->IntegerValue(),
 				type & SPECIAL_MASK);
 	} else if (type & STRING_MASK) {
 #ifdef TYPE_CHECK
 		if (value->IsUndefined())
-			throw std::exception((name + eundef).data());
+			throw myerr((name + eundef).data());
 		if (value->IsNull())
-			throw std::exception((name + enull).data());
+			throw myerr((name + enull).data());
 		if (!(value->IsString()))
-			throw std::exception((name + enotstr).data());
+			throw myerr((name + enotstr).data());
 #endif
 		if ((type & 0xF) == 0)
-			throw std::exception("Wrong strlen_length");
+			throw myerr("Wrong strlen_length");
 		code += convert_int_to_hex_string(value->ToString()->Length() * 2,
 				type & SPECIAL_MASK);
 		code += convert_string_to_hex_string(value->ToString());
 	} else if (type & ASCIISTRING_MASK) {
 #ifdef TYPE_CHECK
 		if (value->IsUndefined())
-			throw std::exception((name + eundef).data());
+			throw myerr((name + eundef).data());
 		if (value->IsNull())
-			throw std::exception((name + enull).data());
+			throw myerr((name + enull).data());
 		if (!(value->IsString()))
-			throw std::exception((name + enotstr).data());
+			throw myerr((name + enotstr).data());
 		if (((type & SPECIAL_MASK) != 0)
 				&& (value->ToString()->Length() != (type & SPECIAL_MASK)))
-			throw std::exception((name + elength).data());
+			throw myerr((name + elength).data());
 #endif
 		code += convert_ascii_string_to_hex_string(value->ToString());
 	} else if (type & BYTES_MASK) {
 #ifdef TYPE_CHECK
 		if (value->IsUndefined())
-			throw std::exception((name + eundef).data());
+			throw myerr((name + eundef).data());
 		if (value->IsNull())
-			throw std::exception((name + enull).data());
+			throw myerr((name + enull).data());
 		if (!(value->IsString()))
-			throw std::exception((name + enotstr).data());
+			throw myerr((name + enotstr).data());
 #endif
 		code += convert_int_to_hex_string(value->ToString()->Length(),
 				type & SPECIAL_MASK);
@@ -311,11 +310,11 @@ static inline void Add(std::string& code, const int type,
 //	if (type & ARRAY_MASK) {
 //#ifdef TYPE_CHECK
 //		if (value->IsUndefined())
-//			throw std::exception((name + eundef).data();
+//			throw myerr((name + eundef).data();
 //		if (value->IsNull())
-//			throw std::exception((name + enull).data();
+//			throw myerr((name + enull).data();
 //		if (!(value->IsArray()))
-//			throw std::exception((name + enotarr).data();
+//			throw myerr((name + enotarr).data();
 //#endif
 //		Local<Object> tmp = value->ToObject();
 //		Local<Value> cur;
@@ -330,7 +329,7 @@ static inline void Add(std::string& code, const int type,
 //			while (!cur->IsUndefined()) {
 //#ifdef TYPE_CHECK
 //				if (!(cur->IsString()))
-//					throw std::exception((eelem + name + enotstr).data();
+//					throw myerr((eelem + name + enotstr).data();
 //#endif
 //				cur2 = cur->ToString();
 //				tmpstr += convert_int_to_hex_string(cur2->Length() * 2, 1);
@@ -344,7 +343,7 @@ static inline void Add(std::string& code, const int type,
 //			while (!cur->IsUndefined()) {
 //#ifdef TYPE_CHECK
 //				if (!(cur->IsArray()))
-//					throw std::exception((eelem + name + enotarr).data();
+//					throw myerr((eelem + name + enotarr).data();
 //#endif
 //				cur3 = cur->ToObject();
 //				type2 = cur3->Get(0)->Uint32Value();
@@ -390,7 +389,7 @@ static inline void Add(std::string& code, const int type,
 //			while (!cur->IsUndefined()) {
 //#ifdef TYPE_CHECK
 //				if (!(cur->IsString()))
-//					throw std::exception((eelem + name + enotstr).data();
+//					throw myerr((eelem + name + enotstr).data();
 //#endif
 //				tmpstr += convert_int_to_hex_string(cur->IntegerValue(), 4);
 //				cur = tmp->Get(i++);
@@ -401,11 +400,11 @@ static inline void Add(std::string& code, const int type,
 //	} else if (type & INT_MASK) {
 //#ifdef TYPE_CHECK
 //		if (value->IsUndefined())
-//			throw std::exception((name + eundef).data();
+//			throw myerr((name + eundef).data();
 //		if (value->IsNull())
-//			throw std::exception((name + enull).data();
+//			throw myerr((name + enull).data();
 //		if (!(value->IsInt32()))
-//			throw std::exception((name + enotint).data();
+//			throw myerr((name + enotint).data();
 //#endif
 //		switch (type) {
 //		case TYPE_ONE_BYTE_INT:
@@ -424,11 +423,11 @@ static inline void Add(std::string& code, const int type,
 //	} else if (type & STRING_MASK) {
 //#ifdef TYPE_CHECK
 //		if (value->IsUndefined())
-//			throw std::exception((name + eundef).data();
+//			throw myerr((name + eundef).data();
 //		if (value->IsNull())
-//			throw std::exception((name + enull).data();
+//			throw myerr((name + enull).data();
 //		if (!(value->IsString()))
-//			throw std::exception((name + enotstr).data();
+//			throw myerr((name + enotstr).data();
 //#endif
 //		switch (type) {
 //		case TYPE_STRING:
@@ -719,10 +718,8 @@ Handle<Value> createViewSelfPack(const Arguments& args) {
 Handle<Value> createSearchUserPack(const Arguments &args) {
 	std::string code("");
 	BEGIN
-		Add(code,
-		TYPE_FOUR_BYTE_INT, args[2], "searcher_uid");
-		Add(code,
-		TYPE_ONE_BYTE_INT, args[0], "search_mode");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "searcher_uid");
+		Add(code, TYPE_ONE_BYTE_INT, args[0], "search_mode");
 		switch (args[0]->Uint32Value()) {
 		case 0:
 			// args[3]: match_option
@@ -885,16 +882,11 @@ Handle<Value> createCreateUserPack(const Arguments &args) {
 Handle<Value> createCreateEventPack(const Arguments &args) {
 	std::string code("");
 	BEGIN
-		Add(code,
-		TYPE_STRING | 1, args[1], "name");
-		Add(code,
-		TYPE_FOUR_BYTE_INT, args[2], "creater_uid");
-		Add(code,
-		TYPE_STRING | 1, args[3], "description");
-		Add(code,
-		TYPE_STRING | 1, args[4], "city");
-		Add(code,
-		TYPE_TAGS, args[5], "tags");
+		Add(code, TYPE_STRING | 1, args[1], "name");
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "creater_uid");
+		Add(code, TYPE_STRING | 1, args[3], "description");
+		Add(code, TYPE_STRING | 1, args[4], "city");
+		Add(code, TYPE_TAGS, args[5], "tags");
 		SetHeadAndReturn(0, 2, 1);END
 }
 
