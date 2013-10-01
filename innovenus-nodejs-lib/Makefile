@@ -5,7 +5,7 @@ all: lib
 	
 lib: src/build/Release/.node
 
-src/build/Release/.node: src/binding.gyp src/common.cpp src/create.cpp src/resolv.cpp
+src/build/Release/.node: src/binding.gyp src/common.cpp src/create.cpp src/resolv.cpp src/common.h src/resolv.h src/create.h
 	cd src;\
 	node-gyp configure;\
 	node-gyp build;\

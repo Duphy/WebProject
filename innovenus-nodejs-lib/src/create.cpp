@@ -108,14 +108,21 @@ static std::string convert_string_to_hex_string(Handle<String> src) {
 	return ans;
 }
 static std::string convert_ascii_string_to_hex_string(Handle<String> src) {
-	int length = src->Length();
-	char *tmp = new char[length * 2 + 1];
-	src->WriteAscii(tmp, 0, length);
-	for (int i = length - 1; i >= 0; i--) {
-		tmp[i * 2 + 1] = formHexBit(tmp[i] & 0xF);
-		tmp[i * 2 + 0] = formHexBit((tmp[i] >> 4) & 0xF);
+	unsigned int length = src->Length();
+	char *tmp = new char[length + 1];
+	src->WriteAscii(tmp);
+#ifdef TYPE_CHECK
+	for (unsigned int i = 0; i < length; i++) {
+		if (!(((tmp[i] <= '9') && (tmp[i] >= '0'))
+				|| ((tmp[i] <= 'F') && (tmp[i] >= 'A'))
+				|| ((tmp[i] <= 'f') && (tmp[i] >= 'a')))) {
+			throw myerr("Wrong ascii string");
+		}
+		if ((tmp[i] >= 'A') && (tmp[i] <= 'F'))
+			tmp[i] = tmp[i] - 'A' + 'a';
 	}
-	tmp[length * 2] = '\0';
+#endif
+	tmp[length] = '\0';
 	std::string ans(tmp);
 	delete[] tmp;
 	return ans;
@@ -287,7 +294,7 @@ static inline void Add(std::string& code, const int type,
 		if (!(value->IsString()))
 			throw myerr((name + enotstr).data());
 		if (((type & SPECIAL_MASK) != 0)
-				&& (value->ToString()->Length() != (type & SPECIAL_MASK)))
+				&& ((value->ToString()->Length()) != ((type & SPECIAL_MASK) * 2)))
 			throw myerr((name + elength).data());
 #endif
 		code += convert_ascii_string_to_hex_string(value->ToString());

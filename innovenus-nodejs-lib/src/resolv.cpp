@@ -1,12 +1,13 @@
 #include <v8.h>
 #include <node.h>
 #include <cstdio>
+#include <cstring>
 #include "common.h"
 
 #define HEADER_LENGTH	22
 typedef struct s_response_header {
 	uint32_t length;
-	char session_key[SESSION_KEY_LENGTH];
+	char session_key[SESSION_KEY_LENGTH * 2];
 	uint32_t uid;
 	int type, subtype;
 } response_header;
@@ -20,29 +21,25 @@ static void readBytes(char *dist, char *buf, int& pointer, int length) {
 					+ resolvHexBit(buf[pointer + i * 2 + 1]);
 	pointer += length * 2;
 }
-static Local<Array> JSreadBytes(char *buf, int &pointer, int length) {
-	char tmp[2] = { };
-	Local<Array> ans = Array::New(0);
-	for (int i = 0; i < length; i++) {
-		tmp[0] = resolvHexBit(buf[pointer++]) << 4;
-		tmp[0] |= resolvHexBit(buf[pointer++]);
-		ans->Set(ans->Length(), String::New(tmp));
-	}
-	return ans;
-}
+/*static Local<Array> JSreadBytes(char *buf, int &pointer, int length) {
+ char tmp[2] = { };
+ Local<Array> ans = Array::New(0);
+ for (int i = 0; i < length; i++) {
+ tmp[0] = resolvHexBit(buf[pointer++]) << 4;
+ tmp[0] |= resolvHexBit(buf[pointer++]);
+ ans->Set(ans->Length(), String::New(tmp));
+ }
+ return ans;
+ }*/
 static void readAsciiString(char *dist, char *buf, int& pointer, int length) {
-	for (int i = 0; i < length; i++)
-		dist[i] = (resolvHexBit(buf[pointer + i * 2]) << 4)
-				+ resolvHexBit(buf[pointer + i * 2 + 1]);
+	memcpy(dist, buf + pointer, length * 2);
 	pointer += length * 2;
 }
 static Local<String> JSreadAsciiString(char *buf, int &pointer, int length) {
-	char *tmp = new char[length];
-	for (int i = 0; i < length; i++)
-		tmp[i] = (resolvHexBit(buf[pointer + i * 2]) << 4)
-				+ resolvHexBit(buf[pointer + i * 2 + 1]);
+	char *tmp = new char[length * 2];
+	memcpy(tmp, buf + pointer, length * 2);
 	pointer += length * 2;
-	Local<String> ans = String::New(tmp, length);
+	Local<String> ans = String::New(tmp, length * 2);
 	delete[] tmp;
 	return ans;
 }
@@ -111,7 +108,7 @@ static void extract_header(char *buf, response_header* ans) {
 static Local<Array> formJSHeader(response_header *header) {
 	Local<Array> ans = Array::New(5);
 	ans->Set(0, Integer::New(header->length));
-	ans->Set(1, String::New(header->session_key, SESSION_KEY_LENGTH));
+	ans->Set(1, String::New(header->session_key, SESSION_KEY_LENGTH * 2));
 	ans->Set(2, Integer::New(header->uid));
 	ans->Set(3, Integer::New(header->type));
 	ans->Set(4, Integer::New(header->subtype));
@@ -939,7 +936,7 @@ Local<Array> resolvUpdatePack(char *pack, int subtype) {
  * 		- 4: acknowledgement (int8)
  */
 Local<Array> resolvReplyPack(char *pack, int subtype) {
-	int pointer = HEADER_LENGTH * 2, mode;
+	int pointer = HEADER_LENGTH * 2;
 	Local<Array> ans = Array::New(5);
 	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
