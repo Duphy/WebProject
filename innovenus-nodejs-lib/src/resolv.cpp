@@ -22,6 +22,7 @@ static void readBytes(char *dist, char *buf, int& pointer, int length) {
 	pointer += length * 2;
 }
 /*static Local<Array> JSreadBytes(char *buf, int &pointer, int length) {
+<<<<<<< HEAD
  char tmp[2] = { };
  Local<Array> ans = Array::New(0);
  for (int i = 0; i < length; i++) {
@@ -33,11 +34,28 @@ static void readBytes(char *dist, char *buf, int& pointer, int length) {
  }*/
 static void readAsciiString(char *dist, char *buf, int& pointer, int length) {
 	memcpy(dist, buf + pointer, length * 2);
+=======
+	char tmp[2] = { };
+	Local<Array> ans = Array::New(0);
+	for (int i = 0; i < length; i++) {
+		tmp[0] = resolvHexBit(buf[pointer++]) << 4;
+		tmp[0] |= resolvHexBit(buf[pointer++]);
+		ans->Set(ans->Length(), String::New(tmp));
+	}
+	return ans;
+}*/
+static void readAsciiString(char *dist, char *buf, int& pointer, int length) {
+	memcpy(dist, buf, length * 2);
+>>>>>>> d02b53a762e9acc70ba67e42fe0b89927c672b44
 	pointer += length * 2;
 }
 static Local<String> JSreadAsciiString(char *buf, int &pointer, int length) {
 	char *tmp = new char[length * 2];
+<<<<<<< HEAD
 	memcpy(tmp, buf + pointer, length * 2);
+=======
+	memcpy(tmp, buf, length * 2);
+>>>>>>> d02b53a762e9acc70ba67e42fe0b89927c672b44
 	pointer += length * 2;
 	Local<String> ans = String::New(tmp, length * 2);
 	delete[] tmp;
