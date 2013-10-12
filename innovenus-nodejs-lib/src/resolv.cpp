@@ -142,7 +142,7 @@ Local<Array> resolvEventIDs(char *pack, int &pointer) {
  * - 1: eventid (string)
  * - 2: postid (string)
  */
-Local<Object> resolvPosting(char *pack, int &pointer) {
+Local<Array> resolvPosting(char *pack, int &pointer) {
 	Local<Array> ans = Array::New(3);
 	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	ans->Set(1, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
