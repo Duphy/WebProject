@@ -229,9 +229,9 @@ Local<Array> resolvUserSimpleOtherPack(char *pack, int &pointer) {
 	Local<Array> ans = Array::New(8);
 	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	uint32_t length;
-	length = readInteger(pack, pointer, 4);
+	length = readInteger(pack, pointer, 1);
 	ans->Set(1, JSreadString(pack, pointer, length));
-	length = readInteger(pack, pointer, 4);
+	length = readInteger(pack, pointer, 1);
 	ans->Set(2, JSreadString(pack, pointer, length));
 	ans->Set(3, JSreadInteger(pack, pointer, 4));
 	ans->Set(4, JSreadInteger(pack, pointer, 1));
