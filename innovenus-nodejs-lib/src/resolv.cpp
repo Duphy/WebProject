@@ -434,7 +434,7 @@ Local<Array> resolvNotification(char *pack, int &pointer) {
 	ans->Set(1, JSreadInteger(pack, pointer, 4));
 	ans->Set(2, JSreadInteger(pack, pointer, UID_LENGTH));
 	ans->Set(3, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
-	ans->Set(4, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
+	ans->Set(4, JSreadAsciiString(pack, pointer, PID_LENGTH));
 	ans->Set(5, JSreadInteger(pack, pointer, 1));
 	msg_len = readInteger(pack, pointer, 1);
 	ans->Set(6, JSreadString(pack, pointer, msg_len));
