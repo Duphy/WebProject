@@ -497,10 +497,12 @@ Local<Array> resolvNotifications(char *pack, int &pointer) {
  * 		- 2: event_eid (string)
  * 		- 3: post_date (int32)
  * 		- 4: post_time (int32)
- * 		- 5: content (string)
- * 		- 6: visibility (int8)
- * 		- 7: tags (::resolvTags)
- * 		- 8: replies (::resolvReplies)
+ * 		- 5: poster_name (string)
+ * 		- 6: event_name (string)
+ * 		- 7: content (string)
+ * 		- 8: visibility (int8)
+ * 		- 9: tags (::resolvTags)
+ * 		- 10: replies (::resolvReplies)
  */
 
 /**
@@ -597,18 +599,22 @@ Local<Array> resolvViewPack(char *pack, int subtype) {
 		}
 		break;
 	case 2: //View posting
-		ans = Array::New(9);
-		int content_len;
+		ans = Array::New(11);
+		int length;
 		ans->Set(0, JSreadAsciiString(pack, pointer, POSTID_LENGTH));
 		ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
 		ans->Set(2, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 		ans->Set(3, JSreadInteger(pack, pointer, 4));
 		ans->Set(4, JSreadInteger(pack, pointer, 4));
-		content_len = readInteger(pack, pointer, 2);
-		ans->Set(5, JSreadString(pack, pointer, content_len));
-		ans->Set(6, JSreadInteger(pack, pointer, 1));
-		ans->Set(7, resolvTags(pack, pointer));
-		ans->Set(8, resolvReplies(pack, pointer));
+		length = readInteger(pack, pointer, 1);
+		ans->Set(5, JSreadString(pack, pointer, length));
+		length = readInteger(pack, pointer, 1);
+		ans->Set(6, JSreadString(pack, pointer, length));
+		length = readInteger(pack, pointer, 2);
+		ans->Set(7, JSreadString(pack, pointer, length));
+		ans->Set(8, JSreadInteger(pack, pointer, 1));
+		ans->Set(9, resolvTags(pack, pointer));
+		ans->Set(10, resolvReplies(pack, pointer));
 		break;
 	case 10: //View user's posting
 		return resolvPostings(pack, pointer);
