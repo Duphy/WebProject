@@ -583,7 +583,7 @@ Handle<Value> createViewPostingPack(const Arguments &args) {
 /**
  * - \b "0 10 View mass postings"
  * - for view user's postings
- * 		- createMassViewPack(0, friends_or_citimates, session_key, viewer_uid)
+ * 		- createMassViewPack(0, friends_or_citimates, session_key, viewer_uid, max_pid)
  * 		- friends_or_citimates
  * 				- 0=friends
  * 				- 1=citimates
@@ -595,25 +595,20 @@ Handle<Value> createViewPostingPack(const Arguments &args) {
 /*0 10 mass view postings: 4 viewer,
  *		1 subtype2 {0 for user postings, 1 for event posting}
  *				when (subtype2=0): 1 subtype3 {0 for friends, 1 for citimates}
- *				when (subtype2=1): 1 subtype3 {always 0} 8 max_pid;*/
+ *				when (subtype2=1): 1 subtype3 {always 0}
+ *		8 max_pid;*/
 // args[0]: subtype2
 // args[1]: subtype3
 // args[2]: session_key
 // args[3]: viewer_uid
+// args[4]: max_pid
 Handle<Value> createMassViewPack(const Arguments &args) {
 	std::string code("");
 	BEGIN
 		Add(code, TYPE_FOUR_BYTE_INT, args[3], "viewer_uid");
 		Add(code, TYPE_ONE_BYTE_INT, args[0], "subtype2");
 		Add(code, TYPE_ONE_BYTE_INT, args[1], "subtype3");
-		switch (args[0]->Uint32Value()) {
-		case 0:
-			break;
-		case 1:
-			// args[4]: pid
-			Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "pid");
-			break;
-		}
+		Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "max_pid");
 		SetHeadAndReturn(2, 0, 10);END
 }
 
