@@ -319,7 +319,7 @@ Local<Array> resolvEventSimpleOtherPack(char *pack, int &pointer) {
  * - 11: country (string)
  */
 Local<Array> resolvUserSimplePack(char *pack, int &pointer) {
-	Local<Array> ans = Array::New(11);
+	Local<Array> ans = Array::New(12);
 	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	uint32_t length = readInteger(pack, pointer, 1);
 	ans->Set(1, JSreadString(pack, pointer, length));
@@ -1246,5 +1246,6 @@ Handle<Value> resolvPack(const Arguments& args) {
 		package->Delete(1);
 		break;
 	}
+	delete[] pack;
 	return package;
 }
