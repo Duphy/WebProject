@@ -5,8 +5,15 @@
       "sources": [ "common.cpp","resolv.cpp","create.cpp" ],
       "cflags!":["-fno-exceptions"],
       "cflags!_cc":["-fno-exceptions"],
-      "cflag":["-fexceptions"],
-      "cflags_cc":["-fexceptions"]
+      "cflags":["-fexceptions"],
+      "cflags_cc":["-fexceptions"],
+      "conditions": [
+        ['OS=="mac"', {
+          'xcode_settings': {
+            'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'
+          }
+        }]
+      ]
     }
   ]
 }
