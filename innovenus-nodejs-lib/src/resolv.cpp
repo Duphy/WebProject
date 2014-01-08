@@ -311,11 +311,12 @@ Local<Array> resolvEventSimpleOtherPack(char *pack, int &pointer) {
  * - 3: birthday (int32)
  * - 4: tags (::resolvTags)
  * - 5: hidden_tags (::resolvTags)
- * - 6: honors (::resolvHonors)
- * - 7: gender (int8)
- * - 8: city (string)
- * - 9: state (string)
- * - 10: country (string)
+ * - 6: rating (int32)
+ * - 7: honors (::resolvHonors)
+ * - 8: gender (int8)
+ * - 9: city (string)
+ * - 10: state (string)
+ * - 11: country (string)
  */
 Local<Array> resolvUserSimplePack(char *pack, int &pointer) {
 	Local<Array> ans = Array::New(11);
@@ -327,14 +328,15 @@ Local<Array> resolvUserSimplePack(char *pack, int &pointer) {
 	ans->Set(3, JSreadInteger(pack, pointer, 4));
 	ans->Set(4, resolvTags(pack, pointer));
 	ans->Set(5, resolvTags(pack, pointer));
-	ans->Set(6, resolvHonors(pack, pointer));
-	ans->Set(7, JSreadInteger(pack, pointer, 1));
-	length = readInteger(pack, pointer, 1);
-	ans->Set(8, JSreadString(pack, pointer, length));
+	ans->Set(6, JSreadInteger(pack, pointer, 4));
+	ans->Set(7, resolvHonors(pack, pointer));
+	ans->Set(8, JSreadInteger(pack, pointer, 1));
 	length = readInteger(pack, pointer, 1);
 	ans->Set(9, JSreadString(pack, pointer, length));
 	length = readInteger(pack, pointer, 1);
 	ans->Set(10, JSreadString(pack, pointer, length));
+	length = readInteger(pack, pointer, 1);
+	ans->Set(11, JSreadString(pack, pointer, length));
 	//TODO Profile picture
 	return ans;
 }
