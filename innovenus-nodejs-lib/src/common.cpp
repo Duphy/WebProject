@@ -45,6 +45,7 @@ void init(Handle<Object> exports) {
 	ExportJSFunction(createMessageToEventPack)
 
 	ExportJSFunction(resolvPack)
+	ExportJSFunction(resolvHeader)
 }
 
 NODE_MODULE(lib, init)

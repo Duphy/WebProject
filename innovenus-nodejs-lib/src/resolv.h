@@ -10,5 +10,6 @@
 
 #include "common.h"
 DeclareJSFunction(resolvPack)
+DeclareJSFunction(resolvHeader)
 
 #endif /* RESOLV_H_ */

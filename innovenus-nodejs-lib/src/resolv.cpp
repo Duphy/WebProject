@@ -1249,3 +1249,19 @@ Handle<Value> resolvPack(const Arguments& args) {
 	delete[] pack;
 	return package;
 }
+
+/**
+ * 	- 0: length
+ * 	- 1: session_key
+ * 	- 2: uid
+ * 	- 3: type
+ * 	- 4: subtype
+ */
+Handle<Value> resolvHeader(const Arguments& args) {
+	char* pack = new char[HEADER_LENGTH * 2];
+	response_header header;
+	args[0]->ToString()->WriteAscii(pack, 0, HEADER_LENGTH * 2);
+	extract_header(pack, &header);
+	delete[] pack;
+	return formJSHeader(&header);
+}
