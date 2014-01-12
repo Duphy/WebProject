@@ -138,12 +138,12 @@ bool CreateDir(std::string path) {
 	int iRet;
 	int iLen = path.length();
 	//在末尾加/
-	if (path.back() != '\\' && path.back() != '/')
+	if (path.back() != '/')
 		path += '/';
 
 	// 创建目录
 	for (i = 0; i < iLen; i++) {
-		if (path[i] == '\\' || path[i] == '/') {
+		if (path[i] == '/') {
 			//如果不存在,创建
 			iRet = ACCESS(path.substr(0, i).c_str(), 0);
 			if (iRet != 0) {
@@ -152,8 +152,6 @@ bool CreateDir(std::string path) {
 					return false;
 				}
 			}
-			//支持linux,将所有\换成/
-			path[i] = '/';
 		}
 	}
 
@@ -512,6 +510,9 @@ Local<Array> resolvNotifications(char *pack, int &pointer) {
  * 			- 2: info (::resolvUserSimpleOtherPack)
  * 		- \b "0 0 23 View user's big avarta"
  * 		- \b "0 0 24 View user's small avarta"
+ * 			- 2: version_date (int32)
+ * 			- 3: version_time (int32)
+ * 			- 4: avarta_file_path (string)
  */
 
 /**
@@ -612,8 +613,6 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 			unsigned int time = readInteger(pack, pointer, 4);
 			ans->Set(3, Integer::New(time)); // version time
 			length = readInteger(pack, pointer, 4);
-			char *avarta = new char[length];
-			readBytes(avarta, pack, pointer, length);
 			std::ostringstream os;
 			os << "public/data/" << header.uid << "/avarta/";
 			if (!CreateDir(os.str())) {
@@ -621,11 +620,24 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 			} else {
 				os << (header.subtype == 23 ? "avarta_" : "smallavarta_")
 						<< date << "_" << time << ".jpg";
-				FILE *file = fopen(os.str().c_str(), "wb");
-				if (fwrite(avarta, 1, length, file) != 0xbc6)
-					*((char*) 0) = '1';
-				fclose(file);
-				ans->Set(4, String::New(os.str().c_str()));
+				if (ACCESS(os.str().c_str(), 0) == 0)
+					ans->Set(4, String::New(os.str().c_str()));
+				else {
+					char *avarta = new char[length];
+					readBytes(avarta, pack, pointer, length);
+
+					FILE *file = fopen(os.str().c_str(), "wb");
+					if ((file == NULL)
+							|| (fwrite(avarta, length, 1, file) != length)) {
+						if (file != NULL)
+							fclose(file);
+						ans->Set(4, String::New(""));
+					} else {
+						fclose(file);
+						ans->Set(4, String::New(os.str().c_str()));
+					}
+					delete[] avarta;
+				}
 			}
 			break;
 		}

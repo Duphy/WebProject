@@ -53,7 +53,7 @@ static const std::string eelem("element of ");
 		tmp += convert_ascii_string_to_hex_string(args[_session_key_index]->ToString()); \
 	} else \
 		tmp += convert_ascii_string_to_hex_string(String::New(DUMB_SESSION_KEY)); \
-	tmp += convert_int_to_hex_string(0, 1); \
+	tmp += convert_int_to_hex_string(1, 1); \
 	tmp += convert_int_to_hex_string(0, 3); \
 	tmp += convert_int_to_hex_string(_type, 1); \
 	tmp += convert_int_to_hex_string(_subtype, 1); \
