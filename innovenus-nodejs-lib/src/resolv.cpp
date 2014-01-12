@@ -2,7 +2,25 @@
 #include <node.h>
 #include <cstdio>
 #include <cstring>
+#include <cstdlib>
+#include <sstream>
 #include "common.h"
+
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#elif _LINUX
+#include <stdarg.h>
+#include <sys/stat.h>
+#endif
+
+#ifdef _WIN32
+#define ACCESS _access
+#define MKDIR(a) _mkdir((a))
+#elif _LINUX
+#define ACCESS access
+#define MKDIR(a) mkdir((a),0755)
+#endif
 
 #define HEADER_LENGTH	22
 typedef struct s_response_header {
@@ -115,6 +133,32 @@ static Local<Array> formJSHeader(response_header *header) {
 	return ans;
 }
 
+bool CreateDir(std::string path) {
+	int i = 0;
+	int iRet;
+	int iLen = path.length();
+	//在末尾加/
+	if (path.back() != '\\' && path.back() != '/')
+		path += '/';
+
+	// 创建目录
+	for (i = 0; i < iLen; i++) {
+		if (path[i] == '\\' || path[i] == '/') {
+			//如果不存在,创建
+			iRet = ACCESS(path.substr(0, i).c_str(), 0);
+			if (iRet != 0) {
+				iRet = MKDIR(path.substr(0, i).c_str());
+				if (iRet != 0) {
+					return false;
+				}
+			}
+			//支持linux,将所有\换成/
+			path[i] = '/';
+		}
+	}
+
+	return true;
+}
 /**
  * Array: uid (int32)
  */
@@ -561,12 +605,30 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 			ans->Set(3, resolvWeightedTags(pack, pointer)); // circatag pack
 			break;
 		case 23: //View user's avarta big
-			ans->Set(2, JSreadInteger(pack, pointer, 4)); // version date
-			ans->Set(3, JSreadInteger(pack, pointer, 4)); // version time
-			length = readInteger(pack, pointer, 4);
 		case 24: //View user's avarta small
-			//TODO avarta
+		{
+			unsigned int date = readInteger(pack, pointer, 4);
+			ans->Set(2, Integer::New(date)); // version date
+			unsigned int time = readInteger(pack, pointer, 4);
+			ans->Set(3, Integer::New(time)); // version time
+			length = readInteger(pack, pointer, 4);
+			char *avarta = new char[length];
+			readBytes(avarta, pack, pointer, length);
+			std::ostringstream os;
+			os << "public/data/" << header.uid << "/avarta/";
+			if (!CreateDir(os.str())) {
+				ans->Set(4, String::New(""));
+			} else {
+				os << (header.subtype == 23 ? "avarta_" : "smallavarta_")
+						<< date << "_" << time << ".jpg";
+				FILE *file = fopen(os.str().c_str(), "wb");
+				if (fwrite(avarta, 1, length, file) != 0xbc6)
+					*((char*) 0) = '1';
+				fclose(file);
+				ans->Set(4, String::New(os.str().c_str()));
+			}
 			break;
+		}
 		}
 		break;
 	case 1: //View event
