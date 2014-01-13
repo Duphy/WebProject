@@ -178,7 +178,7 @@ static Local<String> JSreadFile(const char *buf, int &pointer,
 			readBytes(avarta, buf, pointer, length);
 
 			FILE *file = fopen(path.c_str(), "wb");
-			if ((file == NULL) || (fwrite(avarta, length, 1, file) != length)) {
+			if ((file == NULL) || (fwrite(avarta, 1, length, file) != length)) {
 				if (file != NULL)
 					fclose(file);
 				return String::New("");
