@@ -9,7 +9,7 @@
 #ifdef _WIN32
 #include <direct.h>
 #include <io.h>
-#elif _LINUX
+#elif _LINUX || __APPLE__
 #include <stdarg.h>
 #include <sys/stat.h>
 #endif
@@ -32,7 +32,7 @@ typedef struct s_response_header {
 static inline int resolvHexBit(char a) {
 	return a > '9' ? a - 'a' + 10 : a - '0';
 }
-static void readBytes(char *dist, char *buf, int& pointer, int length) {
+static void readBytes(char *dist, const char *buf, int& pointer, int length) {
 	if (dist != NULL)
 		for (int i = 0; i < length; i++)
 			dist[i] = (resolvHexBit(buf[pointer + i * 2]) << 4)
@@ -49,11 +49,13 @@ static void readBytes(char *dist, char *buf, int& pointer, int length) {
  }
  return ans;
  }*/
-static void readAsciiString(char *dist, char *buf, int& pointer, int length) {
+static void readAsciiString(char *dist, const char *buf, int& pointer,
+		int length) {
 	memcpy(dist, buf + pointer, length * 2);
 	pointer += length * 2;
 }
-static Local<String> JSreadAsciiString(char *buf, int &pointer, int length) {
+static Local<String> JSreadAsciiString(const char *buf, int &pointer,
+		int length) {
 	char *tmp = new char[length * 2];
 	memcpy(tmp, buf + pointer, length * 2);
 	pointer += length * 2;
@@ -61,7 +63,8 @@ static Local<String> JSreadAsciiString(char *buf, int &pointer, int length) {
 	delete[] tmp;
 	return ans;
 }
-static void readString(uint16_t *dist, char *buf, int &pointer, int length) {
+static void readString(uint16_t *dist, const char *buf, int &pointer,
+		int length) {
 	length /= 2;
 	for (int i = 0; i < length; i++)
 		dist[i] = ((resolvHexBit(buf[pointer + i * 4]) << 12)
@@ -70,7 +73,7 @@ static void readString(uint16_t *dist, char *buf, int &pointer, int length) {
 				| (resolvHexBit(buf[pointer + i * 4 + 3])));
 	pointer += length * 4;
 }
-static Local<String> JSreadString(char *buf, int &pointer, int length) {
+static Local<String> JSreadString(const char *buf, int &pointer, int length) {
 	length /= 2;
 	uint16_t *tmp = new uint16_t[length + 1];
 	readString(tmp, buf, pointer, length * 2);
@@ -79,7 +82,7 @@ static Local<String> JSreadString(char *buf, int &pointer, int length) {
 	delete[] tmp;
 	return ans;
 }
-static int64_t readInteger(char *buf, int& pointer, int length) {
+static int64_t readInteger(const char *buf, int& pointer, int length) {
 	int64_t ans = 0;
 	for (int i = 0; i < length; i++) {
 		ans <<= 4;
@@ -89,7 +92,7 @@ static int64_t readInteger(char *buf, int& pointer, int length) {
 	}
 	return ans;
 }
-static Local<Integer> JSreadInteger(char *buf, int &pointer, int length) {
+static Local<Integer> JSreadInteger(const char *buf, int &pointer, int length) {
 	int64_t ans = 0;
 	for (int i = 0; i < length; i++) {
 		ans <<= 4;
@@ -105,15 +108,15 @@ static Local<Integer> JSreadInteger(char *buf, int &pointer, int length) {
 	} else
 		return Number::New(ans)->ToInteger();
 }
-static bool readBool(char *buf, int &pointer) {
+static bool readBool(const char *buf, int &pointer) {
 	char tmp;
 	tmp = readInteger(buf, pointer, 1);
 	return (tmp == 0);
 }
-static Handle<Boolean> JSreadBool(char *buf, int &pointer) {
+static Handle<Boolean> JSreadBool(const char *buf, int &pointer) {
 	return Boolean::New(readBool(buf, pointer));
 }
-static void extract_header(char *buf, response_header* ans) {
+static void extract_header(const char *buf, response_header* ans) {
 	ans->length = 0;
 	int pointer = 0;
 	ans->length = readInteger(buf, pointer, 4);
@@ -123,7 +126,7 @@ static void extract_header(char *buf, response_header* ans) {
 	ans->type = readInteger(buf, pointer, 1);
 	ans->subtype = readInteger(buf, pointer, 1);
 }
-static Local<Array> formJSHeader(response_header *header) {
+static Local<Array> formJSHeader(const response_header *header) {
 	Local<Array> ans = Array::New(5);
 	ans->Set(0, Integer::New(header->length));
 	ans->Set(1, String::New(header->session_key, SESSION_KEY_LENGTH * 2));
@@ -138,7 +141,7 @@ bool CreateDir(std::string path) {
 	int iRet;
 	int iLen = path.length();
 	//在末尾加/
-	if (path.back() != '/')
+	if (path[path.length() - 1] != '/')
 		path += '/';
 
 	// 创建目录
@@ -157,6 +160,38 @@ bool CreateDir(std::string path) {
 
 	return true;
 }
+static Local<String> JSreadFile(const char *buf, int &pointer,
+		std::string path) {
+	int64_t length = readInteger(buf, pointer, 4);
+	int i;
+	for (i = path.length() - 1; i > 0; i--)
+		if (path[i] == '/')
+			break;
+	std::string folder(path.begin(), path.begin() + i);
+	if (!CreateDir(folder))
+		return String::New("");
+	else {
+		if (ACCESS(path.c_str(), 0) == 0)
+			return String::New(path.c_str());
+		else {
+			char *avarta = new char[length];
+			readBytes(avarta, buf, pointer, length);
+
+			FILE *file = fopen(path.c_str(), "wb");
+			if ((file == NULL) || (fwrite(avarta, length, 1, file) != length)) {
+				if (file != NULL)
+					fclose(file);
+				return String::New("");
+			} else {
+				fclose(file);
+				return String::New(path.c_str());
+			}
+			delete[] avarta;
+		}
+	}
+	return String::New("");
+}
+
 /**
  * Array: uid (int32)
  */
@@ -281,7 +316,7 @@ Local<Array> resolvUserSimpleOtherPack(char *pack, int &pointer) {
 	ans->Set(5, JSreadString(pack, pointer, length));
 	ans->Set(6, resolvTags(pack, pointer));
 	ans->Set(7, resolvUIDs(pack, pointer));
-	//TODO Profile picture
+//TODO Profile picture
 	return ans;
 }
 
@@ -379,7 +414,7 @@ Local<Array> resolvUserSimplePack(char *pack, int &pointer) {
 	ans->Set(10, JSreadString(pack, pointer, length));
 	length = readInteger(pack, pointer, 1);
 	ans->Set(11, JSreadString(pack, pointer, length));
-	//TODO Profile picture
+//TODO Profile picture
 	return ans;
 }
 
@@ -497,6 +532,49 @@ Local<Array> resolvNotifications(char *pack, int &pointer) {
 }
 
 /**
+ * Array: picid (string)
+ */
+Local<Array> resolvPictures(const char *pack, int &pointer) {
+	uint32_t num = readInteger(pack, pointer, 4);
+	Local<Array> ans = Array::New(num);
+	for (uint32_t i = 0; i < num; i++)
+		ans->Set(i, JSreadAsciiString(pack, pointer, PICID_LENGTH));
+	return ans;
+}
+
+/**
+ * Array: pubid (string)
+ */
+Local<Array> resolvPubpages(const char *pack, int &pointer) {
+	uint32_t num = readInteger(pack, pointer, 4);
+	Local<Array> ans = Array::New(num);
+	for (uint32_t i = 0; i < num; i++)
+		ans->Set(i, JSreadAsciiString(pack, pointer, PUBID_LENGTH));
+	return ans;
+}
+
+/**
+ * 0: pubid
+ * 1: ad_id
+ */
+Local<Array> resolvAdvertisement(const char *pack, int &pointer) {
+	Local<Array> ans = Array::New(2);
+	ans->Set(0, JSreadAsciiString(pack, pointer, PUBID_LENGTH));
+	ans->Set(1, JSreadAsciiString(pack, pointer, ADID_LENGTH));
+	return ans;
+}
+
+/**
+ * Array: advertisement (::resolvAdvertisement)
+ */
+Local<Array> resolvAdvertisements(const char *pack, int &pointer) {
+	uint32_t num = readInteger(pack, pointer, 4);
+	Local<Array> ans = Array::New(num);
+	for (uint32_t i = 0; i < num; i++)
+		ans->Set(i, resolvAdvertisement(pack, pointer));
+	return ans;
+}
+/**
  * - \b "0 0 View User"
  * 		- 0: viewee_uid (int32)
  * 		- 1: mode (int8)
@@ -550,6 +628,7 @@ Local<Array> resolvNotifications(char *pack, int &pointer) {
  * 		- 8: visibility (int8)
  * 		- 9: tags (::resolvTags)
  * 		- 10: replies (::resolvReplies)
+ * 		- 11: pictures (::resolvPictures)
  */
 
 /**
@@ -577,162 +656,198 @@ Local<Array> resolvNotifications(char *pack, int &pointer) {
  * 			- 2: circatags (::resolvWeightedTags)
  * 		- \b "0 11 23 View self's big avarta"
  * 		- \b "0 11 24 View self's small avarta"
+ * 		- \b "0 11 30 View self's pubpages"
+ * 			- 1: pubpages (::resolvPubpages)
+ */
+
+/**
+ * - \b "0 30 View pubpage"
+ * 		- 0: eid (string)
+ * 		- 1: subtype2 (int8)
+ * 		- \b "0 30 4 View pubpage's info"
+ * 			- 2: eid (string)
+ * 			- 3: name (string)
+ * 			- 4: creator (int32)
+ * 			- 5: description (string)
+ * 			- 6: tags (::resolvTags)
+ * 			- 7: city (string)
+ *			- 8: rating (int32)
+ *			- 9: honors (::resolvHonors)
+ * 		- \b "0 30 23 View pubpage's big avarta"
+ * 		- \b "0 30 24 View pubpage's small avarta"
+ * 			- 2: version_date (int32)
+ * 			- 3: version_time (int32)
+ * 			- 4: avarta_file_path (string)
+ * 		- \b "0 30 31 View pubpage's advertisement"
+ * 			- 2: ads (::resolvAdvertisements)
  */
 Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 	int pointer = HEADER_LENGTH * 2, mode;
 	int64_t length;
 	Local<Array> ans;
 	switch (header.subtype) {
-	case 0: //View user
+	case 0: // View user
 		ans = Array::New(2);
 		ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH)); // viewee_uid
 		mode = readInteger(pack, pointer, 1);
 		ans->Set(1, Integer::New(mode)); // subtype2
 		switch (mode) {
-		case 0: //View user's friends
+		case 0: // View user's friends
 			ans->Set(2, resolvUIDs(pack, pointer)); // friends
 			break;
-		case 1: //View user's events
+		case 1: // View user's events
 			ans->Set(2, resolvEventIDs(pack, pointer)); // events
 			break;
-		case 2: //View user's posting
+		case 2: // View user's posting
 			ans->Set(2, resolvPostings(pack, pointer)); // postings
 			break;
-		case 4: //View user's info
+		case 4: // View user's info
 			ans->Set(2, resolvUserSimpleOtherPack(pack, pointer)); // user simple other pack
 			break;
-		case 18: //View user's circatag
+		case 18: // View user's circatag
 			ans->Set(2, JSreadInteger(pack, pointer, 1)); // opt
 			ans->Set(3, resolvWeightedTags(pack, pointer)); // circatag pack
 			break;
-		case 23: //View user's avarta big
-		case 24: //View user's avarta small
+		case 23: // View user's avarta big
+		case 24: // View user's avarta small
 		{
 			unsigned int date = readInteger(pack, pointer, 4);
 			ans->Set(2, Integer::New(date)); // version date
 			unsigned int time = readInteger(pack, pointer, 4);
 			ans->Set(3, Integer::New(time)); // version time
-			length = readInteger(pack, pointer, 4);
 			std::ostringstream os;
-			os << "public/data/" << header.uid << "/avarta/";
-			if (!CreateDir(os.str())) {
-				ans->Set(4, String::New(""));
-			} else {
-				os << (header.subtype == 23 ? "avarta_" : "smallavarta_")
-						<< date << "_" << time << ".jpg";
-				if (ACCESS(os.str().c_str(), 0) == 0)
-					ans->Set(4, String::New(os.str().c_str()));
-				else {
-					char *avarta = new char[length];
-					readBytes(avarta, pack, pointer, length);
-
-					FILE *file = fopen(os.str().c_str(), "wb");
-					if ((file == NULL)
-							|| (fwrite(avarta, length, 1, file) != length)) {
-						if (file != NULL)
-							fclose(file);
-						ans->Set(4, String::New(""));
-					} else {
-						fclose(file);
-						ans->Set(4, String::New(os.str().c_str()));
-					}
-					delete[] avarta;
-				}
-			}
+			os << "public/data/" << header.uid << "/avarta/"
+					<< (header.subtype == 23 ? "avarta_" : "smallavarta_")
+					<< date << "_" << time << ".jpg";
+			ans->Set(4, JSreadFile(pack, pointer, os.str()));
 			break;
 		}
 		}
 		break;
-	case 1: //View event
+	case 1: // View event
 		ans = Array::New(2);
 		ans->Set(0, JSreadAsciiString(pack, pointer, EVENTID_LENGTH)); // eid
 		mode = readInteger(pack, pointer, 1);
 		ans->Set(1, Integer::New(mode)); // subtype2
 		switch (mode) {
-		case 0: //View member event
+		case 0: // View member event
 			ans->Set(2, resolvUIDs(pack, pointer)); // members
 			break;
-		case 2: //View posting event
+		case 2: // View posting event
 			ans->Set(2, resolvPostings(pack, pointer)); // postings
 			break;
-		case 4: //View event's info
+		case 4: // View event's info
 			ans->Set(2, resolvEventSimpleOtherPack(pack, pointer)); // event simple other pack
 			break;
-		case 5: //View managers event
+		case 5: // View managers event
 			ans->Set(2, resolvUIDs(pack, pointer)); // managers
 			break;
-		case 6: //TODO View event's setting pack
+		case 6: // TODO View event's setting pack
 			break;
-		case 17: //View schedule event
-			ans->Set(2, resolvSchedules(pack, pointer));
+		case 17: // View schedule event
+			ans->Set(2, resolvSchedules(pack, pointer)); // schedules
 			break;
-		case 18: //View Circatag_Pack
-			ans->Set(2, JSreadInteger(pack, pointer, 1));
-			ans->Set(3, resolvWeightedTags(pack, pointer));
+		case 18: // View Circatag_Pack
+			ans->Set(2, JSreadInteger(pack, pointer, 1)); // opt
+			ans->Set(3, resolvWeightedTags(pack, pointer)); // circatags
 			break;
-		case 23: //View user's avarta big
-			//TODO avarta
-		case 24:				//View user's avarta small
-			//TODO avarta
+		case 23: // View user's avarta big
+			// TODO avarta
+		case 24:			// View user's avarta small
+			// TODO avarta
 			break;
 		}
 		break;
-	case 2: //View posting
+	case 2: // View posting
 		if (header.length <= HEADER_LENGTH + 1)
 			return Undefined();
 		ans = Array::New(11);
 		int length;
-		ans->Set(0, JSreadAsciiString(pack, pointer, POSTID_LENGTH));
-		ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
-		ans->Set(2, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
-		ans->Set(3, JSreadInteger(pack, pointer, 4));
-		ans->Set(4, JSreadInteger(pack, pointer, 4));
+		ans->Set(0, JSreadAsciiString(pack, pointer, POSTID_LENGTH)); // pid
+		ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH)); // poster
+		ans->Set(2, JSreadAsciiString(pack, pointer, EVENTID_LENGTH)); // eid
+		ans->Set(3, JSreadInteger(pack, pointer, 4)); // post_date
+		ans->Set(4, JSreadInteger(pack, pointer, 4)); // post_time
 		length = readInteger(pack, pointer, 1);
-		ans->Set(5, JSreadString(pack, pointer, length));
+		ans->Set(5, JSreadString(pack, pointer, length)); // poster name
 		length = readInteger(pack, pointer, 1);
-		ans->Set(6, JSreadString(pack, pointer, length));
+		ans->Set(6, JSreadString(pack, pointer, length)); // event name
 		length = readInteger(pack, pointer, 2);
-		ans->Set(7, JSreadString(pack, pointer, length));
-		ans->Set(8, JSreadInteger(pack, pointer, 1));
-		ans->Set(9, resolvTags(pack, pointer));
-		ans->Set(10, resolvReplies(pack, pointer));
+		ans->Set(7, JSreadString(pack, pointer, length)); // content
+		ans->Set(8, JSreadInteger(pack, pointer, 1)); // visibility
+		ans->Set(9, resolvTags(pack, pointer)); // tags
+		ans->Set(10, resolvReplies(pack, pointer)); // replies
+		ans->Set(11, resolvPictures(pack, pointer)); // pictures
 		break;
-	case 10: //View user's posting
+	case 10: // View user's posting
 		return resolvPostings(pack, pointer);
 		break;
-	case 11: //View self
+	case 11: // View self
 		ans = Array::New(1);
 		mode = readInteger(pack, pointer, 1);
 		ans->Set(0, Integer::New(mode));
 		switch (mode) {
-		case 0: //View self's friends
-			ans->Set(1, resolvUIDs(pack, pointer));
+		case 0: // View self's friends
+			ans->Set(1, resolvUIDs(pack, pointer)); // friends
 			break;
-		case 1: //View self's events
-			ans->Set(1, resolvEventIDs(pack, pointer));
+		case 1: // View self's events
+			ans->Set(1, resolvEventIDs(pack, pointer)); // events
 			break;
-		case 2: //View self's posting
-			ans->Set(1, resolvPostings(pack, pointer));
+		case 2: // View self's posting
+			ans->Set(1, resolvPostings(pack, pointer)); // postings
 			break;
-		case 4: //View self's info
-			ans->Set(1, resolvUserSimplePack(pack, pointer));
+		case 4: // View self's info
+			ans->Set(1, resolvUserSimplePack(pack, pointer)); // info
 			break;
-		case 6:
-			ans->Set(1, resolvUserSettingPack(pack, pointer));
+		case 6: // View self's settings
+			ans->Set(1, resolvUserSettingPack(pack, pointer)); // settings
 			break;
-		case 17:
-			ans->Set(1, resolvSchedules(pack, pointer));
+		case 17: // View self's schedules
+			ans->Set(1, resolvSchedules(pack, pointer)); // schedules
 			break;
-		case 18: //View self's circatag
-			ans->Set(1, JSreadInteger(pack, pointer, 1));
-			ans->Set(2, resolvWeightedTags(pack, pointer));
+		case 18: // View self's circatag
+			ans->Set(1, JSreadInteger(pack, pointer, 1)); // opt
+			ans->Set(2, resolvWeightedTags(pack, pointer)); // circatags
 			break;
-		case 23: //View user's avarta big
+		case 23: //View self's avarta big
 			//TODO avarta
-		case 24:				//View user's avarta small
+		case 24: //View self's avarta small
 			//TODO avarta
+			break;
+		case 30: // View self's pubpages
+			ans->Set(1, resolvPubpages(pack, pointer)); // pubpages
 			break;
 		}
+		break;
+	case 30: // View pubpage
+		ans->Set(0, JSreadAsciiString(pack, pointer, EVENTID_LENGTH)); // eid
+		mode = readInteger(pack, pointer, 1);
+		ans->Set(1, Integer::New(mode)); // subtype2
+		switch (mode) {
+		case 4: // View pubpage's info
+			ans->Set(2, JSreadAsciiString(pack, pointer, EVENTID_LENGTH)); // eid
+			length = readInteger(pack, pointer, 1);
+			ans->Set(3, JSreadString(pack, pointer, length)); // name
+			ans->Set(4, JSreadInteger(pack, pointer, UID_LENGTH)); // creater
+			length = readInteger(pack, pointer, 1);
+			ans->Set(5, JSreadString(pack, pointer, length)); // description
+			ans->Set(6, resolvTags(pack, pointer)); // tags
+			length = readInteger(pack, pointer, 1);
+			ans->Set(7, JSreadString(pack, pointer, length)); // city
+			ans->Set(8, JSreadInteger(pack, pointer, 4)); // rating
+			ans->Set(9, resolvHonors(pack, pointer)); // honors
+			break;
+		case 23: // View pubpage's big avarta
+		case 24: // View pubpage's small avarta
+			// TODO: avarta
+			break;
+		case 31: // View pubpage's advertisement
+			ans->Set(2, resolvAdvertisements(pack, pointer));
+			break;
+		}
+		break;
+	case 31:
+		break;
 	}
 	return ans;
 }

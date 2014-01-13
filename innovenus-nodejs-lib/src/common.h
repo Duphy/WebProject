@@ -20,6 +20,9 @@ using namespace v8;
 #define SID_LENGTH				4
 #define RID_LENGTH				4
 #define POSTID_LENGTH			8
+#define PICID_LENGTH			8
+#define PUBID_LENGTH			8
+#define ADID_LENGTH				8
 #define NUM_OF_BYTES_IN_LENGTH	4
 #define NUM_OF_BITS_IN_BYTE		8
 #define SESSION_KEY_LENGTH		8
