@@ -17,7 +17,7 @@
 #ifdef _WIN32
 #define ACCESS _access
 #define MKDIR(a) _mkdir((a))
-#elif _LINUX
+#elif _LINUX || __APPLE__
 #define ACCESS access
 #define MKDIR(a) mkdir((a),0755)
 #endif
