@@ -9,7 +9,7 @@
 #ifdef _WIN32
 #include <direct.h>
 #include <io.h>
-#elif _LINUX || __APPLE__
+#elif _LINUX || __APPLE__ || linux
 #include <stdarg.h>
 #include <sys/stat.h>
 #endif
