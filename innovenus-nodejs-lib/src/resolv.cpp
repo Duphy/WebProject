@@ -687,8 +687,10 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 	Local<Array> ans;
 	switch (header.subtype) {
 	case 0: // View user
+	{
 		ans = Array::New(2);
-		ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH)); // viewee_uid
+		uint32_t viewee = readInteger(pack, pointer, UID_LENGTH);
+		ans->Set(0, Integer::New(viewee)); // viewee_uid
 		mode = readInteger(pack, pointer, 1);
 		ans->Set(1, Integer::New(mode)); // subtype2
 		switch (mode) {
@@ -716,7 +718,7 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 			unsigned int time = readInteger(pack, pointer, 4);
 			ans->Set(3, Integer::New(time)); // version time
 			std::ostringstream os;
-			os << "public/data/" << header.uid << "/avarta/"
+			os << "public/data/" << viewee << "/avarta/"
 					<< (header.subtype == 23 ? "avarta_" : "smallavarta_")
 					<< date << "_" << time << ".jpg";
 			ans->Set(4, JSreadFile(pack, pointer, os.str()));
@@ -724,6 +726,7 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 		}
 		}
 		break;
+	}
 	case 1: // View event
 		ans = Array::New(2);
 		ans->Set(0, JSreadAsciiString(pack, pointer, EVENTID_LENGTH)); // eid
@@ -783,7 +786,7 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 		return resolvPostings(pack, pointer);
 		break;
 	case 11: // View self
-		ans = Array::New(1);
+		ans = Array::New(2);
 		mode = readInteger(pack, pointer, 1);
 		ans->Set(0, Integer::New(mode));
 		switch (mode) {
@@ -810,10 +813,19 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 			ans->Set(2, resolvWeightedTags(pack, pointer)); // circatags
 			break;
 		case 23: //View self's avarta big
-			//TODO avarta
 		case 24: //View self's avarta small
-			//TODO avarta
+		{
+			unsigned int date = readInteger(pack, pointer, 4);
+			ans->Set(2, Integer::New(date)); // version date
+			unsigned int time = readInteger(pack, pointer, 4);
+			ans->Set(3, Integer::New(time)); // version time
+			std::ostringstream os;
+			os << "public/data/" << header.uid << "/avarta/"
+					<< (header.subtype == 23 ? "avarta_" : "smallavarta_")
+					<< date << "_" << time << ".jpg";
+			ans->Set(4, JSreadFile(pack, pointer, os.str()));
 			break;
+		}
 		case 30: // View self's pubpages
 			ans->Set(1, resolvPubpages(pack, pointer)); // pubpages
 			break;
