@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <string>
 #include "common.h"
+#include <fstream>
 
 #define TYPE_CHECK
 
@@ -13,7 +14,7 @@
 #define STRING_MASK				0x0200
 #define ASCIISTRING_MASK		0x0400
 #define ARRAY_MASK				0x0800
-#define BYTES_MASK				0x1000
+#define FILE_MASK				0x1000
 
 #define TYPE_ONE_BYTE_INT  		(INT_MASK | 0x1)
 #define TYPE_TWO_BYTE_INT  		(INT_MASK | 0x2)
@@ -26,8 +27,7 @@
 #define TYPE_UIDS  				(ARRAY_MASK | 0x1)
 #define TYPE_UPDATES  			(ARRAY_MASK | 0x2)
 #define TYPE_TAGS				(ARRAY_MASK | 0x3)
-
-#define TYPE_BYTES				(BYTES_MASK)
+#define TYPE_FILE				(FILE_MASK)
 
 #define ONE_BYTE_FOR_LENGTH		1
 #define TWO_BYTE_FOR_LENGTH		2
@@ -298,7 +298,7 @@ static inline void Add(std::string& code, const int type,
 			throw myerr((name + elength).data());
 #endif
 		code += convert_ascii_string_to_hex_string(value->ToString());
-	} else if (type & BYTES_MASK) {
+	} else if (type & FILE_MASK) {
 #ifdef TYPE_CHECK
 		if (value->IsUndefined())
 			throw myerr((name + eundef).data());
@@ -307,9 +307,22 @@ static inline void Add(std::string& code, const int type,
 		if (!(value->IsString()))
 			throw myerr((name + enotstr).data());
 #endif
-		code += convert_int_to_hex_string(value->ToString()->Length(),
-				type & SPECIAL_MASK);
-		code += convert_ascii_string_to_hex_string(value->ToString());
+		char *filename = new char[value->ToString()->Length() + 1];
+		value->ToString()->WriteAscii(filename);
+		filename[value->ToString()->Length()] = '\0';
+		std::ifstream ifs(filename, std::ios_base::in | std::ios_base::binary);
+		delete[] filename;
+		ifs.seekg(std::ios_base::end);
+		uint32_t size = ifs.tellg();
+		unsigned char *buf = new unsigned char[size];
+		ifs.seekg(0);
+		ifs.read((char*) buf, size);
+		code += convert_int_to_hex_string(size, type & SPECIAL_MASK);
+		for (unsigned char *p = buf; p != buf; p++) {
+			code += formHexBit(*p >> 4);
+			code += formHexBit((*p) & 0xF);
+		}
+		delete[] buf;
 	}
 }
 //static inline void Prepend(std::string& code, const int type,
@@ -1148,7 +1161,7 @@ Handle<Value> createUpdateAvartaBig(const Arguments &args) {
 			// args[2]: uid
 			// args[3]: content
 			Add(code, TYPE_FOUR_BYTE_INT, args[2], "uid");
-			Add(code, TYPE_BYTES | FOUR_BYTE_FOR_LENGTH, args[3], "content");
+			Add(code, TYPE_FILE | FOUR_BYTE_FOR_LENGTH, args[3], "content");
 			break;
 		case 1:
 			// args[2]: uid
@@ -1156,7 +1169,7 @@ Handle<Value> createUpdateAvartaBig(const Arguments &args) {
 			// args[4]: content
 			Add(code, TYPE_FOUR_BYTE_INT, args[2], "uid");
 			Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "eventid");
-			Add(code, TYPE_BYTES | FOUR_BYTE_FOR_LENGTH, args[4], "content");
+			Add(code, TYPE_FILE | FOUR_BYTE_FOR_LENGTH, args[4], "content");
 			break;
 		}
 		SetHeadAndReturn(1, 3, 23);END
@@ -1185,7 +1198,7 @@ Handle<Value> createUpdateAvartaSmall(const Arguments &args) {
 			// args[2]: uid
 			// args[3]: content
 			Add(code, TYPE_FOUR_BYTE_INT, args[2], "uid");
-			Add(code, TYPE_BYTES | FOUR_BYTE_FOR_LENGTH, args[3], "content");
+			Add(code, TYPE_FILE | FOUR_BYTE_FOR_LENGTH, args[3], "content");
 			break;
 		case 1:
 			// args[2]: uid
@@ -1193,7 +1206,7 @@ Handle<Value> createUpdateAvartaSmall(const Arguments &args) {
 			// args[4]: content
 			Add(code, TYPE_FOUR_BYTE_INT, args[2], "uid");
 			Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "eventid");
-			Add(code, TYPE_BYTES | FOUR_BYTE_FOR_LENGTH, args[4], "content");
+			Add(code, TYPE_FILE | FOUR_BYTE_FOR_LENGTH, args[4], "content");
 			break;
 		}
 		SetHeadAndReturn(1, 3, 24);END
