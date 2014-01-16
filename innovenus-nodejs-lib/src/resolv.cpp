@@ -170,26 +170,26 @@ static Local<String> JSreadFile(const char *buf, int &pointer,
 	std::string folder(path.begin(), path.begin() + i);
 	if (!CreateDir(folder))
 		return String::New("");
+	if (ACCESS(path.c_str(), 0) == 0)
+		return String::New(path.c_str());
+	else if (length == 0)
+		return String::New("");
 	else {
-		if (ACCESS(path.c_str(), 0) == 0)
-			return String::New(path.c_str());
-		else {
-			char *avarta = new char[length];
-			readBytes(avarta, buf, pointer, length);
+		char *avarta = new char[length];
+		readBytes(avarta, buf, pointer, length);
 
-			FILE *file = fopen(path.c_str(), "wb");
-			if ((file == NULL) || (fwrite(avarta, 1, length, file) != length)) {
-				if (file != NULL)
-					fclose(file);
-				return String::New("");
-			} else {
+		FILE *file = fopen(path.c_str(), "wb");
+		if ((file == NULL) || (fwrite(avarta, 1, length, file) != length)) {
+			if (file != NULL)
 				fclose(file);
-				return String::New(path.c_str());
-			}
 			delete[] avarta;
+			return String::New("");
+		} else {
+			fclose(file);
+			delete[] avarta;
+			return String::New(path.c_str());
 		}
 	}
-	return String::New("");
 }
 
 /**
@@ -718,9 +718,8 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 			unsigned int time = readInteger(pack, pointer, 4);
 			ans->Set(3, Integer::New(time)); // version time
 			std::ostringstream os;
-			os << "public/data/" << viewee << "/avarta/"
-					<< (header.subtype == 23 ? "avarta_" : "smallavarta_")
-					<< date << "_" << time << ".jpg";
+			os << "public/data/" << viewee << "/avarta/" << date << "_" << time
+					<< (header.subtype == 23 ? "" : "_small") << ".jpg";
 			ans->Set(4, JSreadFile(pack, pointer, os.str()));
 			break;
 		}
@@ -820,9 +819,8 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 			unsigned int time = readInteger(pack, pointer, 4);
 			ans->Set(3, Integer::New(time)); // version time
 			std::ostringstream os;
-			os << "public/data/" << header.uid << "/avarta/"
-					<< (header.subtype == 23 ? "avarta_" : "smallavarta_")
-					<< date << "_" << time << ".jpg";
+			os << "public/data/" << header.uid << "/avarta/" << date << "_"
+					<< time << (header.subtype == 23 ? "" : "_small") << ".jpg";
 			ans->Set(4, JSreadFile(pack, pointer, os.str()));
 			break;
 		}
