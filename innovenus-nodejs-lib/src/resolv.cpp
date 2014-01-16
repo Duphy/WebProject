@@ -815,13 +815,13 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 		case 24: //View self's avarta small
 		{
 			unsigned int date = readInteger(pack, pointer, 4);
-			ans->Set(2, Integer::New(date)); // version date
+			ans->Set(1, Integer::New(date)); // version date
 			unsigned int time = readInteger(pack, pointer, 4);
-			ans->Set(3, Integer::New(time)); // version time
+			ans->Set(2, Integer::New(time)); // version time
 			std::ostringstream os;
 			os << "public/data/" << header.uid << "/avarta/" << date << "_"
 					<< time << (header.subtype == 23 ? "" : "_small") << ".jpg";
-			ans->Set(4, JSreadFile(pack, pointer, os.str()));
+			ans->Set(3, JSreadFile(pack, pointer, os.str()));
 			break;
 		}
 		case 30: // View self's pubpages
