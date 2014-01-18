@@ -164,10 +164,10 @@ static Local<String> JSreadFile(const char *buf, int &pointer,
 		std::string path) {
 	int64_t length = readInteger(buf, pointer, 4);
 	int i;
-	for (i = path.length() - 1; i > 0; i--)
+	for (i = path.length() - 1; i >= 0; i--)
 		if (path[i] == '/')
 			break;
-	std::string folder(path.begin(), path.begin() + i);
+	std::string folder(path.begin(), path.begin() + i + 1);
 	if (!CreateDir(folder))
 		return String::New("");
 	if (ACCESS(path.c_str(), 0) == 0)

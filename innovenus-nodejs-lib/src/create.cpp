@@ -1141,9 +1141,9 @@ Handle<Value> createUpdateStatusPack(const Arguments &args) {
 /**
  * - \b "3 23 Update avarta big"
  * - for user
- * 		- creaetUpdateAvartaBig(0, uid, content)
+ * 		- createUpdateAvartaBig(0, session_key, uid, content)
  * - for event
- * 		- creaetUpdateAvartaBig(1, uid, eid, content)
+ * 		- createUpdateAvartaBig(1, session_key, uid, eid, content)
  * \see ::resolvUpdatePack
  */
 
@@ -1178,9 +1178,9 @@ Handle<Value> createUpdateAvartaBig(const Arguments &args) {
 /**
  * - \b "3 24 Update avarta small"
  * - for user
- * 		- creaetUpdateAvartaSmall(0, uid, content)
+ * 		- createUpdateAvartaSmall(0, session_key, uid, content)
  * - for event
- * 		- createUpdateAvartaSmall(1, uid, eid, content)
+ * 		- createUpdateAvartaSmall(1, session_key, uid, eid, content)
  * \see ::resolvUpdatePack
  */
 
