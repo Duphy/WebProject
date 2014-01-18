@@ -719,7 +719,7 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 			ans->Set(3, Integer::New(time)); // version time
 			std::ostringstream os;
 			os << "public/data/" << viewee << "/avarta/" << date << "_" << time
-					<< (header.subtype == 23 ? "" : "_small") << ".jpg";
+					<< (mode == 23 ? "" : "_small") << ".jpg";
 			ans->Set(4, JSreadFile(pack, pointer, os.str()));
 			break;
 		}
@@ -820,7 +820,7 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 			ans->Set(2, Integer::New(time)); // version time
 			std::ostringstream os;
 			os << "public/data/" << header.uid << "/avarta/" << date << "_"
-					<< time << (header.subtype == 23 ? "" : "_small") << ".jpg";
+					<< time << (header.mode == 23 ? "" : "_small") << ".jpg";
 			ans->Set(3, JSreadFile(pack, pointer, os.str()));
 			break;
 		}
