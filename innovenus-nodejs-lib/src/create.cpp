@@ -307,18 +307,23 @@ static inline void Add(std::string& code, const int type,
 		if (!(value->IsString()))
 			throw myerr((name + enotstr).data());
 #endif
-		char *filename = new char[value->ToString()->Length() + 1];
-		value->ToString()->WriteAscii(filename);
-		filename[value->ToString()->Length()] = '\0';
+		char *filename = new char[value->ToString()->Length() + 1 + 7];
+		sprintf(filename, "public/");
+		value->ToString()->WriteAscii(filename + 7);
+		filename[value->ToString()->Length() + 7] = '\0';
 		std::ifstream ifs(filename, std::ios_base::in | std::ios_base::binary);
 		delete[] filename;
-		ifs.seekg(std::ios_base::end);
+		if (!ifs.good())
+			throw myerr("Can't open file");
+		ifs.seekg(0, std::ios_base::end);
 		uint32_t size = ifs.tellg();
 		unsigned char *buf = new unsigned char[size];
-		ifs.seekg(0);
+		ifs.seekg(0, std::ios_base::beg);
 		ifs.read((char*) buf, size);
+		ifs.close();
 		code += convert_int_to_hex_string(size, type & SPECIAL_MASK);
-		for (unsigned char *p = buf; p != buf; p++) {
+		unsigned char *end = buf + size;
+		for (unsigned char *p = buf; p != end; p++) {
 			code += formHexBit(*p >> 4);
 			code += formHexBit((*p) & 0xF);
 		}

@@ -171,7 +171,7 @@ static Local<String> JSreadFile(const char *buf, int &pointer,
 	if (!CreateDir(folder))
 		return String::New("");
 	if (ACCESS(path.c_str(), 0) == 0)
-		return String::New(path.c_str());
+		return String::New(path.substr(7).c_str());
 	else if (length == 0)
 		return String::New("");
 	else {
@@ -187,7 +187,7 @@ static Local<String> JSreadFile(const char *buf, int &pointer,
 		} else {
 			fclose(file);
 			delete[] avarta;
-			return String::New(path.c_str());
+			return String::New(path.substr(7).c_str());
 		}
 	}
 }
