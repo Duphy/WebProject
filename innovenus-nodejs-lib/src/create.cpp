@@ -1440,6 +1440,32 @@ Handle<Value> createQuitEventPack(const Arguments &args) {
 }
 
 /**
+ * - \b "10 5 Notification response"
+ * 		- createNotificationPack(session_key, your_uid, subtype2, seqNo, uid, eid, pid, action)
+ */
+
+// args[0]: session_key
+// args[1]: your_uid
+// args[2]: subtype2
+// args[3]: seqNo
+// args[4]: uid
+// args[5]: eid
+// args[6]: pid
+// args[7]: action
+Handle<Value> createNotificationPack(const Arguments &args) {
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_ONE_BYTE_INT, args[2], "subtype2");
+		Add(code, TYPE_FOUR_BYTE_INT, args[3], "seqNo");
+		Add(code, TYPE_FOUR_BYTE_INT, args[4], "uid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[5], "eid");
+		Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[6], "pid");
+		Add(code, TYPE_ONE_BYTE_INT, args[7], "action");
+		SetHeadAndReturn(0, 10, 5);END
+}
+
+/**
  * - \b "12 0 Send message to user"
  * 		- createMessageToUserPack(session_key, your_uid, seqNo, other_uid, content)
  * \see ::resolvMessagePack
