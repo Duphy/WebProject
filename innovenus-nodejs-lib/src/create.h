@@ -41,4 +41,5 @@ DeclareJSFunction(createIdentificationCodeValidationPack)
 DeclareJSFunction(createQuitEventPack)
 DeclareJSFunction(createMessageToUserPack)
 DeclareJSFunction(createMessageToEventPack)
+DeclareJSFunction(createNotificationPack)
 #endif /* CREATE_H_ */
