@@ -1462,6 +1462,7 @@ Handle<Value> createNotificationPack(const Arguments &args) {
 		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[5], "eid");
 		Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[6], "pid");
 		Add(code, TYPE_ONE_BYTE_INT, args[7], "action");
+		Add(code, TYPE_ONE_BYTE_INT, Integer::New(0), "msg_length");
 		SetHeadAndReturn(0, 10, 5);END
 }
 
