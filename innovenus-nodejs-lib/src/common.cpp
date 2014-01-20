@@ -41,6 +41,7 @@ void init(Handle<Object> exports) {
 	ExportJSFunction(createEmailValidationPack)
 	ExportJSFunction(createIdentificationCodeValidationPack)
 	ExportJSFunction(createQuitEventPack)
+	ExportJSFunction(createNotificationPack)
 	ExportJSFunction(createMessageToUserPack)
 	ExportJSFunction(createMessageToEventPack)
 
