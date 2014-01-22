@@ -29,9 +29,7 @@ typedef struct s_response_header {
 	uint32_t uid;
 	int type, subtype;
 } response_header;
-static inline int resolvHexBit(char a) {
-	return a > '9' ? a - 'a' + 10 : a - '0';
-}
+
 static void readBytes(char *dist, const char *buf, int& pointer, int length) {
 	if (dist != NULL)
 		for (int i = 0; i < length; i++)
@@ -1413,6 +1411,7 @@ Handle<Value> resolvPack(const Arguments& args) {
 	Local<Array> package = Array::New(2);
 	response_header header;
 	args[0]->ToString()->WriteAscii(pack, 0, args[0]->ToString()->Length());
+	encode(pack, args[0]->ToString()->Length() / 2);
 	extract_header(pack, &header);
 	package->Set(0, formJSHeader(&header));
 	switch (header.type) {
@@ -1463,6 +1462,7 @@ Handle<Value> resolvPack(const Arguments& args) {
  */
 Handle<Value> resolvHeader(const Arguments& args) {
 	char* pack = new char[HEADER_LENGTH * 2];
+	encode(pack, HEADER_LENGTH);
 	response_header header;
 	args[0]->ToString()->WriteAscii(pack, 0, HEADER_LENGTH * 2);
 	extract_header(pack, &header);

@@ -8,6 +8,25 @@
 #include "resolv.h"
 #include "create.h"
 
+void encode(char *pack, uint32_t length) {
+	return;
+	int x = 97;
+	for (uint32_t i = 4; i < length; i++) {
+		pack[i << 1] = formHexBit((resolvHexBit(pack[i << 1]) ^ (x >> 4)));
+		pack[(i << 1) | 1] = formHexBit((resolvHexBit(pack[(i << 1) | 1]) ^ (x & 0xF)));
+		if (x > 123) x = 97;
+	}
+}
+void encode(std::string &pack, uint32_t length) {
+	return;
+	unsigned int x = 97;
+	for (std::string::iterator it = pack.begin() + 4 * 2; it != pack.end();) {
+		*it++ = formHexBit((resolvHexBit(*it) ^ (x >> 4)));
+		*it++ = formHexBit((resolvHexBit(*it) ^ (x & 0xF)));
+		if (x > 123) x = 97;
+	}
+}
+
 #define ExportJSFunction(x) exports->Set(sym(#x),FunctionTemplate::New(x)->GetFunction());
 
 void init(Handle<Object> exports) {

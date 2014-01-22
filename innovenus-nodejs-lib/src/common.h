@@ -13,6 +13,9 @@
 #else
 #define LLD "%lld"
 #endif
+
+#include <string>
+
 using namespace v8;
 
 #define UID_LENGTH				4
@@ -37,4 +40,13 @@ inline static Local<String> sym(char *x) {
 }
 
 #define DeclareJSFunction(x) Handle<Value> x(const Arguments &args);
+
+inline int resolvHexBit(char a) {
+	return a > '9' ? a - 'a' + 10 : a - '0';
+}
+inline char formHexBit(int a) {
+	return a > 9 ? 'a' + a - 10 : '0' + a;
+}
+void encode(char *buf, uint32_t length);
+void encode(std::string &buf, uint32_t length);
 #endif /* COMMON_H_ */

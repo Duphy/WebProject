@@ -58,6 +58,7 @@ static const std::string eelem("element of ");
 	tmp += convert_int_to_hex_string(_type, 1); \
 	tmp += convert_int_to_hex_string(_subtype, 1); \
 	code = tmp + code; \
+	encode(code, code.length() >> 1); \
 	HandleScope scope; \
 	return scope.Close(String::New(code.data())); \
 	}
@@ -79,9 +80,6 @@ public:
 		return _what;
 	}
 };
-static inline char formHexBit(int a) {
-	return a > 9 ? 'a' + a - 10 : '0' + a;
-}
 static std::string convert_int_to_hex_string(int64_t a, unsigned int length) {
 	char tmp[17] = { '\0' };
 	for (unsigned int i = 0; i < length; i++) {
