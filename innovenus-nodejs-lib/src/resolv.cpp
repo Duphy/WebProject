@@ -449,7 +449,7 @@ Local<Array> resolvSchedule(char *pack, int &pointer) {
 	Local<Array> ans = Array::New(10);
 	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	ans->Set(1, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
-	ans->Set(2, JSreadInteger(pack, pointer, 4));
+	ans->Set(2, JSreadInteger(pack, pointer, SID_LENGTH));
 	ans->Set(3, JSreadInteger(pack, pointer, 4));
 	ans->Set(4, JSreadInteger(pack, pointer, 4));
 	ans->Set(5, JSreadInteger(pack, pointer, 4));
@@ -679,6 +679,20 @@ Local<Array> resolvAdvertisements(const char *pack, int &pointer) {
  * 		- \b "0 30 31 View pubpage's advertisement"
  * 			- 2: ads (::resolvAdvertisements)
  */
+
+/**
+ * - \b "0 31 View advertisement"
+ * 		- 0: ad_id (string)
+ * 		- 1: poster_uid (int32)
+ * 		- 2: pubid (string)
+ * 		- 3: post_date (int32)
+ * 		- 4: post_time (int32)
+ * 		- 5: pubpage_name (string)
+ * 		- 6: content (string)
+ * 		- 7: visibility (int8)
+ * 		- 8: tags (::resolvTags)
+ * 		- 9: pictures (::resolvPictures)
+ */
 Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 	int pointer = HEADER_LENGTH * 2, mode;
 	int64_t length;
@@ -854,7 +868,21 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 			break;
 		}
 		break;
-	case 31:
+	case 31: // View advertisement
+		ans->Set(0, JSreadAsciiString(pack, pointer, ADID_LENGTH));
+		ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
+		ans->Set(2, JSreadAsciiString(pack, pointer, PUBID_LENGTH));
+		ans->Set(3, JSreadInteger(pack, pointer, 4));
+		ans->Set(4, JSreadInteger(pack, pointer, 4));
+		length = readInteger(pack, pointer, 1);
+		ans->Set(5, JSreadString(pack, pointer, length));
+		length = readInteger(pack, pointer, 2);
+		ans->Set(6, JSreadString(pack, pointer, length));
+		ans->Set(7, JSreadInteger(pack, pointer, 1));
+		ans->Set(8, resolvTags(pack, pointer));
+		ans->Set(9, resolvPictures(pack, pointer));
+		break;
+	case 40: // View picture
 		break;
 	}
 	return ans;
@@ -885,6 +913,12 @@ Handle<Value> resolvSearchPack(char *pack, const response_header &header) {
 		break;
 	case 2:			//Search Posting
 		return resolvPostings(pack, pointer);
+		break;
+	case 30: // Search pubpage
+		return resolvPubpages(pack, pointer);
+		break;
+	case 31: // Search advertisement
+		return resolvAdvertisements(pack, pointer);
 		break;
 	}
 	return Undefined();
@@ -951,33 +985,38 @@ Handle<Value> resolvSearchPack(char *pack, const response_header &header) {
  */
 Local<Array> resolvCreatePack(char *pack, const response_header &header) {
 	int pointer = HEADER_LENGTH * 2;
-	bool succ = readBool(pack, pointer);
+	bool succ;
 	Local<Array> ans = Array::New(1);
-	ans->Set(0, Boolean::New(succ));
 	int type, length;
 	switch (header.subtype) {
-	case 0: //Create User
+	case 0: // Create User
+		succ = readBool(pack, pointer);
+		ans->Set(0, Boolean::New(succ));
 		if (succ) {
 			ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
 		} else {
 			ans->Set(1, JSreadInteger(pack, pointer, 1));
 		}
 		break;
-	case 1: //Create Event
+	case 1: // Create Event
+		succ = readBool(pack, pointer);
+		ans->Set(0, Boolean::New(succ));
 		if (succ) {
 			ans->Set(1, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 		} else {
 			ans->Set(1, JSreadInteger(pack, pointer, 1));
 		}
 		break;
-	case 2: //Create Posting
+	case 2: // Create Posting
+		succ = readBool(pack, pointer);
+		ans->Set(0, Boolean::New(succ));
 		if (succ) {
 			ans->Set(1, resolvPosting(pack, pointer));
 		} else {
 			ans->Set(1, JSreadInteger(pack, pointer, 1));
 		}
 		break;
-	case 3: //Create Request
+	case 3: // Create Request
 		type = readInteger(pack, pointer, 1);
 		ans->Set(1, Integer::New(type));
 		switch (type) {
@@ -985,6 +1024,8 @@ Local<Array> resolvCreatePack(char *pack, const response_header &header) {
 			ans->Set(2, JSreadInteger(pack, pointer, UID_LENGTH));
 			length = readInteger(pack, pointer, 1);
 			ans->Set(3, JSreadString(pack, pointer, length));
+			succ = readBool(pack, pointer);
+			ans->Set(0, Boolean::New(succ));
 			if (!succ)
 				ans->Set(4, JSreadInteger(pack, pointer, 1));
 			break;
@@ -992,6 +1033,8 @@ Local<Array> resolvCreatePack(char *pack, const response_header &header) {
 			ans->Set(2, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 			length = readInteger(pack, pointer, 1);
 			ans->Set(3, JSreadString(pack, pointer, length));
+			succ = readBool(pack, pointer);
+			ans->Set(0, Boolean::New(succ));
 			if (!succ)
 				ans->Set(4, JSreadInteger(pack, pointer, 1));
 			break;
@@ -1000,12 +1043,16 @@ Local<Array> resolvCreatePack(char *pack, const response_header &header) {
 			ans->Set(3, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 			length = readInteger(pack, pointer, 1);
 			ans->Set(4, JSreadString(pack, pointer, length));
+			succ = readBool(pack, pointer);
+			ans->Set(0, Boolean::New(succ));
 			if (!succ)
 				ans->Set(5, JSreadInteger(pack, pointer, 1));
 			break;
 		}
 		break;
-	case 17: //Create Schedule
+	case 17: // Create Schedule
+		succ = readBool(pack, pointer);
+		ans->Set(0, Boolean::New(succ));
 		if (succ) {
 			ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
 			ans->Set(2, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
@@ -1014,6 +1061,16 @@ Local<Array> resolvCreatePack(char *pack, const response_header &header) {
 			ans->Set(1, JSreadInteger(pack, pointer, 1));
 		}
 		break;
+	case 31: // Create advertisement
+		succ = readBool(pack, pointer);
+		ans->Set(0, Boolean::New(succ));
+		if (succ) {
+			ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
+			ans->Set(2, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
+			ans->Set(3, JSreadInteger(pack, pointer, 4));
+		} else {
+			ans->Set(1, JSreadInteger(pack, pointer, 1));
+		}
 	}
 	return ans;
 }
@@ -1063,6 +1120,12 @@ Local<Array> resolvCreatePack(char *pack, const response_header &header) {
  *			- \b "if success"
  * 				- 4: version_date (int32)
  * 				- 5: version_time (int32)
+ */
+
+/**
+ * - \b "3 30 Update advertisement"
+ * 		- 0: eid (string)
+ * 		- 1: updates (::resolvUpdates)
  */
 Local<Array> resolvUpdatePack(char *pack, const response_header &header) {
 	int pointer = HEADER_LENGTH * 2, mode;
@@ -1133,6 +1196,10 @@ Local<Array> resolvUpdatePack(char *pack, const response_header &header) {
 			break;
 		}
 		break;
+	case 30: // Update advertisement
+		ans->Set(0, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
+		ans->Set(1, resolvUpdates(pack, pointer));
+		break;
 	}
 	return ans;
 }
@@ -1187,6 +1254,13 @@ Local<Array> resolvReplyPack(char *pack, const response_header &header) {
  *		- 4: rid (int32)
  *		- 5: success (boolean)
  */
+
+/**
+ * - \b "5 31 Delete advertisement"
+ * 		- 0: pubid (string)
+ * 		- 1: ad_id (string)
+ * 		- 2: success (boolean)
+ */
 Local<Array> resolvDeletePack(char *pack, const response_header &header) {
 	int pointer = HEADER_LENGTH * 2;
 	Local<Array> ans;
@@ -1218,6 +1292,12 @@ Local<Array> resolvDeletePack(char *pack, const response_header &header) {
 		ans->Set(3, JSreadAsciiString(pack, pointer, POSTID_LENGTH));
 		ans->Set(4, JSreadInteger(pack, pointer, RID_LENGTH));
 		ans->Set(5, JSreadBool(pack, pointer));
+		break;
+	case 31: // Delete advertisement
+		ans = Array::New(3);
+		ans->Set(0, JSreadAsciiString(pack, pointer, PUBID_LENGTH));
+		ans->Set(1, JSreadAsciiString(pack, pointer, ADID_LENGTH));
+		ans->Set(2, JSreadBool(pack, pointer));
 		break;
 	}
 	return ans;

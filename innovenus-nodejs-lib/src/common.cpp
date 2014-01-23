@@ -30,19 +30,26 @@ void encode(std::string &pack, uint32_t length) {
 #define ExportJSFunction(x) exports->Set(sym(#x),FunctionTemplate::New(x)->GetFunction());
 
 void init(Handle<Object> exports) {
-	ExportJSFunction(createViewUserPack);
+	ExportJSFunction(createViewUserPack)
 	ExportJSFunction(createViewEventPack)
 	ExportJSFunction(createViewPostingPack)
 	ExportJSFunction(createMassViewPack)
-	ExportJSFunction(createViewSelfPack);
+	ExportJSFunction(createViewSelfPack)
+	ExportJSFunction(createViewPubpagePack)
+	ExportJSFunction(createViewAdvertisementPack)
+	ExportJSFunction(createMassViewAdvertisementsPack)
+	ExportJSFunction(createViewPicturePack)
 	ExportJSFunction(createSearchUserPack)
 	ExportJSFunction(createSearchEventPack)
 	ExportJSFunction(createSearchPostingPack)
+	ExportJSFunction(createSearchPubpagePack)
+	ExportJSFunction(createSearchAdvertisementPack)
 	ExportJSFunction(createCreateUserPack)
 	ExportJSFunction(createCreateEventPack)
 	ExportJSFunction(createCreatePostingPack)
 	ExportJSFunction(createCreateRequestPack)
 	ExportJSFunction(createCreateSchedulePack)
+	ExportJSFunction(createCreateAdvertisementPack)
 	ExportJSFunction(createUpdateUserPack)
 	ExportJSFunction(createUpdateEventPack)
 	ExportJSFunction(createUpdatePostingPack)
@@ -50,6 +57,7 @@ void init(Handle<Object> exports) {
 	ExportJSFunction(createUpdateStatusPack)
 	ExportJSFunction(createUpdateAvartaBig)
 	ExportJSFunction(createUpdateAvartaSmall)
+	ExportJSFunction(createUpdatePubpagePack)
 	ExportJSFunction(createReplyPostingPack)
 	ExportJSFunction(createDeleteFriendPack)
 	ExportJSFunction(createDeletePostingPack)
@@ -60,9 +68,9 @@ void init(Handle<Object> exports) {
 	ExportJSFunction(createEmailValidationPack)
 	ExportJSFunction(createIdentificationCodeValidationPack)
 	ExportJSFunction(createQuitEventPack)
-	ExportJSFunction(createNotificationPack)
 	ExportJSFunction(createMessageToUserPack)
 	ExportJSFunction(createMessageToEventPack)
+	ExportJSFunction(createNotificationPack)
 
 	ExportJSFunction(resolvPack)
 	ExportJSFunction(resolvHeader)

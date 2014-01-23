@@ -27,6 +27,8 @@
 #define TYPE_UIDS  				(ARRAY_MASK | 0x1)
 #define TYPE_UPDATES  			(ARRAY_MASK | 0x2)
 #define TYPE_TAGS				(ARRAY_MASK | 0x3)
+#define TYPE_PICTURES			(ARRAY_MASK | 0x4)
+
 #define TYPE_FILE				(FILE_MASK)
 
 #define ONE_BYTE_FOR_LENGTH		1
@@ -125,7 +127,12 @@ static std::string convert_ascii_string_to_hex_string(Handle<String> src) {
 	delete[] tmp;
 	return ans;
 }
-
+static inline void Add(std::string& code, const int type,
+		const Local<Value>& value, const char* name);
+static inline void Add(std::string& code, const int type,
+		const Local<Value>& value, std::string name) {
+	Add(code, type, value, name.c_str());
+}
 static inline void Add(std::string& code, const int type,
 		const Local<Value>& value, const char* name) {
 	if (type & ARRAY_MASK) {
@@ -149,17 +156,14 @@ static inline void Add(std::string& code, const int type,
 			cur = tmp->Get(i = 0);
 			while (!cur->IsUndefined()) {
 #ifdef TYPE_CHECK
-				if (value->IsNull())
-					throw myerr((eelem + name + enull).data());
-				if (!(cur->IsString()))
-					throw myerr((eelem + name + enotstr).data());
+				Add(tmpstr, TYPE_STRING | ONE_BYTE_FOR_LENGTH, cur, eelem + name);
+#else
+				Add(tmpstr, TYPE_STRING | ONE_BYTE_FOR_LENGTH, cur, "");
 #endif
-				cur2 = cur->ToString();
-				tmpstr += convert_int_to_hex_string(cur2->Length() * 2, 1);
-				tmpstr += convert_string_to_hex_string(cur2);
-				cur = tmp->Get(i++);
+				cur = tmp->Get(++i);
 			}
-			code += convert_int_to_hex_string(i, 1) + tmpstr;
+			Add(code, TYPE_ONE_BYTE_INT, Integer::New(i), "");
+			code += tmpstr;
 			break;
 		case TYPE_UPDATES:
 			cur = tmp->Get(i = 0);
@@ -178,9 +182,14 @@ static inline void Add(std::string& code, const int type,
 					throw myerr((eelem + eelem + name + enotint).data());
 #endif
 				type2 = cur3->Get(0)->Uint32Value();
-				tmpstr += convert_int_to_hex_string(type2, 1);
+				Add(tmpstr, TYPE_ONE_BYTE_INT, Integer::New(type2), "");
 				switch (type2) {
 				case 0: //password
+					Add(tmpstr, TYPE_STRING | ONE_BYTE_FOR_LENGTH, cur3->Get(1),
+							"old_password");
+					Add(tmpstr, TYPE_STRING | ONE_BYTE_FOR_LENGTH, cur3->Get(2),
+							"new_password");
+					break;
 				case 1: //name
 				case 2: //nickname
 				case 5: //city
@@ -189,73 +198,69 @@ static inline void Add(std::string& code, const int type,
 				case 8: //add tag
 				case 9: //del tag
 #ifdef TYPE_CHECK
-					if (cur3->Get(1)->IsNull())
-						throw myerr((eelem + eelem + name + enull).data());
-					if (!(cur3->Get(1)->IsString()))
-						throw myerr((eelem + eelem + name + enotstr).data());
+					Add(tmpstr, TYPE_STRING | ONE_BYTE_FOR_LENGTH, cur3->Get(1),
+							eelem + eelem + name);
+#else
+					Add(tmpstr, TYPE_STRING | ONE_BYTE_FOR_LENGTH, cur3->Get(1), eelem + eelem + name);
 #endif
-					tmpstr += convert_int_to_hex_string(
-							cur3->Get(1)->ToString()->Length() * 2, 1);
-					tmpstr += convert_string_to_hex_string(
-							cur3->Get(1)->ToString());
 					break;
 				case 3: //birthday
 				case 11: //add manager
 				case 12: //del manager
 				case 13: //del member
 #ifdef TYPE_CHECK
-					if (cur3->Get(1)->IsNull())
-						throw myerr((eelem + eelem + name + enull).data());
-					if (!(cur3->Get(1)->IsInt32()))
-						throw myerr((eelem + eelem + name + enotint).data());
+					Add(tmpstr, TYPE_FOUR_BYTE_INT, cur3->Get(1),
+							eelem + eelem + name);
+#else
+					Add(tmpstr, TYPE_FOUR_BYTE_INT, cur3->Get(1), "");
 #endif
-					tmpstr += convert_int_to_hex_string(
-							cur3->Get(1)->IntegerValue(), 4);
 					break;
 				case 4: //gender
 #ifdef TYPE_CHECK
-					if (cur3->Get(1)->IsNull())
-						throw myerr((eelem + eelem + name + enull).data());
-					if (!(cur3->Get(1)->IsInt32()))
-						throw myerr((eelem + eelem + name + enotint).data());
+					Add(tmpstr, TYPE_ONE_BYTE_INT, cur3->Get(1),
+							eelem + eelem + name);
+#else
+					Add(tmpstr, TYPE_ONE_BYTE_INT, cur3->Get(1), "");
 #endif
-					tmpstr += convert_int_to_hex_string(
-							cur3->Get(1)->IntegerValue(), 1);
 					break;
 				case 10: //setting
 #ifdef TYPE_CHECK
-					if (cur3->Get(1)->IsNull())
-						throw myerr((eelem + eelem + name + enull).data());
-					if (!(cur3->Get(1)->IsInt32()))
-						throw myerr((eelem + eelem + name + enotint).data());
-					if (cur3->Get(2)->IsNull())
-						throw myerr((eelem + eelem + name + enull).data());
-					if (!(cur3->Get(2)->IsInt32()))
-						throw myerr((eelem + eelem + name + enotint).data());
+					Add(tmpstr, TYPE_ONE_BYTE_INT, cur3->Get(1),
+							eelem + eelem + name);
+					Add(tmpstr, TYPE_ONE_BYTE_INT, cur3->Get(2),
+							eelem + eelem + name);
+#else
+					Add(tmpstr, TYPE_ONE_BYTE_INT, cur3->Get(1), "");
+					Add(tmpstr, TYPE_ONE_BYTE_INT, cur3->Get(2), "");
 #endif
-					tmpstr += convert_int_to_hex_string(
-							cur3->Get(1)->IntegerValue(), 1);
-					tmpstr += convert_int_to_hex_string(
-							cur3->Get(2)->IntegerValue(), 1);
-					break;
 				}
-				cur = tmp->Get(i++);
+				cur = tmp->Get(++i);
 			}
-			code += convert_int_to_hex_string(i, 1) + tmpstr;
+			Add(code, TYPE_ONE_BYTE_INT, Integer::New(i), "");
+			code += tmpstr;
 			break;
 		case TYPE_UIDS:
 			cur = tmp->Get(i = 0);
 			while (!cur->IsUndefined()) {
 #ifdef TYPE_CHECK
-				if (cur->IsNull())
-					throw myerr((eelem + name + enull).data());
-				if (!(cur->IsInt32()))
-					throw myerr((eelem + name + enotint).data());
+				Add(tmpstr, TYPE_FOUR_BYTE_INT, cur3->Get(1),
+						eelem + eelem + name);
+#else
+				Add(tmpstr, TYPE_FOUR_BYTE_INT, cur3->Get(1), "");
 #endif
-				tmpstr += convert_int_to_hex_string(cur->IntegerValue(), 4);
-				cur = tmp->Get(i++);
+				cur = tmp->Get(++i);
 			}
-			code += convert_int_to_hex_string(i, 4) + tmpstr;
+			Add(code, TYPE_FOUR_BYTE_INT, Integer::New(i), "");
+			code += tmpstr;
+			break;
+		case TYPE_PICTURES:
+			cur = tmp->Get(i = 0);
+			while (!cur->IsUndefined()) {
+				Add(tmpstr, TYPE_FILE, cur, "picture");
+				cur = tmp->Get(++i);
+			}
+			Add(code, TYPE_ONE_BYTE_INT, Integer::New(i), "");
+			code += tmpstr;
 			break;
 		}
 	} else if (type & INT_MASK) {
@@ -504,7 +509,7 @@ Handle<Value> createViewUserPack(const Arguments &args) {
 			break;
 		case 2:
 			// args[4]: postid
-			Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "postid");
+			Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "max_pid");
 			break;
 		case 23:
 		case 24:
@@ -561,7 +566,7 @@ Handle<Value> createViewEventPack(const Arguments &args) {
 			break;
 		case 2:
 			// args[4]: pid
-			Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "pid");
+			Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "max_pid");
 			break;
 		case 23:
 		case 24:
@@ -702,6 +707,91 @@ Handle<Value> createViewSelfPack(const Arguments& args) {
 }
 
 /**
+ * - \b "0 30 View pubpage"
+ * - for view pubpage's info
+ * 		- createViewPubpagePack(4, session_key, viewer_uid, pubpage_id)
+ * - for view pubpage's big avarta
+ * 		- createViewPubpagePack(23, session_key, viewer_uid, pubpage_id, local_version_date, local_version_time)
+ * - for view pubpage's small avarta
+ * 		- createViewPubpagePack(24, session_key, viewer_uid, pubpage_id, local_version_date, local_version_time)
+ */
+// args[0]: mode
+// args[1]: session_key
+// args[2]: viewer_uid
+Handle<Value> createViewPubpagePack(const Arguments& args) {
+	std::string code;
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[2], "viewer_uid");
+		Add(code, TYPE_ONE_BYTE_INT, args[0], "mode");
+		switch (args[0]->Uint32Value()) {
+		case 4:
+			break;
+		case 23:
+		case 24:
+			// args[3]: local_version_date
+			// args[4]: local_version_time
+			Add(code, TYPE_FOUR_BYTE_INT, args[3], "local_version_date");
+			Add(code, TYPE_FOUR_BYTE_INT, args[4], "local_version_time");
+			break;
+		}
+		SetHeadAndReturn(1, 0, 30);END
+}
+
+/**
+ * - \b "0 31 View advertisement"
+ * 		- createViewAdvertisementPack(session_key, viewer_uid, pubpage_id, ad_id)
+ */
+// args[0]: session_key
+// args[1]: viewer_uid
+// args[2]: pubpage_id
+// args[3]: ad_id
+Handle<Value> createViewAdvertisementPack(const Arguments& args) {
+	std::string code;
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "viewer_uid");
+		Add(code, TYPE_ASCII_STRING | PUBID_LENGTH, args[2], "pubpage_id");
+		Add(code, TYPE_ASCII_STRING | ADID_LENGTH, args[3], "ad_id");
+		SetHeadAndReturn(0, 0, 31);END
+}
+
+/**
+ * - \b "0 32 Mass view advertisements"
+ * 		- createMassViewAdvertisementsPack(session_key, viewer_uid, range, 0, max_pid)
+ * 		- range:
+ * 			- 0=local
+ * 			- 1=global
+ */
+// args[0]: session_key
+// args[1]: viewer_uid
+// args[2]: range
+// args[3]: subtype3
+// args[4]: max_pid
+Handle<Value> createMassViewAdvertisementsPack(const Arguments& args) {
+	std::string code;
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "viewer_uid");
+		Add(code, TYPE_ONE_BYTE_INT, args[2], "range");
+		Add(code, TYPE_ONE_BYTE_INT, args[3], "subtype3");
+		Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "max_pid");
+		SetHeadAndReturn(0, 0, 32);END
+}
+
+/**
+ * - \b "0 40 View picture"
+ * 		- createViewPicturePack(session_key, viewer_uid, pic_id)
+ */
+// args[0]: session_key
+// args[1]: viewer_uid
+// args[2]: pic_id
+Handle<Value> createViewPicturePack(const Arguments& args) {
+	std::string code;
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "viewer_uid");
+		Add(code, TYPE_ASCII_STRING | PICID_LENGTH, args[2], "pic_id");
+		SetHeadAndReturn(0, 0, 40);END
+}
+
+/**
  * - \b "1 0 Search user"
  * - for search by filter
  * 		- createSearchUserPack(0, session_key, searcher_uid, match_option, \n
@@ -839,6 +929,70 @@ Handle<Value> createSearchPostingPack(const Arguments &args) {
 		Add(code, TYPE_ONE_BYTE_INT, args[3], "local_or_global");
 		Add(code, TYPE_ONE_BYTE_INT, args[4], "option");
 		SetHeadAndReturn(0, 1, 2);END
+}
+
+/**
+ * - \b "1 30 Search pubpage"
+ * - for search by filter
+ * 		- createSearchPubpagePack(0, session_key, searcher_uid, match_option, filter, local_or_global)
+ * 		- option:
+ * 				- 0=both
+ * 				- 1=name only
+ * 				- 2=tags only
+ * 		- local_or_global:
+ * 				- 0=local
+ * 				- 1=global
+ * - for search by id
+ * 		- createSearchPubpagePack(1, session_key, searcher_uid, pubid)
+ * \see ::resolvSearchPack
+ */
+// args[0]: search_mode
+// args[1]: session_key
+// args[2]: searcher_uid
+Handle<Value> createSearchPubpagePack(const Arguments &args) {
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "searcher_uid");
+		Add(code, TYPE_ONE_BYTE_INT, Integer::New(0), "search_mode");
+		switch (args[0]->Uint32Value()) {
+		case 0:
+			// args[3]: match_option
+			// args[4]: filter
+			// args[5]: local_or_global
+			Add(code, TYPE_ONE_BYTE_INT, args[3], "match_option");
+			Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[4], "filter");
+			Add(code, TYPE_ONE_BYTE_INT, args[5], "local_or_global");
+			break;
+		case 1:
+			// args[3]: pubid
+			Add(code, TYPE_ASCII_STRING | PUBID_LENGTH, args[3], "pubid");
+			break;
+		}
+		SetHeadAndReturn(1, 1, 30);END
+}
+
+/**
+ * - \b "1 31 Search advertisement"
+ * 		- createSearchAdvertisementPack(session_key, searcher_uid, filter, local_or_global, 0)
+ * 		- local_or_global:
+ * 				- 0=local
+ * 				- 1=global
+ * \see ::resolvSearchPack
+ */
+// args[0]: session_key
+// args[1]: searcher_uid
+// args[2]: filter
+// args[3]: local_or_global
+// args[4]: option
+Handle<Value> createSearchAdvertisementPack(const Arguments &args) {
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "searcher_uid");
+		Add(code, TYPE_ONE_BYTE_INT, Integer::New(0), "search_mode");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[2], "filter");
+		Add(code, TYPE_ONE_BYTE_INT, args[3], "local_or_global");
+		Add(code, TYPE_ONE_BYTE_INT, args[4], "option");
+		SetHeadAndReturn(0, 1, 31);END
 }
 
 /**
@@ -1022,11 +1176,34 @@ Handle<Value> createCreateSchedulePack(const Arguments &args) {
 }
 
 /**
+ * - \b "2 31 Create advertisement"
+ * 		- createCreateAdvertisementPack(session_key, creater_uid, pub_id, content, 0, tags, pictures)
+ */
+// args[0]: session_key
+// args[1]: creater_uid
+// args[2]: pub_id
+// args[3]: content
+// args[4]: visibility
+// args[5]: tags
+// args[6]: pictures
+Handle<Value> createCreateAdvertisementPack(const Arguments &args) {
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "creater_uid");
+		Add(code, TYPE_ASCII_STRING | PUBID_LENGTH, args[2], "pub_id");
+		Add(code, TYPE_STRING | TWO_BYTE_FOR_LENGTH, args[3], "content");
+		Add(code, TYPE_ONE_BYTE_INT, args[4], "visibility");
+		Add(code, TYPE_TAGS, args[5], "tags");
+		Add(code, TYPE_PICTURES, args[6], "pictures");
+		SetHeadAndReturn(0, 2, 31);END
+}
+
+/**
  * - \b "3 0 Update user"
  * 		- createUpdateUserPack(session_key, uid, updates)
  * 		- updates: Array of Update_User_Pack
  * 		- Update_User_Pack:
- * 				- password: [0, password]
+ * 				- password: [0, old_password, password]
  * 				- name: [1, name]
  * 				- nickname: [2, nick_name]
  * 				- birthday: [3, birthday]
@@ -1216,6 +1393,33 @@ Handle<Value> createUpdateAvartaSmall(const Arguments &args) {
 }
 
 /**
+ * - \b "3 30 Update pubpage"
+ * 		- createUpdatePubpagePack(session_key, your_uid, pub_id, updates)
+ *		- updates: Array of Update_Pubpage_Pack
+ * 		- Update_User_Pack:
+ * 				- name: [1, name]
+ * 				- city:	[5, city]
+ * 				- add tag: [8, tag]
+ * 				- del tag: [9, tag]
+ * 				- setting: [10, setting_No, setting_value]
+ * - e.g.  change name of pubpage 123456 of user 12345 to "abc"
+ * 		- createUpdatePubpagePack(session_key, 12345, "123456", [[1, "abc"]])
+ * \see ::resolvUpdatePack
+ */
+// args[0]: session_key
+// args[1]: your_uid
+// args[2]: pub_id
+// args[3]: updates
+Handle<Value> createUpdatePubpagePack(const Arguments &args) {
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_ASCII_STRING | PUBID_LENGTH, args[2], "pub_id");
+		Add(code, TYPE_UPDATES, args[3], "updates");
+		SetHeadAndReturn(0, 3, 30);END
+}
+
+/**
  * - \b "4 2 Reply posting"
  * 		- createReplyPostingPack(session_key, replier_uid, poster_uid, reply_to_uid, \n
  * 					eid, pid, replyer_name, reply_to_name, content, visibility)
@@ -1333,6 +1537,24 @@ Handle<Value> createDeleteReplyPack(const Arguments &args) {
 		Add(code, TYPE_ASCII_STRING | POSTID_LENGTH, args[4], "pid");
 		Add(code, TYPE_FOUR_BYTE_INT, args[5], "rid");
 		SetHeadAndReturn(0, 5, 22);END
+}
+
+/**
+ * - \b "5 31 Delete advertisement"
+ * 		- createDeleteAdvertisementPack(session_key, your_uid, pub_id, ad_id)
+ * \see ::resolvDeletePack
+ */
+// args[0]: session_key
+// args[1]: your_uid
+// args[2]: pub_id
+// args[3]: ad_id
+Handle<Value> createDeleteAdvertisementPack(const Arguments &args) {
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_ASCII_STRING | PUBID_LENGTH, args[3], "pub_id");
+		Add(code, TYPE_ASCII_STRING | ADID_LENGTH, args[4], "ad_id");
+		SetHeadAndReturn(0, 5, 31);END
 }
 
 /**
@@ -1497,7 +1719,7 @@ Handle<Value> createMessageToEventPack(const Arguments &args) {
 	BEGIN
 		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
 		Add(code, TYPE_FOUR_BYTE_INT, args[2], "seqNo");
-		Add(code, TYPE_ASCII_STRING, args[3], "eventid");
+		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "eventid");
 		Add(code, TYPE_STRING | TWO_BYTE_FOR_LENGTH, args[4], "content");
 		SetHeadAndReturn(0, 12, 1);END
 }
