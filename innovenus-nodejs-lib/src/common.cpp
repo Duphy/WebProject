@@ -9,7 +9,6 @@
 #include "create.h"
 
 void encode(char *pack, uint32_t length) {
-	return;
 	int x = 97;
 	for (uint32_t i = 4; i < length; i++) {
 		pack[i << 1] = formHexBit((resolvHexBit(pack[i << 1]) ^ (x >> 4)));
@@ -18,7 +17,6 @@ void encode(char *pack, uint32_t length) {
 	}
 }
 void encode(std::string &pack, uint32_t length) {
-	return;
 	unsigned int x = 97;
 	for (std::string::iterator it = pack.begin() + 4 * 2; it != pack.end();) {
 		*it++ = formHexBit((resolvHexBit(*it) ^ (x >> 4)));
@@ -73,7 +71,8 @@ void init(Handle<Object> exports) {
 	ExportJSFunction(createNotificationPack)
 
 	ExportJSFunction(resolvPack)
-	ExportJSFunction(resolvHeader)
+	ExportJSFunction(resolvSTCHeader)
+	ExportJSFunction(resolvCTSHeader)
 }
 
 NODE_MODULE(lib, init)

@@ -30,90 +30,6 @@ typedef struct s_response_header {
 	int type, subtype;
 } response_header;
 
-static void readBytes(char *dist, const char *buf, int& pointer, int length) {
-	if (dist != NULL)
-		for (int i = 0; i < length; i++)
-			dist[i] = (resolvHexBit(buf[pointer + i * 2]) << 4)
-					+ resolvHexBit(buf[pointer + i * 2 + 1]);
-	pointer += length * 2;
-}
-/*static Local<Array> JSreadBytes(char *buf, int &pointer, int length) {
- char tmp[2] = { };
- Local<Array> ans = Array::New(0);
- for (int i = 0; i < length; i++) {
- tmp[0] = resolvHexBit(buf[pointer++]) << 4;
- tmp[0] |= resolvHexBit(buf[pointer++]);
- ans->Set(ans->Length(), String::New(tmp));
- }
- return ans;
- }*/
-static void readAsciiString(char *dist, const char *buf, int& pointer,
-		int length) {
-	memcpy(dist, buf + pointer, length * 2);
-	pointer += length * 2;
-}
-static Local<String> JSreadAsciiString(const char *buf, int &pointer,
-		int length) {
-	char *tmp = new char[length * 2];
-	memcpy(tmp, buf + pointer, length * 2);
-	pointer += length * 2;
-	Local<String> ans = String::New(tmp, length * 2);
-	delete[] tmp;
-	return ans;
-}
-static void readString(uint16_t *dist, const char *buf, int &pointer,
-		int length) {
-	length /= 2;
-	for (int i = 0; i < length; i++)
-		dist[i] = ((resolvHexBit(buf[pointer + i * 4]) << 12)
-				| (resolvHexBit(buf[pointer + i * 4 + 1]) << 8)
-				| (resolvHexBit(buf[pointer + i * 4 + 2]) << 4)
-				| (resolvHexBit(buf[pointer + i * 4 + 3])));
-	pointer += length * 4;
-}
-static Local<String> JSreadString(const char *buf, int &pointer, int length) {
-	length /= 2;
-	uint16_t *tmp = new uint16_t[length + 1];
-	readString(tmp, buf, pointer, length * 2);
-	tmp[length] = 0;
-	Local<String> ans = String::New(tmp);
-	delete[] tmp;
-	return ans;
-}
-static int64_t readInteger(const char *buf, int& pointer, int length) {
-	int64_t ans = 0;
-	for (int i = 0; i < length; i++) {
-		ans <<= 4;
-		ans |= resolvHexBit(buf[pointer++]);
-		ans <<= 4;
-		ans |= resolvHexBit(buf[pointer++]);
-	}
-	return ans;
-}
-static Local<Integer> JSreadInteger(const char *buf, int &pointer, int length) {
-	int64_t ans = 0;
-	for (int i = 0; i < length; i++) {
-		ans <<= 4;
-		ans |= resolvHexBit(buf[pointer++]);
-		ans <<= 4;
-		ans |= resolvHexBit(buf[pointer++]);
-	}
-	if (length == 8) {
-		char tmp[40];
-		sprintf(tmp, LLD, ans);
-		Local<Value> value = Script::Compile(String::New(tmp))->Run();
-		return value->ToInteger();
-	} else
-		return Number::New(ans)->ToInteger();
-}
-static bool readBool(const char *buf, int &pointer) {
-	char tmp;
-	tmp = readInteger(buf, pointer, 1);
-	return (tmp == 0);
-}
-static Handle<Boolean> JSreadBool(const char *buf, int &pointer) {
-	return Boolean::New(readBool(buf, pointer));
-}
 static void extract_header(const char *buf, response_header* ans) {
 	ans->length = 0;
 	int pointer = 0;
@@ -1540,7 +1456,7 @@ Handle<Value> resolvPack(const Arguments& args) {
  * 	- 3: type
  * 	- 4: subtype
  */
-Handle<Value> resolvHeader(const Arguments& args) {
+Handle<Value> resolvSTCHeader(const Arguments& args) {
 	char* pack = new char[HEADER_LENGTH * 2];
 	encode(pack, HEADER_LENGTH);
 	response_header header;

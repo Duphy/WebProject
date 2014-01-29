@@ -1723,3 +1723,42 @@ Handle<Value> createMessageToEventPack(const Arguments &args) {
 		Add(code, TYPE_STRING | TWO_BYTE_FOR_LENGTH, args[4], "content");
 		SetHeadAndReturn(0, 12, 1);END
 }
+
+typedef struct s_header {
+	uint32_t length;
+	char session_key[SESSION_KEY_LENGTH * 2];
+	int type, subtype;
+} header;
+static void extract_header(const char *buf, header* ans) {
+	ans->length = 0;
+	int pointer = 0;
+	ans->length = readInteger(buf, pointer, 4);
+	readAsciiString(ans->session_key, buf, pointer, SESSION_KEY_LENGTH);
+	readBytes(NULL, buf, pointer, 4);
+	ans->type = readInteger(buf, pointer, 1);
+	ans->subtype = readInteger(buf, pointer, 1);
+}
+static Local<Array> formJSHeader(const header *header) {
+	Local<Array> ans = Array::New(5);
+	ans->Set(0, Integer::New(header->length));
+	ans->Set(1, String::New(header->session_key, SESSION_KEY_LENGTH * 2));
+	ans->Set(2, Integer::New(header->type));
+	ans->Set(3, Integer::New(header->subtype));
+	return ans;
+}
+
+/**
+ * 	- 0: length
+ * 	- 1: session_key
+ * 	- 2: type
+ * 	- 3: subtype
+ */
+Handle<Value> resolvCTSHeader(const Arguments& args) {
+	char* pack = new char[HEADER_LENGTH * 2];
+	encode(pack, HEADER_LENGTH);
+	header header;
+	args[0]->ToString()->WriteAscii(pack, 0, HEADER_LENGTH * 2);
+	extract_header(pack, &header);
+	delete[] pack;
+	return formJSHeader(&header);
+}

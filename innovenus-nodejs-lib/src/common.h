@@ -49,4 +49,79 @@ inline char formHexBit(int a) {
 }
 void encode(char *buf, uint32_t length);
 void encode(std::string &buf, uint32_t length);
+
+static void readBytes(char *dist, const char *buf, int& pointer, int length) {
+	if (dist != NULL)
+		for (int i = 0; i < length; i++)
+			dist[i] = (resolvHexBit(buf[pointer + i * 2]) << 4)
+					+ resolvHexBit(buf[pointer + i * 2 + 1]);
+	pointer += length * 2;
+}
+static void readAsciiString(char *dist, const char *buf, int& pointer,
+		int length) {
+	memcpy(dist, buf + pointer, length * 2);
+	pointer += length * 2;
+}
+static Local<String> JSreadAsciiString(const char *buf, int &pointer,
+		int length) {
+	char *tmp = new char[length * 2];
+	memcpy(tmp, buf + pointer, length * 2);
+	pointer += length * 2;
+	Local<String> ans = String::New(tmp, length * 2);
+	delete[] tmp;
+	return ans;
+}
+static void readString(uint16_t *dist, const char *buf, int &pointer,
+		int length) {
+	length /= 2;
+	for (int i = 0; i < length; i++)
+		dist[i] = ((resolvHexBit(buf[pointer + i * 4]) << 12)
+				| (resolvHexBit(buf[pointer + i * 4 + 1]) << 8)
+				| (resolvHexBit(buf[pointer + i * 4 + 2]) << 4)
+				| (resolvHexBit(buf[pointer + i * 4 + 3])));
+	pointer += length * 4;
+}
+static Local<String> JSreadString(const char *buf, int &pointer, int length) {
+	length /= 2;
+	uint16_t *tmp = new uint16_t[length + 1];
+	readString(tmp, buf, pointer, length * 2);
+	tmp[length] = 0;
+	Local<String> ans = String::New(tmp);
+	delete[] tmp;
+	return ans;
+}
+static int64_t readInteger(const char *buf, int& pointer, int length) {
+	int64_t ans = 0;
+	for (int i = 0; i < length; i++) {
+		ans <<= 4;
+		ans |= resolvHexBit(buf[pointer++]);
+		ans <<= 4;
+		ans |= resolvHexBit(buf[pointer++]);
+	}
+	return ans;
+}
+static Local<Integer> JSreadInteger(const char *buf, int &pointer, int length) {
+	int64_t ans = 0;
+	for (int i = 0; i < length; i++) {
+		ans <<= 4;
+		ans |= resolvHexBit(buf[pointer++]);
+		ans <<= 4;
+		ans |= resolvHexBit(buf[pointer++]);
+	}
+	if (length == 8) {
+		char tmp[40];
+		sprintf(tmp, LLD, ans);
+		Local<Value> value = Script::Compile(String::New(tmp))->Run();
+		return value->ToInteger();
+	} else
+		return Number::New(ans)->ToInteger();
+}
+static bool readBool(const char *buf, int &pointer) {
+	char tmp;
+	tmp = readInteger(buf, pointer, 1);
+	return (tmp == 0);
+}
+static Handle<Boolean> JSreadBool(const char *buf, int &pointer) {
+	return Boolean::New(readBool(buf, pointer));
+}
 #endif /* COMMON_H_ */
