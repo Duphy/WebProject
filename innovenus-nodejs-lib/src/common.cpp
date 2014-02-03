@@ -19,8 +19,10 @@ void encode(char *pack, uint32_t length) {
 void encode(std::string &pack, uint32_t length) {
 	unsigned int x = 97;
 	for (std::string::iterator it = pack.begin() + 4 * 2; it != pack.end();) {
-		*it++ = formHexBit((resolvHexBit(*it) ^ (x >> 4)));
-		*it++ = formHexBit((resolvHexBit(*it) ^ (x & 0xF)));
+		*it = formHexBit((resolvHexBit(*it) ^ (x >> 4)));
+		it++;
+		*it = formHexBit((resolvHexBit(*it) ^ (x & 0xF)));
+		it++;
 		if (x > 123) x = 97;
 	}
 }
