@@ -1462,9 +1462,9 @@ Handle<Value> resolvPack(const Arguments& args) {
  */
 Handle<Value> resolvSTCHeader(const Arguments& args) {
 	char* pack = new char[HEADER_LENGTH * 2];
-	encode(pack, HEADER_LENGTH);
 	response_header header;
 	args[0]->ToString()->WriteAscii(pack, 0, HEADER_LENGTH * 2);
+	encode(pack, HEADER_LENGTH);
 	extract_header(pack, &header);
 	delete[] pack;
 	return formJSHeader(&header);
