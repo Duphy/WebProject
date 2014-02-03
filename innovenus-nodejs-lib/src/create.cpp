@@ -1001,42 +1001,37 @@ Handle<Value> createSearchAdvertisementPack(const Arguments &args) {
 
 /**
  * - \b "2 0 Create user"
- * 		- createCreateUserPack(email, password, name, nick_name, birthday,\n
+ * 		- createCreateUserPack(email, validate_code, password, name, nick_name, birthday,\n
  * 				gender, city, state, country, visible_tags, hidden_tags)
  * 		- visible_tags, hidden_tags: Array of string
  * \see ::resolvCreatePack
  */
-
-/*2 0 Create User: 1 email len, ? email, 1 password_len, ? password, 1 name len, ? name, 1 nickname len, ? nickname,
- *				   4 birthday, 1 gender,
- *				   1 city len, ? city, 1 state len, ? state, 1 country len, ? country,
- *				   1 # visible tags, <visible tags{1 len, ?tag}>,
- *				   1 # hidden tags, <hidden tags{1 len, ?tag}>*/
 // args[0]: email
-// args[1]: password
-// args[2]: name
-// args[3]: nick_name
-// args[4]: birthday
-// args[5]: gender
-// args[6]: city
-// args[7]: state
-// args[8]: country
-// args[9]: visible_tags
-// args[10]: hidden_tags
+// args[2]: password
+// args[3]: name
+// args[4]: nick_name
+// args[5]: birthday
+// args[6]: gender
+// args[7]: city
+// args[8]: state
+// args[9]: country
+// args[10]: visible_tags
+// args[11]: hidden_tags
 Handle<Value> createCreateUserPack(const Arguments &args) {
 	std::string code("");
 	BEGIN
 		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[0], "email");
-		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[1], "password");
-		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[2], "name");
-		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[3], "nick_name");
-		Add(code, TYPE_FOUR_BYTE_INT, args[4], "birthday");
-		Add(code, TYPE_ONE_BYTE_INT, args[5], "gender");
-		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[6], "city");
-		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[7], "state");
-		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[8], "country");
-		Add(code, TYPE_TAGS, args[9], "visible_tags");
-		Add(code, TYPE_TAGS, args[10], "hidden_tags");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[1], "validate_code");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[2], "password");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[3], "name");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[4], "nick_name");
+		Add(code, TYPE_FOUR_BYTE_INT, args[5], "birthday");
+		Add(code, TYPE_ONE_BYTE_INT, args[6], "gender");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[7], "city");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[8], "state");
+		Add(code, TYPE_STRING | ONE_BYTE_FOR_LENGTH, args[9], "country");
+		Add(code, TYPE_TAGS, args[10], "visible_tags");
+		Add(code, TYPE_TAGS, args[11], "hidden_tags");
 		SetHeadAndReturn(-1, 2, 0);END
 }
 
