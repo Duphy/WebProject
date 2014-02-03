@@ -30,7 +30,7 @@ using namespace v8;
 #define NUM_OF_BYTES_IN_LENGTH	4
 #define NUM_OF_BITS_IN_BYTE		8
 #define SESSION_KEY_LENGTH		8
-#define DUMB_SESSION_KEY		"3030303030303030"
+#define DUMB_SESSION_KEY		"0000000000000000"
 
 #define MAX_EIGHT_BIT_INT  		(1 << 63) - 1
 
