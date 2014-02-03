@@ -15,6 +15,7 @@
 #endif
 
 #include <string>
+#include <cstring>
 
 using namespace v8;
 

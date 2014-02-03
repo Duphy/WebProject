@@ -1,3 +1,7 @@
+/**
+ * \file resolv.cpp
+ */
+
 #include <v8.h>
 #include <node.h>
 #include <cstdio>
@@ -50,7 +54,7 @@ static Local<Array> formJSHeader(const response_header *header) {
 	return ans;
 }
 
-bool CreateDir(std::string path) {
+static bool CreateDir(std::string path) {
 	int i = 0;
 	int iRet;
 	int iLen = path.length();
