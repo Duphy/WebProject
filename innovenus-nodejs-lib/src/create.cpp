@@ -314,10 +314,9 @@ static inline void Add(std::string& code, const int type,
 		if (!(value->IsString()))
 			throw myerr((name + enotstr).data());
 #endif
-		char *filename = new char[value->ToString()->Length() + 1 + 7];
-		sprintf(filename, "public/");
-		value->ToString()->WriteAscii(filename + 7);
-		filename[value->ToString()->Length() + 7] = '\0';
+		char *filename = new char[value->ToString()->Length() + 1];
+		value->ToString()->WriteAscii(filename);
+		filename[value->ToString()->Length()] = '\0';
 		std::ifstream ifs(filename, std::ios_base::in | std::ios_base::binary);
 		delete[] filename;
 		if (!ifs.good())
