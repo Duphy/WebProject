@@ -1232,7 +1232,7 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
     }
   });
   $.ajax({
-    url:'/getuseravarta',
+    url:'/getuseravarta', 
     data:JSON.stringify(userData),
     type:"POST",
     contentType:"application/json",
