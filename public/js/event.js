@@ -148,7 +148,6 @@ $(document).ready(function(){
   $(window).resize(function(){
     $.each($(".tagHead"),function(index,element){
       var tagsGroup = $(element).closest(".tagsGroup");
-      $(tagsGroup).children().slideDown( "fast");
       var parentWidth = $('.tagsGroup').closest('.span2').width();
       var selfWidth = $(element).closest(".tagsGroup").width();
       $(element).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
@@ -283,10 +282,12 @@ $(document).ready(function(){
      }
   });
 $("body").delegate(".userName", 'click', function() {
-  $(this).css("cusor","pointer");
-  localStorage.friendUid  = $(this).attr("uid");
-  localStorage.friendName = $(this).attr("name");
-  window.location = "/user";
+  if($(this).attr("uid") != localStorage.uid){
+    $(this).css("cusor","pointer");
+    localStorage.friendUid  = $(this).attr("uid");
+    localStorage.friendName = $(this).attr("name");
+    window.location = "/user";
+  }
   return false;
 });
 

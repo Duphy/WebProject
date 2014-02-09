@@ -100,10 +100,12 @@ $(".searchSubmit").click(function(){
 });
 
 $("body").delegate(".userName", 'click', function() {
-  $(this).css("cusor","pointer");
-  localStorage.friendUid  = $(this).attr("uid");
-  localStorage.friendName = $(this).attr("name");
-  window.location = "/user";
+  if($(this).attr("uid") != localStorage.uid){
+    $(this).css("cusor","pointer");
+    localStorage.friendUid  = $(this).attr("uid");
+    localStorage.friendName = $(this).attr("name");
+    window.location = "/user";
+    }
   return false;
 });
 

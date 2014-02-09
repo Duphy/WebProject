@@ -119,6 +119,15 @@ function getCurrentDate(){
   return now;
 }
 
+function checkMutual(list, uid){
+  list.forEach(function(element){
+    if(element == uid){
+      return true;
+    }
+  });
+  return false;
+}
+
 /************* end helper functions **********/
 
 /************* render functions **********/
@@ -346,6 +355,8 @@ function userlist(usersData,type){
              if(result.status == "successful"){
                 if(type == "friend" || type == "user"){
                   $("#squaresWaveG-friend").hide();
+                  $("#squaresWaveG-commonFriend").hide();
+                  var commonFriendsList = localStorage.common_friends.trim().split(",");
                   $.each(result.source,function(index,element){
                         var userAvartaData = {};
                         userAvartaData.view_uid = element.uid;
@@ -353,8 +364,11 @@ function userlist(usersData,type){
                         userAvartaData.uid = localStorage.uid;
                         userAvartaData.time = getCurrentTime();
                         userAvartaData.date = getCurrentDate();
-                        $("#friendsList").append(renderFriend(element));
-                        //$("div.chat-window[chatId='"+element.uid+"']").find(".chatFriendName").html(element.nickname);
+                        if(checkMutual(commonFriendsList,element.uid)){
+                          $("#commonFriendsList").append(renderFriend(element));
+                        }else{
+                          $("#friendsList").append(renderFriend(element));
+                        }
                         $.ajax({
                           url:'/getuseravarta',
                           data:JSON.stringify(userAvartaData),
@@ -1169,22 +1183,22 @@ function adjustTags(){
 }
 
 function checkEvent(eid){
-   var eventsList = localStorage.eventsList.split(",");
-    $.each(eventsList,function(index,element){
-      if(element == eid){
+    var eventsList = localStorage.eventsList.split(",");
+    for(var i = 0; i < eventsList.length;i++){
+      if(eventsList[i] == eid){
         return false;
       }
-    });
+    }
     return true;
 }
 
 function checkFriend(view_uid){
     var friendsList = localStorage.friendsList.split(",");
-    $.each(friendsList,function(index,element){
-      if(element == view_uid){
+    for(var i = 0; i < friendsList.length;i++){
+      if(friendsList[i] == view_uid){
         return false;
       }
-    });
+    }
     return true;
 }
 

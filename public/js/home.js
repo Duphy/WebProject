@@ -9,6 +9,7 @@ var postCounter = 0;
 var chatBoxNumber = 0;
 var flag_displayfriend=true;
 var flag_displayevent=true; 
+localStorage.common_friends = "";
 
 $(document).ready(function(){ 
   //set authentication data
@@ -19,7 +20,7 @@ $(document).ready(function(){
   //update page title
   $("title").first().html("Home-"+localStorage.usernickname);
 
-  $("#right").find("a").html("<i class = 'icon-chevron-left' style = 'margin-top:2%;'></i>Events & Friends");
+  $("#right").find("a").html("<i class = 'icon-chevron-left' style = 'margin-top:2%;'></i>Chats");
 
   $(".bootstrap-tagsinput").find("input").attr("placeholder","Add").attr("size",8);
   $(".bootstrap-tagsinput").find("input").limit('14');
@@ -399,10 +400,12 @@ $(document).ready(function(){
   });
 
   $("body").delegate(".userName", 'click', function() {
-    $(this).css("cusor","pointer");
-    localStorage.friendUid  = $(this).attr("uid");
-    localStorage.friendName = $(this).attr("name");
-    window.location = "/user";
+    if($(this).attr("uid") != localStorage.uid){
+      $(this).css("cusor","pointer");
+      localStorage.friendUid  = $(this).attr("uid");
+      localStorage.friendName = $(this).attr("name");
+      window.location = "/user";
+    }
     return false;
   });
 

@@ -13,7 +13,8 @@ var uid;
 var tagsList;
 var gender;
 var city;
-var common_friends; 
+var common_friends = []; 
+var flag_displaycommonfriend = true;
 var flag_displayevent=true;
 var flag_displayfriend=true;
  
@@ -25,6 +26,31 @@ $(document).ready(function(){
   //retrieve user information
   var view_auth_data = auth_data;
   view_auth_data.view_uid = localStorage.friendUid;
+  if(!checkFriend(localStorage.friendUid)){
+    $("#settingProfile").after('<a href="#defriendModal" data-toggle="modal" ><i class="icon-remove"></i>&nbsp;&nbsp;Defriend</a>');
+  }else{
+    $("#settingProfile").after('<a id = "settingAddFriend"><i class="icon-plus"></i>&nbsp;&nbsp;Add Friend</a>');
+  }
+  $("#settingAddFriend").click(function(){
+    var data = {};
+    data = auth_data;
+    data.receiver_uid = localStorage.friendUid;
+    data.content = "Could you add me as your friend? :)";
+    $("#settingAddFriend").css({"pointer-events":"none","cursor":"default","color":"#ccc"});
+    $("#settingAddFriend").html("sending....");
+    $.ajax({
+      url:'/friendrequest',
+      data:JSON.stringify(data),
+      type:"POST",
+      contentType:"application/json",
+      success:function(result){
+        if(result.status == "successful"){
+          $("#settingAddFriend").html("request pending");
+        }
+      }
+    });
+    return false;
+  });
 
   $("#profileUid").html(localStorage.friendUid);
   $.ajax({
@@ -33,7 +59,7 @@ $(document).ready(function(){
     type:"POST",
     contentType:"application/json",
     success:function(data){
-      friendName = data.name;
+      friendName = data.realname;
       friendNickname = data.nickname;
       birthday = data.birthday;
       uid = data.uid;
@@ -54,10 +80,14 @@ $(document).ready(function(){
         $("#userNameLink").text(localStorage.friendName);
 
         //update profile
-        $("#name").html(friendName);
+        if(friendName == ""){
+          $("#name").html(friendNickname);
+        }else{
+          $("#name").html(friendName);
+        }
         $("#nickname").html(friendNickname);
         $("#city").html(city);
-        $("#country").html(country);
+        $("#commonFriendsNumber").html(common_friends.length);
         if(localStorage.friendTags == ""){
         $('#tags').append("<font>None</font>");
         }else{
@@ -67,7 +97,6 @@ $(document).ready(function(){
         }
         $("#birthday").html(birthday);
         $("#gender").html(gender);
-        $("#state").html(state);
         $("#profileEdit").hide();
     }
   });
@@ -133,7 +162,6 @@ $(document).ready(function(){
   $(window).resize(function(){
     $.each($(".tagHead"),function(index,element){
       var tagsGroup = $(element).closest(".tagsGroup");
-      $(tagsGroup).children().slideDown( "fast");
       var parentWidth = $('.tagsGroup').closest('.span2').width();
       var selfWidth = $(element).closest(".tagsGroup").width();
       $(element).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
@@ -193,6 +221,10 @@ $(document).ready(function(){
       $(this).find("a").html("<i class = 'icon-chevron-left' style = 'margin-top:2%;'></i>Events & Friends");
       $(this).attr("action","in");
     }
+    if(flag_displaycommonfriend){
+      flag_displaycommonfriend=false;
+      $("#squaresWaveG-commonFriend").show();
+    }//if flag
     if(flag_displayfriend){
       flag_displayfriend=false;
       $("#squaresWaveG-friend").show();
@@ -217,8 +249,14 @@ $(document).ready(function(){
               $("#friendsNumber").html(localStorage.user_friendsNumber);
               $(".friendItem").remove();
               $("#friendsHead").find("font").html("("+localStorage.user_friendsNumber+")");
+              if(common_friends.length == 0){
+                 $("#squaresWaveG-commonFriend").hide();
+                $("#commonFriendsList").append("<strong style = 'margin-left:15%;color:white;'>No mutual friend.</strong>");
+              }else{
+                $("#commonFriendsHead").find('font').html("("+localStorage.common_friends.length+")");
+              }
               if(localStorage.user_friendsNumber == 0){
-                $("#friendsList").append("<strong style = 'margin-left:15%;color:white;'>No friend yet.</strong>");
+                $("#friendsList").append("<strong style = 'margin-left:15%;color:white;'>No friend.</strong>");
                 $("#squaresWaveG-friend").hide();
               }else{
                   userlist(friendsData,'user');
@@ -251,7 +289,7 @@ $(document).ready(function(){
           $(".eventItem").remove();
           $("#eventsHead").find("font").html("("+localStorage.user_eventsNumber+")");
           if(localStorage.user_eventsNumber == 0){
-            $("#eventsList").append("<strong style = 'margin-left:15%;color:white;'>No event yet.</strong>");
+            $("#eventsList").append("<strong style = 'margin-left:15%;color:white;'>No event.</strong>");
             $("#squaresWaveG-event").hide();
           }else{
             eventlist(eventsData);
@@ -368,9 +406,18 @@ $(document).ready(function(){
   });
   
   $("body").delegate(".userName", 'click', function() {
-    $(this).css("cusor","pointer");
-    localStorage.friendUid  = $(this).attr("uid");
-    localStorage.friendName = $(this).attr("name");
+    if($(this).attr("uid") != localStorage.uid){
+      $(this).css("cusor","pointer");
+      localStorage.friendUid  = $(this).attr("uid");
+      localStorage.friendName = $(this).attr("name");
+      window.location = "/user";
+    }
+    return false;
+  });
+
+  $("body").delegate(".friend_small_avarta",'click',function(){
+    localStorage.friendUid  = $(this).parent().attr("uid");
+    localStorage.friendName = $(this).parent().attr("name");
     window.location = "/user";
     return false;
   });
@@ -419,28 +466,17 @@ $(document).ready(function(){
                  window.location = "/search";
                  return false;
                  });
-  $(document).on('click', "#searchButton", function() {
-                 localStorage.search_tag_content = "";
-                 localStorage.search_tag_option = "";
-                 window.location = "/search";
-                 return false;
-                 });
-  $("#navilogout").click(function(){
-    $.ajax({
-      url:"/logout",
-      data:JSON.stringify(auth_data),
-      type:"POST",
-      contentType: 'application/json',
-      success:function(result){
-        if(result.status == "successful"){
-          localStorage.clear();
-          socket.emit("logout");
-          window.location = "/";
-        }else{
-          alert("fail to logout!");
-        }
-      }
-    });
+
+  $(document).on('click','#homeNav',function(){
+    window.location = "/home";
+    return false;
+  });
+
+  $(document).on('click', "#searchNav", function() {
+    localStorage.search_tag_content = "";
+    localStorage.search_tag_option = "";
+    window.location = "/search";
+    return false;
   });
 
   $('body').delegate('.chat-window-text-box','keypress',function(event){
@@ -477,5 +513,25 @@ $(document).ready(function(){
     }
   });
 
-  $("#createPost").remove();
+  $("#defriendConfirm").click(function(){
+    $("#floatingBarsG-defriend").show();
+    $(this).attr("disabled","disabled");
+    $("#defriendCancel").attr("disabled","disabled");
+    var data = {};
+    data = auth_data;
+    data.id = localStorage.friendUid;
+    $.ajax({
+      url:"/deletefriend",
+          data:JSON.stringify(data),
+          type:"POST",
+          contentType: 'application/json',
+          success:function(result){
+            $(this).removeAttr("disabled");
+            $("#defriendCancel").removeAttr("disabled");
+            $("#floatingBarsG-defriend").hide();
+            $("#defriendModal").modal("hide");
+
+          }
+    });
+  });
 });
