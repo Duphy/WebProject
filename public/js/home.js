@@ -406,6 +406,13 @@ $(document).ready(function(){
     return false;
   });
 
+  $("body").delegate(".friend_small_avarta",'click',function(){
+    localStorage.friendUid  = $(this).parent().attr("uid");
+    localStorage.friendName = $(this).parent().attr("name");
+    window.location = "/user";
+    return false;
+  });
+
   $("body").delegate(".eventName", 'click', function() {
     $(this).css("cusor","pointer");
     localStorage.eid = $(this).attr("eid");
@@ -415,7 +422,7 @@ $(document).ready(function(){
   });
 
   $("body").delegate(".friendItem", 'click', function() {
-      var friendUid = $(this).attr("uid");
+      var friendUid = $(this).parent().attr("uid");
       var proceed = true;
       $.each($("#chatArea").find(".chat-window"),function(index,element){
         if($(element).attr("id").replace("chat","") == friendUid){

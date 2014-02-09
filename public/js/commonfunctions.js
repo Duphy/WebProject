@@ -331,7 +331,7 @@ function renderMember(user){
 }
 
 function renderFriend(friend){
-  var html = '<a href="#" class = "friendItem" name = "'+friend.nickname+'" uid = "'+friend.uid+'" style = "padding:5px;font-size:0.8em;"><img id = "friendAvarta'+friend.uid+'" class = "friend_small_avarta" src = "#" style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;'+friend.nickname+'</a>';
+  var html = '<a href="#" name = "'+friend.nickname+'" uid = "'+friend.uid+'" style = "padding:5px;font-size:0.8em;"><img id = "friendAvarta'+friend.uid+'" class = "friend_small_avarta" src = "#" style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;<font class = "friendItem">'+friend.nickname+'</font></a>';
   return html;
 }
 function userlist(usersData,type){
