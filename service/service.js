@@ -715,6 +715,7 @@ exports.viewSelfAvarta = function(req,res){
 		        if(v2[1]=="jpg"){
 		            date = version[0];
 		            time = v2[0];
+		            current_avarta = files[i];
 		            break;
 		        }
 	        }

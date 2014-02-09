@@ -1227,7 +1227,7 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
     contentType:"application/json",
     success:function(data){
       if(data.status == "successful"){
-        $("#chat"+friendUid).find(".chatName").html(data.name);
+        $("#chat"+friendUid).find(".chatName").html(data.nickname);
       }
     }
   });
