@@ -275,7 +275,13 @@ function createPost(data){
     contentType: 'application/json',
     success:function(result){
       if(result.status == "successful"){
-        $('#left-column').prepend(renderPost(result.post));
+        if(postOrder == 0){
+          $('#left-column').prepend(renderPost(result.post));
+          postOrder = 1;
+        }else{
+          $('#right-column').prepend(renderPost(result.post));
+          postOrder = 0;
+        }
         $('#postArea').val("");
         $('#postModal').modal("hide");
         $(".tagsGroup").width("+=10");
@@ -478,17 +484,19 @@ function renderReply(reply){
 function renderSearchEvents(event){
     var html =
     '<div class = "row-fluid postRoot" uid = "'+event.eid+'" style = "background-color:#FFFFFF;margin-bottom:10px;">'+
-    '<div class = "row-fluid" style = "margin-top:10px;height:50px;">'+
-    '<div class = "span5 row-fluid" style = "text-align: center;">'+
-    '<div class = "span4">'+
-    '<img src = "/img/event_default.png" style = "width:30px;height:30px;border-radius:15px;">'+
-    '</div>'+
-    '<div class = "span8" style = "text-align:left;">'+
-    '<a href = # class = "eventName" name = "'+event.name+'" eid = "'+event.eid+'">'+event.name+'</a><p style = "font-size:12px;color:#999;">'+event.city+'</p>'+
-    '</div>'+
-    '</div>'+
-    '<div class = "offset5 span2" style = "color:white;text-align: center;">'+
-    '<div class = "tagsGroup">';
+      '<div class = "row-fluid" style = "margin-top:10px;height:50px;">'+
+        '<div class = "span6 row-fluid" style = "text-align: center;">'+
+          '<div class = "span4">'+
+            '<img src = "/img/event_default.png" style = "width:30px;height:30px;border-radius:15px;">'+
+          '</div>'+
+          '<div class = "span8" style = "text-align:left;">'+
+            '<a href = # class = "eventName" name = "'+event.name+'" eid = "'+event.eid+'" style = "text-overflow:ellipsis;overflow:hidden;width:150px;display:block;">'+event.name+'</a>'+
+            '<p style = "font-size:12px;margin-bottom:0px;color:#999;">ID:'+event.eid+'</p>'+
+            '<p style = "font-size:12px;color:#999;">'+event.city+'</p>'+
+          '</div>'+
+        '</div>'+
+        '<div class = "offset4 span2" style = "color:white;text-align: center;">'+
+          '<div class = "tagsGroup">';
     var tagCounter = Math.min(4,event.tags.length);
     for(var tagNumber = 0; tagNumber < tagCounter; tagNumber++){
         if(tagNumber == 0){
@@ -498,12 +506,12 @@ function renderSearchEvents(event){
         }
     }
     html = html+
-    '</div>'+
-    '</div>'+
-    '</div>'+
-    '<div class = "row-fluid" style="margin-top:10px;">'+
-    '<div class = "offset1 span10 offset1" style = "text-align: left;"><p style = "font-size:16px;color:#999;">'+event.description+'</p></div>'+
-    '</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class = "row-fluid">'+
+        '<div class = "span10" style = "font-size:16px;color:#999;"><strong class = "pull-left" style = "color:#202020;margin-left:6%;margin-right:5px;">Description: </strong>'+event.description+'</div>'+
+      '</div>'+
     '<div class = "row-fluid" style = "margin-top:10px;">';
     if(checkEvent(event.eid)){
       html = html + '<div class = "offset1 span11"><button class = "btn btn-link joinevent pull-right" id = "'+event.eid+'" style = "cursor:pointer;">+ Join</button></div>';
@@ -528,11 +536,12 @@ function renderSearchUser(user){
           '</div>'+
           '<div class = "span8" style = "text-align:left;">';
           if(user.nickname != ""){
-            html = html + '<a href = # class = "userName" name = "'+user.nickname+'" uid = "'+user.uid+'">'+user.nickname+'</a>';
+            html = html + '<a href = # class = "userName" name = "'+user.nickname+'" uid = "'+user.uid+'" style = "text-overflow:ellipsis;overflow:hidden;width:150px;display:block;">'+user.nickname+'</a>';
           }else{
             html = html + '<a href = # class = "userName" name = "User" uid = "'+user.uid+'">User</a>';
           }
           html = html +
+            '<p style = "font-size:12px;color:#999;margin-bottom:0px;">ID:'+user.uid+'</p>'+
             '<p style = "font-size:12px;color:#999;">'+user.gender+'<br>'+user.city+'</p>'+
           '</div>'+
         '</div>'+

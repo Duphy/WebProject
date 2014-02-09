@@ -3,6 +3,7 @@ if(!localStorage.uid){
 }
 var pidset = [];
 var loadOrder = 0;
+var postOrder = 0;
 var insertOrder = 0;
 var loadingFlag = true;
 var postCounter = 0;
