@@ -1,0 +1,92 @@
+<% include component/header %>
+	<link href = "/css/search.css" rel = "stylesheet">
+    <script src = "/js/commonfunctions.js"></script>
+    <script src = "/js/search.js"></script>
+	<title><%=title%></title>
+</head> 
+<body style = "font-family: 'Roboto', sans-serif;background-color:#E0E0E0;">
+	<div class="navbar navbar-fixed-top">
+	  <div class="navbar-inner" style = "max-height:20px;">
+		<ul class="nav row-fluid" style = "text-align:center;">
+			<li class = "span2">
+				<a class="brand pull-left" style = "padding-top:0px;" href="/home"><img style = "height:45px;" src = "/img/logo.png"></a>
+			</li>
+			<li class = "span5">
+				 <ul class="nav">
+			      <li id = "homeNav" ><a href="#">Home</a></li>
+			      <li id = "searchNav" class="active"><a href="#">Search</a></li>
+			    </ul>
+			</li>
+			<li class = "span2">
+				<div class="btn-group pull-right">
+				  <button id = "createPost" href = "#postModal" data-toggle="modal" class="btn"><i class = "icon-pencil"></i><strong> Post</strong></Button>
+				  <button id = "notification" class="btn dropdown-toggle" data-toggle="dropdown"><i class = "icon-exclamation-sign"></i><font id = "notificationNumber"> 0 </font><span class="caret" style = "border-top-color:black;"></span></Button>
+				  <ul id = "notificationList" class="dropdown-menu" role="menu" aria-labelledby="dLabel" style = "padding:10px;text-align:left;">
+				  <li tabindex='-1' style = 'text-align:center;'>No New Notification.</li>
+			    </ul>
+				</div>
+			</li>
+		</ul>
+	  </div>
+	</div>
+
+    <div class="tabbable">
+	    <ul id = "searchTabBar" class="nav nav-pills" style = "margin-top:50px;margin-left:100px;">
+			<li class="active" style = "margin:10px;margin-left:0px;"><a href="#PostsSearch" data-toggle="tab">Posts</a></li>
+			<li style = "margin:10px;"><a href="#EventsSearch" data-toggle="tab">Events</a></li>
+			<li style = "margin:10px;"><a href="#UsersSearch" data-toggle="tab">Users</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane" id = "UsersSearch">
+				<div class="input-append" style = "margin-left:100px;">
+				  <input class = "span12 searchInput" type="text" style = "height:40px; font-size:24px;" placeholder = "  Users" searchType = "userSearch">
+				  <button class="btn btn-inline searchSubmit" style = "height:50px;min-width:50px;" subtype = 1><img src="/img/search_icon.png"></button>
+				</div>
+			</div>
+
+			<div class="tab-pane" id = "EventsSearch">
+				<div class="input-append" style = "margin-left:100px;">
+				  <input class = "span12 searchInput" type="text" style = "height:40px; font-size:24px;" placeholder = "  Events" searchType = "eventSearch">
+				  <button class="btn btn-inline searchSubmit" style = "height:50px;min-width:50px;" subtype = 1><img src="/img/search_icon.png"></button>
+				</div>
+			</div>
+
+			<div class="tab-pane active" id = "PostsSearch">
+				<div class="input-append" style = "margin-left:100px;">
+				  <input class = "span12 searchInput" type="text" style = "height:40px; font-size:24px;" placeholder = "  Posts" searchType = "postSearch">
+				  <button class="btn btn-inline searchSubmit" style = "height:50px;min-width:50px;" subtype = 1><img src="/img/search_icon.png"></button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id = "contentBody" class = "cbp-spmenu-push" style = "margin-left:50px;margin-right:50px;">
+		<div class="container-fluid" style = "padding-left:0px;padding-right:0px;">
+
+            <div class="row-fluid" id="search_result">
+                        
+            </div>
+            <div id="circularG">
+                <div id="circularG_1" class="circularG">
+                </div>
+                <div id="circularG_2" class="circularG">
+                </div>
+                <div id="circularG_3" class="circularG">
+                </div>
+                <div id="circularG_4" class="circularG">
+                </div>
+                <div id="circularG_5" class="circularG">
+                </div>
+                <div id="circularG_6" class="circularG">
+                </div>
+                <div id="circularG_7" class="circularG">
+                </div>
+                <div id="circularG_8" class="circularG">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+	<script src = "/js/socket.js"></script>
+</body>
+</html>

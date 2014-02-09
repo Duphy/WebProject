@@ -1,0 +1,88 @@
+<% include component/header %>
+  <link href = "/css/eventmanage.css" rel = "stylesheet">
+  <script src = "/js/commonfunctions.js"></script>
+  <script src = "/js/eventmanage.js"></script>
+  <title><%=title%></title> 
+</head> 
+<body style = "font-family: 'Roboto', sans-serif;" class = "ow-fluild">
+    <div style = "margin:20px;margin-right:10%;">
+    <legend style = "font-family: 'Raleway', sans-serif;font-size:30px;"><img id = "eventAvarta" src = "#" style = "width:60px;height:60px;border-radius:30px;margin-bottom:5px;"> <font id = "eventHead">Event</font> <button id = "backButton" class = "btn btn-link pull-right" style = "font-size:20px;margin-top:10px;text-decoration:none;">Back &gt;</button></legend>
+    </div>
+    <div class = "span3">
+      <ul class="nav nav-pills nav-stacked">
+        <li class = "active" id = "memberTab"><a>Members</a></li>
+        <li id = "managerTab" ><a>Managers</a></li>
+      </ul> 
+    </div>
+
+    <div class = "span12 well" id = "content" style = "min-height:500px;">
+      <div id="circularG">
+        <div id="circularG_1" class="circularG">
+        </div>
+        <div id="circularG_2" class="circularG">
+        </div>
+        <div id="circularG_3" class="circularG">
+        </div>
+        <div id="circularG_4" class="circularG">
+        </div>
+        <div id="circularG_5" class="circularG">
+        </div>
+        <div id="circularG_6" class="circularG">
+        </div>
+        <div id="circularG_7" class="circularG">
+        </div>
+        <div id="circularG_8" class="circularG">
+        </div>
+      </div>
+
+      <div class = "row-fluid" id = "membersList">
+        <div class = "span2" id = "membersList1">
+        </div>
+        <div class = "span2" id = "membersList2">
+        </div>
+        <div class = "span2" id = "membersList3">
+        </div>
+        <div class = "span2" id = "membersList4">
+        </div>
+        <div class = "span2" id = "membersList5">
+        </div>
+        <div class = "span2" id = "membersList6">
+      </div>
+    </div>
+
+    <div id="deleteModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-body">
+    Are you sure your want to delete this member?
+    </div>
+    <div class="modal-footer">
+      <div class = "row-fluid">
+          <div class = "span8">
+          <div id="floatingBarsG-delete" class = "pull-right" style ="display:none;">
+                <div class="blockG rotateG_01">
+                </div>
+                <div class="blockG rotateG_02">
+                </div>
+                <div class="blockG rotateG_03">
+                </div>
+                <div class="blockG rotateG_04">
+                </div>
+                <div class="blockG rotateG_05">
+                </div>
+                <div class="blockG rotateG_06">
+                </div>
+                <div class="blockG rotateG_07">
+                </div>
+                <div class="blockG rotateG_08">
+                </div>
+            </div>
+            </div>
+            <div class = "span4">
+            <button id = "deleteConfirm" class="btn btn-danger" disabled>Confirm</button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

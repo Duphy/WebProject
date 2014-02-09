@@ -1,0 +1,177 @@
+<% include component/header %>
+	<link href = "/css/user.css" rel = "stylesheet">
+	<link href = "/css/sidebar.css" rel = "stylesheet">
+	<script src = "/js/commonfunctions.js"></script>
+    <script src = "/js/user.js"></script>
+	<title><%=title%></title> 
+</head>
+<body style = "font-family: 'Roboto', sans-serif;background-color:#E0E0E0;">
+
+	<% include component/navigator %> 
+
+	<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="cbp-spmenu-s1">
+		<div id = "settingsList">
+			<a href="#profileModal" id = "settingProfile" data-toggle="modal"><i class="icon-book"></i>&nbsp;&nbsp;Profile</a>
+			<a href="#" id = "navilogout"><i class="icon-off"></i>&nbsp;&nbsp;Logout</a>
+        </div>
+	</nav>
+
+	<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2">
+		<div id = "friendEventList" style = "overflow-y:hidden;">
+			<div><a id = "friendsHead"><i class = "icon-chevron-down icon-white"></i>friends <font>(0)</font></a></div>
+			<div id = "friendsList" style = "max-height:300px;">
+				<div id="squaresWaveG-friend">
+					<div class="squaresWaveG_1 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_2 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_3 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_4 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_5 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_6 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_7 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_8 squaresWaveG">
+					</div>
+				</div>
+			</div>
+			<div><a id = "eventsHead"><i class = "icon-chevron-down icon-white"></i>events <font>(0)</font></a></a></div>
+			<div id = "eventsList" style = "max-height:300px;">
+				<div id="squaresWaveG-event">
+					<div class="squaresWaveG_1 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_2 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_3 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_4 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_5 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_6 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_7 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_8 squaresWaveG">
+					</div>
+				</div>
+			</div>
+		</div>
+	</nav>
+
+	<div id = "contentBody" class = "cbp-spmenu-push" style = "margin-top:100px;margin-left:100px;margin-right:100px;">
+    		<div class="container-fluid" style = "padding-left:0px;padding-right:0px;">
+
+			<div class="row-fluid">
+			   	
+			      <div class = "span6" id = "left-column"></div>
+			      
+			      <div class = "span6" id = "right-column"></div>
+
+			</div>
+			<div id="circularG">
+				<div id="circularG_1" class="circularG">
+				</div>
+				<div id="circularG_2" class="circularG">
+				</div>
+				<div id="circularG_3" class="circularG">
+				</div>
+				<div id="circularG_4" class="circularG">
+				</div>
+				<div id="circularG_5" class="circularG">
+				</div>
+				<div id="circularG_6" class="circularG">
+				</div>
+				<div id="circularG_7" class="circularG">
+				</div>
+				<div id="circularG_8" class="circularG">
+				</div>
+			</div>
+		</div>
+	</div>
+
+<!-- Modal -->
+	<div id="profileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "width:60%;left:0px;margin-left:20%;">
+	  <div class="modal-body row-fluid" style = "font-size:15px;padding:0px;">
+		<div class = "span3" style = "background-image:url(/img/semi_transparent.png);height:300px;">
+			<img id = "profileAvarta" class = "img-circle" src = "/img/circa.png" style = "height:100px;width:100px;margin-left:15%;margin-top:25%;padding:8px;border:solid;border-color: #dddddd #aaaaaa #aaaaaa #dddddd;border-width: 1px 2px 2px 1px;background-color:white;">
+			<div id = "name" style = "font-size:20px;text-align:center;margin-top:5%;">
+				User
+			</div>
+			<div style = "text-align:center;cursor:pointer;">
+				<a id = "profileUid"></a>
+			</div>
+			<div style = "text-align:center;">
+				<strong id = "eventsNumber" style = "color:#08c;">0</strong> Events
+			</div>
+			<div style = "text-align:center;">
+				<strong id = "friendsNumber" style = "color:#08c;">0</strong> Friends
+			</div>
+		</div>
+		<div class = "span9" style = "margin-top:2%;">
+
+			<form class="row-fluid">
+			  <legend style = "font-family: 'Raleway', sans-serif;font-size:25px;width:95%;">Profile</legend>
+			  <div class = "span5">
+				<div class="control-group" id = "nickNameGroup">
+				    <label class="control-label" for="inputNickName" style = "margin-bottom:0px;">NickName</label>
+				    <div class="controls">
+				    	<a id = "nickname"></a>
+				    </div>
+				</div>
+				<div class="control-group" id = "cityGroup">
+					<label class="control-label" for="inputCity" style = "margin-bottom:0px;">City</label>
+					<div class="controls">
+						<a id = "city"></a>
+					</div>
+				</div>
+				<div class="control-group" id = "countryGroup">
+				    <label class="control-label" for="inputCountry" style = "margin-bottom:0px;">Country</label>
+				    <div class="controls">
+				       <a id = "country"></a>
+				    </div>
+				</div>
+				<div class="control-group" id = "tagsGroup">
+				    <label class="control-label" for="inputTags" style = "margin-bottom:0px;">Tags</label>
+				    <div class="controls">
+				    	<div id = "tags"></div>
+				    </div>
+				</div>
+			  </div>
+			  <div class = "span6">	 
+			    <div class="control-group" id = "birthdayGroup">  
+					<label class="control-label" for="inputBirthday" style = "margin-bottom:0px;">Birthday</label>
+					<div class="controls">
+						<a id = "birthday"></a>
+					</div>
+				</div> 	
+				<div class="control-group" id = "genderGroup">
+					<label class="control-label" for="inputGender" style = "margin-bottom:0px;">Gender</label>
+					<div class="controls">
+						<a id = "gender"></a>
+					</div>
+				</div>
+				<div class="control-group" id = "stateGroup">
+				    <label class="control-label" for="inputCountry" style = "margin-bottom:0px;">State</label>
+				    <div class="controls">
+				       <a id = "state"></a>
+				    </div>
+				</div>
+				<div class="control-group" id = "hiddentagsGroup">
+			      	<label class="control-label" for="inputTags" style = "margin-bottom:0px;">Hidden Tags</label>
+			        <div class="controls">
+				    	<div id = "hidden_tags"></div>
+				    </div>
+				</div>
+			  </div>
+			</form>
+		</div>
+	  </div>
+	</div>
+	<script src = "/js/socket.js"></script>
+</body>
+</html>

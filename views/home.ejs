@@ -1,0 +1,448 @@
+<% include component/header %>
+	<link href = "/css/home.css" rel = "stylesheet">
+	<link href = "/css/sidebar.css" rel = "stylesheet">
+	<script src = "/js/commonfunctions.js"></script>
+    <script src = "/js/home.js"></script>
+	<title><%=title%></title> 
+</head> 
+<body style = "font-family: 'Roboto', sans-serif;background-color:#E0E0E0;">
+
+	<% include component/navigator %>
+
+	<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="cbp-spmenu-s1">
+		<div id = "settingsList">
+			<a id = "settingUserNews"><i class = "icon-file"></i>&nbsp;&nbsp;User News</a>
+			<a id = "settingEventNews"><i class = "icon-list-alt"></i>&nbsp;&nbsp;Circa News</a>
+			<a href="#profileModal" id = "settingProfile" data-toggle="modal"><i class="icon-book"></i>&nbsp;&nbsp;Profile</a>
+			<a href="#createEventModal" id = "settingCreateEvent" data-toggle="modal"><i class="icon-plus-sign"></i>&nbsp;&nbsp;Create Event</a>
+			<a href="#" id = "navilogout"><i class="icon-off"></i>&nbsp;&nbsp;Logout</a>
+        </div>
+	</nav>
+
+	<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2">
+		<div id = "chatList" style = "overflow-y:hidden;">
+			<div><a id = "friendsHead"><i class = "icon-chevron-down icon-white"></i>friends <font>(0)</font></a></div>
+			<div id = "friendsList" style = "max-height:300px;">
+				<div id="squaresWaveG-friend">
+					<div class="squaresWaveG_1 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_2 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_3 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_4 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_5 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_6 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_7 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_8 squaresWaveG">
+					</div>
+				</div>
+			</div>
+			<div><a id = "eventsHead"><i class = "icon-chevron-down icon-white"></i>events <font>(0)</font></a></a></div>
+			<div id = "eventsList" style = "max-height:300px;">
+				<div id="squaresWaveG-event">
+					<div class="squaresWaveG_1 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_2 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_3 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_4 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_5 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_6 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_7 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_8 squaresWaveG">
+					</div>
+				</div>
+			</div>
+		</div>
+	</nav>
+
+	<div id = "contentBody" class = "cbp-spmenu-push" style = "margin-top:100px;margin-left:100px;margin-right:100px;">
+		<div class="container-fluid" style = "padding-left:0px;padding-right:0px;">
+			<div class = "well" style = "text-align:center;min-height:50px;display:none;">
+				No Post yet.
+			</div>
+			<div class="row-fluid"> 
+			   	
+			      <div class = "span6" id = "left-column"></div>
+			      
+			      <div class = "span6" id = "right-column"></div>
+
+			</div>
+			<div id="circularG">
+				<div id="circularG_1" class="circularG">
+				</div>
+				<div id="circularG_2" class="circularG">
+				</div>
+				<div id="circularG_3" class="circularG">
+				</div>
+				<div id="circularG_4" class="circularG">
+				</div>
+				<div id="circularG_5" class="circularG">
+				</div>
+				<div id="circularG_6" class="circularG">
+				</div>
+				<div id="circularG_7" class="circularG">
+				</div>
+				<div id="circularG_8" class="circularG">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id = "chatArea"></div>
+
+	<!-- Modal -->
+	<div id="postModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-body">
+	  	<form class="">
+	  	<div class="control-group">
+	  		<label class="control-label" for="postArea" style = "text-align:left;" data-toggle="tooltip" data-placement="right" title="first tooltip">Post Content <font style = "color:red;">*</font> :</label>
+		    <div class="controls">
+				<textarea rows="5" id = "postArea" placeholder="Share your new ideas..."></textarea>
+		    </div>
+		</div>
+	  	<div class="control-group">
+		    <label class="control-label" for="postTags" style = "text-align:left;width:50px;">Tags:</label>
+		    <div class="controls" style = "margin-left:0px;" >
+	  			<input type="text" id = "postTags" value="" data-role="tagsinput" placeholder="Add Tags"/>
+		    </div>
+	  	</div>
+	  	</form>
+	  </div>
+	  <div class="modal-footer">
+	  	<div class = "row-fluid">
+	  	<div class = "span8">
+	  	<div id="floatingBarsG-post" class = "pull-right">
+			<div class="blockG rotateG_01">
+			</div>
+			<div class="blockG rotateG_02">
+			</div>
+			<div class="blockG rotateG_03">
+			</div>
+			<div class="blockG rotateG_04">
+			</div>
+			<div class="blockG rotateG_05">
+			</div>
+			<div class="blockG rotateG_06">
+			</div>
+			<div class="blockG rotateG_07">
+			</div>
+			<div class="blockG rotateG_08">
+			</div>
+		</div>
+		</div>
+	    <button id = "postSubmit" class="btn btn-success span2 button" disabled>Submit</button>
+	   	<button class="btn span2 button" data-dismiss="modal" id = "postCancel" aria-hidden="true">Cancel</button>
+	  </div>
+	  </div>
+	</div>
+
+	<div id="profileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "width:60%;left:0px;margin-left:20%;">
+	  <div class="modal-body row-fluid" style = "font-size:15px;padding:0px;">
+		<div class = "span3 profileBody" style = "background-image:url(/img/semi_transparent.png);height:300px;">
+			<button id = "editAvarta" class = "btn btn-primary btn-mini button" href="#uploadModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">Change Avatar</button>
+			<img id = "profileAvarta" class = "img-circle selfProfileAvarta" src = "/img/circa.png" />
+			<div style = "font-size:20px;text-align:center;margin-top:5%;">
+				<font id = "profileName">User</font>
+			</div>
+			<div style = "text-align:center;cursor:pointer;">
+				<a id = "profileUid"></a>
+			</div>
+			<div style = "text-align:center;">
+				<strong id = "eventsNumber" style = "color:#08c;">0</strong> Events
+			</div>
+			<div style = "text-align:center;">
+				<strong id = "friendsNumber" style = "color:#08c;">0</strong> Friends
+			</div>
+		</div>
+		<div class = "span9 profileBody" style = "margin-top:2%;">
+
+			<form class="row-fluid">
+			  <legend style = "font-family: 'Raleway', sans-serif;font-size:25px;width:95%;">Profile</legend>
+			  <div class = "span5">
+				<div class="control-group" id = "nickNameGroup">
+				    <label class="control-label" for="nickName" style = "margin-bottom:0px;">NickName</label>
+				    <div class="controls">
+				    	<a id = "nickname"></a>
+				    </div>
+				</div>
+				<div class="control-group" id = "birthdayGroup">  
+					<label class="control-label" for="birthday" style = "margin-bottom:0px;">Birthday</label>
+					<div class="controls">
+						<a id = "birthday"></a>
+					</div>
+				</div> 	
+				<div class="control-group" id = "genderGroup">
+					<label class="control-label" for="gender" style = "margin-bottom:0px;">Gender</label>
+					<div class="controls">
+						<a id = "gender"></a>
+					</div>
+				</div>
+				<div class="control-group" id = "tagsGroup">
+				    <label class="control-label" for="tags" style = "margin-bottom:0px;">Tags</label>
+				    <div class="controls">
+				    	<div id = "tags"></div>
+				    </div>
+				</div>
+			  </div>
+			  <div class = "span6">	 
+			   	<div class="control-group" id = "cityGroup">
+					<label class="control-label" for="city" style = "margin-bottom:0px;">City</label>
+					<div class="controls">
+						<a id = "city"></a>
+					</div>
+				</div>
+				<div class="control-group" id = "stateGroup">
+				    <label class="control-label" for="state" style = "margin-bottom:0px;">State</label>
+				    <div class="controls">
+				       <a id = "state"></a>
+				    </div>
+				</div>
+				<div class="control-group" id = "countryGroup">
+				    <label class="control-label" for="country" style = "margin-bottom:0px;">Country</label>
+				    <div class="controls">
+				       <a id = "country"></a>
+				    </div>
+				</div>
+				<div class="control-group" id = "hiddentagsGroup">
+			      	<label class="control-label" for="hidden_tags" style = "margin-bottom:0px;">Hidden Tags</label>
+			        <div class="controls">
+				    	<div id = "hidden_tags"></div>
+				    </div>
+				</div>
+			  </div>
+			</form>
+		</div>
+        <legend class = "updateBody" style = "font-family:'Raleway', sans-serif;font-size:25px;margin:10px;width:95%;display:none;">Update Profile</legend>
+      	<form class="row-fluid updateBody" style = "width:95%;padding-left:20px;display:none;">
+      		<div class = "span6">
+          		<div class="control-group" id = "nameGroup">
+	            	<label class="control-label" for="inputName">Name<font style = "color:red;">*</font></label>
+	            	<div class="controls">
+	            		<input type="text" id="inputName">
+	            	</div>
+	          	</div>
+          		<div class="control-group" id = "birthdayGroup"> 
+           			<label class="control-label" for="inputBirthday">Birthday<font style = "color:red;">*</font></label>
+	            	<div class="controls">
+	              		<input type="date" id="inputBirthday">
+	            	</div>
+          		</div>
+	            <div class="control-group" id = "tagsGroup">
+	            	<label class="control-label" for="inputTags"/>Tags</label>
+	            	<div class="controls">
+	           			<input type="text" id = "inputTags" data-role="tagsinput" />
+	            	</div>
+	          	</div>
+	        </div>
+
+        	<div class = "span6">
+	            <div class="control-group" id = "nickNameGroup">
+	            	<label class="control-label" for="inputNickName">Nickname<font style = "color:red;">*</font></label>
+	            	<div class="controls">
+		            	<input type="text" id="inputNickName">
+		            </div>
+          		</div>
+          		<div class="control-group" id = "genderGroup">
+            		<label class="control-label" for="inputGender">Gender</label>
+              		<select id = "inputGender">
+                		<option value="1">Male</option>
+                		<option value="0">Female</option>
+                		<option value="2">Secret</option>
+            		</select>
+         		</div>
+        	</div>
+      	</form>
+	  </div>
+	  <div class="modal-footer">
+	  	<div class = "row-fluid">
+	  		<div class = "span9">
+	  			<div id="floatingBarsG-update" class = "pull-right">
+					<div class="blockG rotateG_01">
+					</div>
+					<div class="blockG rotateG_02">
+					</div>
+					<div class="blockG rotateG_03">
+					</div>
+					<div class="blockG rotateG_04">
+					</div>
+					<div class="blockG rotateG_05">
+					</div>
+					<div class="blockG rotateG_06">
+					</div>
+					<div class="blockG rotateG_07">
+					</div>
+					<div class="blockG rotateG_08">
+					</div>
+				</div>
+	  		</div>
+	  		<div class = "span3">
+			    <button class="btn btn-primary profileBody button" id = "profileEdit">Modify</button>
+			    <button class="btn btn-success updateBody button" id = "profileConfirm" style = "display:none;">Confirm</button>
+			   	<button class="btn updateBody button" id = "profileCancel" style = "margin-left:10px;display:none;">Cancel</button>
+		   	</div>
+	   	</div>
+	  </div>
+	</div>
+
+	<div id="createEventModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-body">
+	  	<form>
+		  <legend style = "font-family: 'Raleway', sans-serif;font-size:30px;">New Event</legend>
+		  <div class="control-group" id = "nameGroup">
+		    <label class="control-label" for="createEventInputName">Event Name<font style = "color:red;">*</font></label>
+		    <div class="controls">
+		      <input class = "span6 createEventInput" type="text" id="createEventInputName">
+		    </div>
+		  </div>
+	      <div class="control-group" id = "nameGroup">
+		    <label class="control-label" for="createEventInputDescription">Description<font style = "color:red;">*</font></label>
+		    <div class="controls">
+		      <input class = "span6 createEventInput" type="text" id="createEventInputDescription">
+		    </div>
+		  </div>
+		  <div class="control-group" id = "cityGroup">
+		    <label class="control-label" for="createEventInputCity">City<font style = "color:red;">*</font></label>
+		    <div class="controls">
+		      <input class = "span6 createEventInput" type="text" id="createEventInputCity">
+		    </div>
+		  </div>
+		  <div class="control-group" id = "tagsGroup">
+		    <label class="control-label" for="createEventInputTags"/>Tags</label>
+		    <div class="controls">
+		      <input type="text" id="createEventInputTags" data-role="tagsinput">
+		    </div>
+		  </div>
+		</form>
+	  </div>
+	  <div class="modal-footer">
+	  	<div class = "row-fluid">
+	  	<div class = "span8">
+	  	<div id="floatingBarsG-createEvent" class = "pull-right">
+			<div class="blockG rotateG_01">
+			</div>
+			<div class="blockG rotateG_02">
+			</div>
+			<div class="blockG rotateG_03">
+			</div>
+			<div class="blockG rotateG_04">
+			</div>
+			<div class="blockG rotateG_05">
+			</div>
+			<div class="blockG rotateG_06">
+			</div>
+			<div class="blockG rotateG_07">
+			</div>
+			<div class="blockG rotateG_08">
+			</div>
+		</div>
+		</div>
+	    <button id = "createEventSubmit" class="btn btn-success span2 button" disabled>Submit</button>
+	   	<button class="btn span2 button" data-dismiss="modal" id = "createEventCancel" aria-hidden="true">Cancel</button>
+	  </div>
+	  </div>
+	</div>
+
+	<div id="removePostModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-body">
+		Are you sure your want to remove this post?
+	  </div>
+	  <div class="modal-footer">
+		  <div class = "row-fluid">
+	        <div class = "span8">
+			  	<div id="floatingBarsG-removePost" class = "pull-right" style ="display:none;">
+		            <div class="blockG rotateG_01">
+		            </div>
+		            <div class="blockG rotateG_02">
+		            </div>
+		            <div class="blockG rotateG_03">
+		            </div>
+		            <div class="blockG rotateG_04">
+		            </div>
+		            <div class="blockG rotateG_05">
+		            </div>
+		            <div class="blockG rotateG_06">
+		            </div>
+		            <div class="blockG rotateG_07">
+		            </div>
+		            <div class="blockG rotateG_08">
+		            </div>
+		        </div>
+		        </div>
+		        <div class = "span4">
+				    <button id = "removePostConfirm" class="btn btn-danger button">Confirm</button>
+				   	<button id = "removePostCancel" class="btn button" data-dismiss="modal" aria-hidden="true">Cancel</button>
+			   	</div>
+		   	</div>
+		  </div>
+	  </div>
+	</div>	
+
+	<div id="removeReplyModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-body">
+		Are you sure your want to remove this reply?
+	  </div>
+	  <div class="modal-footer">
+		  <div class = "row-fluid">
+	        <div class = "span8">
+			  	<div id="floatingBarsG-removeReply" class = "pull-right" style ="display:none;">
+		            <div class="blockG rotateG_01">
+		            </div>
+		            <div class="blockG rotateG_02">
+		            </div>
+		            <div class="blockG rotateG_03">
+		            </div>
+		            <div class="blockG rotateG_04">
+		            </div>
+		            <div class="blockG rotateG_05">
+		            </div>
+		            <div class="blockG rotateG_06">
+		            </div>
+		            <div class="blockG rotateG_07">
+		            </div>
+		            <div class="blockG rotateG_08">
+		            </div>
+		        </div>
+		        </div>
+		        <div class = "span4">
+				    <button id = "removeReplyConfirm" class="btn btn-danger button">Confirm</button>
+				   	<button id = "removeReplyCancel" class="btn button" data-dismiss="modal" aria-hidden="true">Cancel</button>
+			   	</div>
+		   	</div>
+		  </div>
+	  </div>
+	</div>
+
+	<div id="uploadModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-body">
+	  	<legend style = "font-family:'Raleway', sans-serif; font-size:25px;margin:10px;width:95%;">Upload Avatar</legend>
+		<div class = "well" style = "width:92%;">
+			<span class="file-wrapper">
+			  <input type="file" name="image" id="fileupload" />
+			  <span class="btn btn-success button btn-large">Choose a Photo</span>
+			</span>
+			<!-- <img id = "preloading" src = "#" style = "height:50px;width:50px;display:none;"> -->
+			<div id="progress" class = "progress progress-striped active" style = "display:none;">
+			    <div class="bar" style="width: 0%;"></div>
+			</div>
+			<p id = "notice" style = "text-align:center;display:none;"></p>
+		</div>
+	  </div>
+	  <div class="modal-footer">
+	  	<button id = "uploadCancel" class="btn button" data-dismiss="modal" aria-hidden="true">Cancel</button>
+	  </div>
+	</div>
+
+	<script src = "/js/socket.js"></script>
+</body>
+</html>

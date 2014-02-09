@@ -1,30 +1,164 @@
 <% include component/header %>
-  <script src = "/js/login.js"></script>
-  </head>
-  <body>
-	<form class="form-horizontal" style = "margin-top:10%;margin-left:30%;width:400px;">
-		<legend style = "font-family: 'Raleway', sans-serif;font-size:50px;">Circa</legend>
-	  <div class="control-group" id = "emailGroup">
-	    <label class="control-label" for="inputEmail">Email</label>
-	    <div class="controls">
-	      <input type="text" id="inputEmail" placeholder="Email">
-	      <span class="help-inline" id = "emailWarning" style = "display:none;">Email should not be empty.</span>
-	    </div>
-	  </div>
-	  <div class="control-group" id = "passwordGroup">  
-	    <label class="control-label" for="inputPassword">Password</label>
-	    <div class="controls">
-	      <input type="password" id="inputPassword" placeholder="Password">
-	      <span class="help-inline" id = "passwordWarning" style = "display:none;">password should not be empty.</span>
-	    </div>
-	  </div>
-	  <div class="control-group" id = "rememberCheckBox">
-	    <div class="controls">
-	      <label class="checkbox">
-	        <input type="checkbox"> Remember me
-	      </label>
-	      <button id = "LoginButton" class="btn btn-primary pull-right">Login</button>
-	    </div>
-	  </div>
-	</form>
-<% include component/footer %>
+    <link href = "/css/login.css" rel = "stylesheet">
+    <script src = "/js/login.js"></script>
+    <title><%=title%></title>
+</head>
+<body style = "margin-bottom:0px;">
+  	<div class="navbar navbar-fixed-top" style = "background:none;background:url(/img/background.jpg);max-height:50px;border:">
+        <div class="navbar-inner" style = "background:none;background:rgba(0, 0, 0, 0.4);border:none;">
+            <div class="container" style="width:100%; padding-left:10px">
+                <a class="brand pull-left" style = "padding-top:0px;" href="#"><img style = "margin-left:30px;height:40px;margin-top:2px;" src = "/img/logo.png"></a>
+				<!-- Signup Starts Here -->
+				<div id="signUpContainer" style="padding-right:20px;margin-right:10px;">
+					<button class="btn-large btn-warning" id="signUpButton"><span>Sign Up</span></button>
+					<div id="signUpBox" style="padding-right:20px;height">
+						<form id="signUpForm">
+							<div id = "valicationbody">
+								<fieldset>
+									<label for="validationEmail" id = "validationEmailLabel"><strong>Email</strong><font class = "btn-mini">(type in your email to verify)</font><a class = "btn-mini">verify</a></label>
+									<input type="email" name="email" id="validationEmail" />
+								</fieldset>
+							</div>
+							<div id="squaresWaveG" style = "display:none;">
+								<div class="squaresWaveG_1 squaresWaveG">
+								</div>
+								<div class="squaresWaveG_2 squaresWaveG">
+								</div>
+								<div class="squaresWaveG_3 squaresWaveG">
+								</div>
+								<div class="squaresWaveG_4 squaresWaveG">
+								</div>
+								<div class="squaresWaveG_5 squaresWaveG">
+								</div>
+								<div class="squaresWaveG_6 squaresWaveG">
+								</div>
+								<div class="squaresWaveG_7 squaresWaveG">
+								</div>
+								<div class="squaresWaveG_8 squaresWaveG">
+								</div>
+							</div>
+							<div id="signUpbody" style = "display:none;">
+								<fieldset>
+									<label style = "text-align:center;"><font >Your email has passed the verification! A verification code has been sent to your email address. Please fill up the verification code and remaining information to create your account.<font></label>
+								</fieldset>
+								<fieldset class = "validationCodeField">
+									<label for="validationCode" id = "validationCodeLabel"><strong>Validation Code: </strong></label>
+									<input type="text" name="validationCode" id="validationCode" />
+								</fieldset>
+								<fieldset>
+									<label for="signUpName" id = "signUpNameLabel"><strong>Nick Name<strong></label>
+									<input type="text" name="name" id="signUpName" />
+								</fieldset>
+								<fieldset>
+									<label for="signUpPassword" id = "signUpPasswordLabel"><strong>Password</strong></label>
+									<input type="password" name="password" id="signUpPassword" />
+								</fieldset>
+								<fieldset>
+									<label for="confirmsignUpPassword" id = "confirmsignUpPasswordLabel"><strong>Confirm Password<strong></label>
+									<input type="password" name="confirmPassword" id="confirmsignUpPassword" />
+								</fieldset>
+								<fieldset>
+									<label class="checkbox" style = "font-weight:bold;padding-left:0px;">
+										  <input type="checkbox" id="inlineCheckbox" style = "width:inherit;margin-right:5px;">I have read and agreed to the <a href = "#">Terms of Service</a>.
+									</label>
+								</fieldset>	
+								<fieldset>
+									<button class="btn btn-warning pull-right" id="submitCreateAccount">CREATE</button>
+									<button class="btn pull-right" id="cancelCreateAccount">CANCEL</button>
+								</fieldset>
+							</div>
+						</form>
+					</div>
+				</div>
+				<!-- Signup Ends Here -->
+
+				<!-- Login Starts Here -->
+				<div id="loginContainer" style="padding-right:20px">
+					<button class="btn-large btn-success" id="loginButton" ><span>Login</span></button>
+					<div id="loginBox" style="padding-right:20px">                
+						<form id="loginForm">
+							<div id="body">
+								<fieldset>
+									<label for="email" id = "loginEmailLabel"><strong>Email Address</strong></label>
+									<input type="text" name="email" id="loginEmail" />
+								</fieldset>
+								<fieldset>
+									<label for="password" id = "loginPasswordLabel"><strong>Password</strong></label>
+									<input type="password" name="password" id="loginPassword" />
+									<span class = "help-block" id = "LoginAlert" style = "font:22px;color:#B94A48;display:none;">Login Unsuccessfully!</span>
+								</fieldset>
+								<fieldset>
+									<button class="btn btn-success pull-right" id="login" style = "width:80px;height:34px;margin-right:10px">GO<i class = " icon-circle-arrow-right" style = "margin-left:3px;margin-top:5px;"></i></button>
+								</fieldset>
+							</div>
+						</form>
+					</div>
+				</div>
+				<!-- Login Ends Here -->
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+
+	<div style ="background:url(/img/background.jpg);background-size:1500px 480px;height:480px;margin-top:-12px;" class = "row-fluid">
+		<div class = "span4" style ="margin-top:5%;">
+			<img class = "pull-right" src = "/img/circle.png">
+		</div>
+		<div class = "offset1 span6" style = "background:none;margin-top:5%;">
+			<div class = "pull-left">
+				<p style = "font-family: 'Lato', sans-serif;font-size:90px;font-weight:100; color:white;">Circa</p>
+				<p style = "font-family: 'Lato', sans-serif;font-size:40px;font-weight:100;color:white;margin-top:10%;margin-bottom:20px;line-height:35px;">
+					Find <font class = "heightlight">Friends</font>, explore <font class = "heightlight">Events</font> interesting you, and<br>
+					"Meet the People <font class = "heightlight">like</font> you!"
+				</p>
+				<div class = "row-fluid">
+					<div class = "span6 row-fluid">
+						<div id = "webButton" class = "row-fluid" style = "margin-bottom:10px;"><button class = "btn btn-primary btn-large downloadButton">Explore the Web!</button></div>
+						<div class = "row-fluid"><button class = "btn btn-primary btn-large downloadButton" disabled><img src = "/img/apple.png"> IOS <strong style = "font-size:14px;">(Coming soon!)</strong></button></div>
+					</div>
+
+					<div class = "span6 row-fluid">
+
+						<div class = "row-fluid" style = "margin-bottom:10px;"><a href="/file/CircaBeta.zip" download="circa.zip"><button class = "btn btn-primary btn-large downloadButton" type ="submit"><img src = "/img/windows.png"> Windows</button></a></div>
+
+						<div class = "row-fluid"><button class = "btn btn-primary btn-large downloadButton" disabled><img src = "/img/android.png"> Android <strong style = "font-size:14px;">(Coming soon!)</strong></button></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id = "introductionArea" style = "margin-left:20%;margin-right:20%;margin-top:20px;margin-bottom:5%;">
+		<div id = "socicalNetworking">
+			<legend class = "introductionHead">Socical Networking</legend>
+			<div class = "row-fluid">
+				<div class = "span5">
+					<img class = "pull-right" src = "/img/socialNetworking.jpg" style = "height:300px;width:300px;">
+				</div>
+				<p class = "introductionContent span7">With Circa, you can befriend with one another, post and share news, upload pictures, create and join groups and participate in group discussion.</p>
+			</div>
+		</div>
+		<div id = "InstantMessaging">
+			<legend class = "introductionHead pull-right">Instant Communication</legend>
+			<div class = "row-fluid">
+				<p class = "introductionContent span7">With Circa, you can freely chat with friends or groupmates. They can chat in groups for group discussion.</p>
+				<div class = "span5">
+					<img class = "pull-left" src = "/img/instantMessaging.jpg" style = "height:300px;width:300px;">
+				</div>
+			</div>
+		</div>
+		<div id = "searchEngine">
+			<legend class = "introductionHead">Find Like-minded Friends</legend>
+			<div class = "row-fluid">
+				<div class = "span5">
+					<img class = "pull-right" src = "/img/search.jpg" style = "height:300px;width:300px;">
+				</div>
+				<p class = "introductionContent span7" style = "text-align:left;">With Circa, you can easily find lik-minded people, especially those in nearby.</p>
+			</div>
+		</div>
+	</div>
+
+	<footer style = "margin:0px;background-color:#252528;height:200px;color:white;padding-top:5%;">
+		Designed and built By Circa technical group. All rights reserved.
+	</footer>
+</body>
+</html>

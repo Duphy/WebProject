@@ -1,0 +1,33 @@
+Express server listening on port 3000
+[90mGET / [32m200 [90m91ms - 6.22kb[0m
+[90mGET /css/bootstrap.min.css [32m200 [90m16ms - 103.52kb[0m
+[90mGET /js/bootstrap.min.js [32m200 [90m9ms - 27.96kb[0m
+[90mGET /css/bootstrap-responsive.min.css [32m200 [90m8ms - 16.45kb[0m
+[90mGET /js/jquery-1.10.1.min.js [32m200 [90m9ms - 90.89kb[0m
+[90mGET /css/bootstrap-tagsinput.css [32m200 [90m5ms - 1.05kb[0m
+[90mGET /js/bootstrap-tagsinput.min.js [32m200 [90m13ms - 6.38kb[0m
+[90mGET /css/login.css [32m200 [90m5ms - 6.12kb[0m
+[90mGET /js/login.js [32m200 [90m4ms - 7.9kb[0m
+[90mGET /img/3.jpg [32m200 [90m7313ms - 1.28mb[0m
+[90mGET /img/2.jpg [32m200 [90m7811ms - 1.91mb[0m
+[90mGET /img/1.jpg [32m200 [90m8427ms - 1.2mb[0m
+[90mGET / [32m200 [90m14ms - 6.22kb[0m
+[90mGET /css/bootstrap-responsive.min.css [32m200 [90m5ms - 16.45kb[0m
+[90mGET /css/bootstrap-tagsinput.css [32m200 [90m24ms - 1.05kb[0m
+[90mGET /js/bootstrap-tagsinput.min.js [32m200 [90m22ms - 6.38kb[0m
+[90mGET /js/bootstrap.min.js [32m200 [90m7ms - 27.96kb[0m
+[90mGET /css/bootstrap.min.css [32m200 [90m537ms - 103.52kb[0m
+[90mGET /css/login.css [32m200 [90m2ms - 6.12kb[0m
+[90mGET /js/login.js [32m200 [90m3ms - 7.9kb[0m
+[90mGET /js/jquery-1.10.1.min.js [32m200 [90m734ms - 90.89kb[0m
+[90mGET /img/1.jpg [32m200 [90m4118ms - 1.2mb[0m
+[90mGET /img/3.jpg [32m200 [90m5195ms - 1.28mb[0m
+[90mGET /img/2.jpg [32m200 [90m7029ms - 1.91mb[0m
+[90mGET /img/glyphicons-halflings.png [32m200 [90m15ms - 12.5kb[0m
+
+events.js:72
+        throw er; // Unhandled 'error' event
+              ^
+Error: connect ETIMEDOUT
+    at errnoException (net.js:901:11)
+    at Object.afterConnect [as oncomplete] (net.js:892:19)

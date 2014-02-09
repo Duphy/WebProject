@@ -1,0 +1,586 @@
+/************* Signup, Login and Logout *****************/
+signUp
+    input:
+        email
+        password
+        nickname
+        realname
+        birthday
+        gender
+        city
+        state
+        country
+        tags:array
+        hidden_tags:array
+    output:
+        status:
+        content:
+
+loginAuth
+    input:
+        email
+        password
+    output:
+        status:
+        uid:
+        session_key:
+
+logout
+    input:
+        session_key
+        uid
+    output:
+        status:
+        
+/******************* Create *******************/
+createEvent
+    input:
+        session_key
+        event_name
+        uid
+        description
+        city
+        tags:array
+    output:
+        status:
+
+createPost
+    input:
+        session_key
+        uid
+        eid
+        content
+        visibility
+        tags:array
+    output:
+        pid:
+        uid:
+        eid:
+        date:
+        time:
+        postContent:
+        visibility:
+        tags:array
+        relies_no:
+        relies:array of reply
+            reply:
+                rid:
+                replier_uid:
+                replyto_uid:
+                replier_name:
+                replyto_name:
+                replyContent:
+                date:
+                time:
+                visibility:
+
+createReply
+    input:
+        session_key
+        uid
+        posterUid
+        replyToUid
+        postEid
+        postPid
+        name
+        replyToName
+        replyContent
+        visibility
+    output:
+        status:
+        reply: poster_uid
+               replyTo_uid
+               eid
+               pid
+
+//The requests are different from header
+createFriendRequest
+    input:
+        session_key
+        uid
+        receiver_uid
+        content
+    ouput:
+        status:
+        reply: type
+               uid
+               content
+
+createJoinEventRequest
+    input:
+        session_key
+        uid
+        eid
+        content
+    output:
+        status:
+        reply: type
+               eid
+               content
+
+createEventInvitationRequest
+    intput:
+        session_key
+        uid
+        receiver_uid
+        eid
+        content
+    output:
+        status:
+        reply: type
+               uid
+               eid
+               content
+               
+createSchedule
+    input:
+        session_key
+        uid
+        eid
+        start_date
+        start_time
+        end_date
+        end_time
+        playce
+        description
+        members:array
+    output:
+        status:
+        uid:
+        eid:
+        sid:
+/******************* View Information *******************/
+
+viewSelfInfo
+    input:
+        session_key
+        uid
+    output:
+        status:
+        name:
+        nickname:
+        birthday:
+        tags: array
+        hidden_tags:
+        honors:
+        gender:
+        city:
+        state:
+        country:
+
+viewUserInfo
+    input:
+        session_key
+        uid
+        view_uid
+    output:
+        status:
+        uid:
+        name:
+        nickname:
+        birthday:
+        tags: array
+        gender:
+        city:
+        common_friends: array(uid)
+        
+viewSelfFriends
+    input:
+        session_key
+        uid
+    output:
+        friend_uids: array
+
+viewUserFriends
+    input:
+        session_key
+        uid
+        view_uid
+    output:
+        friend_uids: array
+
+viewSelfPosts
+    input:
+        session_key
+        uid
+        max_pid
+    output:
+        pids: array
+
+viewUserPosts
+    input:
+        session_key
+        uid
+        view_uid
+        max_pid
+    output:
+        pids: array
+
+viewSelfEvents
+    input:
+        session_key
+        uid
+    output:
+        events: array
+
+viewUserEvents
+    input:
+        session_key
+        uid
+        view_uid
+    output:
+        events: array
+
+viewSelfSchedule
+    input:
+        session_key
+        uid
+    output:
+        schedules: array(schedule)
+            ->sechedule:
+                uid
+                eid
+                sid
+                start_date
+                start_time
+                end_date
+                end_time
+                place
+                description
+                users: array(uid)
+
+viewSelfCircatags
+    input:
+        session_key
+        uid
+        option:
+            0:personal
+            1:city
+            2:friends
+            3:city_user
+            4:city_events
+            5:coty_posting
+    output:
+        circatags: array(weighted tag)
+            ->weighted_tag: tag
+                            weight
+
+viewUserCircatags
+    input:
+        session_key
+        uid
+        view_uid
+        option:
+            0:personal
+            1:city
+            2:friends
+            3:city_user
+            4:city_events
+            5:coty_posting
+    output:
+        circatags: array(weighted tag)
+            ->weighted_tag: tag
+                            weight
+
+viewSelfAvarta
+    input:
+        session_key
+        uid
+        date
+        time
+    output:
+        version_date
+        version_time
+        avarta
+
+viewSelfSmallAvarta
+    input:
+        session_key
+        uid
+        date
+        time
+    output:
+        version_date
+        version_time
+        avarta
+
+viewUserAvarta
+    input:
+        session_key
+        uid
+        view_uid
+        date
+        time
+    output:
+        version_date
+        version_time
+        avarta
+
+viewUserSmallAvarta
+    input:
+        session_key
+        uid
+        view_uid
+        date
+        time
+    output:
+        version_date
+        version_time
+        avarta
+
+viewPostContent
+    input:
+        session_key
+        uid
+        pidlist:array
+        eidlist:array
+        pidlist:array
+    output:
+        pid
+        uid
+        eid
+        date
+        time
+        postContent
+        visibility
+        tags
+        relies_no
+        replies: array(reply)
+            ->reply: rid
+                     replier_uid
+                     replyto_uid
+                     replier_name
+                     replyto_name
+                     replyContent
+                     date
+                     time
+                     visibility
+
+/******************* Search ********************/
+
+//Search Users
+searchUserByFilter
+    input:
+        session_key
+        uid
+        option: 1:name
+                2:tags
+                0:both
+        filter
+        range:  0:local
+                1:global
+        age_lower
+        age_upper
+        gender: 0:female
+                1:male
+                2:both
+    output:
+        uids: array(uid)
+
+searchUserById
+    input:
+        session_key
+        uid
+        id
+    output:
+        uids: array(uid)
+        
+searchUserByEmail
+    input:
+        session_key
+        uid
+        email
+    output:
+        uids: array(uid)
+        
+//Search Events
+searchEventbyFilter
+    input:
+        session_key
+        uid
+        option: 1:name
+                2:tags
+                0:both
+        filter
+        range:  0:local
+                1:global
+    output:
+        eids: array(eid)
+
+searchEventById
+    input:
+        session_key
+        uid
+        id
+    output:
+        eids: array(eid)
+
+//Search Post
+searchPost
+    input:
+        session_key
+        uid
+        filter
+        range:  0:local
+                1:global
+        option: 1:name
+                2:tags
+                0:both
+    output:
+        pidsets: array(uid, eid, pid)
+
+/******************* Update Information *******************/
+updateUser
+    input:
+        session_key
+        uid
+        name
+        nickname
+        birthday
+        gender
+        city
+        state
+        country
+        add_tag
+        delete_tag
+        setting_no
+        setting
+    output:
+        status
+
+updateUserPassword
+    input:
+        session_key
+        uid
+        password
+    output:
+        status
+updateEvent
+    input:
+        name
+        city
+        add_tag
+        delete_tag
+        setting_no
+        setting
+        add_manager
+        del_manager
+        del_member
+    output:
+        status
+
+/*****not finished****/
+updateFriendComments
+    input:
+        session_key
+        uid
+        target_uid
+        comment
+    output:
+        pidsets: array(uid,pid,eid)
+updateStatus
+    input:
+        session_key
+        uid
+        status: 0:offline
+                1:online
+                2:leave
+                ?:invisible
+    output:
+        status
+/*****not finished****/
+
+updateUserAvarta
+    input:
+        session_key
+        uid
+        avarta
+    output:
+        status
+updateUserSmallAvarta
+    input:
+        session_key
+        uid
+        avarta
+    output:
+        status
+
+/*****not finished****/
+updateEventAvarta
+    input:
+        session_key
+        uid
+        eid
+        avarta
+    output:
+        status
+updateEventSmallAvarta
+    input:
+        session_key
+        uid
+        eid
+        avarta
+    output:
+        status
+/*****not finished****/
+
+deleteFriend
+    input:
+        session_key
+        uid
+        id
+    output:
+        status
+
+deletePost
+    input:
+        session_key
+        uid
+        id
+        eid
+        pid
+    output:
+        status
+
+deleteSchedule
+    input:
+        session_key
+        uid
+        id
+        eid
+        sid
+    output:
+        status
+
+deleteReply
+    input:
+        session_key
+        uid
+        id
+        eid
+        pid
+        rid
+    output:
+        status
+
+emailValidation
+    input:
+        email
+    output:
+        status
+        
+identificationCodeValidation
+    input:
+        email
+        code_1
+        code_2
+    output:
+        status
+
+quitEvent
+    input:
+        session_key
+        uid
+        eid
+    output:
+        status
