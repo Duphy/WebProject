@@ -293,10 +293,14 @@ $(document).on('click', ".joinevent", function() {
     }
   });
   
+  $("#timeoutButton").click(function(){
+    localStorage.clear();
+    window.location = "/";
+    return false;
+  });
+
   $("#createPost").remove();
   $("#searchButton").remove();
-
-
 });
 
 function search(val,type){

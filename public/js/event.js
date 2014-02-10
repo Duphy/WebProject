@@ -691,4 +691,10 @@ $("body").delegate(".memberItem", 'click', function() {
       return false;
     }
   });
+
+  $("#timeoutButton").click(function(){
+    localStorage.clear();
+    window.location = "/";
+    return false;
+  });
 });

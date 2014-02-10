@@ -270,4 +270,10 @@ $(document).ready(function(){
 		console.log("click back button.");
 		return false;
 	});
+
+	$("#timeoutButton").click(function(){
+	    localStorage.clear();
+	    window.location = "/";
+	    return false;
+	  });
 });

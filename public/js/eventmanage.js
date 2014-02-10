@@ -228,6 +228,12 @@ $(document).ready(function(){
     //TO DO: to be completed
 
   });
+
+  $("#timeoutButton").click(function(){
+    localStorage.clear();
+    window.location = "/";
+    return false;
+  });
 });
 
 function renderUser(user){

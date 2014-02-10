@@ -443,6 +443,19 @@
 	  	<button id = "uploadCancel" class="btn button" data-dismiss="modal" aria-hidden="true">Cancel</button>
 	  </div>
 	</div>
+
+	<div id="timeoutModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-body" style = "text-align:center;">
+		Login Timeout. Please re-login.
+	  </div>
+	  <div class="modal-footer">
+		  <div class = "row-fluid">
+			<button id = "timeoutButton" class="btn btn-warning button">Logout</button>
+		  </div>
+	  </div>
+	</div>
+
+	<div data-toggle = "modal" id = "timeout" href="#timeoutModal" data-backdrop="static" data-keyboard="false" style = "opacity:0;"></div>
 	<script src = "/js/socket.js"></script>
 </body>
 </html>

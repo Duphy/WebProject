@@ -1010,22 +1010,9 @@ $(document).ready(function(){
   });
 
   $("#navilogout").click(function(){
-    $.ajax({
-      url:"/logout",
-      data:JSON.stringify(auth_data),
-      type:"POST",
-      contentType: 'application/json',
-      success:function(result){
-        if(result.status == "successful"){
-          localStorage.clear();
-          socket.emit("logout");
-          window.location = "/";
-        }else{
-          alert("fail to logout!");
-        }
-      }
-    });
-    
+    localStorage.clear();
+    socket.emit("logout");
+    window.location = "/";
   });
 
   $('body').delegate('.chat-window-title','click',function(){
@@ -1148,6 +1135,12 @@ $(document).ready(function(){
             }
         }
     });
+    return false;
+  });
+
+  $("#timeoutButton").click(function(){
+    localStorage.clear();
+    window.location = "/";
     return false;
   });
 });
