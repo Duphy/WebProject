@@ -200,6 +200,9 @@ io.on('connection',function(socket){
 			if(err){
 				throw err;
 			}
+			console.log("logout");
+			console.log(uid);
+			console.log(session_key);
 			notificationsPool[uid] = [];
             service.helper.disconnect(session_key);
 		});
