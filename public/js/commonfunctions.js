@@ -498,7 +498,7 @@ function renderReply(reply){
 function renderSearchEvents(event){
     var html =
     '<div class = "row-fluid postRoot" uid = "'+event.eid+'" style = "background-color:#FFFFFF;margin-bottom:10px;">'+
-      '<div class = "row-fluid" style = "margin-top:10px;height:50px;">'+
+      '<div class = "row-fluid" style = "margin-top:10px;">'+
         '<div class = "span6 row-fluid" style = "text-align: center;">'+
           '<div class = "span4">'+
             '<img src = "/img/event_default.png" style = "width:30px;height:30px;border-radius:15px;">'+
@@ -524,7 +524,8 @@ function renderSearchEvents(event){
         '</div>'+
       '</div>'+
       '<div class = "row-fluid">'+
-        '<div class = "span10" style = "font-size:16px;color:#999;font-family: \'Lato\', sans-serif;font-weight:300;"><strong class = "pull-left" style = "color:#202020;margin-left:6%;margin-right:5px;font-family: \'Lato\', sans-serif;font-weight:300;">Description: </strong>'+event.description+'</div>'+
+        '<div class = "span4"><font class ="pull-right" style = "font-family: \'Lato\', sans-serif;font-weight:400;">Description: </font></div>'+
+        '<div class = "span7" style ="font-family: \'Lato\', sans-serif;font-weight:300;">'+event.description+'</div>'+
       '</div>'+
     '<div class = "row-fluid" style = "margin-top:10px;">';
     if(checkEvent(event.eid)){
