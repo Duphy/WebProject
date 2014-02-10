@@ -110,6 +110,7 @@ $(document).ready(function(){
 	});
 
 	$('#submitCreateAccount').click(function(){
+		$("#floatingBarsG-signup").prev().hide();
 		var nickname = $('#signUpName').val();
 		var email = $('#validationEmail').val();
 		var password = $('#signUpPassword').val();
@@ -158,6 +159,8 @@ $(document).ready(function(){
 			$('.checkbox').first().css('font-size','14px');
 		}
 		if(proceed){
+			$("#floatingBarsG-signup").show();
+			$("#submitCreateAccount").attr('disabled','disabled');
 			var data = {};
 			data.realname = nickname;
 			data.nickname = nickname;
@@ -215,10 +218,16 @@ $(document).ready(function(){
 						        localStorage.state = data.state;
 						        localStorage.country = data.country;
 						        console.log("ready to go home");
+						        $("#floatingBarsG-signup").hide();
+						        $("#submitCreateAccount").removeAttr('disabled');
                                 window.location = "/home";
                                 }
                                 });
-                          }//if
+                          }else{
+                          	$("#floatingBarsG-signup").hide();
+                          	$("#floatingBarsG-signup").prev().show();
+                          	$("#submitCreateAccount").removeAttr('disabled');
+                          }
                           }//success
                           });
                    }}});
@@ -227,6 +236,7 @@ $(document).ready(function(){
 	});
 
 	$('#login').click(function(){
+		$("#floatingBarsG-login").prev().hide();
 		var Email = $('#loginEmail').val();
 		var password = $('#loginPassword').val();
 		var proceed = true;
@@ -247,6 +257,8 @@ $(document).ready(function(){
 			$('#loginPassword').css('border-color','#CCC');
 		}
 		if(proceed){
+			$("#floatingBarsG-login").show();
+			$("#login").attr("disabled","disabled");
 			var data = {};
 			data.email = Email;
 			data.password = password;
@@ -284,9 +296,15 @@ $(document).ready(function(){
 						        localStorage.state = data.state;
 						        localStorage.country = data.country;
 						        console.log("ready to go home");
+						        $("#floatingBarsG-login").hide();
+						        $("#login").removeAttr("disabled");
 								window.location = "/home";
 							}
 						});
+					}else{
+						$("#floatingBarsG-login").hide();
+						$("#floatingBarsG-login").prev().show();
+						$("#login").removeAttr("disabled");
 					}
 				}
 			});

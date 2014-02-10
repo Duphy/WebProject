@@ -148,7 +148,7 @@ function renderPost(post){
            'src = "'+localStorage.self_small_avarta+'" style = "width:40px;height:40px;border-radius:20px;">'+
         '</div>'+
         '<div class = "span8" style = "text-align:left;">'+
-          '<a href = # class = "userName" name = "'+post.poster_name+'" uid = "'+post.uid+'">'+post.poster_name+'</a><p style = "font-size:12px;color:#999;">'+time[0]+' &nbsp;&nbsp;'+time[1]+'</p>'+
+          '<a href = # class = "userName" name = "'+post.poster_name+'" uid = "'+post.uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+post.poster_name+'</a><p style = "font-size:12px;color:#999;font-family: \'Lato\', sans-serif;font-weight:300;">'+time[0]+' &nbsp;&nbsp;'+time[1]+'</p>'+
         '</div>'+
       '</div>';
       if(post.uid == localStorage.uid){
@@ -174,7 +174,7 @@ function renderPost(post){
     '</div>'+
     '<div class = "row-fluid">'+
     '<div class = "offset1 span9 offset2">'+
-    '<pre class = "length-limited">'+post.postContent+'</pre>'+
+    '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+post.postContent+'</pre>'+
     '</div>'+
     '</div>'+
   '<div class = "row-fluid shareButtons" style = "margin-top:10px;">'+
@@ -335,12 +335,12 @@ function member(member,type){
 }
 
 function renderMember(user){
-  var html = '<a href="#" class = "memberItem" name = "'+user.nickname+'" uid = "'+user.uid+'"><img id = "memberAvarta'+user.uid+'" class = "member_small_avarta" src = "#" style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;'+user.nickname+'</a>';
+  var html = '<a href="#" class = "memberItem row-fluid" name = "'+user.nickname+'" uid = "'+user.uid+'"><img id = "memberAvarta'+user.uid+'" class = "member_small_avarta span4" src = "#" style = "border-radius:15px;width:30px;height:30px;display:block;overflow:hidden;text-overflow:ellipsis;">&nbsp;&nbsp;<font class="span8" style = "display:block;overflow:hidden;text-overflow:ellipsis;">'+user.nickname+'</font></a>';
   return html;
 }
 
 function renderFriend(friend){
-  var html = '<a href="#" name = "'+friend.nickname+'" uid = "'+friend.uid+'" style = "padding:5px;font-size:0.8em;"><img id = "friendAvarta'+friend.uid+'" class = "friend_small_avarta" src = "#" style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;<font class = "friendItem">'+friend.nickname+'</font></a>';
+  var html = '<a href="#" class = "row-fluid" name = "'+friend.nickname+'" uid = "'+friend.uid+'" style = "padding:5px;font-size:0.8em;"><img id = "friendAvarta'+friend.uid+'" class = "friend_small_avarta span4" src = "#" style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;<font class = "friendItem span8" style = "display:block;overflow:hidden;text-overflow:ellipsis;">'+friend.nickname+'</font></a>';
   return html;
 }
 function userlist(usersData,type){
@@ -384,7 +384,7 @@ function userlist(usersData,type){
                       });
                   });
                 }else if(type == "event"){
-                  $("#squaresWaveG-right").hide();
+                  $("#squaresWaveG-member").hide();
                   $.each(result.source,function(index,element){
                         var userAvartaData = {};
                         userAvartaData.view_uid = element.uid;
@@ -419,7 +419,7 @@ function renderSubNavBar(){
 }
 
 function renderEvent(event){
-  var html = '<a href="#" class = "eventItem" ename = "'+event.name+'" eid = "'+event.eid+'" style = "padding:5px;font-size:0.8em;"><img id = "eventAvarta'+event.eid+'" class = "event_small_avarta" src = "#"  style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;'+event.name+'</a>';
+  var html = '<a href="#" class = "eventItem row-fluid" ename = "'+event.name+'" eid = "'+event.eid+'" style = "padding:5px;font-size:0.8em;"><img id = "eventAvarta'+event.eid+'" class = "event_small_avarta span4" src = "#"  style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;<font style = "display:block;overflow:hidden;text-overflow:ellipsis;width" class = "span8">'+event.name+'</font></a>';
   return html;
 }
 function eventlist(eventData){
@@ -717,6 +717,7 @@ function viewpost(pids,postCounter){
            //console.log("posts content:");
            //console.log(result);
             if(result.status == "successful"){
+              $("#contentBody").find(".well").hide();
               $.each(result.source,function(index,element){
                     var postAvartaData = {};
                     postAvartaData.session_key = localStorage.session_key;

@@ -5,47 +5,47 @@
     <script src = "/js/event.js"></script>
 	<title ><%=title%></title>  
 </head>
-<body style = "font-family: 'Roboto', sans-serif;background-color:#E0E0E0;">
+<body style = "background-color:#E0E0E0;">
 
 	<% include component/navigator %>
 
 	<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="cbp-spmenu-s1">
-		<h3>Settings</h3>
         <div id = "manageList">
-		<a href="#profileModal" id = "event_profile" data-toggle="modal"><i class="icon-book"></i>&nbsp;&nbsp;Event Details</a>
-        <a href = "#" id = "event_manage"><i class="icon-cog"></i>&nbsp;&nbsp;Manage</a>
-        <a href = "#" id = "event_schedule"><i class="icon-calendar"></i>&nbsp;&nbsp;Schedule</a>
-		<a href="#quitModal" id = "event_quit" data-toggle="modal"><i class="icon-off"></i>&nbsp;&nbsp;Quit Event</a>
-		<a href="#" id = "navilogout"><i class="icon-off"></i>&nbsp;&nbsp;Logout</a>
-        </div>
-	</nav>  
+		<a href="#profileModal" id = "eventProfile" data-toggle="modal"><i class="icon-book"></i>&nbsp;&nbsp;Group Details</a>
+        <a href = "#" id = "eventManage"><i class="icon-cog"></i>&nbsp;&nbsp;Manage</a>
+	</nav>   
 
 	<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2">
-		<h3 id = "membersListHead">Members</h3>
-		<div id="squaresWaveG-right"> 
-			<div class="squaresWaveG_1 squaresWaveG">
-			</div>
-			<div class="squaresWaveG_2 squaresWaveG">
-			</div>
-			<div class="squaresWaveG_3 squaresWaveG"> 
-			</div>
-			<div class="squaresWaveG_4 squaresWaveG">
-			</div>
-			<div class="squaresWaveG_5 squaresWaveG"> 
-			</div>
-			<div class="squaresWaveG_6 squaresWaveG">
-			</div>
-			<div class="squaresWaveG_7 squaresWaveG">
-			</div>
-			<div class="squaresWaveG_8 squaresWaveG">
+		<div id = "friendEventList" style = "overflow-y:hidden;">
+			<div><a id = "membersHead"><i class = "icon-chevron-down icon-white"></i>members <font>(0)</font></a></div>
+			<div id = "membersList" style = "max-height:300px;">
+				<div id="squaresWaveG-member">
+					<div class="squaresWaveG_1 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_2 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_3 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_4 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_5 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_6 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_7 squaresWaveG">
+					</div>
+					<div class="squaresWaveG_8 squaresWaveG">
+					</div>
+				</div>
 			</div>
 		</div>
-		<div id = "membersList"></div>
 	</nav>
 
 	<div id = "contentBody" class = "cbp-spmenu-push" style = "margin-top:100px;margin-left:100px;margin-right:100px;">
 		<div class="container-fluid" style = "padding-left:0px;padding-right:0px;">
-
+			<div class = "well" style = "text-align:center;min-height:50px;display:none;">
+				No Post yet.
+			</div>
 			<div class="row-fluid">
 			   	
 			      <div class = "span6" id = "left-column"></div>
@@ -87,7 +87,7 @@
 	  	<div class="control-group">
 		    <label class="control-label" for="postTags" style = "text-align:left;width:50px;">Tags:</label>
 		    <div class="controls" style = "margin-left:0px;" >
-	  			<input type="text" id = "postTags" value="Circa,Friend" data-role="tagsinput" placeholder="Add Tags"/>
+	  			<input type="text" id = "postTags" value="" data-role="tagsinput" placeholder="Add Tags"/>
 		    </div>
 	  	</div>
 	  	</form>
@@ -133,7 +133,7 @@
 		</div>
 		<div class = "span8 profileBody" style = "margin-top:2%;">
 			<form class="row-fluid">
-			  <legend style = "font-family: 'Raleway', sans-serif;font-size:25px;width:95%;">Profile</legend>
+			  <legend style = "font-family: 'Raleway', sans-serif;font-size:25px;width:95%;">Group Details</legend>
 			  <div class = "span5">
 				<div class="control-group" id = "creatorGroup">
 				    <label class="control-label" for="inputCreator" style = "margin-bottom:0px;">Creator</label>
@@ -170,7 +170,7 @@
 			  </div>
 			</form>
 		</div>
-         <legend class = "updateBody" style = "font-family: \'Raleway\', sans-serif;font-size:25px;margin:10px;width:95%;display:none;">Update</legend>
+         <legend class = "updateBody" style = "font-family: 'Raleway', sans-serif;font-size:25px;margin:10px;width:95%;display:none;">Update</legend>
       	<form class="row-fluid updateBody" style = "width:95%;padding-left:20px;display:none;">
       		<div class = "span6">
           		<div class="control-group" id = "nameGroup">
@@ -217,7 +217,7 @@
             </div>
         </div>
        	<div class = "span4">
-		    <button class="btn btn-primary profileBody button" id = "profileEdit">Edit</button>
+		    <button class="btn btn-primary profileBody button" id = "profileEdit">Modify</button>
 		    <button class="btn btn-success updateBody button" id = "profileConfirm" style = "display:none;">Confirm</button>
 			<button class="btn updateBody button" id = "profileCancel" style = "margin-left:10px;display:none;">Cancel</button>
 		</div>

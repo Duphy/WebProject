@@ -1,3 +1,17 @@
+#membersHead{
+	color: #afdefa;
+	background: #0d77b6;
+	font-size:1.2em;
+	text-decoration:none;
+	cursor:pointer;
+	padding:5px;
+}
+
+#membersHead i{
+	margin-top:3%;
+	margin-right:2%;
+}
+
 .length-limited {
 	/*overflow:auto;
 	text-overflow:ellipsis;*/
@@ -210,15 +224,7 @@ transform:scale(.3)}
 
 }
 
-#squaresWaveG-left{
-position:relative;
-width:60px;
-height:7px;
-margin-left:25%;
-margin-top:20px;
-}
-
-#squaresWaveG-right{
+#squaresWaveG-member{
 position:relative;
 width:60px;
 height:7px;

@@ -5,7 +5,7 @@
     <script src = "/js/home.js"></script>
 	<title><%=title%></title> 
 </head> 
-<body style = "font-family: 'Roboto', sans-serif;background-color:#E0E0E0;">
+<body style = "background-color:#E0E0E0;">
 
 	<% include component/navigator %>
 
@@ -42,7 +42,7 @@
 					</div>
 				</div>
 			</div>
-			<div><a id = "eventsHead"><i class = "icon-chevron-down icon-white"></i>events <font>(0)</font></a></a></div>
+			<div><a id = "eventsHead"><i class = "icon-chevron-down icon-white"></i>groups <font>(0)</font></a></a></div>
 			<div id = "eventsList" style = "max-height:300px;">
 				<div id="squaresWaveG-event">
 					<div class="squaresWaveG_1 squaresWaveG">
@@ -73,9 +73,9 @@
 			</div>
 			<div class="row-fluid"> 
 			   	
-			      <div class = "span6" id = "left-column"></div>
+			      <div class = "span6" id = "left-column" style = "font-family: 'Lato', sans-serif;font-weight:300;"></div>
 			      
-			      <div class = "span6" id = "right-column"></div>
+			      <div class = "span6" id = "right-column" style = "font-family: 'Lato', sans-serif;font-weight:300;"></div>
 
 			</div>
 			<div id="circularG">
@@ -442,7 +442,6 @@
 	  	<button id = "uploadCancel" class="btn button" data-dismiss="modal" aria-hidden="true">Cancel</button>
 	  </div>
 	</div>
-
 	<script src = "/js/socket.js"></script>
 </body>
 </html>

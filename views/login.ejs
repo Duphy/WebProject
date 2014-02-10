@@ -7,7 +7,7 @@
   	<div class="navbar navbar-fixed-top" style = "background:none;background:url(/img/background.jpg);max-height:50px;border:">
         <div class="navbar-inner" style = "background:none;background:rgba(0, 0, 0, 0.4);border:none;">
             <div class="container" style="width:100%; padding-left:10px">
-                <a class="brand pull-left" style = "padding-top:0px;" href="#"><img style = "margin-left:30px;height:40px;margin-top:2px;" src = "/img/logo.png"></a>
+                <a class="brand pull-left" style = "padding-top:0px;margin-top:10px;" href="#"><font style = "font-family: 'Lato', sans-serif;font-weight:100;font-size:50px;color:white;">Circa</font></a>
 				<!-- Signup Starts Here -->
 				<div id="signUpContainer" style="padding-right:20px;margin-right:10px;">
 					<button class="btn-large btn-warning" id="signUpButton"><span>Sign Up</span></button>
@@ -63,8 +63,33 @@
 									</label>
 								</fieldset>	
 								<fieldset>
-									<button class="btn btn-warning pull-right" id="submitCreateAccount">CREATE</button>
-									<button class="btn pull-right" id="cancelCreateAccount">CANCEL</button>
+								<div class = "row-fluid">
+									<div class = "span4">
+								  		<font style = "color:#B94A48;font-size:14px;display:none;" class = "pull-right">Signup Failed!</font>
+									  	<div id="floatingBarsG-signup" class = "pull-right">
+											<div class="blockG rotateG_01">
+											</div>
+											<div class="blockG rotateG_02">
+											</div>
+											<div class="blockG rotateG_03">
+											</div>
+											<div class="blockG rotateG_04">
+											</div>
+											<div class="blockG rotateG_05">
+											</div>
+											<div class="blockG rotateG_06">
+											</div>
+											<div class="blockG rotateG_07">
+											</div>
+											<div class="blockG rotateG_08">
+											</div>
+										</div>
+									</div>
+									<div class = "span8">
+										<button class="btn btn-warning pull-right" id="submitCreateAccount">CREATE</button>
+										<button class="btn pull-right" id="cancelCreateAccount">CANCEL</button>
+									</div>
+								</div>
 								</fieldset>
 							</div>
 						</form>
@@ -88,7 +113,30 @@
 									<span class = "help-block" id = "LoginAlert" style = "font:22px;color:#B94A48;display:none;">Login Unsuccessfully!</span>
 								</fieldset>
 								<fieldset>
-									<button class="btn btn-success pull-right" id="login" style = "width:80px;height:34px;margin-right:10px">GO<i class = " icon-circle-arrow-right" style = "margin-left:3px;margin-top:5px;"></i></button>
+									<div class = "row-fluid">
+									  	<div class = "span8">
+									  		<font style = "color:#B94A48;font-size:14px;display:none;" class = "pull-right">Login Failed!</font>
+										  	<div id="floatingBarsG-login" class = "pull-right">
+												<div class="blockG rotateG_01">
+												</div>
+												<div class="blockG rotateG_02">
+												</div>
+												<div class="blockG rotateG_03">
+												</div>
+												<div class="blockG rotateG_04">
+												</div>
+												<div class="blockG rotateG_05">
+												</div>
+												<div class="blockG rotateG_06">
+												</div>
+												<div class="blockG rotateG_07">
+												</div>
+												<div class="blockG rotateG_08">
+												</div>
+											</div>
+										</div>
+									<button class="btn btn-success pull-right span2" id="login" style = "width:80px;height:34px;margin-right:10px;margin-top:0px;">GO<i class = " icon-circle-arrow-right" style = "margin-left:3px;margin-top:5px;"></i></button>
+									</div>
 								</fieldset>
 							</div>
 						</form>

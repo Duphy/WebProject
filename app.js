@@ -50,13 +50,12 @@ app.get('/updateuserinfo',routes.updateUserInfo);
 app.get('/editevent',routes.updateEventInfo);
 app.get('/search',routes.search);
 app.get('/newevent', routes.createevent);
-//TO DO:
 app.get('/eventmanage',routes.eventmanage);
 app.get('/eventnews',routes.eventnews);
 app.get('/profile',routes.profile);
 app.get('/userprofile',routes.userprofile);
 app.get('/eventprofile',routes.eventprofile);
-app.get("/scheduling",routes.scheduling);
+// app.get("/scheduling",routes.scheduling);
 
 
 /************** URL dispatchers *****************/

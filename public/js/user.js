@@ -46,6 +46,8 @@ $(document).ready(function(){
       success:function(result){
         if(result.status == "successful"){
           $("#settingAddFriend").html("request pending");
+        }else{
+          $("#settingAddFriend").html("request failed");
         }
       }
     });
@@ -180,6 +182,19 @@ $(document).ready(function(){
       $(this).find(".icon-chevron-left").remove();
       $(this).find("a").append("<i class = 'icon-chevron-right' style = 'margin-top:2%;'></i>");
       $(this).attr("action","in");
+    }
+    return false;
+  });
+
+  $("#commonFriendsHead").click(function(){
+    if($(this).find("i").hasClass("icon-chevron-right")){
+      $(this).find("i").remove();
+      $(this).prepend("<i class = 'icon-chevron-down icon-white' style = 'margin-top:3%;margin-right:2%;'></i>");
+      $("#commonFriendsList").show();
+    }else{
+      $(this).find("i").remove();
+      $(this).prepend("<i class = 'icon-chevron-right icon-white' style = 'margin-top:3%;margin-right:2%;'></i>");
+      $("#commonFriendsList").hide();
     }
     return false;
   });
@@ -534,4 +549,6 @@ $(document).ready(function(){
           }
     });
   });
+
+  $("#createPost").remove();
 });

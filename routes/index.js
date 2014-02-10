@@ -43,6 +43,6 @@ exports.eventmanage = function(req,res){
 exports.eventnews = function(req,res){
 	res.render('eventnews',{title:"Event News"});
 }
-exports.scheduling = function(req,res){
-	res.render('scheduling',{title:"scheduling"});
-}
+// exports.scheduling = function(req,res){
+// 	res.render('scheduling',{title:"scheduling"});
+// }
