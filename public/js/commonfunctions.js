@@ -335,12 +335,12 @@ function member(member,type){
 }
 
 function renderMember(user){
-  var html = '<a href="#" class = "memberItem row-fluid" name = "'+user.nickname+'" uid = "'+user.uid+'"><img id = "memberAvarta'+user.uid+'" class = "member_small_avarta span4" src = "#" style = "border-radius:15px;width:30px;height:30px;display:block;overflow:hidden;text-overflow:ellipsis;">&nbsp;&nbsp;<font class="span8" style = "display:block;overflow:hidden;text-overflow:ellipsis;">'+user.nickname+'</font></a>';
+  var html = '<a href="#" class = "memberItem row-fluid" name = "'+user.nickname+'" uid = "'+user.uid+'"><img id = "memberAvarta'+user.uid+'" class = "member_small_avarta span4" src = "#" style = "border-radius:15px;width:30px;height:30px;display:block;overflow:hidden;text-overflow:ellipsis;">&nbsp;&nbsp;<font class="span8" style = "display:block;overflow:hidden;text-overflow:ellipsis;font-family: \'Lato\', sans-serif;font-weight:300;">'+user.nickname+'</font></a>';
   return html;
 }
 
 function renderFriend(friend){
-  var html = '<a href="#" class = "row-fluid" name = "'+friend.nickname+'" uid = "'+friend.uid+'" style = "padding:5px;font-size:0.8em;"><img id = "friendAvarta'+friend.uid+'" class = "friend_small_avarta span4" src = "#" style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;<font class = "friendItem span8" style = "display:block;overflow:hidden;text-overflow:ellipsis;">'+friend.nickname+'</font></a>';
+  var html = '<a href="#" class = "row-fluid" name = "'+friend.nickname+'" uid = "'+friend.uid+'" style = "padding:5px;font-size:0.8em;"><img id = "friendAvarta'+friend.uid+'" class = "friend_small_avarta span4" src = "#" style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;<font class = "friendItem span8" style = "display:block;overflow:hidden;text-overflow:ellipsis;font-family: \'Lato\', sans-serif;font-weight:300;">'+friend.nickname+'</font></a>';
   return html;
 }
 function userlist(usersData,type){
@@ -419,7 +419,7 @@ function renderSubNavBar(){
 }
 
 function renderEvent(event){
-  var html = '<a href="#" class = "eventItem row-fluid" ename = "'+event.name+'" eid = "'+event.eid+'" style = "padding:5px;font-size:0.8em;"><img id = "eventAvarta'+event.eid+'" class = "event_small_avarta span4" src = "#"  style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;<font style = "display:block;overflow:hidden;text-overflow:ellipsis;width" class = "span8">'+event.name+'</font></a>';
+  var html = '<a href="#" class = "eventItem row-fluid" ename = "'+event.name+'" eid = "'+event.eid+'" style = "padding:5px;font-size:0.8em;"><img id = "eventAvarta'+event.eid+'" class = "event_small_avarta span4" src = "#"  style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;<font style = "display:block;overflow:hidden;text-overflow:ellipsis;width;font-family: \'Lato\', sans-serif;font-weight:300;" class = "span8">'+event.name+'</font></a>';
   return html;
 }
 function eventlist(eventData){
@@ -473,19 +473,19 @@ function renderReply(reply){
       'src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">'+
       '<div class = "span8">'+
           '<div class = "row-fluid">'+
-            '<strong><a href = "#" class = "userName" name = "'+reply.replier_name+'" uid = "'+reply.replier_uid+'">'+reply.replier_name+'</a></strong>'+
+            '<strong><a href = "#" class = "userName" name = "'+reply.replier_name+'" uid = "'+reply.replier_uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replier_name+'</a></strong>'+
             '&nbsp; to &nbsp;'+
-            '<strong><a href = "#" class = "userName" name = "'+reply.replyto_name+'" uid = "'+reply.replyto_uid+'">'+reply.replyto_name+'</a></strong>'+
+            '<strong><a href = "#" class = "userName" name = "'+reply.replyto_name+'" uid = "'+reply.replyto_uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replyto_name+'</a></strong>'+
             '&nbsp;&nbsp;<font>'+reply.date+'&nbsp;'+reply.time+'</font>'+
           '</div>'+
           '<div class = "row-fluid">'+
-            '<p>'+reply.replyContent+'</p>'+
+            '<p style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replyContent+'</p>'+
           '</div>'+
       '</div>'+
       '<div class = "span1">';
       if(reply.replier_uid != localStorage.uid){
         html=html+
-        '<button class = "btn btn-link pull-right replyLink" style ="padding:inherit;">reply</button>';
+        '<button class = "btn btn-link pull-right replyLink" style ="padding:inherit;font-family: \'Lato\', sans-serif;font-weight:300;">reply</button>';
       }
       html=html+
       '</div>'+
@@ -504,9 +504,9 @@ function renderSearchEvents(event){
             '<img src = "/img/event_default.png" style = "width:30px;height:30px;border-radius:15px;">'+
           '</div>'+
           '<div class = "span8" style = "text-align:left;">'+
-            '<a href = # class = "eventName" name = "'+event.name+'" eid = "'+event.eid+'" style = "text-overflow:ellipsis;overflow:hidden;width:150px;display:block;">'+event.name+'</a>'+
-            '<p style = "font-size:12px;margin-bottom:0px;color:#999;">ID:'+event.eid+'</p>'+
-            '<p style = "font-size:12px;color:#999;">'+event.city+'</p>'+
+            '<a href = # class = "eventName" name = "'+event.name+'" eid = "'+event.eid+'" style = "text-overflow:ellipsis;overflow:hidden;width:150px;display:block;font-family: \'Lato\', sans-serif;font-weight:300;">'+event.name+'</a>'+
+            '<p style = "font-size:12px;margin-bottom:0px;color:#999;font-family: \'Lato\', sans-serif;font-weight:300;">ID:'+event.eid+'</p>'+
+            '<p style = "font-size:12px;color:#999;font-family: \'Lato\', sans-serif;font-weight:300;">'+event.city+'</p>'+
           '</div>'+
         '</div>'+
         '<div class = "offset4 span2" style = "color:white;text-align: center;">'+
@@ -524,11 +524,11 @@ function renderSearchEvents(event){
         '</div>'+
       '</div>'+
       '<div class = "row-fluid">'+
-        '<div class = "span10" style = "font-size:16px;color:#999;"><strong class = "pull-left" style = "color:#202020;margin-left:6%;margin-right:5px;">Description: </strong>'+event.description+'</div>'+
+        '<div class = "span10" style = "font-size:16px;color:#999;font-family: \'Lato\', sans-serif;font-weight:300;"><strong class = "pull-left" style = "color:#202020;margin-left:6%;margin-right:5px;font-family: \'Lato\', sans-serif;font-weight:300;">Description: </strong>'+event.description+'</div>'+
       '</div>'+
     '<div class = "row-fluid" style = "margin-top:10px;">';
     if(checkEvent(event.eid)){
-      html = html + '<div class = "offset1 span11"><button class = "btn btn-link joinevent pull-right" id = "'+event.eid+'" style = "cursor:pointer;">+ Join</button></div>';
+      html = html + '<div class = "offset1 span11"><button class = "btn btn-link joinevent pull-right" id = "'+event.eid+'" style = "cursor:pointer;font-family: \'Lato\', sans-serif;font-weight:300;">+ Join</button></div>';
     }
     html = html+
     '</div>'+
@@ -550,13 +550,13 @@ function renderSearchUser(user){
           '</div>'+
           '<div class = "span8" style = "text-align:left;">';
           if(user.nickname != ""){
-            html = html + '<a href = # class = "userName" name = "'+user.nickname+'" uid = "'+user.uid+'" style = "text-overflow:ellipsis;overflow:hidden;width:150px;display:block;">'+user.nickname+'</a>';
+            html = html + '<a href = # class = "userName" name = "'+user.nickname+'" uid = "'+user.uid+'" style = "text-overflow:ellipsis;overflow:hidden;width:150px;display:block;font-family: \'Lato\', sans-serif;font-weight:300;">'+user.nickname+'</a>';
           }else{
-            html = html + '<a href = # class = "userName" name = "User" uid = "'+user.uid+'">User</a>';
+            html = html + '<a href = # class = "userName" name = "User" uid = "'+user.uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">User</a>';
           }
           html = html +
-            '<p style = "font-size:12px;color:#999;margin-bottom:0px;">ID:'+user.uid+'</p>'+
-            '<p style = "font-size:12px;color:#999;">'+user.gender+'<br>'+user.city+'</p>'+
+            '<p style = "font-size:12px;color:#999;margin-bottom:0px;font-family: \'Lato\', sans-serif;font-weight:300;">ID:'+user.uid+'</p>'+
+            '<p style = "font-size:12px;color:#999;font-family: \'Lato\', sans-serif;font-weight:300;">'+user.gender+'<br>'+user.city+'</p>'+
           '</div>'+
         '</div>'+
         '<div class = "offset5 span2" style = "color:white;text-align: center;">'+
@@ -575,12 +575,12 @@ function renderSearchUser(user){
       '</div>'+
     '<div class = "row-fluid" style = "margin-top:10px;">';
     if(checkFriend(user.uid)){
-      html = html + '<div class = "offset1 span11"><button class = "btn btn-link addfriend pull-right" id = "'+user.uid+'" style = "cursor: pointer;">+ Add</button></div>';
+      html = html + '<div class = "offset1 span11"><button class = "btn btn-link addfriend pull-right" id = "'+user.uid+'" style = "cursor: pointer;font-family: \'Lato\', sans-serif;font-weight:300;">+ Add</button></div>';
     }
     html = html +
     '</div>'+
     '<div class = "row-fluid" style="margin-top:10px;">'+
-      '<div class = "offset1 span10 offset1" style = "text-align: center;"><a style = "text-decoration:none;">You have '+user.common_friends.length+' common friends</a></div>'+
+      '<div class = "offset1 span10 offset1" style = "text-align: center;"><a style = "text-decoration:none;font-family: \'Lato\', sans-serif;font-weight:300;">You have '+user.common_friends.length+' common friends</a></div>'+
     '</div>'+
     '</div>';
     return html;
