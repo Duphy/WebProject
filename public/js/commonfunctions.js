@@ -732,13 +732,6 @@ function viewpost(pids,postCounter){
                     }else{
                       $('#left-column').append(renderPost(element));
                     }
-                    // if(loadOrder == 0){
-                    // $('#left-column').append(renderPost(element));
-                    // loadOrder = 1;
-                    // }else{
-                    // $('#right-column').append(renderPost(element));
-                    // loadOrder = 0;
-                    // }
                     $.ajax({
                            url:'/getuseravarta',
                            data:JSON.stringify(postAvartaData),

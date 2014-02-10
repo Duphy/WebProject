@@ -9,7 +9,7 @@ var loadingFlag = true;
 var postCounter = 0; 
 var view_eid = localStorage.eid;
 var flag_displaymember=true;
-var isMember = false;
+var isMember = false; 
 
 $(document).ready(function(){
   $("#circularG").show();
@@ -18,7 +18,7 @@ $(document).ready(function(){
   auth_data.uid = localStorage.uid;
 
   //update page title 
-  $("title").first().html(localStorage.ename);
+  $("title").first().html("Group-"+localStorage.ename);
   $("#userNameLink").text(localStorage.usernickname);
 
   $(".bootstrap-tagsinput").find("input").attr("placeholder","Add").attr("size",8);
@@ -132,7 +132,7 @@ $(document).ready(function(){
         $("#profileEdit").hide();
         $("#createPost").hide();
         $("#profileModal").find(".modal-footer").hide();
-        $("#eventProfile").after('<a id = "settingJoinEvent"><i class="icon-plus"></i>&nbsp;&nbsp;Join Event</a>');
+        $("#eventManage").after('<a id = "settingJoinEvent"><i class="icon-plus"></i>&nbsp;&nbsp;Join Event</a>');
         $("#settingJoinEvent").click(function(){
           var data = {};
           data = auth_data;
@@ -156,7 +156,7 @@ $(document).ready(function(){
           return false;
         });
       }else{
-        $("#eventProfile").after('<a href="#quitModal" data-toggle="modal" ><i class="icon-remove"></i>&nbsp;&nbsp;Quit Event</a>');
+        $("#eventManage").after('<a href="#quitModal" data-toggle="modal" ><i class="icon-remove"></i>&nbsp;&nbsp;Quit Event</a>');
       }
     }
   });

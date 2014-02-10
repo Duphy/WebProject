@@ -74,12 +74,12 @@ $(document).ready(function(){
        $($("#subNavBar").find("li")[index+1]).html('<a class = "usertag" href="#" tag = '+tagsList[index]+'>'+tagsList[index]+'</a>');
       }
         //update page title
-        $("title").first().html(friendName);
+        $("title").first().html('User-'+friendNickname);
 
         $("#right").find("a").html("<i class = 'icon-chevron-left' style = 'margin-top:1%;'></i>Events & Friends");
          //update the user name in the navbar
         $("#left a").prepend('<img id = "navi_avarta" src = "#" style = "width:22px;height:22px;border-radius:11px;">&nbsp;<strong id="userNameLink">user</strong>');
-        $("#userNameLink").text(localStorage.friendName);
+        $("#userNameLink").text(friendNickname);
 
         //update profile
         if(friendName == ""){
