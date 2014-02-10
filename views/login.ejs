@@ -59,7 +59,7 @@
 								</fieldset>
 								<fieldset>
 									<label class="checkbox" style = "font-weight:bold;padding-left:0px;">
-										  <input type="checkbox" id="inlineCheckbox" style = "width:inherit;margin-right:5px;">I have read and agreed to the <a href = "#">Terms of Service</a>.
+										  <input type="checkbox" id="inlineCheckbox" style = "width:inherit;margin-right:5px;">I have read and agreed to the <a href = "#agreementModal" data-toggle="modal">Terms of Service</a>.
 									</label>
 								</fieldset>	
 								<fieldset>
@@ -208,5 +208,21 @@
 	<footer style = "margin:0px;background-color:#252528;height:200px;color:white;padding-top:5%;">
 		Designed and built By Circa technical group. All rights reserved.
 	</footer>
+
+	<div id="agreementModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<legend style = "font-family:'Raleway', sans-serif; font-size:25px;margin:10px;width:95%;">Agreement</legend>
+	  <div class="modal-body" style = "font-weight:normal;">
+		To use or access Circa products (www.circatag.com, Circa PC client, or Circa Android, Circa iOS), you agree to all statements in this document.<br>
+		<strong>1.</strong>	Circa does its best to maintain userís privacy. But to ensure the privacy of your data, you are responsible and liable to maintain the privacy of your own data.<br>
+		<strong>2.</strong>	We encourage users to provide authentic data. But we cannot guarantee it. Thus, you are responsible and liable to protect yourself from offence or fraud.<br>
+		<strong>3.</strong>	We do our best to maintain Circaís stability. But we cannot guarantee it, and are not liable to any accidents thence raised.<br>
+		<strong>4.</strong>	We promise not to intentionally disclose your password. But you are responsible for your own account security. <br>
+		<strong>5.</strong>	Circa does not check copyrights, security, sensitivity, etc. of data provided by users. Thus you are responsible and liable for these issues raised from data you provided.<br>
+		<strong>6.</strong>	This statement is subject to change. Amendments will be available on www.circatag.com. By continuing using or accessing Circa products, you agree to all amendments.<br>
+	  </div>
+	  <div class="modal-footer">
+	  	<button id = "agreementBack" class="btn btn-success" data-dismiss="modal" aria-hidden="true">Agree and Go back</button>
+	  </div>
+	</div>
 </body>
 </html>

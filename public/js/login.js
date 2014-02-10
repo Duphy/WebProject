@@ -311,6 +311,11 @@ $(document).ready(function(){
 		}
 		return false;
 	});
+
+	$("#agreementBack").click(function(){
+		$("#agreementModal").modal("hide");
+		return false;
+	});
 });
 
 function isValidEmailAddress(emailAddress) {
