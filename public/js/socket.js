@@ -166,6 +166,12 @@ socket.on("receive event chat",function(eid, s_uid, message, date, time){
 		}
 	});
 });
+
+socket.on("log out",function(){
+	localStorage.clear();
+	socket.emit("logout");
+	window.location = "/";
+});
 // socket.on("deleted from event",function(name,uid,eventName,eid){
 
 // });

@@ -254,7 +254,7 @@ function notificationHandler(notifications,uid){
 function timeoutHandler(uid){
     if(socketsList[uid] && !socketsList[uid].disconnected){
 	 	console.log("find socket!!!!");
-        socketsList[uid].emit("log out")
+        socketsList[uid].emit("log out");
     }else{
 	 	console.log("cannot find socket!!!!");
     }

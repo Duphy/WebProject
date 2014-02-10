@@ -337,6 +337,51 @@ $(document).ready(function(){
     return false;
   });
   
+  $('body').delegate('.removereply','click',function(){
+    $("#removeReplyConfirm").attr("postId",$(this).closest(".postRoot").attr("id"));
+  });
+
+  $("#removeReplyConfirm").click(function(){
+      $("#floatingBarsG-removeReply").show();
+      $("#removeReplyConfirm").attr("disabled","disabled");
+      var postId = $(this).attr("postId");
+      var context = $("#"+postId);
+      var data = auth_data;
+      data.id = context.attr('posterUid');
+      data.eid = context.attr('postEid');
+      data.pid = context.attr('postPid');
+      var reply = context.find('.replyBody');
+      var repliesArea = context.find('.repliesArea');
+      data.rid = reply.attr("rid");
+      $.ajax({
+            url:"/deletereply",
+            data:JSON.stringify(data),
+            type:"POST",
+            contentType: 'application/json',
+            success:function(data){
+              console.log(data);
+              if(data.status=="successful"){
+                if(context.attr("repliesNumber") == 1){
+                  repliesArea.remove();
+                }else{
+                  reply.remove();
+                  var repliesNumber = parseInt(context.attr("repliesNumber"));
+                  context.attr("repliesNumber",(repliesNumber - 1));
+                  if(repliesNumber == 2){
+                    repliesArea.find(".accordion-toggle").html('1 reply');
+                  }else{
+                    repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
+                  }
+                }
+              }
+              $("#removeConfirm").removeAttr("disabled");
+              $("#floatingBarsG-removeReply").hide();
+              $("#removeCancel").trigger("click");
+            }
+      });
+    return false;
+  });
+
   $('body').delegate('.replyInput','focus',function(){
     console.log("focus");
     var replyToName = $(this).attr("replyToName");

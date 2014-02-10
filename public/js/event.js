@@ -414,28 +414,106 @@ $("body").delegate(".memberItem", 'click', function() {
   });
 
   $('body').delegate('.replyLink','click',function(){
-                     var replier = $(this).prev().find('.replier').first();
-                     var textarea = $(this).closest('.postRoot').find('textarea').first();
-                     textarea.attr({replyToName:replier.attr('name'),replyToUid:replier.attr('uid')});
-                     textarea.focus();
-                     return false;
-                     });
+    var replier = $(this).prev().find('.replier').first();
+    var textarea = $(this).closest('.postRoot').find('textarea').first();
+    textarea.attr({replyToName:replier.attr('name'),replyToUid:replier.attr('uid')});
+    textarea.focus();
+    return false;
+  });
+
+  $('body').delegate('.removePost','click',function(){
+    var context = $(this).closest('.postRoot');
+    $("#removePostConfirm").attr("postId",$(this).closest(".postRoot").attr("id")).attr('postUid',$(context).attr('posterUid')).attr('postEid',$(context).attr('postEid')).attr('postPid',$(context).attr('postPid'));
+  });
+
+  $('#removePostConfirm').click(function(){
+    $("#floatingBarsG-removePost").show();
+    $("#removePostConfirm").attr("disabled","disabled");
+    var data = auth_data;
+    var id = $(this).attr('postId');
+    data.id = $(this).attr('postUid');
+    data.eid = $(this).attr('postEid');
+    data.pid = $(this).attr('postPid');
+    $.ajax({
+      url:"/deletepost",
+      data:JSON.stringify(data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(data){
+        console.log(data);
+        if(data.status=="successful"){
+          $('#'+id).remove();
+          if($("#left-column").html() == "" && $("#right-column").html() == ""){
+            $("#contentBody").find(".well").show();
+          }
+        }
+        $("#removePostConfirm").removeAttr("disabled");
+        $("#floatingBarsG-removePost").hide();
+        $("#removePostCancel").trigger("click");
+      }
+    });
+  });
+
+  $('body').delegate('.removereply','click',function(){
+    $("#removeReplyConfirm").attr("postId",$(this).closest(".postRoot").attr("id"));
+  });
+
+  $("#removeReplyConfirm").click(function(){
+      $("#floatingBarsG-removeReply").show();
+      $("#removeReplyConfirm").attr("disabled","disabled");
+      var postId = $(this).attr("postId");
+      var context = $("#"+postId);
+      var data = auth_data;
+      data.id = context.attr('posterUid');
+      data.eid = context.attr('postEid');
+      data.pid = context.attr('postPid');
+      var reply = context.find('.replyBody');
+      var repliesArea = context.find('.repliesArea');
+      data.rid = reply.attr("rid");
+      $.ajax({
+            url:"/deletereply",
+            data:JSON.stringify(data),
+            type:"POST",
+            contentType: 'application/json',
+            success:function(data){
+              console.log(data);
+              if(data.status=="successful"){
+                if(context.attr("repliesNumber") == 1){
+                  repliesArea.remove();
+                }else{
+                  reply.remove();
+                  var repliesNumber = parseInt(context.attr("repliesNumber"));
+                  context.attr("repliesNumber",(repliesNumber - 1));
+                  if(repliesNumber == 2){
+                    repliesArea.find(".accordion-toggle").html('1 reply');
+                  }else{
+                    repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
+                  }
+                }
+              }
+              $("#removeConfirm").removeAttr("disabled");
+              $("#floatingBarsG-removeReply").hide();
+              $("#removeCancel").trigger("click");
+            }
+      });
+    return false;
+  });
 
   $('body').delegate('.replyInput','focus',function(){
-                     console.log("focus");
-                     var replyToName = $(this).attr("replyToName");
-                     $(this).attr('placeholder','Reply to '+replyToName+":");
-                     return false;
-                     });
+    console.log("focus");
+    var replyToName = $(this).attr("replyToName");
+    $(this).attr('placeholder','Reply to '+replyToName+":");
+    return false;
+  });
 
   $('body').delegate('.replyInput','keyup',function(){
-                     console.log("enabled");
-                     if($(this).val() == ""){
-                     $(this).closest('.postRoot').find('.replySubmit').attr('disabled','disabled');
-                     }else{
-                     $(this).closest('.postRoot').find('.replySubmit').removeAttr('disabled');
-                     }
-                     });
+    console.log("enabled");
+    if($(this).val() == ""){
+      $(this).closest('.postRoot').find('.replySubmit').attr('disabled','disabled');
+    }else{
+      $(this).closest('.postRoot').find('.replySubmit').removeAttr('disabled');
+    }
+  });
 
   $('body').delegate('.replySubmit','click',function(){
                      //TODO: choose reply target
