@@ -1106,10 +1106,13 @@ $(document).ready(function(){
     $.each($(".createEventInput"),function(index,element){
       $(element).val("");
     });
+    $('#createEventInputTags').tagsinput("removeAll");
     $("#createEventSubmit").attr("disabled","disabled");
   });
 
   $("#createEventSubmit").click(function(){
+    $(this).attr("disabled","disabled");
+    $("#createEventCancel").attr("disabled","disabled");
     var realname = $('#createEventInputName').val();
     var city = $('#createEventInputCity').val();
     var description = $('#createEventInputDescription').val();
@@ -1134,6 +1137,12 @@ $(document).ready(function(){
             if(data.status == "successful"){
                 localStorage.eid = data.eid;
                 localStorage.ename = data.event_name;
+                $.each($(".createEventInput"),function(index,element){
+                  $(element).val("");
+                });
+                $('#createEventInputTags').tagsinput("removeAll");
+                $(this).removeAttr("disabled");
+                $("#createEventCancel").removeAttr("disabled");
                 //TO DO: handle the returned data
                 window.location = "/event";
             }
