@@ -61,11 +61,13 @@
 									<label class="checkbox" style = "font-weight:bold;padding-left:0px;">
 										  <input type="checkbox" id="inlineCheckbox" style = "width:inherit;margin-right:5px;">I have read and agreed to the <a href = "#agreementModal" data-toggle="modal">Terms of Service</a>.
 									</label>
-								</fieldset>	
+								</fieldset>
+								<div id="signupAlert" class="alert alert-error" style = "font-size:14px;width: 79%;margin-left: 2%;text-align:center;display:none;">
+									Signup Failed!
+								</div>	
 								<fieldset>
 								<div class = "row-fluid">
 									<div class = "span4">
-								  		<font style = "color:#B94A48;font-size:14px;display:none;" class = "pull-right">Signup Failed!</font>
 									  	<div id="floatingBarsG-signup" class = "pull-right">
 											<div class="blockG rotateG_01">
 											</div>
@@ -107,15 +109,17 @@
 									<label for="email" id = "loginEmailLabel"><strong>Email Address</strong></label>
 									<input type="text" name="email" id="loginEmail" />
 								</fieldset>
-								<fieldset>
+								<fieldset style = "margin-bottom:0px;">
 									<label for="password" id = "loginPasswordLabel"><strong>Password</strong></label>
 									<input type="password" name="password" id="loginPassword" />
-									<span class = "help-block" id = "LoginAlert" style = "font:22px;color:#B94A48;display:none;">Login Unsuccessfully!</span>
+									
 								</fieldset>
+								<div id="loginAlert" class="alert alert-error" style = "font-size:14px;width: 79%;margin-left: 2%;text-align:center;display:none;">
+									Invalid Email or Password!
+								</div>
 								<fieldset>
 									<div class = "row-fluid">
 									  	<div class = "span8">
-									  		<font style = "color:#B94A48;font-size:14px;display:none;" class = "pull-right">Login Failed!</font>
 										  	<div id="floatingBarsG-login" class = "pull-right">
 												<div class="blockG rotateG_01">
 												</div>

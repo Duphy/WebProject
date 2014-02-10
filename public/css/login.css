@@ -44,14 +44,6 @@ p{
     font-weight:900;
 }
 
-.alert{
-    margin-left:180px;
-    margin-top:5px;
-    margin-bottom:0px;
-    width:170px;
-    display:none;
-}
-
 #rmbcheck{
     float:center;
     margin-bottom:7px;
@@ -90,14 +82,6 @@ h3{
 }
 
 a { text-decoration:none }
-
-#loginAlert{
-    display:inline;
-    margin-left:5px;
-    margin-right:5px;
-    width: 100%;
-    padding: 8px 8px 8px 8px;
-}
 
 #bar { width:100%; height:35px; padding:15px 0; background:url(images/bar.png) repeat-x; }
 .container { width:960px; margin:0 auto; }

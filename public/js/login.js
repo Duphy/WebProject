@@ -58,7 +58,6 @@ $(function() {
 
 $(document).ready(function(){
 	$('.help-inline').hide();
-	$('.alert').hide();
 
 	$("#validationEmailLabel").find("a").click(function(){
 		var email = $("#validationEmail").val();
@@ -110,7 +109,7 @@ $(document).ready(function(){
 	});
 
 	$('#submitCreateAccount').click(function(){
-		$("#floatingBarsG-signup").prev().hide();
+		$("#signupAlert").hide();
 		var nickname = $('#signUpName').val();
 		var email = $('#validationEmail').val();
 		var password = $('#signUpPassword').val();
@@ -225,7 +224,7 @@ $(document).ready(function(){
                                 });
                           }else{
                           	$("#floatingBarsG-signup").hide();
-                          	$("#floatingBarsG-signup").prev().show();
+                          	$("#signupAlert").show();
                           	$("#submitCreateAccount").removeAttr('disabled');
                           }
                           }//success
@@ -236,7 +235,7 @@ $(document).ready(function(){
 	});
 
 	$('#login').click(function(){
-		$("#floatingBarsG-login").prev().hide();
+		$('#loginAlert').hide();
 		var Email = $('#loginEmail').val();
 		var password = $('#loginPassword').val();
 		var proceed = true;
@@ -268,7 +267,7 @@ $(document).ready(function(){
 				type:"POST",
 				contentType: 'application/json',
 				success:function(data){
-					$('#loginAlert').hide();
+					console.log(data);
 					if(data.status == "successful"){
 						console.log("login successful");
 						localStorage.session_key = data.session_key;
@@ -303,7 +302,7 @@ $(document).ready(function(){
 						});
 					}else{
 						$("#floatingBarsG-login").hide();
-						$("#floatingBarsG-login").prev().show();
+						$('#loginAlert').show();
 						$("#login").removeAttr("disabled");
 					}
 				}
