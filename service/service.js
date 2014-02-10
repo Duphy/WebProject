@@ -124,6 +124,7 @@ exports.createEvent = function(req, res) {
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	console.log(pkg);
+	var eid;
 	if (pkg[1][0] == 1) {
 	    status = "successful";
 	    eid = helper.hexToDec(pkg[1][1]);
