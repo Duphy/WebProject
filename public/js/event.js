@@ -286,26 +286,30 @@ $(document).ready(function(){
 
   $('#postSubmit').click(function(){
     $(this).attr("disabled","disabled");
+    $('#postCancel').attr("disabled","disabled");
     var content = $('#postArea').val();
     var tags = $('#postTags').tagsinput('items');
+    if(tags=="")
+      tags=[];
     if(content != ""){
-    var eid = view_eid;
-    var visibility = 0;
-    var tags = tags;
-    var data = {};
-    var d = new Date();
-    data.content = content;
-    data.eid = eid;
-    data.visibility = visibility;
-    data.tags = tags;
-    data.date = d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
-    data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
-    data.session_key = localStorage.session_key;
-    data.uid = localStorage.uid;
-    $("#floatingBarsG-post").show();
-    createPost(data);
+      var eid = "0000000000000000";
+      var visibility = 0;
+      var tags = tags;
+      var data = {};
+      var d = new Date();
+      data.content = content;
+      data.eid = eid;
+      data.visibility = visibility;
+      data.tags = tags;
+      data.date = d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+      data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
+      data.session_key = localStorage.session_key;
+      data.uid = localStorage.uid;
+      $("#floatingBarsG-post").show();
+      createPost(data);
     }
   });
+
 $("body").delegate(".userName", 'click', function() {
   if($(this).attr("uid") != localStorage.uid){
     $(this).css("cusor","pointer");
