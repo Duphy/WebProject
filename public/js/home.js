@@ -1011,7 +1011,7 @@ $(document).ready(function(){
 
   $("#navilogout").click(function(){
     localStorage.clear();
-    socket.emit("logout"，localStorage.session_key);
+    socket.emit("logout",localStorage.session_key);
     window.location = "/";
   });
 
