@@ -1010,8 +1010,8 @@ $(document).ready(function(){
   });
 
   $("#navilogout").click(function(){
-    localStorage.clear();
     socket.emit("logout",localStorage.session_key);
+    localStorage.clear();
     window.location = "/";
   });
 
