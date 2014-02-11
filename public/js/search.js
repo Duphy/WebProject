@@ -3,6 +3,10 @@ if(!localStorage.uid){
 }
 var loadOrder = 0;
 var loadingFlag = false;
+var pidsets = [];
+var uids = [];
+var eids = [];
+
 var postCounter =0;
 var userCounter = 0;
 var eventCounter = 0;
@@ -90,6 +94,7 @@ $(document).ready(function(){
 
 $("body").delegate('.searchInput','keypress',function(event){
   if(event.which == '13'){
+    $("#loadMoreButton").html("More").removeAttr("disabled","disabled").hide();
     search($(this).val(),$(this).attr("searchType"));
   }
 });
@@ -292,6 +297,24 @@ $(document).on('click', ".joinevent", function() {
       return false;
     }
   });
+
+  $("#loadMoreButton").click(function(){
+    var type = $("#searchTabBar").find(".active a").html();
+    switch(type){
+      case "Users":
+        getMoreUsers();
+        break;
+      case "Groups":
+        getMoreEvents();
+        break;
+      case "Posts":
+        getMorePosts();
+        break;
+      default:
+        break;
+    }
+    return false;
+  });  
   
   $("#timeoutButton").click(function(){
     localStorage.clear();
@@ -359,7 +382,7 @@ function search(val,type){
                     $(".tagsGroup").width("+=10");
                     $(".tagsGroup a").hide();
                     $('.tagHead').show();
-                    adjustTags(); 
+                    adjustTags();
                     $("#circularG").hide();
                   }else{
                     $("#circularG").hide();
@@ -521,6 +544,7 @@ function search(val,type){
         if(data.pidsets.length > 0){
           viewpost(data.pidsets,postCounter);
         }else{
+          $("#loadMoreButton").hide();
           $("#circularG").hide();
           $("#search_result").html("");
           $("#search_result").css("text-align","center");

@@ -683,3 +683,13 @@ background-color:#FFFFFF}
   opacity: 0.0;
   font-size: 100px;
 }
+
+#loadMoreButton{
+	font-family: 'Lato', sans-serif;
+	font-weight:300;
+	width:100%;
+	background-color:#F0F0F0;
+	outline:none;
+	text-decoration:none;
+	display:none;
+}

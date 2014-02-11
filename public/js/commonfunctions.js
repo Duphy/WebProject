@@ -1,4 +1,3 @@
-
 /************* helper functions **********/
 
 function isValidEmailAddress(emailAddress) {
@@ -711,7 +710,8 @@ function renderEventUpdate(){
 
 function viewpost(pids,postCounter){
     if(pids.length != 0){
-      $("#contentBody").find(".well").hide();
+        $("#contentBody").find(".well").hide();
+        $("#loadMoreButton").hide();
         $("#circularG").show();
         var loadingFlag = true;
         pidsets = pids;
@@ -779,87 +779,11 @@ function viewpost(pids,postCounter){
               $(".tagsGroup a").hide();
               $('.tagHead').show();
               adjustTags();
+              $("#loadMoreButton").show();
               $("#circularG").hide();
               $(window).scroll(function(){
-                if($(window).scrollTop() + $(window).height() == $(document).height() && loadingFlag) {
-                if(postCounter<pidsets.length){
-                  loadingFlag = false;
-                  $("#circularG").show();
-                  var postData = {};
-                  postData.session_key = localStorage.session_key;
-                  postData.uid = localStorage.uid;
-                  postData.uidList = [];
-                  postData.eidList = [];
-                  postData.pidList = [];
-                  for(var i = postCounter; i < Math.min(postCounter+6,pidsets.length); i++){
-                    postData.uidList[i-postCounter] = pidsets[i][0];
-                    postData.eidList[i-postCounter] = pidsets[i][1];
-                    postData.pidList[i-postCounter] = pidsets[i][2];
-                  }
-                  postCounter = Math.min(postCounter+6,pidsets.length);
-                  $.ajax({
-                       url:"/getpostscontent",
-                       data:JSON.stringify(postData),
-                       type:"POST",
-                       contentType: 'application/json',
-                       success:function(result){
-                       if(result.status == "successful"){
-                        $.each(result.source,function(index,element){
-                            var postAvartaData = {};
-                            postAvartaData.session_key = localStorage.session_key;
-                            postAvartaData.uid = localStorage.uid;
-                            postAvartaData.view_uid = element.uid;
-                            var replyAvartaData = {};
-                            replyAvartaData.session_key = localStorage.session_key;
-                            replyAvartaData.uid = localStorage.uid;
-                            if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
-                              $('#right-column').append(renderPost(element));
-                            }else{
-                              console.log("right is large");
-                              $('#left-column').append(renderPost(element));
-                            }
-                            // if(loadOrder == 0){
-                            // $('#left-column').append(renderPost(element));
-                            // loadOrder = 1;
-                            // }else{
-                            // $('#right-column').append(renderPost(element));
-                            // loadOrder = 0;
-                            // }
-                            $.ajax({
-                                url:'/getuseravarta',
-                                data:JSON.stringify(postAvartaData),
-                                type:"POST",
-                                contentType:"application/json",
-                                success:function(data){
-                                //TO DO: render the user's avarta into home page
-                                    $("#post_user_avarta"+element.pid).attr("src",data.avarta);
-                                }
-                            });
-                            $.each(element.replies,function(replyIndex,reply){
-                                replyAvartaData.view_uid = reply.replier_uid;
-                                replyAvartaData.time = 0000//getCurrentTime();
-                                replyAvartaData.date = 00000000//getCurrentDate();
-                                $.ajax({
-                                    url:'/getuseravarta',
-                                    data:JSON.stringify(replyAvartaData),
-                                    type:"POST",
-                                    contentType:"application/json",
-                                    success:function(data){
-                                        $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
-                                    }
-                                });
-                            });
-                        });
-                        $(".tagsGroup").width("+=10");
-                        $(".tagsGroup a").hide();
-                        $('.tagHead').show();
-                        adjustTags();
-                        $("#circularG").hide();
-                        loadingFlag = true;
-                       }
-                       }
-                  });
-                }
+                if($(window).scrollTop() + $(window).height() == $(document).height() && loadingFlag){
+                  getMorePosts();
                 }
               });
             }
@@ -872,7 +796,7 @@ function viewpost(pids,postCounter){
 }
 
 function searchUser(searchData,loadOrder){
-  var userCounter = 0;
+  userCounter = 0;
   $.ajax({
     url:"/searchuserbyfilter",
     data:JSON.stringify(searchData),
@@ -887,11 +811,13 @@ function searchUser(searchData,loadOrder){
         friendsData.uidList = [];
         friendsData.session_key = localStorage.session_key;
         friendsData.uid = localStorage.uid;
-        var uids=data.uids;
+        uids=data.uids;
+        console.log("userCounter before:"+userCounter);
         for(var i = 0; i < Math.min(6,uids.length); i++){
           friendsData.uidList[i] = uids[i];
         }
         userCounter = Math.min(userCounter+6,uids.length);
+        console.log("userCounter after:"+userCounter);
         if(userCounter<uids.length){
           loadingFlag=true;
         }
@@ -932,77 +858,23 @@ function searchUser(searchData,loadOrder){
                 $(".tagsGroup a").hide();
                 $('.tagHead').show();
                 adjustTags();
+                $("#loadMoreButton").show();
                 $("#circularG").hide();
                 $(window).scroll(
                   function(){
                     if($(window).scrollTop() + $(window).height() == $(document).height() && loadingFlag) {
-                      console.log(loadingFlag);
-                      if (userCounter<uids.length){
-                        loadingFlag = false;
-                        $("#circularG").show();
-                        var friendsData = {};
-                        friendsData.uidList = [];
-                        friendsData.session_key = localStorage.session_key;
-                        friendsData.uid = localStorage.uid;
-                        for(var i = userCounter; i < Math.min(userCounter+6,uids.length); i++){
-                          friendsData.uidList[i-userCounter] = uids[i];
-                        }
-                        userCounter = Math.min(userCounter+6,uids.length);
-                        $.ajax({
-                          url:"/getusersinfo",
-                          data:JSON.stringify(friendsData),
-                          type:"POST",
-                          contentType:'application/json',
-                          success:function(result){
-                            if(result.status == "successful"){
-                              $.each(result.source,function(index,element){
-                                //TO DO: change to add avarta
-                                if(loadOrder == 0){
-                                  $('#left-column').append(renderSearchUser(element));
-                                  loadOrder = 1;
-                                }else if(loadOrder == 1){
-                                  $('#middle-column').append(renderSearchUser(element));
-                                  loadOrder = 2;
-                                }else{
-                                  $('#right-column').append(renderSearchUser(element));
-                                  loadOrder = 0;
-                                }
-                                var userAvartaData = {};
-                                userAvartaData.session_key = localStorage.session_key;
-                                userAvartaData.uid = localStorage.uid;
-                                userAvartaData.view_uid = element.uid;
-                                userAvartaData.time = 0000//getCurrentTime();
-                                userAvartaData.date = 00000000//getCurrentDate();
-                                $.ajax({
-                                  url:'/getuseravarta',
-                                  data:JSON.stringify(userAvartaData),
-                                  type:"POST",
-                                  contentType:"application/json",
-                                  success:function(data){
-                                    $(".user_small_avarta"+element.uid).attr("src",data.avarta);
-                                  }
-                                });
-                                $(".tagsGroup a").hide();
-                                $('.tagHead').show();
-                                adjustTags();
-                                $("#circularG").hide();
-                                loadingFlag=true;                                
-                              });
-                            }else{
-                              $("#circularG").hide();
-                            }
-                          }//success
-                        });
-                      }
+                      getMoreUsers();
                     }
-                });//window scroll
+                });
               });
             }else{
+              $("#loadMoreButton").show();
               $("#circularG").hide();
             }
           }
         });//get usersinfo
       }else{
+        $("#loadMoreButton").hide();
         $("#circularG").hide();
         $("#search_result").html("");
         $("#search_result").css("text-align","center");
@@ -1026,7 +898,7 @@ function searchEvents(searchData,loadOrder){
         eventsData.eidList = [];
         eventsData.session_key = localStorage.session_key;
         eventsData.uid = localStorage.uid;
-        var eids=data.eids;
+        eids=data.eids;
         for(var i = 0; i < Math.min(6,eids.length); i++){
           eventsData.eidList[i] = eids[i];
         }
@@ -1056,61 +928,23 @@ function searchEvents(searchData,loadOrder){
                 $(".tagsGroup a").hide();
                 $('.tagHead').show();
                 adjustTags();
+                $("#loadMoreButton").show();
                 $("#circularG").hide();
                 $(window).scroll(
                   function(){
                     if($(window).scrollTop() + $(window).height() == $(document).height() && loadingFlag) {
-                      if (eventCounter<eids.length){
-                        loadingFlag = false;
-                        $("#circularG").show();
-                        var eventsData = {};
-                        eventsData.eidList = [];
-                        eventsData.session_key = localStorage.session_key;
-                        eventsData.uid = localStorage.uid;
-                        for(var i = userCounter; i < Math.min(eventCounter+6,eids.length); i++){
-                          eventsData.eidList[i-userCounter] = eids[i];
-                        }
-                        eventCounter = Math.min(eventCounter+6,eids.length);
-                        $.ajax({
-                          url:"/geteventsinfo",
-                          data:JSON.stringify(eventsData),
-                          type:"POST",
-                          contentType:'application/json',
-                          success:function(result){
-                            if(result.status == "successful"){
-                              $.each(result.source,function(index,element){
-                                //TO DO: change to add avarta
-                                if(loadOrder == 0){
-                                  $('#left-column').append(renderSearchEvents(element));
-                                  loadOrder = 1;
-                                }else if(loadOrder == 1){
-                                  $('#middle-column').append(renderSearchEvents(element));
-                                  loadOrder = 2;
-                                }else{
-                                  $('#right-column').append(renderSearchEvents(element));
-                                  loadOrder = 0;
-                                }
-                                $(".tagsGroup a").hide();
-                                $('.tagHead').show();
-                                adjustTags();
-                                $("#circularG").hide();
-                                loadingFlag=true;
-                              });
-                            }else{
-                              $("#circularG").hide();
-                            }
-                          }//sucess
-                        });
-                      }
+                      getMoreEvents();
                     }
-                });//window scroll
+                });
               });
             }else{
+              $("#loadMoreButton").show();
               $("#circularG").hide();
             }
           }
         });//get eventsinfo  
       }else{
+        $("#loadMoreButton").hide();
         $("#circularG").hide();
         $("#search_result").html("");
         $("#search_result").css("text-align","center");
@@ -1300,6 +1134,208 @@ function openEventsChatBox(session_key,selfUid, eventEid, chatBoxNumber){
       }
     }
   });
+}
+
+function getMorePosts(){
+  if(postCounter<pidsets.length){
+    loadingFlag = false;
+    $("#loadMoreButton").hide();
+    $("#circularG").show();
+    var postData = {};
+    postData.session_key = localStorage.session_key;
+    postData.uid = localStorage.uid;
+    postData.uidList = [];
+    postData.eidList = [];
+    postData.pidList = [];
+    for(var i = postCounter; i < Math.min(postCounter+6,pidsets.length); i++){
+      postData.uidList[i-postCounter] = pidsets[i][0];
+      postData.eidList[i-postCounter] = pidsets[i][1];
+      postData.pidList[i-postCounter] = pidsets[i][2];
+    }
+    postCounter = Math.min(postCounter+6,pidsets.length);
+    $.ajax({
+         url:"/getpostscontent",
+         data:JSON.stringify(postData),
+         type:"POST",
+         contentType: 'application/json',
+         success:function(result){
+         if(result.status == "successful"){
+          $.each(result.source,function(index,element){
+              var postAvartaData = {};
+              postAvartaData.session_key = localStorage.session_key;
+              postAvartaData.uid = localStorage.uid;
+              postAvartaData.view_uid = element.uid;
+              var replyAvartaData = {};
+              replyAvartaData.session_key = localStorage.session_key;
+              replyAvartaData.uid = localStorage.uid;
+              if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
+                $('#right-column').append(renderPost(element));
+              }else{
+                console.log("right is large");
+                $('#left-column').append(renderPost(element));
+              }
+              $.ajax({
+                  url:'/getuseravarta',
+                  data:JSON.stringify(postAvartaData),
+                  type:"POST",
+                  contentType:"application/json",
+                  success:function(data){
+                      $("#post_user_avarta"+element.pid).attr("src",data.avarta);
+                  }
+              });
+              $.each(element.replies,function(replyIndex,reply){
+                  replyAvartaData.view_uid = reply.replier_uid;
+                  replyAvartaData.time = 0000//getCurrentTime();
+                  replyAvartaData.date = 00000000//getCurrentDate();
+                  $.ajax({
+                      url:'/getuseravarta',
+                      data:JSON.stringify(replyAvartaData),
+                      type:"POST",
+                      contentType:"application/json",
+                      success:function(data){
+                          $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
+                      }
+                  });
+              });
+          });
+          $(".tagsGroup").width("+=10");
+          $(".tagsGroup a").hide();
+          $('.tagHead').show();
+          adjustTags();
+          console.log("woca");
+          $("#loadMoreButton").show();
+          $("#circularG").hide();
+          loadingFlag = true;
+         }
+         }
+    });
+  }else{
+    $("#loadMoreButton").html("No More Posts");
+    $("#loadMoreButton").attr("disabled","disabled");
+  }
+}
+
+function getMoreUsers(){
+  console.log("before:"+userCounter);
+  if(userCounter<uids.length){
+    console.log("fuck");
+    loadingFlag = false;
+    $("#loadMoreButton").hide();
+    $("#circularG").show();
+    var friendsData = {};
+    friendsData.uidList = [];
+    friendsData.session_key = localStorage.session_key;
+    friendsData.uid = localStorage.uid;
+    console.log("userCounter before:"+userCounter);
+    for(var i = userCounter; i < Math.min(userCounter+6,uids.length); i++){
+      friendsData.uidList[i-userCounter] = uids[i];
+    }
+    userCounter = Math.min(userCounter+6,uids.length);
+    console.log("userCounter after:"+userCounter);
+    $.ajax({
+      url:"/getusersinfo",
+      data:JSON.stringify(friendsData),
+      type:"POST",
+      contentType:'application/json',
+      success:function(result){
+        console.log("search result");
+        console.log(result);
+        if(result.status == "successful"){
+          $.each(result.source,function(index,element){
+            //TO DO: change to add avarta
+            if(loadOrder == 0){
+              $('#left-column').append(renderSearchUser(element));
+              loadOrder = 1;
+            }else if(loadOrder == 1){
+              $('#middle-column').append(renderSearchUser(element));
+              loadOrder = 2;
+            }else{
+              $('#right-column').append(renderSearchUser(element));
+              loadOrder = 0;
+            }
+            var userAvartaData = {};
+            userAvartaData.session_key = localStorage.session_key;
+            userAvartaData.uid = localStorage.uid;
+            userAvartaData.view_uid = element.uid;
+            userAvartaData.time = 0000//getCurrentTime();
+            userAvartaData.date = 00000000//getCurrentDate();
+            $.ajax({
+              url:'/getuseravarta',
+              data:JSON.stringify(userAvartaData),
+              type:"POST",
+              contentType:"application/json",
+              success:function(data){
+                $(".user_small_avarta"+element.uid).attr("src",data.avarta);
+              }
+            });
+            $(".tagsGroup a").hide();
+            $('.tagHead').show();
+            adjustTags();
+            $("#loadMoreButton").show();
+            $("#circularG").hide();
+            loadingFlag=true;                                
+          });
+        }else{
+          $("#loadMoreButton").show();
+          $("#circularG").hide();
+        }
+      }//success
+    });
+  }else{
+    $("#loadMoreButton").html("No More Users");
+    $("#loadMoreButton").attr("disabled","disabled");
+  }
+}
+
+function getMoreEvents(){
+  if(eventCounter<eids.length){
+    loadingFlag = false;
+    $("#loadMoreButton").hide();
+    $("#circularG").show();
+    var eventsData = {};
+    eventsData.eidList = [];
+    eventsData.session_key = localStorage.session_key;
+    eventsData.uid = localStorage.uid;
+    for(var i = eventCounter; i < Math.min(eventCounter+6,eids.length); i++){
+      eventsData.eidList[i-eventCounter] = eids[i];
+    }
+    eventCounter = Math.min(eventCounter+6,eids.length);
+    $.ajax({
+      url:"/geteventsinfo",
+      data:JSON.stringify(eventsData),
+      type:"POST",
+      contentType:'application/json',
+      success:function(result){
+        if(result.status == "successful"){
+          $.each(result.source,function(index,element){
+            //TO DO: change to add avarta
+            if(loadOrder == 0){
+              $('#left-column').append(renderSearchEvents(element));
+              loadOrder = 1;
+            }else if(loadOrder == 1){
+              $('#middle-column').append(renderSearchEvents(element));
+              loadOrder = 2;
+            }else{
+              $('#right-column').append(renderSearchEvents(element));
+              loadOrder = 0;
+            }
+            $(".tagsGroup a").hide();
+            $('.tagHead').show();
+            adjustTags();
+            $("#loadMoreButton").show();
+            $("#circularG").hide();
+            loadingFlag=true;
+          });
+        }else{
+          $("#loadMoreButton").show();
+          $("#circularG").hide();
+        }
+      }
+    });
+  }else{
+    $("#loadMoreButton").html("No More Groups");
+    $("#loadMoreButton").attr("disabled","disabled");
+  }
 }
 
 (function($){ 

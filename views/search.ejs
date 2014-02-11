@@ -37,7 +37,7 @@
 			<li style = "margin:10px;"><a href="#EventsSearch" data-toggle="tab">Groups</a></li>
 		</ul>
 		<div class="tab-content">
-			<div class="tab-pane" id = "UsersSearch">
+			<div class="tab-pane active" id = "UsersSearch">
 				<div class="input-append" style = "margin-left:100px;">
 				  <input class = "span12 searchInput" type="text" style = "height:40px; font-size:24px;" placeholder = "  Users" searchType = "userSearch">
 				  <button class="btn btn-inline searchSubmit" style = "height:50px;min-width:50px;" subtype = 1><img src="/img/search_icon.png"></button>
@@ -51,7 +51,7 @@
 				</div>
 			</div>
 
-			<div class="tab-pane active" id = "PostsSearch">
+			<div class="tab-pane" id = "PostsSearch">
 				<div class="input-append" style = "margin-left:100px;">
 				  <input class = "span12 searchInput" type="text" style = "height:40px; font-size:24px;" placeholder = "  Posts" searchType = "postSearch">
 				  <button class="btn btn-inline searchSubmit" style = "height:50px;min-width:50px;" subtype = 1><img src="/img/search_icon.png"></button>
@@ -66,6 +66,7 @@
             <div class="row-fluid" id="search_result">
                         
             </div>
+            <button id = "loadMoreButton" class = "btn btn-block btn-link">More</button>
             <div id="circularG">
                 <div id="circularG_1" class="circularG">
                 </div>

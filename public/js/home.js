@@ -1,7 +1,7 @@
 if(!localStorage.uid){
   window.location = "/";
 }
-var pidset = []; 
+var pidsets = []; 
 var loadOrder = 0;
 var postOrder = 0;
 var loadingFlag = true;
@@ -477,7 +477,6 @@ $(document).ready(function(){
     newsData.option = 1;
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
-    $("#circularG").show();
     $.ajax({
       url:"/getusernews",
       data:JSON.stringify(newsData),
@@ -490,7 +489,6 @@ $(document).ready(function(){
         $("#right-column").html("");
         viewpost(data.pidsets,postCounter);
         $("#userNameLink").html("User News");
-        $("#circularG").hide();
       }
     });
     return false;
@@ -503,7 +501,6 @@ $(document).ready(function(){
     newsData.option = 1;
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
-    $("#circularG").show();
     $.ajax({
       url:"/geteventnews",
       data:JSON.stringify(newsData),
@@ -516,7 +513,6 @@ $(document).ready(function(){
         $("#right-column").html("");
         viewpost(data.pidsets,postCounter);
         $("#userNameLink").html("Circa News");
-        $("#circularG").hide();
       }
     });
     return false;

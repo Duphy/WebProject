@@ -856,3 +856,13 @@ background-color:#000000}
 background-color:#FFFFFF}
 
 }
+
+#loadMoreButton{
+	font-family: 'Lato', sans-serif;
+	font-weight:300;
+	width:100%;
+	background-color:#F0F0F0;
+	outline:none;
+	text-decoration:none;
+	display:none;
+}
