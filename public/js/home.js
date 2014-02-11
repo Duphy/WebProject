@@ -447,7 +447,7 @@ $(document).ready(function(){
   });
 
   $("body").delegate(".eventItem", 'click', function(){
-    var eid = $(this).attr("eid");
+    var eid = $(this).parent().attr("eid");
     var proceed = true;
     $.each($("#chatArea").find(".chat-window"),function(index,element){
       if($(element).attr("id").replace("chat","") == eid){
