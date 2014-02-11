@@ -125,7 +125,7 @@ $(document).ready(function(){
      success:function(data){
        console.log("News:");
        console.log(data);
-       viewpost(data.pidsets,postCounter);
+       viewpost(data.pidsets);
      }
   });
 

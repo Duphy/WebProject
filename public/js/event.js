@@ -108,7 +108,7 @@ $(document).ready(function(){
       $("#contentBody").find(".well").show();
       $("#circularG").hide();
      }else{
-      viewpost(data.pidsets,postCounter);
+      viewpost(data.pidsets);
      }
    }
   });

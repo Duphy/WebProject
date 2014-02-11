@@ -369,7 +369,7 @@ $(document).ready(function(){
 		success:function(data){
 			console.log("News:");
 			console.log(data);
-      viewpost(data.pidsets,postCounter);
+      viewpost(data.pidsets);
 		}
 	});
 
@@ -502,7 +502,7 @@ $(document).ready(function(){
         console.log(data);
         $("#left-column").html("");
         $("#right-column").html("");
-        viewpost(data.pidsets,postCounter);
+        viewpost(data.pidsets);
         $("#userNameLink").html("User News");
       }
     });
@@ -526,7 +526,7 @@ $(document).ready(function(){
         console.log(data);
         $("#left-column").html("");
         $("#right-column").html("");
-        viewpost(data.pidsets,postCounter);
+        viewpost(data.pidsets);
         $("#userNameLink").html("Circa News");
       }
     });

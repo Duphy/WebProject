@@ -708,7 +708,7 @@ function renderEventUpdate(){
 
 /************* general functions **********/
 
-function viewpost(pids,postCounter){
+function viewpost(pids){
     if(pids.length != 0){
         $("#contentBody").find(".well").hide();
         $("#loadMoreButton").hide();

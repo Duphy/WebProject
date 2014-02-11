@@ -150,7 +150,7 @@ $(document).on('click', ".posttag", function() {
                       console.log("searchpost result:");
                       console.log(data);
                       $(window).unbind('scroll');
-                      viewpost(data.pidsets,postCounter);
+                      viewpost(data.pidsets);
                       }
                       });
              return false;
@@ -545,7 +545,7 @@ function search(val,type){
         console.log("searchpost result:");
         console.log(data);
         if(data.pidsets.length > 0){
-          viewpost(data.pidsets,postCounter);
+          viewpost(data.pidsets);
         }else{
           $("#loadMoreButton").hide();
           $("#circularG").hide();
