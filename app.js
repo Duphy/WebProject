@@ -364,10 +364,10 @@ function sendChat(chat,socket){
 		case 1:
             switch(chat[1][0]){
                 case 0:
-                    socket.emit("send event chat",chat[1][1],chat[1][2]);//seq status
+                    socket.emit("send event chat",service.helper.hexToDec(chat[1][1]),chat[1][2]);//seq status
                     break;
                 case 1:
-                    socket.emit("receive event chat",chat[1][1],chat[1][2],service.sanitizer.escape(chat[1][3]),chat[1][4],chat[1][5]);//eid,s_uid, message, date, time
+                    socket.emit("receive event chat",service.helper.hexToDec(chat[1][1]),chat[1][2],service.sanitizer.escape(chat[1][3]),chat[1][4],chat[1][5]);//eid,s_uid, message, date, time
                     break;
             }
 			break;
