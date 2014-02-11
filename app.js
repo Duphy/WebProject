@@ -379,16 +379,11 @@ function sendChat(chat,socket){
 
 function chatToEvent(session_key, uid, seq, eid, content){
 	// console.log("I got the chat!!!!!!!!!!!!!!!!!!!");
-	// var status = "unsuccessful";
-	// var pack = lib.createMessageToEventPack(session_key,parseInt(uid), parseInt(seq), eid, content);
-	//     helper.connectAndSend(pack, function(){
-	// 	    var output = {"status":"successful"};
-	// 	    if(socketsList[uid]
-	// 		clearChatHandler(uid,seq);
-	// 		},
-	// 		null,
-	// 		true
-	// 	);
+	var status = "unsuccessful";
+	var pack = lib.createMessageToEventPack(session_key,parseInt(uid), parseInt(seq), service.helper.decToHex(eid), content);
+	    helper.connectAndSend(pack, function(){
+	 	    var output = {"status":"successful"};
+		},null,true);
 }
 
 function chatToUser(session_key, uid, seq, to_uid, content){
