@@ -282,10 +282,10 @@ function sendNotification(notification,socket){
 			socket.emit("friend request",notification[2],notification[2],notification[3],notification[4],notification[5],notification[1]);
 			break;
 		case 1:
-			socket.emit("event membership request",notification[2],notification[2],notification[4],notification[3],notification[3],notification[5],notification[1]);
+			socket.emit("event membership request",notification[2],notification[2],notification[4],service.helper.hexToDec(notification[3]),service.helper.hexToDec(notification[3]),notification[5],notification[1]);
 			break;
 		case 2:
-			socket.emit("reply posting",notification[2],notification[2],notification[3],notification[4],notification[4],notification[1]);
+			socket.emit("reply posting",notification[2],notification[2],service.helper.hexToDec(notification[3]),notification[4],notification[4],notification[1]);
 			break;
 		default:
 			console.log("no matched notification type!");
