@@ -48,8 +48,8 @@ $(document).ready(function(){
    localStorage.ecreator = data.creator;
    localStorage.edescription = data.description;
    localStorage.erating = data.rating;
-   localStorage.etags = data.tags;
-   var tagsList = data.tags;
+   localStorage.etags = sortTags(data.tags);
+   var tagsList = sortTags(data.tags);
    localStorage.ecity = data.city;
    console.log(tagsList);
    for(var index = 0; index <  Math.min(4,tagsList.length); index++){

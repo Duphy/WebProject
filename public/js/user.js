@@ -65,8 +65,8 @@ $(document).ready(function(){
       friendNickname = data.nickname;
       birthday = data.birthday;
       uid = data.uid;
-      localStorage.friendTags = data.tags;
-      tagsList = data.tags;
+      localStorage.friendTags = sortTags(data.tags);
+      tagsList = sortTags(data.tags);
       gender = data.gender;
       city = data.city;
       common_friends = data.common_friends;

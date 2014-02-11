@@ -111,7 +111,21 @@ function checkMonth(month){
   }
   return "Other";
 }
-
+function sortTags(tags){
+  var results = [];
+  var second = [];
+  var u_tags = localStorage.usertags.split(",");
+  for(var i=0;i<tags.length;i++){
+    if(u_tags.indexOf(tags[i])!==-1)
+      results.push(tags[i]);
+    else
+      second.push(tags[i]);
+  }
+  var length = second.length;
+  for(var i =0;i<length;i++)
+    results.push(second[i]);
+  return results;
+}
 function getCurrentDate(){
   var now = new Date();
   var tmp = [ "Jan ", "Feb ", "Mar ", "Apr ", "May ", "Jun ", "Jul ", "Aug ", "Sep ", "Oct ", "Nov ", "Dec "];
@@ -160,12 +174,14 @@ function renderPost(post){
         html = html +
           '<div class = "offset6 span2 pull-right" style = "color:white;text-align: center;">'+
             '<div class = "tagsGroup">';
-      }        
-    for(var tagNumber = 0; tagNumber < post.tags.length; tagNumber++){
+      }
+    var posttags = sortTags(post.tags); 
+    var length = Math.min(4,posttags.length);       
+    for(var tagNumber = 0; tagNumber <length; tagNumber++){
         if(tagNumber == 0){
-            html = html +'<a class = "tagHead posttag" tag = '+post.tags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+post.tags[tagNumber]+'</a>';
+            html = html +'<a class = "tagHead posttag" tag = '+posttags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+posttags[tagNumber]+'</a>';
         }else{
-            html = html +'<a class = "posttag tags" tag = '+post.tags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+post.tags[tagNumber]+'</a>';
+            html = html +'<a class = "posttag tags" tag = '+posttags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+posttags[tagNumber]+'</a>';
         }
     }
     html = html+
@@ -512,11 +528,12 @@ function renderSearchEvents(event){
         '<div class = "offset4 span2" style = "color:white;text-align: center;">'+
           '<div class = "tagsGroup">';
     var tagCounter = Math.min(4,event.tags.length);
+    var eventtags = sortTags(event.tags);
     for(var tagNumber = 0; tagNumber < tagCounter; tagNumber++){
         if(tagNumber == 0){
-            html = html +'<a class = "tagHead eventtag" tag = '+event.tags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+event.tags[tagNumber]+'</a>';
+            html = html +'<a class = "tagHead eventtag" tag = '+eventtags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+eventtags[tagNumber]+'</a>';
         }else{
-            html = html +'<a class = "eventtag tags" tag = '+event.tags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+event.tags[tagNumber]+'</a>';
+            html = html +'<a class = "eventtag tags" tag = '+eventtags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+eventtags[tagNumber]+'</a>';
         }
     }
     html = html+
@@ -562,12 +579,13 @@ function renderSearchUser(user){
         '</div>'+
         '<div class = "offset5 span2" style = "color:white;text-align: center;">'+
           '<div class = "tagsGroup">';
-            var tagCounter = Math.min(4,user.tags.length);
+            var usertags = sortTags(user.tags);
+            var tagCounter = Math.min(4,usertags.length);
             for(var tagNumber = 0; tagNumber < tagCounter; tagNumber++){
                 if(tagNumber == 0){
-                    html = html +'<a class = "tagHead usertag" tag = '+user.tags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+user.tags[tagNumber]+'</a>';
+                    html = html +'<a class = "tagHead usertag" tag = '+usertags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+usertags[tagNumber]+'</a>';
                 }else{
-                    html = html +'<a class = "usertag tags" tag ='+ user.tags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+user.tags[tagNumber]+'</a>';
+                    html = html +'<a class = "usertag tags" tag ='+ usertags[tagNumber]+'><li class = "icon-tag pull-left"></li>&nbsp;'+usertags[tagNumber]+'</a>';
                 }
             }
     html = html+
