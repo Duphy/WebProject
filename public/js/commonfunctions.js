@@ -1127,7 +1127,7 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
   var eventData = {};
   eventData.session_key = session_key;
   eventData.uid = selfUid;
-  eventData.view_uid = eventEid;
+  eventData.eid = eventEid;
   $.ajax({
     url:'/geteventinfo',
     data:JSON.stringify(eventData),
