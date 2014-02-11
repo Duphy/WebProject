@@ -434,7 +434,7 @@ function renderSubNavBar(){
 }
 
 function renderEvent(event){
-  var html = '<a href="#" class = "eventItem row-fluid" ename = "'+event.name+'" eid = "'+event.eid+'" style = "padding:5px;font-size:0.8em;"><img id = "eventAvarta'+event.eid+'" class = "event_small_avarta span4" src = "#"  style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;<font style = "display:block;overflow:hidden;text-overflow:ellipsis;width;font-family: \'Lato\', sans-serif;font-weight:300;" class = "span8">'+event.name+'</font></a>';
+  var html = '<a href="#" class = "row-fluid" ename = "'+event.name+'" eid = "'+event.eid+'" style = "padding:5px;font-size:0.8em;"><img id = "eventAvarta'+event.eid+'" class = "event_small_avarta span4" src = "#"  style = "border-radius:15px;width:30px;height:30px;">&nbsp;&nbsp;<font style = "display:block;overflow:hidden;text-overflow:ellipsis;width;font-family: \'Lato\', sans-serif;font-weight:300;" class = "eventItem span8">'+event.name+'</font></a>';
   return html;
 }
 function eventlist(eventData){

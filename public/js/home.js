@@ -424,6 +424,13 @@ $(document).ready(function(){
     return false;
   });
 
+  $("body").delegate(".event_small_avarta",'click',function(){
+    localStorage.eid  = $(this).parent().attr("eid");
+    localStorage.ename = $(this).parent().attr("ename");
+    window.location = "/event";
+    return false;
+  });
+
   $("body").delegate(".friendItem", 'click', function() {
       var friendUid = $(this).parent().attr("uid");
       var proceed = true;

@@ -483,15 +483,23 @@ $(document).ready(function(){
   });
 
   $("body").delegate(".eventName", 'click', function() {
+    $(this).css("cusor","pointer");
     localStorage.eid = $(this).attr("eid");
     localStorage.ename = $(this).attr("name");
     window.location = "/event";
     return false;
   });
 
+  $("body").delegate(".event_small_avarta",'click',function(){
+    localStorage.eid  = $(this).parent().attr("eid");
+    localStorage.ename = $(this).parent().attr("ename");
+    window.location = "/event";
+    return false;
+  });
+
   $("body").delegate(".eventItem", 'click', function() {
-   localStorage.eid  = $(this).attr("eid");
-   localStorage.ename = $(this).attr("ename");
+   localStorage.eid  = $(this).parent().attr("eid");
+   localStorage.ename = $(this).parent().attr("ename");
    window.location = "/event";
   });
   $("body").delegate(".friendItem", 'click', function() {

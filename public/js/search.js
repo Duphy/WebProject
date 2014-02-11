@@ -110,7 +110,7 @@ $("body").delegate(".userName", 'click', function() {
     localStorage.friendUid  = $(this).attr("uid");
     localStorage.friendName = $(this).attr("name");
     window.location = "/user";
-    }
+  }
   return false;
 });
 
@@ -123,9 +123,12 @@ $("body").delegate(".eventName", 'click', function() {
 
 $("body").delegate(".postName", 'click', function() {
   $(this).css("cusor","pointer");
-  localStorage.friendUid  = $(this).attr("uid");
-  localStorage.friendName = $(this).attr("name");
-  window.location = "/user";
+  /*TO DO: handle the event when user clicks 
+           post name in notification
+  */
+  // localStorage.friendUid  = $(this).attr("uid");
+  // localStorage.friendName = $(this).attr("name");
+  // window.location = "/user";
   return false;
 });
 
