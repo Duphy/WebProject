@@ -495,8 +495,8 @@ $(document).ready(function(){
    window.location = "/event";
   });
   $("body").delegate(".friendItem", 'click', function() {
-   localStorage.friendUid  = $(this).attr("uid");
-   localStorage.friendName = $(this).attr("name");
+   localStorage.friendUid  = $(this).parent().attr("uid");
+   localStorage.friendName = $(this).parent().attr("name");
    window.location = "/user";
    return false;
   });
