@@ -292,7 +292,7 @@ $(document).ready(function(){
     if(tags=="")
       tags=[];
     if(content != ""){
-      var eid = "0000000000000000";
+      var eid = view_eid;
       var visibility = 0;
       var tags = tags;
       var data = {};
