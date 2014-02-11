@@ -594,6 +594,12 @@ $(document).ready(function(){
           }
     });
   });
+
+  $("#loadMoreButton").click(function(){
+    getMorePosts();
+    return false;
+  });
+
   $("#timeoutButton").click(function(){
     localStorage.clear();
     window.location = "/";

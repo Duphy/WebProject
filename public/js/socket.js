@@ -106,16 +106,6 @@ socket.on("receive user chat",function(uid, message, date, time){
 		openFriendsChatBox(localStorage.session_key,localStorage.uid,uid,chatBoxNumber);
 		chatBoxNumber++;
 	}
-	// if(proceed){
-	// 	if($(".friendItem").length != 0){
-	// 		var name = $("a.friendItem[uid='"+uid+"']").attr("name");
-	// 		var url = $("a.friendItem[uid='"+uid+"']").find("img").attr("src");
-	// 		$('#chatArea').append(renderChatBox({"name":name,"id":uid,"url":url},chatBoxNumber));
-	// 	}else{	
-	// 		$('#chatArea').append(renderChatBox({"name":uid,"id":uid,"url":"#"},chatBoxNumber));
-	// 	}
-	// 	chatBoxNumber++;
-	// }
 	$.each($("#chatArea").find(".chat-window"), function(index,element){
 		if($(element).attr("id").replace("chat","") == uid){
 			if($(element).find(".chat-message").last().attr("uid") == uid){

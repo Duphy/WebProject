@@ -691,6 +691,11 @@ $("body").delegate(".memberItem", 'click', function() {
       return false;
     }
   });
+  
+  $("#loadMoreButton").click(function(){
+    getMorePosts();
+    return false;
+  });
 
   $("#timeoutButton").click(function(){
     localStorage.clear();
