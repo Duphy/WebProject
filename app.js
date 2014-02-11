@@ -179,16 +179,16 @@ io.on('connection',function(socket){
 
 	socket.on('get user chat',function(session_key, uid, seq, c_uid, content){
 		chatToUser(session_key, uid, seq, c_uid, content);
-  		var now = new Date();
-		var chat = new mongo.friendchat({selfUid:uid,date:now,content:content,friendUid:c_uid});
-		chat.save(function(err){
-		    if (err){
-		    	console.log("chat save error "+uid+" "+c_uid);
-		    	throw err;
-		    }else{
-		    	console.log("chat save successfully "+uid+" "+c_uid);
-		    }
-		});
+  		// var now = new Date();
+		// var chat = new mongo.friendchat({selfUid:uid,date:now,content:content,friendUid:c_uid});
+		// chat.save(function(err){
+		//     if (err){
+		//     	console.log("chat save error "+uid+" "+c_uid);
+		//     	throw err;
+		//     }else{
+		//     	console.log("chat save successfully "+uid+" "+c_uid);
+		//     }
+		// });
 	});
 
 	socket.on('get event chat',function(session_key,uid, seq, eid,content){

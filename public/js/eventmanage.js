@@ -234,6 +234,41 @@ $(document).ready(function(){
     window.location = "/";
     return false;
   });
+
+  $('body').delegate('.chat-window-text-box','keypress',function(event){
+    var content = $(this).val();
+    if(event.keyCode == 13)
+    {
+      var chatArea = $(this).closest(".chat-window").find(".chat-window-content");
+      if($(this).closest(".chat-window").find(".chat-message").last().attr("uid") == localStorage.uid){
+        $(this).closest(".chat-window").find(".chat-message").last().find(".chat-text-wrapper").append('<p>'+content+'</p>');
+      }else{
+        $(chatArea).append(
+          '<div class = "chat-message" uid = "'+localStorage.uid+'">'+
+            '<div class = "chat-gravatar-wrapper">'+
+              '<img src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
+            '</div>'+
+            '<div class = "chat-text-wrapper">'+
+              '<p>'+content+'</p>'+            
+            '</div>'+
+          '</div>'
+          );
+      }
+      $(chatArea).animate({scrollTop:$(chatArea)[0].scrollHeight}, 1000);
+      $(this).val("");
+      var id = $(this).closest(".chat-window").attr('id').replace("chat","");
+      console.log("id length:"+id.length);
+      if(id.length > 7){
+          console.log("event chat: "+id+" "+content);
+          socket.emit("get event chat",localStorage.session_key, localStorage.uid, 0, id, content);
+      }else{
+          console.log("friend chat: "+id+" "+content);
+          socket.emit("get user chat",localStorage.session_key, localStorage.uid, 0, id, content);
+      }
+      return false;
+    }
+  });
+  
 });
 
 function renderUser(user){

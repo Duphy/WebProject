@@ -132,26 +132,46 @@ socket.on("receive event chat",function(eid, s_uid, message, date, time){
 	console.log("chat: "+message+" eid: "+eid);
 	console.log(date);
 	console.log(time);
-	$($("#eventsList").find('.eventItem'),function(index,element){
-		if($(element).attr("eid") == eid){
-			$(element).trigger("click");
+	var proceed = true;
+	$.each($("#chatArea").find(".chat-window"),function(index,element){
+		if($(element).attr("id").replace("chat","") == eid){
+		  proceed = false;
 		}
 	});
+	if(proceed){
+		openEventsChatBox(localStorage.session_key,localStorage.uid,uid,chatBoxNumber);
+		chatBoxNumber++;
+	}
 	$.each($("#chatArea").find(".chat-window"), function(index,element){
 		if($(element).attr("chatId") == eid){
-			if($(element).find(".chat-message").last().attr("uid") == localStorage.uid){
+			if($(element).find(".chat-message").last().attr("uid") == s_uid){
 				$(element).find(".chat-message").last().find(".chat-text-wrapper").append('<p>'+message+'</p>');
 			}else{
-				$(element).find(".chat-window-content").append(
-				  '<div class = "chat-message" uid = "'+s_uid+'">'+
-				    '<div class = "chat-gravatar-wrapper">'+
-				      '<img src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
-				    '</div>'+
-				    '<div class = "chat-text-wrapper">'+
-				      '<p>'+message+'</p>'+            
-				    '</div>'+
-				  '</div>'
-				);
+				if(localStorage.getItem("avarta"+s_uid) == null){
+					$(element).find(".chat-window-content").append(
+					  '<div class = "chat-message" uid = "'+s_uid+'">'+
+					    '<div class = "chat-gravatar-wrapper">'+
+					      '<img class = "chatAvarta'+s_uid+'" src = "" style = "height:20px;width:20px;border-radius:10px;">'+
+					    '</div>'+
+					    '<div class = "chat-text-wrapper">'+
+					      '<p>'+message+'</p>'+            
+					    '</div>'+
+					  '</div>'
+					);
+				}else{
+					$(element).find(".chat-window-content").append(
+					  '<div class = "chat-message" uid = "'+s_uid+'">'+
+					    '<div class = "chat-gravatar-wrapper">'+
+					      '<img class = "chatAvarta'+s_uid+'" src = "'+localStorage.getItem("avarta"+s_uid)+'" style = "height:20px;width:20px;border-radius:10px;">'+
+					    '</div>'+
+					    '<div class = "chat-text-wrapper">'+
+					      '<p>'+message+'</p>'+            
+					    '</div>'+
+					  '</div>'
+					);
+				}
+				var chatArea = $(element).find(".chat-window-content");
+				$(chatArea).animate({scrollTop:$(chatArea)[0].scrollHeight}, 1000);
 			}
 		}
 	});

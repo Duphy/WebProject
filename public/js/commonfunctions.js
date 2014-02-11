@@ -1049,7 +1049,7 @@ function checkFriend(view_uid){
     return true;
 }
 
-function renderChatBox(id, chatBoxNumber){
+function renderChatBox(type, id, chatBoxNumber){
   var html = "";
   switch(chatBoxNumber){
     case 0:
@@ -1070,8 +1070,13 @@ function renderChatBox(id, chatBoxNumber){
   }
   html = html +
     '<div class = "chat-window-title">'+
-      '<i class="icon-remove icon-white pull-right closeChat"></i>'+
-      '<div class = "text chatName">user</div>'+
+      '<i class="icon-remove icon-white pull-right closeChat"></i>';
+      if(type == "user"){
+        html = html + '<div class = "text chatName">user</div>';
+      }else{
+        html = html + '<div class = "text chatName">group</div>';
+      }
+  html = html +
     '</div>'+
     '<div class = "chat-window-content" style = "max-height:250px;overflow-y:auto;">'+
       '<div class = "chat-window-inner-content">'+
@@ -1085,7 +1090,7 @@ function renderChatBox(id, chatBoxNumber){
 }
 
 function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
-  $("#chatArea").append(renderChatBox(friendUid, chatBoxNumber));
+  $("#chatArea").append(renderChatBox("user", friendUid, chatBoxNumber));
   var userData = {};
   userData.session_key = session_key;
   userData.uid = selfUid;
@@ -1117,12 +1122,12 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
   });
 }
 
-function openEventsChatBox(session_key,selfUid, eventEid, chatBoxNumber){
-  $("#chatArea").append(renderChatBox(eventEid, chatBoxNumber));
+function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
+  $("#chatArea").append(renderChatBox("event", eventEid, chatBoxNumber));
   var eventData = {};
   eventData.session_key = session_key;
   eventData.uid = selfUid;
-  eventData.view_uid = friendUid;
+  eventData.view_uid = eventEid;
   $.ajax({
     url:'/geteventinfo',
     data:JSON.stringify(eventData),

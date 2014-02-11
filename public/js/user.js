@@ -560,14 +560,14 @@ $(document).ready(function(){
       }
       $(chatArea).animate({scrollTop:$(chatArea)[0].scrollHeight}, 1000);
       $(this).val("");
-      var friendId = $(this).closest(".chat-window").attr('id').replace("chat","");
-      console.log("id length:"+friendId.length);
-      if(friendId.length > 7){
-          console.log("event chat: "+friendId+" "+content);
-          socket.emit("get event chat",localStorage.session_key, localStorage.uid, 0, friendId, content);
+      var id = $(this).closest(".chat-window").attr('id').replace("chat","");
+      console.log("id length:"+id.length);
+      if(id.length > 7){
+          console.log("event chat: "+id+" "+content);
+          socket.emit("get event chat",localStorage.session_key, localStorage.uid, 0, id, content);
       }else{
-          console.log("friend chat: "+friendId+" "+content);
-          socket.emit("get user chat",localStorage.session_key, localStorage.uid, 0, friendId, content);
+          console.log("friend chat: "+id+" "+content);
+          socket.emit("get user chat",localStorage.session_key, localStorage.uid, 0, id, content);
       }
       return false;
     }
