@@ -380,7 +380,7 @@ function sendChat(chat,socket){
 function chatToEvent(session_key, uid, seq, eid, content){
 	// console.log("I got the chat!!!!!!!!!!!!!!!!!!!");
 	var status = "unsuccessful";
-	var pack = lib.createMessageToEventPack(session_key,parseInt(uid), parseInt(seq), service.helper.decToHex(eid), content);
+	var pack = service.lib.createMessageToEventPack(session_key,parseInt(uid), parseInt(seq), service.helper.decToHex(eid), content);
 	    helper.connectAndSend(pack, function(){
 	 	    var output = {"status":"successful"};
 		},null,true);
