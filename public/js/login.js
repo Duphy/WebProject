@@ -219,7 +219,9 @@ $(document).ready(function(){
 						        console.log("ready to go home");
 						        $("#floatingBarsG-signup").hide();
 						        $("#submitCreateAccount").removeAttr('disabled');
-                                window.location = "/home";
+						        localStorage.search_tag_option = "user";
+						        localStorage.search_tag_content = "";
+                                window.location = "/search";
                                 }
                                 });
                           }else{
@@ -297,7 +299,9 @@ $(document).ready(function(){
 						        console.log("ready to go home");
 						        $("#floatingBarsG-login").hide();
 						        $("#login").removeAttr("disabled");
-								window.location = "/home";
+						        localStorage.search_tag_option = "user";
+						        localStorage.search_tag_content = "";
+								window.location = "/search";
 							}
 						});
 					}else{

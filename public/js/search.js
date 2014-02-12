@@ -19,12 +19,12 @@ $(document).ready(function(){
   if(localStorage.search_tag_option!=""){
       switch(localStorage.search_tag_option){
         case "post":
-            $($("#searchTabBar").find("a")[0]).trigger("click");
+            $($("#searchTabBar").find("a")[2]).trigger("click");
             $("#PostsSearch").find(".searchInput").val(localStorage.search_tag_content);
             search(localStorage.search_tag_content,"postSearch");
         break;
         case "user":
-            $($("#searchTabBar").find("a")[2]).trigger("click");
+            $($("#searchTabBar").find("a")[0]).trigger("click");
             $("#UsersSearch").find(".searchInput").val(localStorage.search_tag_content);
             search(localStorage.search_tag_content,"userSearch");
         break;
@@ -454,6 +454,7 @@ function search(val,type){
       }
     }else{
       //search by filter
+      console.log("search By filter");
       searchData.filter = searchValue;
       //name & tag
       searchData.option = 0;

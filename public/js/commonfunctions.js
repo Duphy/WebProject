@@ -1030,6 +1030,7 @@ function adjustTags(){
 }
 
 function checkEvent(eid){
+  if(localStorage.eventsList != null){
     var eventsList = localStorage.eventsList.split(",");
     for(var i = 0; i < eventsList.length;i++){
       if(eventsList[i] == eid){
@@ -1037,16 +1038,23 @@ function checkEvent(eid){
       }
     }
     return true;
+  }else{
+    return true;
+  }
 }
 
 function checkFriend(view_uid){
-    var friendsList = localStorage.friendsList.split(",");
-    for(var i = 0; i < friendsList.length;i++){
-      if(friendsList[i] == view_uid){
-        return false;
+    if(localStorage.friendsList != null){
+      var friendsList = localStorage.friendsList.split(",");
+      for(var i = 0; i < friendsList.length;i++){
+        if(friendsList[i] == view_uid){
+          return false;
+        }
       }
+      return true;
+    }else{
+      return true;
     }
-    return true;
 }
 
 function renderChatBox(type, id, chatBoxNumber){
