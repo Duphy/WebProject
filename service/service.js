@@ -7,7 +7,7 @@ var fs = require("fs");
 var sanitizer = require("sanitizer");
 exports.sanitizer = sanitizer;
 var dataPath = __dirname.replace("service","") + "public/data/";
-var im = require("imagemagick");
+var gm = require("gm");
 var default_avarta = "/img/circa.png";
 var default_eventAvarta = "/img/event_default.png";
 var clearNotificationHandler;
@@ -1836,17 +1836,8 @@ exports.uploadAvarta = function(req, res){
 					var smallimagePath = path +'small'+imageName;
 					fs.writeFileSync(imagePath, data);
 					fs.writeFileSync(smallimagePath, data);
-					im.resize({
-						srcPath: smallimagePath,
-						height: 24,
-						quality: 1
-					}, function(err, stdout, stderr){
-						//if (err) throw err;
-			 			res.send({
-			 				status:"successful",
-			 			});
-					});
-					//res.send({status:"successful"});
+					gm(smallimagePath).resize(24,24);
+					res.send({status:"successful"});
 				}
 			});
 		}
