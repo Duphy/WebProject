@@ -13,7 +13,7 @@
 					<button class="btn-large btn-warning" id="signUpButton"><span>Sign Up</span></button>
 					<div id="signUpBox" style="padding-right:20px;height">
 						<form id="signUpForm">
-							<div id = "valicationbody">
+							<div id = "valicationbody" style="">
 								<fieldset>
 									<label for="validationEmail" id = "validationEmailLabel"><strong>Email</strong><font class = "btn-mini">(type in your email to verify)</font><a class = "btn-mini">verify</a></label>
 									<input type="email" name="email" id="validationEmail" />
@@ -43,31 +43,46 @@
 								</fieldset>
 								<fieldset class = "validationCodeField">
 									<label for="validationCode" id = "validationCodeLabel"><strong>Validation Code: </strong></label>
-									<input type="text" name="validationCode" id="validationCode" />
+									<input type="text" name="validationCode" id="validationCode" style = "width:94%;"/>
+								</fieldset>
+								<div class = "row-fluid">
+									<div class = "span6">
+										<fieldset>
+											<label for="signUpName" id = "signUpRealNameLabel"><strong>Real Name<strong></label>
+											<input type="text" name="name" id="signUpRealName" />
+										</fieldset>
+										
+										<fieldset>
+											<label for="signUpPassword" id = "signUpPasswordLabel"><strong>Password</strong></label>
+											<input type="password" name="password" id="signUpPassword" />
+										</fieldset>
+									</div>
+									<div class = "span6">
+										<fieldset>
+											<label for="signUpName" id = "signUpNickNameLabel"><strong>Nick Name<strong></label>
+											<input type="text" name="name" id="signUpNickName" />
+										</fieldset>
+										<fieldset>
+											<label for="confirmsignUpPassword" id = "confirmsignUpPasswordLabel"><strong>Confirm Password<strong></label>
+											<input type="password" name="confirmPassword" id="confirmsignUpPassword" />
+										</fieldset>
+									</div>
+								</div>
+								<fieldset>
+									<label for="signUpTags" id = "signUpTagsLabel"><strong>Tags<strong></label>
+									<input type="password" name="tags" id="signUpTags" value="NUS,ISE,CS1020,Music,Cinnamon,PGP" data-role="tagsinput"/>
 								</fieldset>
 								<fieldset>
-									<label for="signUpName" id = "signUpNameLabel"><strong>Nick Name<strong></label>
-									<input type="text" name="name" id="signUpName" />
-								</fieldset>
-								<fieldset>
-									<label for="signUpPassword" id = "signUpPasswordLabel"><strong>Password</strong></label>
-									<input type="password" name="password" id="signUpPassword" />
-								</fieldset>
-								<fieldset>
-									<label for="confirmsignUpPassword" id = "confirmsignUpPasswordLabel"><strong>Confirm Password<strong></label>
-									<input type="password" name="confirmPassword" id="confirmsignUpPassword" />
-								</fieldset>
-								<fieldset>
-									<label class="checkbox" style = "font-weight:bold;padding-left:0px;">
-										  <input type="checkbox" id="inlineCheckbox" style = "width:inherit;margin-right:5px;">I have read and agreed to the <a href = "#agreementModal" data-toggle="modal">Terms of Service</a>.
-									</label>
-								</fieldset>
-								<div id="signupAlert" class="alert alert-error" style = "font-size:14px;width: 79%;margin-left: 2%;text-align:center;display:none;">
+										<label class="checkbox" style = "font-weight:bold;padding-left:0px;">
+											  <input type="checkbox" id="inlineCheckbox" style = "width:inherit;margin-right:5px;">I have read and agreed to the <a href = "#agreementModal" data-toggle="modal">Terms of Service</a>.
+										</label>
+									</fieldset>
+								<div id="signupAlert" class="alert alert-error" style = "font-size:14px;width: 86%;margin-left: 2%;text-align:center;display:none;">
 									Signup Failed!
 								</div>	
 								<fieldset>
 								<div class = "row-fluid">
-									<div class = "span4">
+									<div class = "span6">
 									  	<div id="floatingBarsG-signup" class = "pull-right">
 											<div class="blockG rotateG_01">
 											</div>
@@ -87,7 +102,7 @@
 											</div>
 										</div>
 									</div>
-									<div class = "span8">
+									<div class = "span6">
 										<button class="btn btn-warning pull-right" id="submitCreateAccount">CREATE</button>
 										<button class="btn pull-right" id="cancelCreateAccount">CANCEL</button>
 									</div>

@@ -255,7 +255,7 @@ a { text-decoration:none }
 }
 
 #signUpForm {
-    width:308px; 
+    width:550px; 
     border:1px solid #899caa;
     border-radius:3px 0 3px 3px;
     -moz-border-radius:3px 0 3px 3px;
@@ -271,24 +271,6 @@ a { text-decoration:none }
 }
 
 fieldset#body {
-    background:#fff;
-    /*border-radius:3px;*/
-    /*-moz-border-radius:3px;*/
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    padding:10px 10px 13px 10px;
-    margin:0px -6px 0 0;
-}
-
-fieldset#validationbody {
-    background:#fff;
-    /*border-radius:3px;*/
-    /*-moz-border-radius:3px;*/
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    padding:10px 10px 13px 10px;
-    margin:0px -6px 0 0;
-}
-
-fieldset#signUpbody {
     background:#fff;
     /*border-radius:3px;*/
     /*-moz-border-radius:3px;*/
@@ -339,7 +321,6 @@ fieldset#signUpbody {
 
 #signUpForm span {
     text-align:center;
-    display:block;
     /*padding:7px 0 4px 0;*/
 }
 

@@ -36,7 +36,7 @@ $(document).ready(function(){
   renderSubNavBar();
 
   //update the user name in the navbar
-  $("#left a").prepend('<img class = "selfProfileAvarta" src = "#" style = "width:22px;height:22px;border-radius:11px;">&nbsp;<strong id="userNameLink">user</strong>');
+  $("#left a").prepend('<img class = "selfProfileSmallAvarta" src = "#" style = "width:22px;height:22px;border-radius:11px;">&nbsp;<strong id="userNameLink">user</strong>');
 	$("#userNameLink").text(localStorage.usernickname);
 
   //set self avarta data
@@ -173,8 +173,10 @@ $(document).ready(function(){
                         console.log("new avarta");
                         console.log(avarta);
                         if(avarta.status == "successful"){
-                          localStorage.self_small_avarta = avarta.avarta;
-                          $(".selfProfileAvarta").attr("src",avarta.avarta);
+                          localStorage.self_big_avarta = avarta.bigAvarta;
+                          localStorage.self_small_avarta = avarta.smallAvarta;
+                          $(".selfProfileBigAvarta").attr("src",avarta.bigAvarta);
+                          $(".selfProfileSmallAvarta").attr("src",avarta.smallAvarta);
                           setTimeout(function(){
                             $('#notice').html("").css("color","black");
                             $('#uploadCancel').removeAttr("disabled");
@@ -342,17 +344,28 @@ $(document).ready(function(){
     return false;
   });
 
-  //retrieve self avarta
+  //retrieve self big avarta
 	$.ajax({
 	 	url:'/getselfavarta',
 	 	data:JSON.stringify(selfAvartaData),
 	 	type:"POST",
 	 	contentType:"application/json",
 	 	success:function(data){
-      localStorage.self_small_avarta = data.avarta;
-      $(".selfProfileAvarta").attr("src",data.avarta);
+      localStorage.self_big_avarta = data.avarta;
+      $(".selfProfileBigAvarta").attr("src",data.avarta);
     }
 	});
+
+  $.ajax({
+    url:'/getselfsmallavarta',
+    data:JSON.stringify(selfAvartaData),
+    type:"POST",
+    contentType:"application/json",
+    success:function(data){
+      localStorage.self_small_avarta = data.avarta;
+      $(".selfProfileSmallAvarta").attr("src",data.avarta);
+    }
+  });
 
 	//retrieve self posts
   var newsData = {};
@@ -533,6 +546,10 @@ $(document).ready(function(){
     return false;
   });
 
+  $("#postCancel").click(function(){
+    $("#postArea").val("");
+    $("#postTags").tagsinput("removeAll");
+  });
 
 	$('#postSubmit').click(function(){
     $(this).attr("disabled","disabled");

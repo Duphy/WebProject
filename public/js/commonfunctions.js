@@ -155,7 +155,7 @@ function renderPost(post){
         '<div class = "span4">'+
           '<img id = "post_user_avarta'+post.pid+'" ';
           if(post.uid == localStorage.uid){
-            html = html + 'class="selfProfileAvarta"';
+            html = html + 'class="selfProfileSmallAvarta"';
           }
           html = html +
            'src = "'+localStorage.self_small_avarta+'" style = "width:40px;height:40px;border-radius:20px;">'+
@@ -258,7 +258,7 @@ function renderPost(post){
     '<hr>'+
     '<div class = "row-fluid" style = "margin-bottom:10px;">'+
     '<div class = "span1">'+
-    '<img class = "selfProfileAvarta" src = '+localStorage.self_small_avarta+' style = "width:36px;height:36px;border-radius:18px;margin-left:10px;">'+
+    '<img class = "selfProfileSmallAvarta" src = '+localStorage.self_small_avarta+' style = "width:36px;height:36px;border-radius:18px;margin-left:10px;">'+
     '</div>'+
     '<div class= "span11" style = "padding-left:10px;padding-right:20px;">'+
     '<textarea class = "input-block-level replyInput" replyToUid = "'+post.uid+'" replyToName = "'+post.poster_name+'" type = "text" placeholder = "Add Comments here..." style = "min-height:70px;"></textarea>'+
@@ -480,7 +480,7 @@ function renderReply(reply){
     '<li id = "" class = "row-fluid replyBody">'+
       '<img ';
       if(reply.replier_uid != localStorage.uid){
-        html = html + 'class="span1 selfProfileAvarta"';
+        html = html + 'class="span1 selfProfileSmallAvarta"';
       }else{
         html = html + 'class="span1"';
       }
