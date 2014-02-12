@@ -1517,7 +1517,7 @@ exports.updateUserAvarta = function(req, res) {
 		if (pkg[1][2]) {
 			status = "successful";
 			//fs.unlinkSync(path);
-			fs.unlink(__dirname.replace("service","") + "public"+path);
+			fs.unlink(path);
 		}
 		var output = {
 			"status" : status
@@ -1536,7 +1536,7 @@ exports.updateUserSmallAvarta = function(req, res) {
 	if (pkg[1][2]) {
 	    status = "successful";
         //fs.unlinkSync(path);
-        fs.unlink(__dirname.replace("service","") + "public"+path);
+        fs.unlink(path);
 	}
 	var output = {
 	    "status" : status
