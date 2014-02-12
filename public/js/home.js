@@ -533,6 +533,10 @@ $(document).ready(function(){
     return false;
   });
 
+  $("#postCancel").click(function(){
+    $("#postArea").val("");
+    $("#postTags").tagsinput("removeAll");
+  });
 
 	$('#postSubmit').click(function(){
     $(this).attr("disabled","disabled");

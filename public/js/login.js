@@ -58,6 +58,8 @@ $(function() {
 
 $(document).ready(function(){
 	$('.help-inline').hide();
+	$(".bootstrap-tagsinput").find("input").attr("placeholder","Add").attr("size",8);
+  	$(".bootstrap-tagsinput").find("input").limit('14');
 
 	$("#validationEmailLabel").find("a").click(function(){
 		var email = $("#validationEmail").val();
@@ -89,6 +91,7 @@ $(document).ready(function(){
 					}else{
 						$("#signUpbody").show();
 						$(input).css('border-color','#CCC').attr('disabled','disabled');
+						$("#validationEmailLabel").find("a").hide();
 					}
 					$("#squaresWaveG").hide();
 				}
@@ -105,18 +108,22 @@ $(document).ready(function(){
 		$('#inlineCheckbox').removeAttr("checked");
 		$("#signUpbody").hide();
 		$('#validationEmail').removeAttr('disabled');
+		$("#validationEmailLabel").find("a").show();
 		return false;
 	});
 
 	$('#submitCreateAccount').click(function(){
 		$("#signupAlert").hide();
-		var nickname = $('#signUpName').val();
+		var realname = $('#signUpRealName').val();
+		var nickname = $('#signUpNickName').val();
 		var email = $('#validationEmail').val();
 		var password = $('#signUpPassword').val();
 		var confirmPassword = $('#confirmsignUpPassword').val();
 		var term = $('#inlineCheckbox').is(":checked");
-		var verificationCode = $('#validationCode').val();
+		var validationCode = $('#validationCode').val();
 		var proceed = true;
+		var tags = $('#signUpTags').tagsinput('items');
+		console.log(tags);
 		if(validationCode == ""){
 			$("#validationCodeLabel").html('<strong>Validation Code </strong><font color ="#B94A48">*required</font>');
 			$('#validationCode').css('border-color','#B94A48');
@@ -125,13 +132,21 @@ $(document).ready(function(){
 			$("#validationCodeLabel").html('<strong>Validation Code </strong>');
 			$('#validationCode').css('border-color','#CCC');
 		}
-		if(nickname == ""){
-			$('#signUpNameLabel').html('<strong>Nick Name </strong><font color ="#B94A48">*required</font>');
-			$('#signUpName').css('border-color','#B94A48');
+		if(realname == ""){
+			$('#signUpRealNameLabel').html('<strong>Nick Name </strong><font color ="#B94A48">*required</font>');
+			$('#signUpRealName').css('border-color','#B94A48');
 			proceed = false;
 		}else{
-			$('#signUpNameLabel').html('<strong>Nick Name<strong>');
-			$('#signUpName').css('border-color','#CCC');
+			$('#signUpRealNameLabel').html('<strong>Nick Name<strong>');
+			$('#signUpRealName').css('border-color','#CCC');
+		}
+		if(nickname == ""){
+			$('#signUpNickNameLabel').html('<strong>Nick Name </strong><font color ="#B94A48">*required</font>');
+			$('#signUpNickName').css('border-color','#B94A48');
+			proceed = false;
+		}else{
+			$('#signUpNickNameLabel').html('<strong>Nick Name<strong>');
+			$('#signUpNickName').css('border-color','#CCC');
 		}
 		if(password.length <6){
 			$('#signUpPasswordLabel').html('<strong>Password </strong><font color ="#B94A48">*at least 6 characters.</font>');
@@ -160,8 +175,9 @@ $(document).ready(function(){
 		if(proceed){
 			$("#floatingBarsG-signup").show();
 			$("#submitCreateAccount").attr('disabled','disabled');
+			$("#cancelCreateAccount").attr('disabled','disabled');
 			var data = {};
-			data.realname = nickname;
+			data.realname = realname;
 			data.nickname = nickname;
 			data.email = email;
 			data.password = password;
@@ -170,9 +186,9 @@ $(document).ready(function(){
 			data.city = "Singapore";
 			data.state = "Singapore";
 			data.country = "Singapore";
-            data.tags = ["Circa"];
-			data.hidden_tags = ["Circa"];
-			data.code = verificationCode;
+            data.tags = tags;
+			data.hidden_tags = [];
+			data.code = validationCode;
 			$.ajax({
 				url:'/signup',
 				data:JSON.stringify(data),
@@ -184,55 +200,58 @@ $(document).ready(function(){
                     	var data = {};
                     	data.email = email;
                     	data.password = password;
-                          $.ajax({
-                          url:"/login",
-                          data:JSON.stringify(data),
-                          type:"POST",
-                          contentType: 'application/json',
-                          success:function(data){
-                          $('#loginAlert').hide();
-                          if(data.status == "successful"){
-                          console.log("sigup successful");
-                          localStorage.session_key = data.session_key;
-                          localStorage.uid = data.uid;
-                          var auth_data = {};
-                          auth_data.session_key = localStorage.session_key;
-                          auth_data.uid = localStorage.uid;
-                          $.ajax({
-                                url:"/getselfinfo",
-                                data:JSON.stringify(auth_data),
-                                type:"POST",
-                                contentType: 'application/json',
-                                success:function(data){
-                                console.log("self data:");
-                                console.log(data);
-                                localStorage.username = data.realname;
-								localStorage.usernickname = data.nickname;
-						        localStorage.raw_birthday = data.birthday;
-						        localStorage.usertags = data.tags;
-						        localStorage.hiddentags= data.hidden_tags;
-						        localStorage.honors = data.honors;
-						        localStorage.gender = data.raw_gender;
-						        localStorage.city = data.city;
-						        localStorage.state = data.state;
-						        localStorage.country = data.country;
-						        console.log("ready to go home");
-						        $("#floatingBarsG-signup").hide();
-						        $("#submitCreateAccount").removeAttr('disabled');
-						        localStorage.search_tag_option = "user";
-						        localStorage.search_tag_content = "";
-                                window.location = "/search";
-                                }
-                                });
-                          }else{
-                          	$("#floatingBarsG-signup").hide();
-                          	$("#signupAlert").show();
-                          	$("#submitCreateAccount").removeAttr('disabled');
-                          }
+						$.ajax({
+						url:"/login",
+						data:JSON.stringify(data),
+						type:"POST",
+						contentType: 'application/json',
+						success:function(data){
+							$('#loginAlert').hide();
+							if(data.status == "successful"){
+								console.log("sigup successful");
+								localStorage.session_key = data.session_key;
+								localStorage.uid = data.uid;
+								var auth_data = {};
+								auth_data.session_key = localStorage.session_key;
+								auth_data.uid = localStorage.uid;
+								$.ajax({
+								    url:"/getselfinfo",
+								    data:JSON.stringify(auth_data),
+								    type:"POST",
+								    contentType: 'application/json',
+								    success:function(data){
+								    console.log("self data:");
+								    console.log(data);
+								    localStorage.username = data.realname;
+									localStorage.usernickname = data.nickname;
+								    localStorage.raw_birthday = data.birthday;
+								    localStorage.usertags = data.tags;
+								    localStorage.hiddentags= data.hidden_tags;
+								    localStorage.honors = data.honors;
+								    localStorage.gender = data.raw_gender;
+								    localStorage.city = data.city;
+								    localStorage.state = data.state;
+								    localStorage.country = data.country;
+								    console.log("ready to go home");
+								    $("#floatingBarsG-signup").hide();
+								    $("#submitCreateAccount").removeAttr('disabled');
+								    localStorage.search_tag_option = "user";
+								    localStorage.search_tag_content = "";
+								    window.location = "/search";
+								    }
+								});
+							}
                           }//success
-                          });
-                   }}});
+                         });
+                    }else{
+						$("#floatingBarsG-signup").hide();
+						$("#signupAlert").show();
+						$("#submitCreateAccount").removeAttr('disabled');
+						$("#cancelCreateAccount").removeAttr('disabled');
+					}
                 }
+            });
+        }
 		return false;
 	});
 
@@ -325,3 +344,28 @@ function isValidEmailAddress(emailAddress) {
     var pattern = new RegExp(/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i);
     return pattern.test(emailAddress);
 };
+
+(function($){ 
+     $.fn.extend({  
+         limit: function(limit) {
+      
+      var interval, f;
+      var self = $(this);
+          
+      $(this).focus(function(){
+        interval = window.setInterval(substring,100);
+      });
+      
+      $(this).blur(function(){
+        clearInterval(interval);
+        substring();
+      });
+      
+      substringFunction = "function substring(){ var val = $(self).val();var length = val.length;if(length > limit){$(self).val($(self).val().substring(0,limit));}}";      
+      eval(substringFunction);
+          
+      substring();
+      
+        } 
+    }); 
+})(jQuery);
