@@ -961,14 +961,14 @@ function friendRequestNotification(userName, userId, eventId, postId, action, se
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem friendRequestNotification unread">'+
                 '<i class="icon-user"></i>'+
                 '&nbsp;&nbsp;<span><a class = "userName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have approved your friend request.</span>&nbsp;'+
-                '<button class = "btn btn-primary" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '<button class = "btn btn-primary friendResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 1:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem friendRequestNotification unread">'+
                 '<i class="icon-user"></i>'+
                 '&nbsp;&nbsp;<span><a class = "usernName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have rejected your friend request.</span>&nbsp;'+
-                '<button class = "btn btn-primary" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '<button class = "btn btn-primary friendResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 2:
@@ -990,14 +990,14 @@ function eventJoinRequestNotification(userName, userId, postId, eventName, event
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
                 '<p class = "span10" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> has approved your event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
-                '<button class = "btn btn-primary span2" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '<button class = "btn btn-primary span2 eventResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 1:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
                 '<p class = "span10" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> has rejected your event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
-                '<button class = "btn btn-primary span2" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '<button class = "btn btn-primary span2 eventResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 2:
@@ -1019,6 +1019,16 @@ function postReplyNotification(userName, userId, eventId, post, postId ,seqNo){
                 '<button class = "btn btn-primary" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+               
              '</li>';
   return html;
+}
+
+function removeNotification(){
+  var newNotificationNumber = parseInt($("#notificationNumber").html().trim()) - 1;
+  $("#notificationNumber").html(" "+newNotificationNumber+" ");
+  console.log(($("#notificationNumber").html()).trim());
+  if(newNotificationNumber == 0){
+    $("#notificationNumber").css({"color":"black","font-weight":"normal"});
+    $("#notificationList").html("<li tabindex='-1' style = 'text-align:center;'>No New Notification.</li>");
+  }
 }
 
 function adjustTags(){

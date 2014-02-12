@@ -608,6 +608,152 @@ $(document).ready(function(){
     return false;
   });
 
+  $("#notification").hover(function(){
+    $(this).tooltip('show');
+    console.log("first");
+    setTimeout(function(){$('#notification').tooltip('hide')},2000);
+  });
+
+  //Handle notifications behaviors
+  $('body').delegate('.notificationItem','click',function(){
+    if($(this).hasClass('unread')){
+      $(this).removeClass('unread');
+    }
+    return false;
+  });
+
+  $('body').delegate('.friendResponse','click',function(){
+    console.log("read friend response");
+    flag_displayfriend = true;
+    var notification = $(this).closest('.notificationItem');
+    if(notification.prev() && notification.prev().hasClass("divider")){
+        notification.prev().remove();
+    };
+    notification.remove();
+    removeNotification();
+    return false;
+  });
+
+  $('body').delegate('.approveFriendRequest','click',function(){
+    console.log("friend request processing");
+    var notification = $(this).closest('.notificationItem');
+    var data = auth_data;
+    data.subType = 0;
+    data.seq = notification.attr("seqNo");
+    data.n_uid = notification.attr("uid");
+    data.eid = notification.attr("eid");
+    data.pid = notification.attr("pid");
+    data.action = 0;
+    $.ajax({
+      url:"/responsetonotification",
+      data:JSON.stringify(data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(result){
+        if(result.status == "successful"){
+          flag_displayfriend = true;
+          if(notification.prev() && notification.prev().hasClass("divider")){
+              notification.prev().remove();
+          };
+          notification.remove();
+        }
+      }
+    });
+    removeNotification();
+  });
+  $('body').delegate('.rejectFriendRequest','click',function(){
+    console.log("friend request processing");
+    var notification = $(this).closest('.notificationItem');
+    var data = auth_data;
+    data.subType = 0;
+    data.seq = notification.attr("seqNo");
+    data.n_uid = notification.attr("uid");
+    data.eid = notification.attr("eid");
+    data.pid = notification.attr("pid");
+    data.action = 1;
+    $.ajax({
+      url:"/responsetonotification",
+      data:JSON.stringify(data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(result){
+        if(result.status == "successful"){
+          console.log(notification.prev());
+          if(notification.prev() && notification.prev().hasClass("divider")){
+              notification.prev().remove();
+          };
+          notification.remove();
+        }
+      }
+    });
+    removeNotification();
+  });
+
+  $('body').delegate('.eventResponse','click',function(){
+    console.log("read event response");
+    flag_displayevent = true;
+    if(notification.prev() && notification.prev().hasClass("divider")){
+        notification.prev().remove();
+    };
+    notification.remove();
+    removeNotification();
+    return false;
+  });
+
+  $('body').delegate('.approveEventJoinRequest','click',function(){
+    console.log("event request processing");
+    var notification = $(this).closest('.notificationItem');
+    var data = auth_data;
+    data.subType = 1;
+    data.seq = notification.attr("seqNo");
+    data.n_uid = notification.attr("uid");
+    data.eid = notification.attr("eid");
+    data.pid = notification.attr("pid");
+    data.action = 0;
+    $.ajax({
+      url:"/responsetonotification",
+      data:JSON.stringify(data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(result){
+        if(result.status == "successful"){
+          flag_displayevent = true;
+          if(notification.prev() && notification.prev().hasClass("divider")){
+              notification.prev().remove();
+          };
+          notification.remove();
+        }
+      }
+    });
+    removeNotification();
+  });
+  $('body').delegate('.rejectEventJoinRequest','click',function(){
+    console.log("event request processing");
+    var notification = $(this).closest('.notificationItem');
+    var data = auth_data;
+    data.subType = 1;
+    data.seq = notification.attr("seqNo");
+    data.n_uid = notification.attr("uid");
+    data.eid = notification.attr("eid");
+    data.pid = notification.attr("pid");
+    data.action = 1;
+    $.ajax({
+      url:"/responsetonotification",
+      data:JSON.stringify(data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(result){
+        if(result.status == "successful"){
+          if(notification.prev() && notification.prev().hasClass("divider")){
+              notification.prev().remove();
+          };
+          notification.remove();
+        }
+      }
+    });
+    removeNotification();
+  });
+
   $("#timeoutButton").click(function(){
     localStorage.clear();
     window.location = "/";

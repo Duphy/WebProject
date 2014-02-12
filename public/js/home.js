@@ -242,7 +242,7 @@ $(document).ready(function(){
           $('#notice').show().html("failed!").css("color","#B94A48");
         });
     },
-    start: function(e, data){
+    start:function(e, data){
         $('#progress').show();
         $('#notice').show().html("uploading...");
         $('#uploadCancel').attr("disabled","disabled");
@@ -527,14 +527,6 @@ $(document).ready(function(){
   //     }
   //     return false;
   // });
-
-  $("#notification").hover(
-    function(){
-      $(this).tooltip('show');
-      console.log("first");
-      setTimeout(function(){$('#notification').tooltip('hide')},2000);},
-    function(){$(this).tooltip('hide')}
-    );
 
   $("#settingUserNews").click(function(){
     var newsData = {};
@@ -929,6 +921,12 @@ $(document).ready(function(){
     return false; 
 	});
 
+  $("#notification").hover(function(){
+    $(this).tooltip('show');
+    console.log("first");
+    setTimeout(function(){$('#notification').tooltip('hide')},2000);
+  });
+
   //Handle notifications behaviors
   $('body').delegate('.notificationItem','click',function(){
     if($(this).hasClass('unread')){
@@ -936,6 +934,19 @@ $(document).ready(function(){
     }
     return false;
   });
+
+  $('body').delegate('.friendResponse','click',function(){
+    console.log("read friend response");
+    flag_displayfriend = true;
+    var notification = $(this).closest('.notificationItem');
+    if(notification.prev() && notification.prev().hasClass("divider")){
+        notification.prev().remove();
+    };
+    notification.remove();
+    removeNotification();
+    return false;
+  });
+
   $('body').delegate('.approveFriendRequest','click',function(){
     console.log("friend request processing");
     var notification = $(this).closest('.notificationItem');
@@ -990,6 +1001,18 @@ $(document).ready(function(){
     });
     removeNotification();
   });
+
+  $('body').delegate('.eventResponse','click',function(){
+    console.log("read event response");
+    flag_displayevent = true;
+    if(notification.prev() && notification.prev().hasClass("divider")){
+        notification.prev().remove();
+    };
+    notification.remove();
+    removeNotification();
+    return false;
+  });
+
   $('body').delegate('.approveEventJoinRequest','click',function(){
     console.log("event request processing");
     var notification = $(this).closest('.notificationItem');
@@ -1215,13 +1238,3 @@ $(document).ready(function(){
     return false;
   });
 });
-
-function removeNotification(){
-  var newNotificationNumber = parseInt($("#notificationNumber").html().trim()) - 1;
-  $("#notificationNumber").html(" "+newNotificationNumber+" ");
-  console.log(($("#notificationNumber").html()).trim());
-  if(newNotificationNumber == 0){
-    $("#notificationNumber").css({"color":"black","font-weight":"normal"});
-    $("#notificationList").html("<li tabindex='-1' style = 'text-align:center;'>No New Notification.</li>");
-  }
-}
