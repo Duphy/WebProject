@@ -1112,7 +1112,7 @@ $(document).ready(function(){
     $(this).attr("disabled","disabled");
     $("#createEventCancel").attr("disabled","disabled");
     var realname = $('#createEventInputName').val();
-    var city = $('#createEventInputCity').val();
+    var city = "Singapore";
     var description = $('#createEventInputDescription').val();
     var tags = [];
     if($('#createEventInputTags').val().indexOf(",")>-1)
