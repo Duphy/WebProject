@@ -1801,6 +1801,7 @@ exports.responseNoti = function(req, res) {
 exports.uploadAvarta = function(req, res){
 	fs.readFile(req.files.image.path, function(err, data){
 		var imageName = req.files.image.name;
+		var imgsize =1;
 		/// If there's an error
 		if(!imageName){
 			console.log("There was an error.")
@@ -1816,16 +1817,35 @@ exports.uploadAvarta = function(req, res){
 						var imagePath = path + imageName;
 						fs.writeFile(imagePath, data, function(err){
 							/// let's see it
-						 	console.log(imagePath);
-						 	console.log("image has been saved successfully.");
-						 	res.send({status:"successful"});
+						 	im.resize({
+								srcPath: imagePath,
+								dstPath: path +'small'+imageName,
+								height: 24,
+								quality: 1
+							}, function(err, stdout, stderr){
+								//if (err) throw err;
+			 					res.send({
+			 						status:"successful",
+			 					});
+							});
 						});
 					});
 				}else{
 					console.log("exists");
 					var imagePath = path + imageName;
 					fs.writeFileSync(imagePath, data);
-					res.send({status:"successful"});
+					im.resize({
+						srcPath: imagePath,
+							dstPath: path +'small'+imageName,
+							height: 24,
+							quality: 1
+					}, function(err, stdout, stderr){
+						//if (err) throw err;
+			 			res.send({
+			 				status:"successful",
+			 			});
+					});
+					//res.send({status:"successful"});
 				}
 			});
 		}
