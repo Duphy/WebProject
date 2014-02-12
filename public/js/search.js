@@ -14,6 +14,9 @@ var eventCounter = 0;
 $(document).ready(function(){
 
   $("#circularG").hide();
+  var auth_data = {};
+  auth_data.uid = localStorage.uid;
+  auth_data.session_key = localStorage.session_key;
 
    //TO DO: add the case handler for no matched result.
   if(localStorage.search_tag_option!=""){
