@@ -14,6 +14,7 @@ var service = require('./service/service');
 var routes = require('./routes');
 var fs = require('fs');
 var mongo = require('./service/mongo');
+var redis = require('node-redis')
 
 //TO DO: to be configured 
 //mongoose.connect('mongodb://localhost/test');
