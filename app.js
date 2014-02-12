@@ -20,7 +20,7 @@ var redis = require('redis');
 //mongoose.connect('mongodb://localhost/test');
 
 var app = express();
-var redisClient = redis.createClient();
+//var redisClient = redis.createClient();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -156,9 +156,9 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 });
 
 //configure redis
-client.on("error", function (err) {
-    console.log("Error " + err);
-});
+// redisClient.on("error", function (err) {
+//     console.log("Error " + err);
+// });
 
 //configure socket.io connection
 var socketsList = {};

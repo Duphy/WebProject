@@ -157,6 +157,43 @@ $(document).ready(function(){
               var filename = data.files[0].name;
               var avartaData = auth_data;
               avartaData.avarta = filename;
+              var finishCounter = 0;
+              $.ajax({
+                url:'/updateselfsmallavarta',
+                data:JSON.stringify(avartaData),
+                type:'POST',
+                contentType: 'application/json',
+                success:function(result){
+                  if(result.status == "successful"){
+                    $.ajax({
+                      url:'/getselfsmallavarta',
+                      data:JSON.stringify(auth_data),
+                      type:'POST',
+                      contentType: 'application/json',
+                      success:function(avarta){
+                        console.log("new avarta");
+                        console.log(avarta);
+                        if(avarta.status == "successful"){
+                          localStorage.self_small_avarta = avarta.avarta;
+                          $(".selfProfileSmallAvarta").attr("src",avarta.avarta);
+                          finishCounter++;
+                          if(finishCounter == 2){
+                            setTimeout(function(){
+                              $('#notice').html("").css("color","black");
+                              $('#uploadCancel').removeAttr("disabled");
+                              $('#fileupload').removeAttr("disabled");
+                              $('#uploadModal').modal("hide");
+                              $('#profileModal').modal("show");
+                            },3000);
+                          }
+                        }
+                      }
+                    });
+                  }else{
+                    console.log(result);
+                  }
+                }
+              });
               $.ajax({
                 url:'/updateselfavarta',
                 data:JSON.stringify(avartaData),
@@ -173,17 +210,18 @@ $(document).ready(function(){
                         console.log("new avarta");
                         console.log(avarta);
                         if(avarta.status == "successful"){
-                          localStorage.self_big_avarta = avarta.bigAvarta;
-                          localStorage.self_small_avarta = avarta.smallAvarta;
-                          $(".selfProfileBigAvarta").attr("src",avarta.bigAvarta);
-                          $(".selfProfileSmallAvarta").attr("src",avarta.smallAvarta);
-                          setTimeout(function(){
-                            $('#notice').html("").css("color","black");
-                            $('#uploadCancel').removeAttr("disabled");
-                            $('#fileupload').removeAttr("disabled");
-                            $('#uploadModal').modal("hide");
-                            $('#profileModal').modal("show");
-                          },3000);
+                          localStorage.self_big_avarta = avarta.avarta;
+                          $(".selfProfileBigAvarta").attr("src",avarta.avarta);
+                          finishCounter++;
+                          if(finishCounter == 2){
+                            setTimeout(function(){
+                              $('#notice').html("").css("color","black");
+                              $('#uploadCancel').removeAttr("disabled");
+                              $('#fileupload').removeAttr("disabled");
+                              $('#uploadModal').modal("hide");
+                              $('#profileModal').modal("show");
+                            },3000);
+                          }
                         }
                       }
                     });
