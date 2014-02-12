@@ -1815,20 +1815,11 @@ exports.uploadAvarta = function(req, res){
 					fs.mkdir(path,function(err){
 						console.log("created dir");
 						var imagePath = path + imageName;
-						fs.writeFile(imagePath, data, function(err){
-							/// let's see it
-						 	im.resize({
-								srcPath: imagePath,
-								dstPath: path +'small'+imageName,
-								height: 24,
-								quality: 1
-							}, function(err, stdout, stderr){
-								//if (err) throw err;
-			 					res.send({
-			 						status:"successful",
-			 					});
-							});
-						});
+						var smallimagePath = path +'small'+imageName;
+						fs.writeFileSync(imagePath, data);
+						fs.writeFileSync(smallimagePath, data);
+						gm(smallimagePath).resize(24,24);
+						res.send({status:"successful"});
 					});
 				}else{
 					console.log("exists");
