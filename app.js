@@ -14,12 +14,13 @@ var service = require('./service/service');
 var routes = require('./routes');
 var fs = require('fs');
 var mongo = require('./service/mongo');
-var redis = require('node-redis')
+var redis = require('redis');
 
 //TO DO: to be configured 
 //mongoose.connect('mongodb://localhost/test');
 
 var app = express();
+var redisClient = redis.createClient();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -152,6 +153,11 @@ app.post('/uploadavarta',service.uploadAvarta);
 //Server starts
 var server = http.createServer(app).listen(app.get('port'), function(){
   	console.log('Express server listening on port ' + app.get('port'));
+});
+
+//configure redis
+client.on("error", function (err) {
+    console.log("Error " + err);
 });
 
 //configure socket.io connection
