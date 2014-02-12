@@ -1516,7 +1516,6 @@ exports.updateUserAvarta = function(req, res) {
 		var pkg = lib.resolvPack(data);
 		if (pkg[1][2]) {
 			status = "successful";
-			//fs.unlinkSync(path);
 			fs.unlink(path);
 		}
 		var output = {
@@ -1535,8 +1534,7 @@ exports.updateUserSmallAvarta = function(req, res) {
 	var pkg = lib.resolvPack(data);
 	if (pkg[1][2]) {
 	    status = "successful";
-        //fs.unlinkSync(path);
-        
+        fs.unlink(path);
 
 	}
 	var output = {
