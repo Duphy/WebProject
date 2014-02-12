@@ -1528,7 +1528,7 @@ exports.updateUserAvarta = function(req, res) {
 
 exports.updateUserSmallAvarta = function(req, res) {
     var status = "unsuccessful";
-    var path = dataPath+req.body.uid+'/tmp/'+req.body.avarta;
+    var path = dataPath+req.body.uid+'/tmp/small'+req.body.avarta;
     //var path = "/data/"+req.body.uid+"/tmp/"+req.body.avarta;
     var pack = lib.createUpdateAvartaSmall(0, req.body.session_key, parseInt(req.body.uid), path);
     helper.connectAndSend(pack, function(data) {
@@ -1536,7 +1536,8 @@ exports.updateUserSmallAvarta = function(req, res) {
 	if (pkg[1][2]) {
 	    status = "successful";
         //fs.unlinkSync(path);
-        fs.unlink(path);
+        
+
 	}
 	var output = {
 	    "status" : status
