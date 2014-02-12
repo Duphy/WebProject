@@ -1833,12 +1833,13 @@ exports.uploadAvarta = function(req, res){
 				}else{
 					console.log("exists");
 					var imagePath = path + imageName;
+					var smallimagePath = path +'small'+imageName;
 					fs.writeFileSync(imagePath, data);
+					fs.writeFileSync(smallimagePath, data);
 					im.resize({
-						srcPath: imagePath,
-							dstPath: path +'small'+imageName,
-							height: 24,
-							quality: 1
+						srcPath: smallimagePath,
+						height: 24,
+						quality: 1
 					}, function(err, stdout, stderr){
 						//if (err) throw err;
 			 			res.send({
