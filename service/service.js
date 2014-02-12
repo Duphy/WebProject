@@ -211,7 +211,7 @@ exports.createReply = function(req, res) {
     var status = "unsuccessful";
     var pack = lib.createReplyPostingPack(req.body.session_key,
 	    parseInt(req.body.uid), parseInt(req.body.posterUid),
-	    parseInt(req.body.replyToUid), req.body.postEid, req.body.postPid,
+	    parseInt(req.body.replyToUid), helper.decToHex(req.body.postEid), req.body.postPid,
 	    req.body.replier_name, req.body.replyToName, req.body.replyContent,
 	    parseInt(req.body.visibility));
     helper.connectAndSend(pack, function(data) {

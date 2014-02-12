@@ -406,7 +406,7 @@ $(document).ready(function(){
     data.replyContent = $(this).closest('.span11').children('textarea').first().val();
     data.posterUid = parseInt($(this).closest('.span11').children('textarea').first().attr('replyToUid'));
     data.replyToUid = data.posterUid;
-    data.postEid = context.attr('postEid');
+    data.postEid = "0";
     data.postPid = context.attr('postPid');
     data.replyToName = $(this).closest('.span11').children('textarea').first().attr("replyToName");
     data.visibility = 0;
