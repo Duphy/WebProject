@@ -1,4 +1,4 @@
-var socket = io.connect('http://localhost:3000');
+var socket = io.connect('http://circatag.com');
 console.log("client socket connected!");
 socket.emit("uid",localStorage.uid);
 socket.on("friend request",function(name, uid, eid, pid, action, seq){
@@ -143,7 +143,7 @@ socket.on("receive event chat",function(eid, s_uid, message, date, time){
 		chatBoxNumber++;
 	}
 	$.each($("#chatArea").find(".chat-window"), function(index,element){
-		if($(element).attr("chatId") == eid){
+		if($(element).attr("id").replace("chat","") == eid){
 			if($(element).find(".chat-message").last().attr("uid") == s_uid){
 				$(element).find(".chat-message").last().find(".chat-text-wrapper").append('<p>'+message+'</p>');
 			}else{
