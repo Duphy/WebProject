@@ -139,7 +139,7 @@ socket.on("receive event chat",function(eid, s_uid, message, date, time){
 		}
 	});
 	if(proceed){
-		openEventsChatBox(localStorage.session_key,localStorage.uid,uid,chatBoxNumber);
+		openEventsChatBox(localStorage.session_key,localStorage.uid,eid,chatBoxNumber);
 		chatBoxNumber++;
 	}
 	$.each($("#chatArea").find(".chat-window"), function(index,element){
