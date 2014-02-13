@@ -7,6 +7,7 @@ var postOrder = 0;
 var insertOrder = 0;
 var loadingFlag = true;
 var postCounter = 0; 
+var chatBoxNumber = 0;
 var view_eid = localStorage.eid;
 var flag_displaymember=true;
 var isMember = false; 

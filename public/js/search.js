@@ -10,6 +10,7 @@ var eids = [];
 var postCounter =0;
 var userCounter = 0;
 var eventCounter = 0;
+var chatBoxNumber = 0;
 
 $(document).ready(function(){
 

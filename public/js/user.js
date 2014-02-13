@@ -17,6 +17,7 @@ var common_friends = [];
 var flag_displaycommonfriend = true;
 var flag_displayevent=true;
 var flag_displayfriend=true;
+var chatBoxNumber = 0;
  
 $(document).ready(function(){
   var auth_data = {};

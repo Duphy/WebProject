@@ -2,6 +2,7 @@ var schedulingList = {};
 var today = new Date();
 var clickDate = "";
 var isManager = false;
+var chatBoxNumber = 0;
 $(document).ready(function(){
 	var schedulingId = localStorage.schedulingId;
 	var schedulingType = localStorage.schedulingType;

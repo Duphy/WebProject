@@ -1,5 +1,6 @@
 var eid = localStorage.eid;
 var loadOrder = 1;
+var chatBoxNumber = 0;
 $(document).ready(function(){
     $("#eventHead").html(localStorage.ename);
     var auth_data = {};
