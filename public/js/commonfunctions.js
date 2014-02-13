@@ -1100,8 +1100,13 @@ function renderChatBox(type, id, chatBoxNumber){
       '<div class = "chat-window-inner-content">'+
       '</div>'+
     '</div>'+
-    '<div class = "chat-window-text-box-wrapper">'+
-      '<textarea turn = 0 rows="1" class="chat-window-text-box" style = "overflow:hidden;word-wrap:break-word;resize:none;height:26px;"></textarea>'+
+    '<div class = "chat-window-text-box-wrapper">';
+    if(type == "user"){
+      html = html + '<textarea turn = 0 rows="1" class="friendTextBox chat-window-text-box" style = "overflow:hidden;word-wrap:break-word;resize:none;height:26px;"></textarea>';
+    }else{
+      html = html + '<textarea turn = 0 rows="1" class="eventtTextBox chat-window-text-box" style = "overflow:hidden;word-wrap:break-word;resize:none;height:26px;"></textarea>';
+    }
+    html = html +
     '</div>'+
   '</div>';
   return html;

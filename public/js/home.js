@@ -1153,7 +1153,7 @@ $(document).ready(function(){
       $(this).val("");
       var id = $(this).closest(".chat-window").attr('id').replace("chat","");
       console.log("id length:"+id.length);
-      if(id.length > 7){
+      if($(this).hasClass("eventtTextBox")){
           console.log("event chat: "+id+" "+content);
           socket.emit("get event chat",localStorage.session_key, localStorage.uid, 0, id, content);
       }else{
