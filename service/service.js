@@ -1516,8 +1516,7 @@ exports.updateUserAvarta = function(req, res) {
 		var pkg = lib.resolvPack(data);
 		if (pkg[1][2]) {
 			status = "successful";
-			//fs.unlinkSync(path);
-			fs.unlink(__dirname.replace("service","") + "public"+path);
+			fs.unlink(path);
 		}
 		var output = {
 			"status" : status
@@ -1528,15 +1527,15 @@ exports.updateUserAvarta = function(req, res) {
 
 exports.updateUserSmallAvarta = function(req, res) {
     var status = "unsuccessful";
-    var path = dataPath+req.body.uid+'/tmp/'+req.body.avarta;
+    var path = dataPath+req.body.uid+'/tmp/small'+req.body.avarta;
     //var path = "/data/"+req.body.uid+"/tmp/"+req.body.avarta;
     var pack = lib.createUpdateAvartaSmall(0, req.body.session_key, parseInt(req.body.uid), path);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	if (pkg[1][2]) {
 	    status = "successful";
-        //fs.unlinkSync(path);
-        fs.unlink(__dirname.replace("service","") + "public"+path);
+        fs.unlink(path);
+
 	}
 	var output = {
 	    "status" : status
