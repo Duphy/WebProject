@@ -9,7 +9,7 @@ var timelimit = 10000;
 var retrylimit = 0;
 var lib = require("../node_modules/lib");
 var conns = [];
-var dumb_session_key = "3030303030303030";
+var dumb_session_key = "0000000000000000";
 function UserSocket() {
     var self = this;
     this.timer = null;
@@ -25,6 +25,7 @@ function UserSocket() {
     this.retval = "";
     this.connected = false;
     this.timeout = function() {
+	self.timer = null;
 	self.retry_count++;
 	console.log("timeout, uid: " + self.uid);
 	self.conn.destroy();
@@ -34,10 +35,10 @@ function UserSocket() {
 	self.data_length = 0;
 	if (self.retry_count > retrylimit) {
 	    console.log("final timeout, uid: " + self.uid + "\n\t" + self.msg);
-	    self.msg = "";
 	    self.retry_count = 0;
-	    if (timeout_handle != null)
-		timeout_handle(self.uid);
+	    if (self.timeout_handle != null)
+		self.timeout_handle();
+	    self.msg = "";
 	    self.nextTask();
 	} else
 	    self.conn.connect(port, host, function() {
@@ -134,7 +135,7 @@ UserSocket.prototype.nextTask = function() {
 	return;
     self.msg = self.queue[0][0];
     self.handle = self.queue[0][1];
-    self.error_handle = self.queue[0][2];
+    self.timeout_handle = self.queue[0][2];
     var no_response = self.queue[0][3];
     self.queue.shift();
     if (self.connected) {
