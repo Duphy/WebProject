@@ -71,6 +71,7 @@ void init(Handle<Object> exports) {
 	ExportJSFunction(createMessageToUserPack)
 	ExportJSFunction(createMessageToEventPack)
 	ExportJSFunction(createNotificationPack)
+	ExportJSFunction(createInvitationPack)
 
 	ExportJSFunction(resolvPack)
 	ExportJSFunction(resolvSTCHeader)

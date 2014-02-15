@@ -160,7 +160,8 @@ static inline void Add(std::string& code, const int type,
 			cur = tmp->Get(i = 0);
 			while (!cur->IsUndefined()) {
 #ifdef TYPE_CHECK
-				Add(tmpstr, TYPE_STRING | ONE_BYTE_FOR_LENGTH, cur, eelem + name);
+				Add(tmpstr, TYPE_STRING | ONE_BYTE_FOR_LENGTH, cur,
+						eelem + name);
 #else
 				Add(tmpstr, TYPE_STRING | ONE_BYTE_FOR_LENGTH, cur, "");
 #endif
@@ -1706,6 +1707,12 @@ Handle<Value> createMessageToUserPack(const Arguments &args) {
 		SetHeadAndReturn(0, 12, 0);END
 }
 
+/**
+ * - \b "12 1 Send message to event"
+ * 		- createMessageToUserPack(session_key, your_uid, seqNo, eventid, content)
+ * \see ::resolvMessagePack
+ */
+
 /*12 1 message to event: 4 your_uid, 4 seqNo, 8 event-eid, 2 conent_en, ? content*/
 // args[0]: session_key
 // args[1]: your_uid
@@ -1720,6 +1727,21 @@ Handle<Value> createMessageToEventPack(const Arguments &args) {
 		Add(code, TYPE_ASCII_STRING | EVENTID_LENGTH, args[3], "eventid");
 		Add(code, TYPE_STRING | TWO_BYTE_FOR_LENGTH, args[4], "content");
 		SetHeadAndReturn(0, 12, 1);END
+}
+
+/**
+ * - \b "13 0 Send invitation"
+ * 		- createInvitationPack(session_key, your_uid, emails)
+ */
+// args[0]: session_key
+// args[1]: your_uid
+// args[2]: emails
+Handle<Value> createInvitationPack(const Arguments &args) {
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_TAGS, args[2], "emails");
+		SetHeadAndReturn(0, 13, 0);END
 }
 
 typedef struct s_header {

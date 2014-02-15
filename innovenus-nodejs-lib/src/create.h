@@ -50,6 +50,7 @@ DeclareJSFunction(createQuitEventPack)
 DeclareJSFunction(createMessageToUserPack)
 DeclareJSFunction(createMessageToEventPack)
 DeclareJSFunction(createNotificationPack)
+DeclareJSFunction(createInvitationPack)
 DeclareJSFunction(resolvCTSHeader)
 
 #endif /* CREATE_H_ */
