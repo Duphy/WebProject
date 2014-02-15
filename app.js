@@ -131,6 +131,7 @@ app.post('/joinevent', express.bodyParser(), service.createJoinEventRequest);
 app.post('/eventinvitation', express.bodyParser(),service.createEventInvitationRequest);
 app.post('/quitevent', express.bodyParser(), service.quitEvent);
 app.post('/emailvalidation',express.bodyParser(), service.emailValidation);
+app.post('/emailinvitation',express.bodyParser(), service.emailInvitation);
 app.post('/validatecode',express.bodyParser(), service.validateCode);
 //delete
 app.post('/deletefriend', express.bodyParser(), service.deleteFriend);

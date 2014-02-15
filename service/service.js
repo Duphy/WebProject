@@ -1747,7 +1747,7 @@ exports.validateCode = function(req, res) {
 }
 exports.quitEvent = function(req, res) {
     var status = "unsuccessful";
-    var pack = lib.createIdentificationCodeValidationPack(req.body.session_key,
+    var pack = lib.createQuitEventPack(req.body.session_key,
 	    parseInt(req.body.uid), helper.decToHex(req.body.eid));
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
@@ -1759,6 +1759,15 @@ exports.quitEvent = function(req, res) {
 	};
 	res.send(output);
     });
+}
+exports.emailInvitation = function(req, res) {
+    var status = "unsuccessful";
+    var pack = lib.createInvitationPack(req.body.session_key,
+	    parseInt(req.body.uid), req.body.emails);
+    helper.connectAndSend(pack, function() {
+	var output = {"status":"successful"};
+	res.send(output);
+    },null,true);
 }
 /** ***************Notifications****************** */
 exports.responseNoti = function(req, res) {
