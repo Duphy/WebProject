@@ -39,6 +39,7 @@ void init(Handle<Object> exports) {
 	ExportJSFunction(createViewAdvertisementPack)
 	ExportJSFunction(createMassViewAdvertisementsPack)
 	ExportJSFunction(createViewPicturePack)
+	ExportJSFunction(createViewPubpicturePack)
 	ExportJSFunction(createSearchUserPack)
 	ExportJSFunction(createSearchEventPack)
 	ExportJSFunction(createSearchPostingPack)

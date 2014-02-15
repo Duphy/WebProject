@@ -796,6 +796,21 @@ Handle<Value> createViewPicturePack(const Arguments& args) {
 }
 
 /**
+ * - \b "0 41 View pubpicture"
+ * 		- createViewPicturePack(session_key, viewer_uid, pic_id)
+ */
+// args[0]: session_key
+// args[1]: viewer_uid
+// args[2]: pic_id
+Handle<Value> createViewPubpicturePack(const Arguments& args) {
+	std::string code;
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "viewer_uid");
+		Add(code, TYPE_ASCII_STRING | PICID_LENGTH, args[2], "pic_id");
+		SetHeadAndReturn(0, 0, 40);END
+}
+
+/**
  * - \b "1 0 Search user"
  * - for search by filter
  * 		- createSearchUserPack(0, session_key, searcher_uid, match_option, \n

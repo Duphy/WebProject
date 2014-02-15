@@ -613,6 +613,12 @@ Local<Array> resolvAdvertisements(const char *pack, int &pointer) {
  * 		- 8: tags (::resolvTags)
  * 		- 9: pictures (::resolvPictures)
  */
+
+/**
+ * - \b "0 40 View picture"
+ * 		- 0: picid (string)
+ * 		- 1: picture_path (string)
+ */
 Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 	int pointer = HEADER_LENGTH * 2, mode;
 	int64_t length;
@@ -803,7 +809,15 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 		ans->Set(9, resolvPictures(pack, pointer));
 		break;
 	case 40: // View picture
+	{
+		char picid[PICID_LENGTH * 2 + 1];
+		readAsciiString(picid, pack, pointer, PICID_LENGTH);
+		ans->Set(0, String::New(picid, PICID_LENGTH)); // version time
+		std::ostringstream os;
+		os << "public/data/post/" << picid << ".jpg";
+		ans->Set(1, JSreadFile(pack, pointer, os.str()));
 		break;
+	}
 	}
 	return ans;
 }
