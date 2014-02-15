@@ -851,7 +851,7 @@ $(document).ready(function(){
 	$('body').delegate('.replySubmit','click',function(){
         //TODO: choose reply target
         var data = auth_data;
-        data.replier_name = localStorage.username;
+        data.replier_name = localStorage.usernickname;
         var context = $(this).closest('.postRoot');
         data.replyContent = $(this).closest('.span11').children('textarea').first().val();
         data.posterUid = parseInt($(this).closest('.span11').children('textarea').first().attr('replyToUid'));
