@@ -1063,20 +1063,17 @@ Handle<Value> createCreateEventPack(const Arguments &args) {
 
 /**
  * - \b "2 2 Create posting
- * 		- createCreatePosting(session_key, creater_uid, eventid, content, visibility, tags)
+ * 		- createCreatePosting(session_key, creater_uid, eventid, content, visibility, tags, pictures)
  * 		- tags: Array of string
  * - \see ::resolvCreatePack
  */
-
-/*2 2 Create Posting: 4 creater id, 8 event id, 2 content len, ? content
- *			1 visibility {0 for can be searched, 1 for cannot be searched}
- *			1 # tags, <tags{1 len, ?tag}>*/
 // args[0]: session_key
 // args[1]: creater_uid
 // args[2]: eventid
 // args[3]: content
 // args[4]: visibility
 // args[5]: tags
+// args[6]: pictures
 Handle<Value> createCreatePostingPack(const Arguments &args) {
 	std::string code("");
 	BEGIN
@@ -1085,6 +1082,7 @@ Handle<Value> createCreatePostingPack(const Arguments &args) {
 		Add(code, TYPE_STRING | TWO_BYTE_FOR_LENGTH, args[3], "content");
 		Add(code, TYPE_ONE_BYTE_INT, args[4], "visibility");
 		Add(code, TYPE_TAGS, args[5], "tags");
+		Add(code, TYPE_PICTURES, args[6], "pictures");
 		SetHeadAndReturn(0, 2, 2);END
 }
 
