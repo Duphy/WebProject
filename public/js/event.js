@@ -11,7 +11,7 @@ var chatBoxNumber = 0;
 var view_eid = localStorage.eid;
 var flag_displaymember=true;
 var isMember = false; 
-
+var isManager = false;
 $(document).ready(function(){
   $("#circularG").show();
   var auth_data = {};
@@ -114,6 +114,29 @@ $(document).ready(function(){
    }
   });
 
+  $.ajax({
+    url:"/geteventmanagers",
+    data:JSON.stringify(view_auth_data),
+    type:"POST",
+    contentType: 'application/json',
+    success:function(data){
+      console.log("here");
+      console.log(data);
+      //$("#membersNumber").html(data.members.length);
+      for(var i = 0; i < data.members.length;i++){
+        if(data.members[i] == localStorage.uid){
+          isManager = true;
+          break;
+        }
+      }
+      if(!isManager){
+        $("#eventManage").hide();
+      }
+      else{
+        $("#eventManage").show();
+      }
+    }
+  });
   //get event members
   $.ajax({
     url:"/geteventmembers",
@@ -157,6 +180,7 @@ $(document).ready(function(){
           return false;
         });
       }else{
+        //$("#eventManage").hide();
         $("#eventManage").after('<a href="#quitModal" data-toggle="modal" ><i class="icon-remove"></i>&nbsp;&nbsp;Quit Event</a>');
       }
     }

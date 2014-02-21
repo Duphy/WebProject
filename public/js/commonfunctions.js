@@ -188,7 +188,7 @@ function renderPost(post){
     '</div>'+
     '</div>'+
     '<div class = "row-fluid">'+
-    '<div class = "offset1 span9 offset2">'+
+    '<div class = "offset1 span10 offset2">'+
     '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+post.postContent+'</pre>'+
     '</div>'+
     '</div>'+
@@ -322,9 +322,24 @@ function createPost(data){
 }
 
 function member(member,type){
+  var userAvartaData = {};
+  userAvartaData.view_uid = member.uid;
+  userAvartaData.session_key = localStorage.session_key;
+  userAvartaData.uid = localStorage.uid;
+  $.ajax({
+    url:'/getusersmallavarta',
+    data:JSON.stringify(userAvartaData),
+    type:"POST",
+    contentType:"application/json",
+    success:function(data){
+      console.log(data.avarta);
+      $("#memberAvarta"+member.uid).attr("src",data.avarta);
+      //$("div.chat-window[chatId='"+element.uid+"']").attr("url",data.avarta);
+    }
+  });
   var html = 
     '<div class = "row-fluid member" style = "margin:5px;">'+
-      '<img id = "memberAvarta'+member.uid+'" class = "member_small_avarta span6" src = "'+localStorage.self_small_avarta+'" style = "border-radius:30px;width:60px;height:60px;">'+
+      '<img id = "memberAvarta'+member.uid+'" class = "member_small_avarta span6" src = "" style = "border-radius:30px;width:60px;height:60px;">'+
       '<div class = "span6">'+
         '<a href="#" class = "memberItem userName" name = "'+member.nickname+'" uid = "'+member.uid+'" style = "text-decoration: none;">'+
           '&nbsp;&nbsp;'+member.nickname+
@@ -373,30 +388,30 @@ function userlist(usersData,type){
                   $("#squaresWaveG-commonFriend").hide();
                   var commonFriendsList = localStorage.common_friends.trim().split(",");
                   $.each(result.source,function(index,element){
-                        var userAvartaData = {};
-                        userAvartaData.view_uid = element.uid;
-                        userAvartaData.session_key = localStorage.session_key;
-                        userAvartaData.uid = localStorage.uid;
-                        userAvartaData.time = getCurrentTime();
-                        userAvartaData.date = getCurrentDate();
-                        if(checkMutual(commonFriendsList,element.uid)){
-                          $("#commonFriendsList").append(renderFriend(element));
-                        }else{
-                          $("#friendsList").append(renderFriend(element));
-                        }
-                        $.ajax({
-                          url:'/getuseravarta',
-                          data:JSON.stringify(userAvartaData),
-                          type:"POST",
-                          contentType:"application/json",
-                          success:function(data){
-                            $("#friendAvarta"+element.uid).attr("src",data.avarta);
-                            //$("div.chat-window[chatId='"+element.uid+"']").attr("url",data.avarta);
-                            $.each($(".chatAvarta"+element.uid),function(index,element){
-                              $(element).attr("src",data.avarta);
-                            });
-                          }
-                      });
+                    var userAvartaData = {};
+                    userAvartaData.view_uid = element.uid;
+                    userAvartaData.session_key = localStorage.session_key;
+                    userAvartaData.uid = localStorage.uid;
+                    userAvartaData.time = getCurrentTime();
+                    userAvartaData.date = getCurrentDate();
+                    if(checkMutual(commonFriendsList,element.uid)){
+                      $("#commonFriendsList").append(renderFriend(element));
+                    }else{
+                      $("#friendsList").append(renderFriend(element));
+                    }
+                    $.ajax({
+                      url:'/getuseravarta',
+                      data:JSON.stringify(userAvartaData),
+                      type:"POST",
+                      contentType:"application/json",
+                      success:function(data){
+                        $("#friendAvarta"+element.uid).attr("src",data.avarta);
+                        //$("div.chat-window[chatId='"+element.uid+"']").attr("url",data.avarta);
+                        $.each($(".chatAvarta"+element.uid),function(index,element){
+                          $(element).attr("src",data.avarta);
+                        });
+                      }
+                    });
                   });
                 }else if(type == "event"){
                   $("#squaresWaveG-member").hide();
