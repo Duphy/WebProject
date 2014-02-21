@@ -93,7 +93,7 @@ app.post('/getselfsmallavarta',express.bodyParser(),service.viewSelfSmallAvarta)
 app.post('/geteventavarta',express.bodyParser(),service.viewEventAvarta);
 app.post('/geteventsmallavarta',express.bodyParser(),service.viewEventSmallAvarta);
 app.post('/getusercircatags',express.bodyParser(),service.viewUserCircatags);
-app.post('/getpostcontent',express.bodyParser(),service.viewPostContent);
+//app.post('/getpostcontent',express.bodyParser(),service.viewPostContent);
 app.post('/getpostscontent',express.bodyParser(),service.viewPostsContent);
 app.post('/geteventinfo',express.bodyParser(),service.viewEventInfo);
 app.post('/geteventsinfo',express.bodyParser(),service.viewEventsInfo);
