@@ -165,9 +165,9 @@ exports.createPost = function(req, res) {
 			"rid" : reply_set[i][0],
 			"replier_uid" : reply_set[i][1],
 			"replyto_uid" : reply_set[i][2],
-			"replier_name" : sanitizer.sanitize(reply_set[i][3]),
-			"replyto_name" : sanitizer.sanitize(reply_set[i][4]),
-			"replyContent" : sanitizer.sanitize(reply_set[i][5]),
+			"replier_name" : sanitizer.escape(reply_set[i][3]),
+			"replyto_name" : sanitizer.escape(reply_set[i][4]),
+			"replyContent" : sanitizer.escape(reply_set[i][5]),
 			"date" : time[0],
 			"time" : time[1],
 			"visibility" : reply_set[i][8]
@@ -179,9 +179,9 @@ exports.createPost = function(req, res) {
 		    "eid" : helper.hexToDec(pkg[1][2]),
 		    "date" : pkg[1][3],
 		    "time" : pkg[1][4],
-		    "poster_name" : sanitizer.sanitize(pkg[1][5]),
-		    "event_name" : sanitizer.sanitize(pkg[1][6]),
-		    "postContent" : sanitizer.sanitize(pkg[1][7]),
+		    "poster_name" : sanitizer.escape(pkg[1][5]),
+		    "event_name" : sanitizer.escape(pkg[1][6]),
+		    "postContent" : sanitizer.escape(pkg[1][7]),
 		    "visibility" : pkg[1][8],
 		    "tags" : parseTags(pkg[1][9]),
 		    "replies_no" : reply_set.length,
@@ -377,8 +377,8 @@ exports.viewSelfInfo = function(req, res) {
 	var gender = helper.print_gender(pkg[1][1][8]);
 	var output = {
 	    "status" : "successful",
-	    "realname" : sanitizer.sanitize(pkg[1][1][1]),
-	    "nickname" : sanitizer.sanitize(pkg[1][1][2]),
+	    "realname" : sanitizer.escape(pkg[1][1][1]),
+	    "nickname" : sanitizer.escape(pkg[1][1][2]),
 	    "birthday" : birthday,
 	    "raw_birthday" : pkg[1][1][3],
 	    "tags" : parseTags(pkg[1][1][4]),
@@ -387,9 +387,9 @@ exports.viewSelfInfo = function(req, res) {
 	    "honors" : pkg[1][1][7],
 	    "gender" : gender,
 	    "raw_gender" : pkg[1][1][8],
-	    "city" : sanitizer.sanitize(pkg[1][1][9]),
-	    "state" : sanitizer.sanitize(pkg[1][1][10]),
-	    "country" : sanitizer.sanitize(pkg[1][1][11])
+	    "city" : sanitizer.escape(pkg[1][1][9]),
+	    "state" : sanitizer.escape(pkg[1][1][10]),
+	    "country" : sanitizer.escape(pkg[1][1][11])
 	};
 	res.send(output);
     }, function() {
@@ -410,14 +410,14 @@ exports.viewUserInfo = function(req, res) {
 	output = {
 	    "status" : "successful",
 	    "uid" : pkg[1][2][0],
-	    "realname" : sanitizer.sanitize(pkg[1][2][1]),
-	    "nickname" : sanitizer.sanitize(pkg[1][2][2]),
+	    "realname" : sanitizer.escape(pkg[1][2][1]),
+	    "nickname" : sanitizer.escape(pkg[1][2][2]),
 	    "birthday" : birthday,
 	    "raw_birthday" : pkg[1][2][3],
 	    "tags" : parseTags(pkg[1][2][6]),
 	    "gender" : gender,
 	    "raw_gender" : pkg[1][2][4],
-	    "city" : sanitizer.sanitize(pkg[1][2][5]),
+	    "city" : sanitizer.escape(pkg[1][2][5]),
 	    "common_friends" : pkg[1][2][7]
 	};
 	res.send(output);
@@ -442,12 +442,12 @@ exports.viewUsersInfo = function(req, res) {
 	    results[counter] = {
 		"status" : "successful",
 		"uid" : pkg[1][2][0],
-		"realname" : sanitizer.sanitize(pkg[1][2][1]),
-		"nickname" : sanitizer.sanitize(pkg[1][2][2]),
+		"realname" : sanitizer.escape(pkg[1][2][1]),
+		"nickname" : sanitizer.escape(pkg[1][2][2]),
 		"birthday" : pkg[1][2][3],
 		"tags" : parseTags(pkg[1][2][6]),
 		"gender" : gender,
-		"city" : sanitizer.sanitize(pkg[1][2][5]),
+		"city" : sanitizer.escape(pkg[1][2][5]),
 		"common_friends" : pkg[1][2][7]
 	    };
 	    counter++;
@@ -904,11 +904,11 @@ exports.viewEventInfo = function(req, res) {
 	output = {
 	    "status" : "successful",
 	    "eid" : helper.hexToDec(pkg[1][2][0]),
-	    "name" : sanitizer.sanitize(pkg[1][2][1]),
+	    "name" : sanitizer.escape(pkg[1][2][1]),
 	    "creator" : pkg[1][2][2],
-	    "description" : sanitizer.sanitize(pkg[1][2][3]),
+	    "description" : sanitizer.escape(pkg[1][2][3]),
 	    "tags" : parseTags(pkg[1][2][4]),
-	    "city" : sanitizer.sanitize(pkg[1][2][5]),
+	    "city" : sanitizer.escape(pkg[1][2][5]),
 	    "rating" : pkg[1][2][6],
 	    "honors" : pkg[1][2][7]
 	};
@@ -932,11 +932,11 @@ exports.viewEventsInfo = function(req, res) {
 	    results[counter] = {
 		"status" : "successful",
 		"eid" : helper.hexToDec(pkg[1][2][0]),
-		"name" : sanitizer.sanitize(pkg[1][2][1]),
+		"name" : sanitizer.escape(pkg[1][2][1]),
 		"creator" : pkg[1][2][2],
-		"description" : sanitizer.sanitize(pkg[1][2][3]),
+		"description" : sanitizer.escape(pkg[1][2][3]),
 		"tags" : parseTags(pkg[1][2][4]),
-		"city" : sanitizer.sanitize(pkg[1][2][5]),
+		"city" : sanitizer.escape(pkg[1][2][5]),
 		"rating" : pkg[1][2][6],
 		"honors" : pkg[1][2][7]
 	    };
@@ -1144,9 +1144,9 @@ exports.viewPostContent = function(req, res) {
 		"rid" : reply_set[i][0],
 		"replier_uid" : reply_set[i][1],
 		"replyto_uid" : reply_set[i][2],
-		"replier_name" : sanitizer.sanitize(reply_set[i][3]),
-		"replyto_name" : sanitizer.sanitize(reply_set[i][4]),
-		"replyContent" : sanitizer.sanitize(reply_set[i][5]),
+		"replier_name" : sanitizer.escape(reply_set[i][3]),
+		"replyto_name" : sanitizer.escape(reply_set[i][4]),
+		"replyContent" : sanitizer.escape(reply_set[i][5]),
 		"date" : reply_set[i][6],
 		"time" : reply_set[i][7],
 		"visibility" : reply_set[i][8]
@@ -1158,9 +1158,9 @@ exports.viewPostContent = function(req, res) {
 	    "eid" : helper.hexToDec(pkg[1][2]),
 	    "date" : pkg[1][3],
 	    "time" : pkg[1][4],
-	    "poster_name" : sanitizer.sanitize(pkg[1][5]),
-	    "event_name" : sanitizer.sanitize(pkg[1][6]),
-	    "postContent" : sanitizer.sanitize(pkg[1][7]),
+	    "poster_name" : sanitizer.escape(pkg[1][5]),
+	    "event_name" : sanitizer.escape(pkg[1][6]),
+	    "postContent" : sanitizer.escape(pkg[1][7]),
 	    "visibility" : pkg[1][8],
 	    "tags" : parseTags(pkg[1][9]),
 	    "replies_no" : reply_set.length,
@@ -1204,9 +1204,9 @@ exports.viewPostsContent = function(req, res) {
 		"rid" : reply_set[i][0],
 		"replier_uid" : reply_set[i][1],
 		"replyto_uid" : reply_set[i][2],
-		"replier_name" : sanitizer.sanitize(reply_set[i][3]),
-		"replyto_name" : sanitizer.sanitize(reply_set[i][4]),
-		"replyContent" : sanitizer.sanitize(reply_set[i][5]),
+		"replier_name" : sanitizer.escape(reply_set[i][3]),
+		"replyto_name" : sanitizer.escape(reply_set[i][4]),
+		"replyContent" : sanitizer.escape(reply_set[i][5]),
 		"date" : reply_set[i][6],
 		"time" : reply_set[i][7],
 		"visibility" : reply_set[i][8]
@@ -1218,9 +1218,9 @@ exports.viewPostsContent = function(req, res) {
 	    "eid" : helper.hexToDec(pkg[1][2]),
 	    "date" : pkg[1][3],
 	    "time" : pkg[1][4],
-	    "poster_name" : sanitizer.sanitize(pkg[1][5]),
-	    "event_name" : sanitizer.sanitize(pkg[1][6]),
-	    "postContent" : sanitizer.sanitize(pkg[1][7]),
+	    "poster_name" : sanitizer.escape(pkg[1][5]),
+	    "event_name" : sanitizer.escape(pkg[1][6]),
+	    "postContent" : sanitizer.escape(pkg[1][7]),
 	    "visibility" : pkg[1][8],
 	    "tags" : parseTags(pkg[1][9]),
 	    "replies_no" : reply_set.length,
@@ -1848,7 +1848,7 @@ function parseTags(tags){
 	var results=[];
 	if(tags){
 		for(var i=0;i<tags.length;i++)
-			results[i] = sanitizer.sanitize(tags[i]);
+			results[i] = sanitizer.escape(tags[i]);
 	}
 	return results;
 }
