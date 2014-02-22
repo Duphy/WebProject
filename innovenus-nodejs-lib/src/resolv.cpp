@@ -644,6 +644,9 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 		case 4: // View user's info
 			ans->Set(2, resolvUserSimpleOtherPack(pack, pointer)); // user simple other pack
 			break;
+		case 9: // View common friends
+			ans->Set(2, resolvUIDs(pack, pointer));
+			break;
 		case 18: // View user's circatag
 			ans->Set(2, JSreadInteger(pack, pointer, 1)); // opt
 			ans->Set(3, resolvWeightedTags(pack, pointer)); // circatag pack
@@ -812,7 +815,7 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 	{
 		char picid[PICID_LENGTH * 2 + 1];
 		readAsciiString(picid, pack, pointer, PICID_LENGTH);
-		ans->Set(0, String::New(picid, PICID_LENGTH)); // version time
+		ans->Set(0, String::New(picid, PICID_LENGTH));
 		std::ostringstream os;
 		os << "public/data/post/" << picid << ".jpg";
 		ans->Set(1, JSreadFile(pack, pointer, os.str()));

@@ -482,6 +482,8 @@ static inline void Add(std::string& code, const int type,
  * 		- createViewUserPack(2, session_key, viewer_uid, viewee_uid, max_pid)
  * - for view user's info
  * 		- createViewUserPack(4, session_key, viewer_uid, viewee_uid)
+ * - for view user's common friends
+ * 		- createViewUserPack(9, session_key, viewer_uid, viewee_uid)
  * - for view user's circatags
  * 		- createViewUserPack(18, session_key, viewer_uid, viewee_uid)
  * - for view user's big avarta
@@ -509,6 +511,7 @@ Handle<Value> createViewUserPack(const Arguments &args) {
 		case 0:
 		case 1:
 		case 4:
+		case 9:
 		case 18:
 			break;
 		case 2:
