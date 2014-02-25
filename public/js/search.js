@@ -19,6 +19,19 @@ $(document).ready(function(){
   auth_data.uid = localStorage.uid;
   auth_data.session_key = localStorage.session_key;
 
+  if(localStorage.self_small_avarta == ""){
+    $.ajax({
+      url:'/getselfsmallavarta',
+      data:JSON.stringify(auth_data),
+      type:"POST",
+      contentType:"application/json",
+      success:function(data){
+        localStorage.self_small_avarta = data.avarta;
+        $(".selfProfileSmallAvarta").attr("src",data.avarta);
+      }
+    });
+  }
+
    //TO DO: add the case handler for no matched result.
   if(localStorage.search_tag_option!=""){
       switch(localStorage.search_tag_option){
@@ -282,7 +295,7 @@ $(document).on('click', ".joinevent", function() {
         $(chatArea).append(
           '<div class = "chat-message" uid = "'+localStorage.uid+'">'+
             '<div class = "chat-gravatar-wrapper">'+
-              '<img src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
+              '<img class = "chatAvarta'+localStorage.uid+'" src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
             '</div>'+
             '<div class = "chat-text-wrapper">'+
               '<p>'+content+'</p>'+            

@@ -1,4 +1,4 @@
-var socket = io.connect('http://circatag.com');
+var socket = io.connect('http://localhost:3000');
 console.log("client socket connected!");
 socket.emit("uid",localStorage.uid);
 socket.on("friend request",function(name, uid, eid, pid, action, seq){
@@ -103,6 +103,7 @@ socket.on("receive user chat",function(uid, message, date, time){
 		}
 	});
 	if(proceed){
+		console.log("open a new friend chat window.");
 		openFriendsChatBox(localStorage.session_key,localStorage.uid,uid,chatBoxNumber);
 		chatBoxNumber++;
 	}
@@ -139,6 +140,7 @@ socket.on("receive event chat",function(eid, s_uid, message, date, time){
 		}
 	});
 	if(proceed){
+		console.log("open a new event chat window.");
 		openEventsChatBox(localStorage.session_key,localStorage.uid,eid,chatBoxNumber);
 		chatBoxNumber++;
 	}

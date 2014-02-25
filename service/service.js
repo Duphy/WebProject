@@ -42,8 +42,8 @@ exports.signUp = function(req, res) {
 	    req.body.country, tags, hidden_tags);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log("signup feedback:");
-	console.log(pkg);
+	//console.log("signup feedback:");
+	//console.log(pkg);
 	if (pkg[1][0]) {
 	    output = {
 		"status" : "successful",
@@ -126,7 +126,6 @@ exports.createEvent = function(req, res) {
 	    req.body.city, req.body.tags);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log(pkg);
 	var eid;
 	if (pkg[1][0] == 1) {
 	    status = "successful";
@@ -151,7 +150,6 @@ exports.createPost = function(req, res) {
 	var pkg = lib.resolvPack(data);
 	if (pkg[1][0]) {
 	    var pidset = pkg[1][1];
-	    console.log(pidset);
 	    var pack = lib.createViewPostingPack(req.body.session_key,
 		    parseInt(req.body.uid), pidset[0], pidset[1], pidset[2]);
 	    var output;
@@ -219,8 +217,6 @@ exports.createReply = function(req, res) {
 	    parseInt(req.body.visibility));
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log("reply package:");
-	console.log(pkg);
 	if (pkg[1][4] == 0) {
 	    var output = {
 		"poster_uid" : pkg[1][0],
@@ -251,8 +247,6 @@ exports.createFriendRequest = function(req, res) {
 	    req.body.content);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-    console.log("send friend request");
-	console.log(pkg);
 	if (pkg[1][0] == 1) {
 	    var output = {
 		"type" : pkg[1][1],
@@ -279,8 +273,6 @@ exports.createJoinEventRequest = function(req, res) {
 	    parseInt(req.body.uid), helper.decToHex(req.body.eid), req.body.content);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-                          console.log("send event request");
-                          console.log(pkg);
 	if (pkg[1][0] == 1) {
 	    var output = {
 		"type" : pkg[1][1],
@@ -308,7 +300,6 @@ exports.createEventInvitationRequest = function(req, res) {
 	    helper.decToHex(req.body.eid), req.body.content);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log(pkg);
 	if (pkg[1][0] == 1) {
 	    var output = {
 		"type" : pkg[1][1],
@@ -520,8 +511,8 @@ exports.viewSelfPosts = function(req, res) {
 	    parseInt(req.body.uid), max_pid);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log("self posts:");
-	console.log(pkg);
+	//console.log("self posts:");
+	//console.log(pkg);
 	output = {
 	    "pidsets" : pkg[1][1]
 	};
@@ -600,7 +591,7 @@ exports.viewSelfSchedule = function(req, res) {
     var output;
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log(data);
+	//console.log(data);
 	var schedules = [];
 	var schedules_set = pkg[1][1];
 	for (var i = 0; i < schedules_set.length; i++) {
@@ -730,7 +721,7 @@ exports.viewSelfAvarta = function(req,res){
     var output;
     helper.connectAndSend(pack,function(data){
         var pkg = lib.resolvPack(data);
-        console.log(pkg);
+        //console.log(pkg);
 		if(!pkg[1][3]){
 			avarta = default_avarta;
 		}
@@ -781,7 +772,7 @@ exports.viewSelfSmallAvarta = function(req,res){
     var output;
     helper.connectAndSend(pack,function(data){
         var pkg = lib.resolvPack(data);
-        console.log(pkg);
+        //console.log(pkg);
 		if(!pkg[1][3]){
 			avarta = default_avarta;
 		}
@@ -830,7 +821,7 @@ exports.viewUserAvarta = function(req,res){
     var output;
     helper.connectAndSend(pack,function(data){
         var pkg = lib.resolvPack(data);
-        console.log(pkg);
+        //console.log(pkg);
         //var time = helper.UTCtimeTransform(pkg[1][0],pkg[1][1]);
 		if(!pkg[1][4]){
 			avarta = default_avarta;
@@ -873,7 +864,7 @@ exports.viewUserSmallAvarta = function(req,res){
     var output;
     helper.connectAndSend(pack,function(data){
         var pkg = lib.resolvPack(data);
-        console.log(pkg);
+        //console.log(pkg);
         //var time = helper.UTCtimeTransform(pkg[1][0],pkg[1][1]);
                           if(!pkg[1][4]){
                           avarta = default_avarta;
@@ -896,7 +887,7 @@ exports.viewUserSmallAvarta = function(req,res){
 exports.viewEventInfo = function(req, res) {
     var output;
     var eid = helper.decToHex(req.body.eid);
-    console.log(eid);
+    //console.log(eid);
     var pack = lib.createViewEventPack(4, req.body.session_key,
 	    parseInt(req.body.uid), eid);
     helper.connectAndSend(pack, function(data) {
@@ -1376,9 +1367,9 @@ exports.searchPost = function(req, res) {
 	    parseInt(req.body.uid), req.body.filter, parseInt(req.body.range),
 	    parseInt(req.body.option));
     helper.connectAndSend(pack, function(data) {
-                          console.log(data);
+    console.log(data);
 	var pkg = lib.resolvPack(data);
-                          console.log(pkg);
+    console.log(pkg);
 	var output = {
 	    "pidsets" : pkg[1]
 	};

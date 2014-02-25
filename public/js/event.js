@@ -694,7 +694,7 @@ $("body").delegate(".memberItem", 'click', function() {
         $(chatArea).append(
           '<div class = "chat-message" uid = "'+localStorage.uid+'">'+
             '<div class = "chat-gravatar-wrapper">'+
-              '<img src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
+              '<img class = "chatAvarta'+localStorage.uid+'" src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
             '</div>'+
             '<div class = "chat-text-wrapper">'+
               '<p>'+content+'</p>'+            

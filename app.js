@@ -12,6 +12,8 @@ var http = require('http');
 var path = require('path');
 var service = require('./service/service'); 
 var routes = require('./routes');
+var mkdirp = require("mkdirp");
+var rimraf = require("rimraf");
 var fs = require('fs');
 var mongo = require('./service/mongo');
 var redis = require('redis');
@@ -183,6 +185,8 @@ io.on('connection',function(socket){
 				throw err;
 			}
 		});
+		readUserChat(uid);
+		readEventChat(uid);
 	});
 
 	socket.on('get user chat',function(session_key, uid, seq, c_uid, content){
@@ -241,7 +245,6 @@ io.on('connection',function(socket){
 function notificationHandler(notifications,uid){
 	console.log("get notifications!");
 	var uid = notifications[0][2];
-	console.log("user id is: "+uid);
 	if(socketsList[uid] && !socketsList[uid].disconnected){
 		console.log("find socket!!!!");
 		for(var i = 0;i < notifications[1].length;i++){
@@ -397,7 +400,7 @@ function saveChat(chat){
                     //socket.emit("send user chat",chat[1][1],chat[1][2]);//seq status
                     break;
                 case 1:
-                	var data;
+                	var data = {};
                 	var uid = chat[0][2];
                 	data.sender_uid = chat[1][1];
                 	data.content = chat[1][2];
@@ -416,7 +419,7 @@ function saveChat(chat){
                     break;
                 case 1:
                     //socket.emit("receive event chat",service.helper.hexToDec(chat[1][1]),chat[1][2],service.sanitizer.escape(chat[1][3]),chat[1][4],chat[1][5]);//eid,s_uid, message, date, time
-                    var data;
+                    var data = {};
                 	var uid = chat[0][2];
                 	data.eid = chat[1][1];
                 	data.sender_uid = chat[1][2];
@@ -431,26 +434,28 @@ function saveChat(chat){
 			console.log("no matched chat type!");
 			break;
 	}
-
-
 }
 function storeUserChat(uid,sender_uid, data){
 	var path = service.dataPath +uid+"/chat/user/";
 	service.fs.readdir(path, function(err){
 		if(err){
-			console.log("not exists");
-			service.fs.mkdir(path,function(err){
-				console.log("created dir");
-				var chatPath = path + sender_uid;//public/data/uid/sender_uid
-				//service.fs.writeFileSync(chatPath, data,);
-				service.fs.appendFileSync(chatPath, data + "\n");
-				res.send({status:"successful"});
+			console.log("dir does not exists.");
+			mkdirp(path, function(err){
+			    if(err){
+			    	console.log("created dir unsuccessfully.");
+			    }else{
+			   		console.log("created dir");
+					var chatPath = path + sender_uid;//public/data/uid/sender_uid
+					//service.fs.writeFileSync(chatPath, data,);
+					service.fs.appendFileSync(chatPath, data + "\n");
+					//res.send({status:"successful"});
+			    }
 			});
 		}else{
-			console.log("exists");
+			console.log("dir exists.");
 			var chatPath = path + sender_uid;//public/data/uid/sender_uid
 			service.fs.appendFileSync(chatPath, data + "\n");
-			res.send({status:"successful"});
+			//res.send({status:"successful"});
 		}
 	});
 }
@@ -458,45 +463,58 @@ function storeEventChat(uid,sender_uid, data){
 	var path = service.dataPath +uid+"/chat/event/";
 	service.fs.readdir(path, function(err){
 		if(err){
-			console.log("not exists");
-			service.fs.mkdir(path,function(err){
-				console.log("created dir");
-				var chatPath = path + sender_uid;//public/data/uid/sender_uid
-				//service.fs.writeFileSync(chatPath, data,);
-				service.fs.appendFileSync(chatPath, data + "\n");
-				res.send({status:"successful"});
+			console.log("dir does not exists.");
+			mkdirp(path, function(err){
+			    if(err){
+			    	console.log("created dir unsuccessfully.");
+			    }else{
+			   		console.log("created dir");
+					var chatPath = path + sender_uid;//public/data/uid/sender_uid
+					//service.fs.writeFileSync(chatPath, data,);
+					service.fs.appendFileSync(chatPath, data + "\n");
+					//res.send({status:"successful"});
+			    }
 			});
 		}else{
-			console.log("exists");
+			console.log("dir exists.");
 			var chatPath = path + sender_uid;//public/data/uid/sender_uid
 			service.fs.appendFileSync(chatPath, data + "\n");
-			res.send({status:"successful"});
+			//res.send({status:"successful"});
 		}
 	});
 }
 function readUserChat(uid){
+	console.log("enter readUserChat function.");
 	var path = service.dataPath+uid+"/chat/user/";
 	var chats=[];
-	service.fs.readdir(path, function(err,files){
+	fs.readdir(path, function(err,files){
 		if(err){
 			console.log("not exists");
-			//do nothing
 		}
 		else{
-			//check if the chat exists
 			for (var i in files){
-				fs.readFileSync(files[i]).toString().split('\n').forEach(function (line) {
-					var chat = JSON.parse(line);
-					socket.emit("receive user chat",chat.sender_uid,
-					service.sanitizer.escape(chat.content),
-					chat.date,chat.time);//s_uid, message, date, time
-		        //console.log(version);
+				console.log("the file[i] are:");
+				console.log(path+files[i]);
+				fs.readFileSync(path+files[i]).toString().split('\n').forEach(function (line) {
+					if(line != ""){
+						console.log("message :"+line);
+						var chat = JSON.parse(line);
+						if(socketsList[uid] && !socketsList[uid].disconnected){
+							socketsList[uid].emit("receive user chat",chat.sender_uid,
+							service.sanitizer.escape(chat.content),
+							chat.date,chat.time);//s_uid, message, date, time
+							console.log("finished send one chat message.");
+						}
+					}
 		        });
 			}
-			service.fs.rmdirSync(path);	
+			rimraf(path, function(err){
+				console.log("remove directory successfully");
+			});
 		}
 	});
 }
+
 function readEventChat(uid){
 	var path = service.dataPath+uid+"/chat/event/";
 	var chats=[];
@@ -506,17 +524,24 @@ function readEventChat(uid){
 			//do nothing
 		}
 		else{
-			//check if the chat exists
 			for (var i in files){
-				fs.readFileSync(files[i]).toString().split('\n').forEach(function (line) {
-					var chat = JSON.parse(line);
-					socket.emit("receive event chat",chat.eid, chat.sender_uid,
-					service.sanitizer.escape(chat.content),
-					chat.date,chat.time);//s_uid, message, date, time
-		        //console.log(version);
+				console.log("the file[i] are:");
+				console.log(path+files[i]);
+				fs.readFileSync(path+files[i]).toString().split('\n').forEach(function (line) {
+					if(line != ""){
+						console.log("message :"+line);
+						var chat = JSON.parse(line);
+						if(socketsList[uid] && !socketsList[uid].disconnected){
+							socketsList[uid].emit("receive event chat",chat.eid, chat.sender_uid,
+							service.sanitizer.escape(chat.content),
+							chat.date,chat.time);//s_uid, message, date, time
+						}
+					}
 		        });
 			}
-			service.fs.rmdirSync(path);	
+			rimraf(path, function(err){
+				console.log("remove directory successfully");
+			});
 		}
 	});
 }
