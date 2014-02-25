@@ -315,12 +315,23 @@ $(document).ready(function(){
 						        localStorage.city = data.city;
 						        localStorage.state = data.state;
 						        localStorage.country = data.country;
-						        console.log("ready to go home");
-						        $("#floatingBarsG-login").hide();
-						        $("#login").removeAttr("disabled");
 						        localStorage.search_tag_option = "user";
 						        localStorage.search_tag_content = "";
-								window.location = "/search";
+						        $.ajax({
+						        	url:"/getselffriendsinfo",
+									data:JSON.stringify(auth_data),
+									type:"POST",
+									contentType: 'application/json',
+									success:function(data){
+										console.log("ready to go home");
+						        		$("#floatingBarsG-login").hide();
+						        		$("#login").removeAttr("disabled");
+						        		if(data.friend_uids.length>7)
+											window.location = "/home";
+										else
+											window.location = "/search";
+									}
+						        });
 							}
 						});
 					}else{
