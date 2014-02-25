@@ -327,6 +327,10 @@ function chatHandler(chat,uid){
 	 	console.log("find socket!!!!");
         sendChat(chat,socketsList[uid]);
     }
+    else{//socket close store it in the disk
+    	console.log("cannot find socket");
+    	saveChat(chat);
+    }
 	//  }else{
 	//  	console.log("cannot find socket!!!!");
 	//  	if(personalChatPool[uid]){
@@ -384,7 +388,138 @@ function sendChat(chat,socket){
 			break;
 	}
 }
+function saveChat(chat){
+	switch(chat[0][4]){
+		case 0:
+			switch(chat[1][0]){
+                case 0:
+                	//do nothing
+                    //socket.emit("send user chat",chat[1][1],chat[1][2]);//seq status
+                    break;
+                case 1:
+                	var data;
+                	var uid = chat[0][2];
+                	data.sender_uid = chat[1][1];
+                	data.content = chat[1][2];
+                	data.date = chat[1][3];
+                	data.time = chat[1][4];
+                	storeUserChat(uid, data.sender_uid, JSON.stringify(data));
+                    //socket.emit("receive user chat",chat[1][1],service.sanitizer.escape(chat[1][2]),chat[1][3],chat[1][4]);//s_uid, message, date, time
+                    //socket.emit("receive user chat",1235760,"hello world",20110811,48636);//s_uid, message, date, time
+                    break;
+            }
+			break;
+		case 1:
+            switch(chat[1][0]){
+                case 0:
+                    //socket.emit("send event chat",chat[1][1],chat[1][2]);//seq status
+                    break;
+                case 1:
+                    //socket.emit("receive event chat",service.helper.hexToDec(chat[1][1]),chat[1][2],service.sanitizer.escape(chat[1][3]),chat[1][4],chat[1][5]);//eid,s_uid, message, date, time
+                    var data;
+                	var uid = chat[0][2];
+                	data.eid = chat[1][1];
+                	data.sender_uid = chat[1][2];
+                	data.content = chat[1][3];
+                	data.date = chat[1][4];
+                	data.time = chat[1][5];
+                	storeEventChat(uid, data.eid, JSON.stringify(data));
+                    break;
+            }
+			break;
+		default:
+			console.log("no matched chat type!");
+			break;
+	}
 
+
+}
+function storeUserChat(uid,sender_uid, data){
+	var path = service.dataPath +uid+"/chat/user/";
+	service.fs.readdir(path, function(err){
+		if(err){
+			console.log("not exists");
+			service.fs.mkdir(path,function(err){
+				console.log("created dir");
+				var chatPath = path + sender_uid;//public/data/uid/sender_uid
+				//service.fs.writeFileSync(chatPath, data,);
+				service.fs.appendFileSync(chatPath, data + "\n");
+				res.send({status:"successful"});
+			});
+		}else{
+			console.log("exists");
+			var chatPath = path + sender_uid;//public/data/uid/sender_uid
+			service.fs.appendFileSync(chatPath, data + "\n");
+			res.send({status:"successful"});
+		}
+	});
+}
+function storeEventChat(uid,sender_uid, data){
+	var path = service.dataPath +uid+"/chat/event/";
+	service.fs.readdir(path, function(err){
+		if(err){
+			console.log("not exists");
+			service.fs.mkdir(path,function(err){
+				console.log("created dir");
+				var chatPath = path + sender_uid;//public/data/uid/sender_uid
+				//service.fs.writeFileSync(chatPath, data,);
+				service.fs.appendFileSync(chatPath, data + "\n");
+				res.send({status:"successful"});
+			});
+		}else{
+			console.log("exists");
+			var chatPath = path + sender_uid;//public/data/uid/sender_uid
+			service.fs.appendFileSync(chatPath, data + "\n");
+			res.send({status:"successful"});
+		}
+	});
+}
+function readUserChat(uid){
+	var path = service.dataPath+uid+"/chat/user/";
+	var chats=[];
+	service.fs.readdir(path, function(err,files){
+		if(err){
+			console.log("not exists");
+			//do nothing
+		}
+		else{
+			//check if the chat exists
+			for (var i in files){
+				fs.readFileSync(files[i]).toString().split('\n').forEach(function (line) {
+					var chat = JSON.parse(line);
+					socket.emit("receive user chat",chat.sender_uid,
+					service.sanitizer.escape(chat.content),
+					chat.date,chat.time);//s_uid, message, date, time
+		        //console.log(version);
+		        });
+			}
+			service.fs.rmdirSync(path);	
+		}
+	});
+}
+function readEventChat(uid){
+	var path = service.dataPath+uid+"/chat/event/";
+	var chats=[];
+	service.fs.readdir(path, function(err,files){
+		if(err){
+			console.log("not exists");
+			//do nothing
+		}
+		else{
+			//check if the chat exists
+			for (var i in files){
+				fs.readFileSync(files[i]).toString().split('\n').forEach(function (line) {
+					var chat = JSON.parse(line);
+					socket.emit("receive event chat",chat.eid, chat.sender_uid,
+					service.sanitizer.escape(chat.content),
+					chat.date,chat.time);//s_uid, message, date, time
+		        //console.log(version);
+		        });
+			}
+			service.fs.rmdirSync(path);	
+		}
+	});
+}
 function chatToEvent(session_key, uid, seq, eid, content){
 	// console.log("I got the chat!!!!!!!!!!!!!!!!!!!");
 	var status = "unsuccessful";
