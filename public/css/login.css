@@ -842,3 +842,12 @@ background-color:#000000}
 background-color:#FFFFFF}
 
 }
+
+@media (max-width:1096px) {
+  .downloadButton img {
+    display: none;
+  }
+  .downloadButton font {
+    display: none;
+  }
+}
