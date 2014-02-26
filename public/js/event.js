@@ -159,28 +159,6 @@ $(document).ready(function(){
           $("#createPost").hide();
           $("#profileModal").find(".modal-footer").hide();
           $("#eventManage").after('<a id = "settingJoinEvent"><i class="icon-plus"></i>&nbsp;&nbsp;Join Event</a>');
-          $("#settingJoinEvent").click(function(){
-            var data = {};
-            data = auth_data;
-            data.eid = localStorage.eid;
-            data.content = "Could you add me into your event? :)";
-            $("#settingJoinEvent").css({"pointer-events":"none","cursor":"default","color":"#ccc"});
-            $("#settingJoinEvent").html("sending....");
-            $.ajax({
-              url:"/joinevent",
-              data:JSON.stringify(data),
-              type:"POST",
-              contentType: 'application/json',
-              success:function(result){
-                if(result.status == "successful"){
-                  $("#settingJoinEvent").html("request pending");
-                }else{
-                  $("#settingJoinEvent").html("request failed");
-                }
-              }
-            });
-            return false;
-          });
         }else{
           //$("#eventManage").hide();
           $("#eventManage").after('<a href="#quitModal" data-toggle="modal" ><i class="icon-remove"></i>&nbsp;&nbsp;Quit Event</a>');
@@ -190,7 +168,13 @@ $(document).ready(function(){
   }
   else{
     //TODO: add warning message
-    flag_displaymember=false;
+    //flag_displaymember=false;
+    $("#right").hide();
+    $(".nonMemberWarning").show();
+    $("#circularG").hide();
+    $("#createPost").hide();
+    $("#eventManage").hide();
+    $("#eventManage").after('<a id = "settingJoinEvent"><i class="icon-plus"></i>&nbsp;&nbsp;Join Event</a>');
   }
   //Adjust posting Area width
   $('#postArea').css({'width':$('#postModal').width()*0.9,'height':"80px"});
@@ -341,6 +325,29 @@ $(document).ready(function(){
     }
   });
 
+$("body").delegate("#settingJoinEvent",'click',function(){
+  var data = {};
+  data = auth_data;
+  data.eid = localStorage.eid;
+  data.content = "Could you add me into your event? :)";
+  $("#settingJoinEvent").css({"pointer-events":"none","cursor":"default","color":"#ccc"});
+  $("#settingJoinEvent").html("sending....");
+  $.ajax({
+    url:"/joinevent",
+    data:JSON.stringify(data),
+    type:"POST",
+    contentType: 'application/json',
+    success:function(result){
+      if(result.status == "successful"){
+        $("#settingJoinEvent").html("request pending");
+      }else{
+        $("#settingJoinEvent").html("request failed");
+      }
+    }
+  });
+  return false;
+});
+
 $("body").delegate(".userName", 'click', function() {
   if($(this).attr("uid") != localStorage.uid){
     $(this).css("cusor","pointer");
@@ -368,6 +375,7 @@ $("body").delegate(".memberItem", 'click', function() {
 });
 
   $("#left").click(function(){
+    console.log("shaobi");
    $('#contentBody').toggleClass('cbp-spmenu-push-toright').removeClass('cbp-spmenu-push-toleft');
    $('#cbp-spmenu-s1').toggleClass('cbp-spmenu-open');
    $('#cbp-spmenu-s2').removeClass('cbp-spmenu-open');
@@ -429,7 +437,7 @@ $("body").delegate(".memberItem", 'click', function() {
               }
              }
         });//ajax
-    }//if flag
+    }
   });
 
   $('body').delegate('.tagHead','mouseover',function(){
@@ -869,6 +877,11 @@ $("body").delegate(".memberItem", 'click', function() {
       }
     });
     removeNotification();
+  });
+
+  $(".nonMemberWarning").click(function(){
+    $("#left").trigger("click");
+    return false;
   });
 
   $("#timeoutButton").click(function(){
