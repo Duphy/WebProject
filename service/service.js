@@ -701,6 +701,22 @@ exports.viewPictures = function(req,res){
 		);
 	}
 }
+exports.viewCommonFriends = function(req,res){
+	var pack = createViewUserPack(9, req.body.session_key,
+	    parseInt(req.body.uid), parseInt(req.body.view_uid));
+	var output;
+    helper.connectAndSend(pack, function(data) {
+		var pkg = lib.resolvPack(data);
+		output = {
+		    "common_friends" : pkg[1][2]
+		};
+		res.send(output);
+	    }, function() {
+		res.send({
+		    status : "timeout"
+		});
+    });
+}
 exports.viewUserCircatags = function(req, res) {
     var pack = lib.createViewUserPack(18, req.body.session_key,
 	    parseInt(req.body.uid), parseInt(req.body.view_uid));

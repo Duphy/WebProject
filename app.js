@@ -83,6 +83,8 @@ app.post('/getuserposts',express.bodyParser(),service.viewUserPosts);
 app.post('/getselfevents',express.bodyParser(),service.viewSelfEvents);
 app.post('/getuserevents',express.bodyParser(),service.viewUserEvents);
 app.post('/getselfcircatags',express.bodyParser(),service.viewSelfCircatags);
+app.post('/getpictures',express.bodyParser(),service.viewPictures);
+app.post('/getcommonfriends',express.bodyParser(),service.viewCommonFriends);
 
 app.post('/getuseravarta',express.bodyParser(),service.viewUserAvarta);
 app.post('/getusersmallavarta',express.bodyParser(),service.viewUserSmallAvarta);
