@@ -767,4 +767,5 @@ $(document).ready(function(){
   });
 
   $("#createPost").remove();
+  $("#createPicture").remove();
 });

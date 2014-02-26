@@ -159,6 +159,7 @@ $(document).ready(function(){
           $("#eventManage").hide();
           $("#profileEdit").hide();
           $("#createPost").hide();
+          $("#createPicture").hide();
           $("#profileModal").find(".modal-footer").hide();
           $("#eventManage").after('<a id = "settingJoinEvent"><i class="icon-plus"></i>&nbsp;&nbsp;Join Event</a>');
         }else{
