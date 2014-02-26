@@ -191,15 +191,9 @@ function renderPost(post){
     '<div class = "offset1 span10 offset2">'+
     '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+post.postContent+'</pre>'+
     '</div>'+
-    '</div>';
-    //TO DO: add post picture here.
-    if(false){
-      html = html + 
-      '<div class="row-fluid" style = "margin-left:2%;">'+
-        '<img src = "#" style = "width:96%;">'+
-      '</div>';
-    }
-    html = html +
+    '</div>'+
+    '<div class="row-fluid pictureArea" style = "margin-left:2%;">'+
+    '</div>'+
     '<div class = "row-fluid shareButtons" style = "margin-top:10px;">'+
       /*'<div class = "offset1 span1"><button class = "btn button" style = "width:50px;"><i class = "icon-thumbs-up"></i>0</button></div>'+
       '<div class = "span1"><button class = "btn button" style = "width:50px;margin-left:10px;"><i class = "icon-share"></i></button></div>';
@@ -324,6 +318,28 @@ function createPost(data){
         $('#floatingBarsG-post').hide();
         $("#contentBody").find(".well").hide();
         $("#postSubmit").removeAttr("disabled");
+        if(result.post.pics){
+          var pictureData  = {};
+          pictureData.session_key = localStorage.session_key;
+          pictureData.uid = localStorage.uid;
+          pictureData.pids = post.pics;
+          $.ajax({
+            url:'/getpictures',
+            data:JSON.stringify(pictureData),
+            type:"POST",
+            contentType:"application/json",
+            success:function(data){
+              if(data.picture){
+                console.log("picture url is:");
+                console.log(data.picture);
+                var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                $("#"+postid).find(".pictureArea").append("<img src = '"+data.picture+"' style = 'width:96%;'/>");
+              }else{
+                console.log("failed to get the picture of this post");
+              }
+            }
+          });
+        }
       }
     }
   });
@@ -760,6 +776,7 @@ function viewpost(pids,char,newsData){
            //console.log(result);
             if(result.status == "successful"){
               $("#contentBody").find(".well").hide();
+              console.log(result.source);
               $.each(result.source,function(index,element){
                     var postAvartaData = {};
                     postAvartaData.session_key = localStorage.session_key;
@@ -773,6 +790,32 @@ function viewpost(pids,char,newsData){
                     }else{
                       $('#left-column').append(renderPost(element));
                     }
+                    //retrieve the pics of the element if any.
+                    if(element.pics.length > 0){
+                      console.log("element:");
+                      console.log(element);
+                      console.log(element.pics);
+                      console.log(element.pics.length);
+                      var pictureData  = {};
+                      pictureData.session_key = localStorage.session_key;
+                      pictureData.uid = localStorage.uid;
+                      pictureData.pids = element.pics;
+                      $.ajax({
+                        url:'/getpictures',
+                        data:JSON.stringify(pictureData),
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                          if(data.picture){
+                            var postid = element.uid+""+element.eid+""+element.pid;
+                            $("#"+postid).find(".pictureArea").append("<img src = '"+data.picture+"' style = 'width:96%;'/>");
+                          }else{
+                            console.log("failed to get the picture of this post");
+                          }
+                        }
+                      });
+                    }
+                    //retrieve the avatar of the poster
                     $.ajax({
                            url:'/getuseravarta',
                            data:JSON.stringify(postAvartaData),

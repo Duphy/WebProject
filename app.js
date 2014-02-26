@@ -148,6 +148,7 @@ app.post('/deleteeventmanager',express.bodyParser(), service.deleteEventManager)
 app.post('/responsetonotification', express.bodyParser(), service.responseNoti);
 
 //upload Avarta
+app.post('/uploadpostpicture',service.uploadPicture);
 app.post('/uploadavarta',service.uploadAvarta);
 /*************** End *****************/
 
