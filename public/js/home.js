@@ -384,7 +384,7 @@ $(document).ready(function(){
   });
 
   ("#pictureFileupload").fileupload({
-    url:"/",
+    url:"/uploadpostpicture",
     type:"POST",
     dataType:"json",
     maxFileSize:10000000,
@@ -472,7 +472,7 @@ $(document).ready(function(){
     data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
     data.session_key = localStorage.session_key;
     data.uid = localStorage.uid;
-    data.pics = $(this).attr("picturename");
+    data.pics = [$(this).attr("picturename")];
     $("#floatingBarsG-picture").show();
     createPost(data);
     return false;
@@ -711,7 +711,7 @@ $(document).ready(function(){
 			data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
 			data.session_key = localStorage.session_key;
 			data.uid = localStorage.uid;
-      data.pics = "";
+      data.pics = [];
       $("#floatingBarsG-post").show();
       createPost(data);
 		}

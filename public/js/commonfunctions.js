@@ -322,7 +322,7 @@ function createPost(data){
           var pictureData  = {};
           pictureData.session_key = localStorage.session_key;
           pictureData.uid = localStorage.uid;
-          pictureData.picids = [post.pics];
+          pictureData.picids = post.pics;
           $.ajax({
             url:'/getpictures',
             data:JSON.stringify(pictureData),
@@ -330,6 +330,8 @@ function createPost(data){
             contentType:"application/json",
             success:function(data){
               if(data.picture){
+                console.log("picture url is:");
+                console.log(data.picture);
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
                 $("#"+postid).find(".pictureArea").append("<img src = '"+data.picture+"' style = 'width:96%;'/>");
               }else{
@@ -792,7 +794,7 @@ function viewpost(pids,char,newsData){
                       var pictureData  = {};
                       pictureData.session_key = localStorage.session_key;
                       pictureData.uid = localStorage.uid;
-                      pictureData.picids = [element.pics];
+                      pictureData.picids = element.pics;
                       $.ajax({
                         url:'/getpictures',
                         data:JSON.stringify(pictureData),
