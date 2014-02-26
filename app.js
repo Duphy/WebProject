@@ -15,11 +15,7 @@ var routes = require('./routes');
 var mkdirp = require("mkdirp");
 var rimraf = require("rimraf");
 var fs = require('fs');
-var mongo = require('./service/mongo');
 var redis = require('redis');
-
-//TO DO: to be configured 
-//mongoose.connect('mongodb://localhost/test');
 
 var app = express();
 //var redisClient = redis.createClient();
@@ -191,16 +187,6 @@ io.on('connection',function(socket){
 
 	socket.on('get user chat',function(session_key, uid, seq, c_uid, content){
 		chatToUser(session_key, uid, seq, c_uid, content);
-  		// var now = new Date();
-		// var chat = new mongo.friendchat({selfUid:uid,date:now,content:content,friendUid:c_uid});
-		// chat.save(function(err){
-		//     if (err){
-		//     	console.log("chat save error "+uid+" "+c_uid);
-		//     	throw err;
-		//     }else{
-		//     	console.log("chat save successfully "+uid+" "+c_uid);
-		//     }
-		// });
 	});
 
 	socket.on('get event chat',function(session_key,uid, seq, eid,content){
@@ -309,18 +295,6 @@ function chatHandler(chat,uid){
 	console.log("get chat!");
 	console.log(chat);
 
-	//save to mongodb
-	//TO DO:need to convert date and time to Date object
-	// var chatItem = new mongo.friendchat({selfUid:uid,date:now,content:content,friendUid:c_uid});
-	// chatItem.save(function(err){
-	//     if (err){
-	//     	console.log("chat save error "+uid+" "+c_uid);
-	//     	throw err;
-	//     }else{
-	//     	console.log("chat save successfully "+uid+" "+c_uid);
-	//     }
-	// });
-
 	var uid = chat[0][2];
 	console.log("user id is: "+uid);
     //console.log(socketsList[uid]);
@@ -334,17 +308,6 @@ function chatHandler(chat,uid){
     	console.log("cannot find socket");
     	saveChat(chat);
     }
-	//  }else{
-	//  	console.log("cannot find socket!!!!");
-	//  	if(personalChatPool[uid]){
-	//  		console.log("pool is not empty!!!!");
-	//  		var newChatList = personalChatPool[uid];
- //             newChatList.push(chat);
-	//  		personalChatPool[uid] = newChatList;
-	//  	}else{
-	//  		personalChatPool[uid] = chat;
-	//  	}
-	// }
 	console.log("finished handling");
 }
 function clearChatHandler(uid,seq){
