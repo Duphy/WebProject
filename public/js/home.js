@@ -482,7 +482,7 @@ $(document).ready(function(){
     //TO DO: remove the picture just uploaded.
     $("#pictureDescArea").val("");
     $("#pictureTags").val("");
-    $("#pictureSubmit").("picturename","");
+    $("#pictureSubmit").attr("picturename","");
     return false;
   });
 
