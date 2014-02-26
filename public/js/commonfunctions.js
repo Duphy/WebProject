@@ -791,15 +791,15 @@ function viewpost(pids,char,newsData){
                       $('#left-column').append(renderPost(element));
                     }
                     //retrieve the pics of the element if any.
-                    if(element.pics.length > 0){
+                    if(element.picids.length > 0){
                       console.log("element:");
                       console.log(element);
-                      console.log(element.pics);
-                      console.log(element.pics.length);
+                      console.log(element.picids);
+                      console.log(element.picids.length);
                       var pictureData  = {};
                       pictureData.session_key = localStorage.session_key;
                       pictureData.uid = localStorage.uid;
-                      pictureData.picids = element.pics;
+                      pictureData.picids = element.picids;
                       $.ajax({
                         url:'/getpictures',
                         data:JSON.stringify(pictureData),
