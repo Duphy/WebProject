@@ -682,7 +682,25 @@ exports.viewSelfCircatags = function(req, res) {
 	});
     });
 }
-
+exports.viewPictures = function(req,res){
+	var output;
+	for(var i=0;i<req.body.pids.length;i++){
+		var pack = lib.createViewPicturePack(req.body.session_key,
+			parseInt(req.body.uid),req.body.pids[i]);
+		helper.connectAndSend(pack, function(data){
+			var pkg = lib.resolvPack(data);
+			output = {
+			    "picture" : pkg[1][1]
+			};
+			res.send(output);
+		    }, function() {
+				res.send({
+				    status : "timeout"
+				});
+		   }
+		);
+	}
+}
 exports.viewUserCircatags = function(req, res) {
     var pack = lib.createViewUserPack(18, req.body.session_key,
 	    parseInt(req.body.uid), parseInt(req.body.view_uid));
@@ -926,33 +944,33 @@ exports.viewEventsInfo = function(req, res) {
     var results = [];
     var pack;
     for (var i = 0; i < eidList.length; i++) {
-	var pack = lib.createViewEventPack(4, req.body.session_key,
-		parseInt(req.body.uid), helper.decToHex(eidList[i]));
-	helper.connectAndSend(pack, function(data) {
-	    var pkg = lib.resolvPack(data);
-	    results[counter] = {
-		"status" : "successful",
-		"eid" : helper.hexToDec(pkg[1][2][0]),
-		"name" : sanitizer.escape(pkg[1][2][1]),
-		"creator" : pkg[1][2][2],
-		"description" : sanitizer.escape(pkg[1][2][3]),
-		"tags" : parseTags(pkg[1][2][4]),
-		"city" : sanitizer.escape(pkg[1][2][5]),
-		"rating" : pkg[1][2][6],
-		"honors" : pkg[1][2][7]
-	    };
-	    counter++;
-	    if (counter == eidList.length) {
-		res.send({
-		    status : "successful",
-		    source : results
+		var pack = lib.createViewEventPack(4, req.body.session_key,
+			parseInt(req.body.uid), helper.decToHex(eidList[i]));
+		helper.connectAndSend(pack, function(data) {
+		    var pkg = lib.resolvPack(data);
+		    results[counter] = {
+			"status" : "successful",
+			"eid" : helper.hexToDec(pkg[1][2][0]),
+			"name" : sanitizer.escape(pkg[1][2][1]),
+			"creator" : pkg[1][2][2],
+			"description" : sanitizer.escape(pkg[1][2][3]),
+			"tags" : parseTags(pkg[1][2][4]),
+			"city" : sanitizer.escape(pkg[1][2][5]),
+			"rating" : pkg[1][2][6],
+			"honors" : pkg[1][2][7]
+		    };
+		    counter++;
+		    if (counter == eidList.length) {
+			res.send({
+			    status : "successful",
+			    source : results
+			});
+		    }
+		}, function() {
+		    res.send({
+			status : "timeout"
+		    });
 		});
-	    }
-	}, function() {
-	    res.send({
-		status : "timeout"
-	    });
-	});
     }
 }
 exports.viewEventMembers = function(req, res) {
@@ -1229,7 +1247,8 @@ exports.viewPostsContent = function(req, res) {
 	    "visibility" : pkg[1][8],
 	    "tags" : parseTags(pkg[1][9]),
 	    "replies_no" : reply_set.length,
-	    "replies" : replies
+	    "replies" : replies, 
+	    "pics": pkg[1][11]
 	};
 	counter++;
 	if (counter == pidList.length)
