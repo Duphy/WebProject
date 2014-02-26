@@ -383,7 +383,7 @@ $(document).ready(function(){
     return false;
   });
 
-  ("#pictureFileupload").fileupload({
+  $("#pictureFileupload").fileupload({
     url:"/uploadpostpicture",
     type:"POST",
     dataType:"json",

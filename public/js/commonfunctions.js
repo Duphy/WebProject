@@ -322,7 +322,7 @@ function createPost(data){
           var pictureData  = {};
           pictureData.session_key = localStorage.session_key;
           pictureData.uid = localStorage.uid;
-          pictureData.picids = post.pics;
+          pictureData.pids = post.pics;
           $.ajax({
             url:'/getpictures',
             data:JSON.stringify(pictureData),
@@ -776,6 +776,7 @@ function viewpost(pids,char,newsData){
            //console.log(result);
             if(result.status == "successful"){
               $("#contentBody").find(".well").hide();
+              console.log(result.source);
               $.each(result.source,function(index,element){
                     var postAvartaData = {};
                     postAvartaData.session_key = localStorage.session_key;
@@ -790,11 +791,15 @@ function viewpost(pids,char,newsData){
                       $('#left-column').append(renderPost(element));
                     }
                     //retrieve the pics of the element if any.
-                    if(element.pics){
+                    if(element.pics.length > 0){
+                      console.log("element:");
+                      console.log(element);
+                      console.log(element.pics);
+                      console.log(element.pics.length);
                       var pictureData  = {};
                       pictureData.session_key = localStorage.session_key;
                       pictureData.uid = localStorage.uid;
-                      pictureData.picids = element.pics;
+                      pictureData.pids = element.pics;
                       $.ajax({
                         url:'/getpictures',
                         data:JSON.stringify(pictureData),
