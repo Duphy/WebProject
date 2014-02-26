@@ -143,13 +143,21 @@ exports.createEvent = function(req, res) {
 }
 exports.createPost = function(req, res) {
     console.log("creater uid: " + req.body.uid);
+    var pic_paths=[];
+    for(var i =0;i<req.body.pics.length;i++){
+    	var path = dataPath+req.body.uid+'/tmp/'+req.body.pics[i];
+    	pic_paths.push(path);
+    }
     var pack = lib.createCreatePostingPack(req.body.session_key,
 	    parseInt(req.body.uid), helper.decToHex(req.body.eid), req.body.content,
-	    parseInt(req.body.visibility), req.body.tags,req.body.pics);
+	    parseInt(req.body.visibility), req.body.tags,pic_paths);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	if (pkg[1][0]) {
 	    var pidset = pkg[1][1];
+	    for(var j =0;j<pic_paths.length;j++){
+		    fs.unlinkSync(pic_paths[j]);
+		}
 	    var pack = lib.createViewPostingPack(req.body.session_key,
 		    parseInt(req.body.uid), pidset[0], pidset[1], pidset[2]);
 	    var output;
@@ -186,7 +194,7 @@ exports.createPost = function(req, res) {
 		    "tags" : parseTags(pkg[1][9]),
 		    "replies_no" : reply_set.length,
 		    "replies" : replies,
-		    "pics": pkg[1][11]
+		    "picids": pkg[1][11]
 		};
 		res.send({
 		    status : "successful",
@@ -684,13 +692,13 @@ exports.viewSelfCircatags = function(req, res) {
 }
 exports.viewPictures = function(req,res){
 	var output;
-	for(var i=0;i<req.body.pids.length;i++){
+	for(var i=0;i<req.body.picids.length;i++){
 		var pack = lib.createViewPicturePack(req.body.session_key,
-			parseInt(req.body.uid),req.body.pids[i]);
+			parseInt(req.body.uid),req.body.picids[i]);
 		helper.connectAndSend(pack, function(data){
 			var pkg = lib.resolvPack(data);
 			output = {
-			    "picture" : pkg[1][1]
+			    "pics" : pkg[1][1]
 			};
 			res.send(output);
 		    }, function() {
@@ -1203,7 +1211,7 @@ exports.viewPostContent = function(req, res) {
 	    "tags" : parseTags(pkg[1][9]),
 	    "replies_no" : reply_set.length,
 	    "replies" : replies,
-	    "pics":pkg[1][11]
+	    "picids":pkg[1][11]
 	};
 	res.send({
 	    status : "successful",
@@ -1264,7 +1272,7 @@ exports.viewPostsContent = function(req, res) {
 	    "tags" : parseTags(pkg[1][9]),
 	    "replies_no" : reply_set.length,
 	    "replies" : replies, 
-	    "pics": pkg[1][11]
+	    "picids": pkg[1][11]
 	};
 	counter++;
 	if (counter == pidList.length)
