@@ -410,6 +410,7 @@ $(document).ready(function(){
   newsData.session_key = localStorage.session_key;
   newsData.uid = localStorage.uid;
 	newsData.option = 1;
+  newsData.max_pid = 0;
   var date = new Date();
   var timeoffset = date.getTimezoneOffset();
 	$.ajax({
@@ -420,7 +421,7 @@ $(document).ready(function(){
 		success:function(data){
 			console.log("News:");
 			console.log(data);
-      viewpost(data.pidsets);
+      viewpost(data.pidsets,0,newsData);
 		}
 	});
 
@@ -545,7 +546,7 @@ $(document).ready(function(){
         console.log(data);
         $("#left-column").html("");
         $("#right-column").html("");
-        viewpost(data.pidsets);
+        viewpost(data.pidsets,0);
         $("#userNameLink").html("User News");
       }
     });
@@ -1228,7 +1229,7 @@ $(document).ready(function(){
   });
 
   $("#loadMoreButton").click(function(){
-    getMorePosts();
+    getMorePosts(0);
     return false;
   });
 

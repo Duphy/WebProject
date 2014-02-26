@@ -145,7 +145,7 @@ exports.createPost = function(req, res) {
     console.log("creater uid: " + req.body.uid);
     var pack = lib.createCreatePostingPack(req.body.session_key,
 	    parseInt(req.body.uid), helper.decToHex(req.body.eid), req.body.content,
-	    parseInt(req.body.visibility), req.body.tags);
+	    parseInt(req.body.visibility), req.body.tags,req.body.pics);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	if (pkg[1][0]) {
@@ -185,7 +185,8 @@ exports.createPost = function(req, res) {
 		    "visibility" : pkg[1][8],
 		    "tags" : parseTags(pkg[1][9]),
 		    "replies_no" : reply_set.length,
-		    "replies" : replies
+		    "replies" : replies,
+		    "pics": pkg[1][11]
 		};
 		res.send({
 		    status : "successful",
@@ -526,9 +527,11 @@ exports.viewSelfPosts = function(req, res) {
 
 exports.viewUserPosts = function(req, res) {
     var output;
+    var maxp=req.body.max_pid;
+    if(maxp==0);
+    	maxp = max_pid;
     var pack = lib.createViewUserPack(2, req.body.session_key,
-	    parseInt(req.body.uid), parseInt(req.body.view_uid), max_pid);
-
+	    parseInt(req.body.uid), parseInt(req.body.view_uid), maxp);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	output = {
@@ -620,8 +623,13 @@ exports.viewSelfSchedule = function(req, res) {
 }
 exports.viewUserNews = function(req, res) {
     var output;
+    var maxp=req.body.max_pid;
+    if(maxp==0)
+    	maxp = max_pid;
+    console.log("max pid is ");
+    console.log(maxp);
     var pack = lib.createMassViewPack(0, parseInt(req.body.option),
-	    req.body.session_key, parseInt(req.body.uid), max_pid);
+	    req.body.session_key, parseInt(req.body.uid), maxp);
     //console.log(pack);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
@@ -1157,7 +1165,8 @@ exports.viewPostContent = function(req, res) {
 	    "visibility" : pkg[1][8],
 	    "tags" : parseTags(pkg[1][9]),
 	    "replies_no" : reply_set.length,
-	    "replies" : replies
+	    "replies" : replies,
+	    "pics":pkg[1][11]
 	};
 	res.send({
 	    status : "successful",

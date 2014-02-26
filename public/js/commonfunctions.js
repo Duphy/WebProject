@@ -723,7 +723,7 @@ function renderEventUpdate(){
 
 /************* general functions **********/
 
-function viewpost(pids){
+function viewpost(pids,char,newsData){
     if(pids.length != 0){
         $("#contentBody").find(".well").hide();
         $("#loadMoreButton").hide();
@@ -798,7 +798,7 @@ function viewpost(pids){
               $("#circularG").hide();
               $(window).scroll(function(){
                 if($(window).scrollTop() + $(window).height() == $(document).height() && loadingFlag){
-                  getMorePosts();
+                  getMorePosts(char,newsData);
                 }
               });
             }
@@ -1181,7 +1181,7 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
   });
 }
 
-function getMorePosts(){
+function getMorePosts(char,newsData){
   if(postCounter<pidsets.length){
     loadingFlag = false;
     $("#loadMoreButton").hide();
@@ -1196,6 +1196,40 @@ function getMorePosts(){
       postData.uidList[i-postCounter] = pidsets[i][0];
       postData.eidList[i-postCounter] = pidsets[i][1];
       postData.pidList[i-postCounter] = pidsets[i][2];
+    }
+    if(postCounter+6>=pidsets.length){
+      console.log("postCounter");
+      console.log(postCounter);
+      var posturl;
+      switch (char){
+        case 0://self
+          posturl = "/getusernews"
+          break;
+        case 1://user
+          posturl = "/getuserposts"
+          break;
+        case 2://event
+          posturl = "/geteventpost"
+          break;
+        default:
+      }
+      newsData.max_pid = pidsets[pidsets.length-1][2];
+      console.log("Max pid");
+      console.log(newsData.max_pid);
+      $.ajax({
+        url:posturl,
+        data:JSON.stringify(newsData),
+        type:"POST",
+        contentType: 'application/json',
+        success:function(data){
+          console.log("More post:");
+          //console.log(data);
+          pidsets.concat(data.pidsets);
+          for(var j=0;j<data.pidsets.length;j++)
+            pidsets.push(data.pidsets[j]);
+          console.log(pidsets);
+        }
+      });
     }
     postCounter = Math.min(postCounter+6,pidsets.length);
     $.ajax({

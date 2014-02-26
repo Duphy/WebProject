@@ -83,7 +83,7 @@ $(document).ready(function(){
   //get event avarta
   $.ajax({
     url:"/geteventavarta",
-    data:JSON.stringify(newsData),
+    data:JSON.stringify(eventAvartaData),
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -97,6 +97,7 @@ $(document).ready(function(){
   //get event posts
   var newsData = view_auth_data;
   newsData.option = 0;
+  newsData.max_pid = 0;
   $.ajax({
    url:"/geteventpost",
    data:JSON.stringify(newsData),
@@ -109,7 +110,7 @@ $(document).ready(function(){
       $("#contentBody").find(".well").show();
       $("#circularG").hide();
      }else{
-      viewpost(data.pidsets);
+      viewpost(data.pidsets,2,newsData);
      }
    }
   });
@@ -718,7 +719,7 @@ $("body").delegate(".memberItem", 'click', function() {
   });
   
   $("#loadMoreButton").click(function(){
-    getMorePosts();
+    getMorePosts(2,newsData);
     return false;
   });
 

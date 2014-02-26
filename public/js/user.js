@@ -118,15 +118,18 @@ $(document).ready(function(){
   });
 
   //retrieve user's posts
+  var newsData = view_auth_data;
+  newsData.option = 0;
+  newsData.max_pid = 0;
   $.ajax({
      url:"/getuserposts",
-     data:JSON.stringify(view_auth_data),
+     data:JSON.stringify(newsData),
      type:"POST",
      contentType: 'application/json',
      success:function(data){
        console.log("News:");
        console.log(data);
-       viewpost(data.pidsets);
+       viewpost(data.pidsets,1,newsData);
      }
   });
 
@@ -599,13 +602,12 @@ $(document).ready(function(){
             $("#defriendCancel").removeAttr("disabled");
             $("#floatingBarsG-defriend").hide();
             $("#defriendModal").modal("hide");
-
           }
     });
   });
 
   $("#loadMoreButton").click(function(){
-    getMorePosts();
+    getMorePosts(1,newsData);
     return false;
   });
 
