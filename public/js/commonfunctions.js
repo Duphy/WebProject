@@ -322,7 +322,7 @@ function createPost(data){
           var pictureData  = {};
           pictureData.session_key = localStorage.session_key;
           pictureData.uid = localStorage.uid;
-          pictureData.pids = post.pics;
+          pictureData.picids = post.pics;
           $.ajax({
             url:'/getpictures',
             data:JSON.stringify(pictureData),
@@ -799,7 +799,7 @@ function viewpost(pids,char,newsData){
                       var pictureData  = {};
                       pictureData.session_key = localStorage.session_key;
                       pictureData.uid = localStorage.uid;
-                      pictureData.pids = element.pics;
+                      pictureData.picids = element.pics;
                       $.ajax({
                         url:'/getpictures',
                         data:JSON.stringify(pictureData),
