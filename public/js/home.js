@@ -534,6 +534,7 @@ $(document).ready(function(){
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
     newsData.option = 1;
+    newsData.max_pid = 0;
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
     $.ajax({
@@ -546,7 +547,7 @@ $(document).ready(function(){
         console.log(data);
         $("#left-column").html("");
         $("#right-column").html("");
-        viewpost(data.pidsets,0);
+        viewpost(data.pidsets,0,newsData);
         $("#userNameLink").html("User News");
       }
     });
@@ -558,6 +559,7 @@ $(document).ready(function(){
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
     newsData.option = 1;
+    newsData.max_pid = 0;
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
     $.ajax({
@@ -570,7 +572,8 @@ $(document).ready(function(){
         console.log(data);
         $("#left-column").html("");
         $("#right-column").html("");
-        viewpost(data.pidsets);
+        //TO DO: to be verified.
+        viewpost(data.pidsets,1,newsData);
         $("#userNameLink").html("Circa News");
       }
     });
