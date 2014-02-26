@@ -263,146 +263,6 @@ $(document).ready(function(){
     }
   });
 
-  ("#pictureFileupload").fileupload({
-    url:"/",
-    type:"POST",
-    dataType:"json",
-    maxFileSize:10000000,
-    acceptFileTypes: /\.(gif|jpe?g|png)$/i,
-    formData: {
-      uid: localStorage.uid
-    },
-    progress:function(e, data){
-        var progress = parseInt(data.loaded / data.total * 100, 10);
-        $('#progress .bar').css(
-            'width',
-            progress + '%'
-        );
-    },
-    add: function(e, data){
-        data.files[0].name = localStorage.uid+".jpg";
-        console.log(data);
-        data.submit().success(function(result, textStatus, jqXHR){
-          console.log("upload feedback:");
-          console.log(result);
-          if(result.status == "successful"){
-            setTimeout(function(){
-              $('#progress').hide();
-              $('#notice').html("finished!").css("color",'green');
-              $('#progress .bar').css(
-                  'width',
-                  '0%'
-              );
-              //TO DO: use ajax to save image to database
-              var filename = data.files[0].name;
-              var avartaData = auth_data;
-              avartaData.avarta = filename;
-              var finishCounter = 0;
-              $.ajax({
-                url:'/updateselfsmallavarta',
-                data:JSON.stringify(avartaData),
-                type:'POST',
-                contentType: 'application/json',
-                success:function(result){
-                  if(result.status == "successful"){
-                    $.ajax({
-                      url:'/getselfsmallavarta',
-                      data:JSON.stringify(auth_data),
-                      type:'POST',
-                      contentType: 'application/json',
-                      success:function(avarta){
-                        console.log("new avarta");
-                        console.log(avarta);
-                        if(avarta.status == "successful"){
-                          localStorage.self_small_avarta = avarta.avarta;
-                          $(".selfProfileSmallAvarta").attr("src",avarta.avarta);
-                          finishCounter++;
-                          if(finishCounter == 2){
-                            setTimeout(function(){
-                              $('#notice').html("").css("color","black");
-                              $('#uploadCancel').removeAttr("disabled");
-                              $('#fileupload').removeAttr("disabled");
-                              $('#uploadModal').modal("hide");
-                              $('#profileModal').modal("show");
-                            },3000);
-                          }
-                        }
-                      }
-                    });
-                  }else{
-                    console.log(result);
-                  }
-                }
-              });
-              $.ajax({
-                url:'/updateselfavarta',
-                data:JSON.stringify(avartaData),
-                type:'POST',
-                contentType: 'application/json',
-                success:function(result){
-                  if(result.status == "successful"){
-                    $.ajax({
-                      url:'/getselfavarta',
-                      data:JSON.stringify(auth_data),
-                      type:'POST',
-                      contentType: 'application/json',
-                      success:function(avarta){
-                        console.log("new avarta");
-                        console.log(avarta);
-                        if(avarta.status == "successful"){
-                          localStorage.self_big_avarta = avarta.avarta;
-                          $(".selfProfileBigAvarta").attr("src",avarta.avarta);
-                          finishCounter++;
-                          if(finishCounter == 2){
-                            setTimeout(function(){
-                              $('#notice').html("").css("color","black");
-                              $('#uploadCancel').removeAttr("disabled");
-                              $('#fileupload').removeAttr("disabled");
-                              $('#uploadModal').modal("hide");
-                              $('#profileModal').modal("show");
-                            },3000);
-                          }
-                        }
-                      }
-                    });
-                  }else{
-                    console.log(result);
-                  }
-                }
-              });
-            },1000);
-          }
-        }).error(function(jqXHR, textStatus, errorThrown){
-          $('#uploadCancel').removeAttr("disabled");
-          $('#progress').hide();
-          $('#progress .bar').css(
-              'width',
-              '0%'
-          );
-          $('#notice').show().html("failed!").css("color","#B94A48");
-        });
-    },
-    start:function(e, data){
-        $('#progress').show();
-        $('#notice').show().html("uploading...");
-        $('#uploadCancel').attr("disabled","disabled");
-        $('#fileupload').attr("disabled","disabled");
-    },
-    fail:function(e, data){
-        $('#notice').show().html("failed!").css("color","#B94A48");
-        $('#uploadCancel').removeAttr("disabled");
-        $('#fileupload').removeAttr("disabled");
-        $('#progress .bar').css(
-            'width',
-            '0%'
-        );
-    },
-    done:function(e,data){  
-        console.log("upload done.");    
-    }
-  });
-
-
   $("#profileConfirm").click(function(){
     $("#profileConfirm").attr("disabled","disabled");
     $("#profileCancel").attr("disabled","disabled");
@@ -522,6 +382,84 @@ $(document).ready(function(){
     $(".updateBody").hide();
     return false;
   });
+
+  ("#pictureFileupload").fileupload({
+    url:"/",
+    type:"POST",
+    dataType:"json",
+    maxFileSize:10000000,
+    acceptFileTypes: /\.(gif|jpe?g|png)$/i,
+    formData: {
+      uid: localStorage.uid
+    },
+    progress: function(e, data){
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#pictureProgress .bar').css(
+            'width',
+            progress + '%'
+        );
+    },
+    add: function(e, data){
+        data.files[0].name = localStorage.uid+".jpg";
+        console.log(data);
+        data.submit().success(function(result, textStatus, jqXHR){
+          console.log("upload feedback:");
+          console.log(result);
+          if(result.status == "successful"){
+            setTimeout(function(){
+              $('#pictureProgress').hide();
+              $('#pictureNotice').html("finished!").css("color",'green');
+              $('#pictureProgress .bar').css(
+                  'width',
+                  '0%'
+              );
+              $('#pictureCancel').removeAttr("disabled");
+              $('#pictureSubmit').removeAttr("disabled");
+            },1000);
+          }
+        }).error(function(jqXHR, textStatus, errorThrown){
+          $('#pictureSubmit').removeAttr("disabled");
+          $('#pictureCancel').removeAttr("disabled");
+          $('#pictureProgress').hide();
+          $('#pictureProgress .bar').css(
+              'width',
+              '0%'
+          );
+          $('#notice').show().html("failed!").css("color","#B94A48");
+        });
+    },
+    start:function(e, data){
+        $('#pictureProgress').show();
+        $('#pictureNotice').show().html("uploading...");
+        $('#pictureSubmit').attr("disabled","disabled");
+        $('#pictureCancel').attr("disabled","disabled");
+        $('#pictureFileupload').attr("disabled","disabled");
+    },
+    fail:function(e, data){
+        $('#pictureNotice').show().html("failed!").css("color","#B94A48");
+        $('#pictureSubmit').removeAttr("disabled");
+        $('#pictureCancel').removeAttr("disabled");
+        $('#pictureFileupload').removeAttr("disabled");
+        $('#pictureProgress .bar').css(
+            'width',
+            '0%'
+        );
+    },
+    done:function(e,data){  
+        console.log("upload done.");    
+    }
+  });
+
+  $("#pictureSubmit").click(function(){
+    //TO DO: submit the picture just uploaded.
+    return false;
+  });
+
+  $("#pictureCancel").click(function(){
+    //TO DO: remove the picture just uploaded.
+    return false;
+  });
+
 
   //retrieve self big avarta
 	$.ajax({
