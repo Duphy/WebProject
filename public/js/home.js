@@ -264,7 +264,7 @@ $(document).ready(function(){
   });
 
   ("#pictureFileupload").fileupload({
-    url:"／",
+    url:"/",
     type:"POST",
     dataType:"json",
     maxFileSize:10000000,
