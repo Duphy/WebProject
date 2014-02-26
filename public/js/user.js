@@ -20,6 +20,9 @@ var flag_displayfriend=true;
 var chatBoxNumber = 0;
  
 $(document).ready(function(){
+  $("#circularG").show();
+  $("#homeNav").removeClass("active");
+  $("#searchNav").removeClass("active");
   var auth_data = {};
   auth_data.session_key = localStorage.session_key;
   auth_data.uid = localStorage.uid;
@@ -270,12 +273,12 @@ $(document).ready(function(){
               $("#friendsHead").find("font").html("("+localStorage.user_friendsNumber+")");
               if(common_friends.length == 0){
                  $("#squaresWaveG-commonFriend").hide();
-                $("#commonFriendsList").append("<strong style = 'margin-left:15%;color:white;'>No mutual friend.</strong>");
+                $("#commonFriendsList").append("<strong style = 'text-align:center;margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Mutual Friend.</strong>");
               }else{
                 $("#commonFriendsHead").find('font').html("("+localStorage.common_friends.length+")");
               }
               if(localStorage.user_friendsNumber == 0){
-                $("#friendsList").append("<strong style = 'margin-left:15%;color:white;'>No friend.</strong>");
+                $("#friendsList").append("<strong style = 'text-align:center;margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Friend.</strong>");
                 $("#squaresWaveG-friend").hide();
               }else{
                   userlist(friendsData,'user');

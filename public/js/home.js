@@ -534,6 +534,7 @@ $(document).ready(function(){
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
     newsData.option = 1;
+    newsData.max_pid = 0;
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
     $.ajax({
@@ -546,7 +547,7 @@ $(document).ready(function(){
         console.log(data);
         $("#left-column").html("");
         $("#right-column").html("");
-        viewpost(data.pidsets,0);
+        viewpost(data.pidsets,0,newsData);
         $("#userNameLink").html("User News");
       }
     });
@@ -558,6 +559,7 @@ $(document).ready(function(){
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
     newsData.option = 1;
+    newsData.max_pid = 0;
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
     $.ajax({
@@ -570,7 +572,8 @@ $(document).ready(function(){
         console.log(data);
         $("#left-column").html("");
         $("#right-column").html("");
-        viewpost(data.pidsets);
+        //TO DO: to be verified.
+        viewpost(data.pidsets,1,newsData);
         $("#userNameLink").html("Circa News");
       }
     });
@@ -686,7 +689,7 @@ $(document).ready(function(){
             $(".friendItem").remove();
             $("#friendsHead").find("font").html("("+localStorage.friendsNumber+")");
             if(localStorage.friendsNumber == 0){
-              $("#friendsList").append("<strong style = 'margin-left:15%;color:white;'>No friend yet.</strong>");
+              $("#friendsList").append("<strong style = 'margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Friend Yet.</strong>");
               $("#squaresWaveG-friend").hide();
             }else{
               $("#friendsList").html("");
@@ -720,7 +723,7 @@ $(document).ready(function(){
               $(".eventItem").remove();
               $("#eventsHead").find("font").html("("+localStorage.eventsNumber+")");
               if(localStorage.eventsNumber == 0){
-                $("#eventsList").append("<strong style = 'margin-left:15%;color:white;'>No event yet.</strong>");
+                $("#eventsList").append("<strong style = 'margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Event Yet.</strong>");
                 $("#squaresWaveG-event").hide();
               }else{
                 $("#eventsList").html("");
