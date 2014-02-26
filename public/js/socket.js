@@ -1,4 +1,4 @@
-var socket = io.connect('http://localhost:3000');
+var socket = io.connect('http://circatag.com');
 console.log("client socket connected!");
 socket.emit("uid",localStorage.uid);
 socket.on("friend request",function(name, uid, eid, pid, action, seq){
