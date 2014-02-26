@@ -217,3 +217,7 @@ transform:scale(.3)}
 	text-decoration:none;
 	display:none;
 }
+
+#searchNav.active{
+	font-weight: bold;
+}

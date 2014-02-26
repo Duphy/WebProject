@@ -693,3 +693,7 @@ background-color:#FFFFFF}
 	text-decoration:none;
 	display:none;
 }
+
+#homeNav.active{
+	font-weight: bold;
+}

@@ -14,6 +14,8 @@ var isMember = false;
 var isManager = false;
 $(document).ready(function(){
   $("#circularG").show();
+  $("#homeNav").removeClass("active");
+  $("#searchNav").removeClass("active");
   var auth_data = {};
   auth_data.session_key = localStorage.session_key;
   auth_data.uid = localStorage.uid;
@@ -430,7 +432,7 @@ $("body").delegate(".memberItem", 'click', function() {
              membersData.session_key = localStorage.session_key;
              membersData.uid = localStorage.uid;
              if(membersData.uidList.length == 0){
-                $("#membersList").append("<strong style = 'margin-left:15%;color:white;'>No member yet.</strong>");
+                $("#membersList").append("<strong style = 'margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Member Yet.</strong>");
                 $("#squaresWaveG-member").hide();
               }else{
                 userlist(membersData,"event");

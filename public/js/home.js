@@ -686,7 +686,7 @@ $(document).ready(function(){
             $(".friendItem").remove();
             $("#friendsHead").find("font").html("("+localStorage.friendsNumber+")");
             if(localStorage.friendsNumber == 0){
-              $("#friendsList").append("<strong style = 'margin-left:15%;color:white;'>No friend yet.</strong>");
+              $("#friendsList").append("<strong style = 'margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Friend Yet.</strong>");
               $("#squaresWaveG-friend").hide();
             }else{
               $("#friendsList").html("");
@@ -720,7 +720,7 @@ $(document).ready(function(){
               $(".eventItem").remove();
               $("#eventsHead").find("font").html("("+localStorage.eventsNumber+")");
               if(localStorage.eventsNumber == 0){
-                $("#eventsList").append("<strong style = 'margin-left:15%;color:white;'>No event yet.</strong>");
+                $("#eventsList").append("<strong style = 'margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Event Yet.</strong>");
                 $("#squaresWaveG-event").hide();
               }else{
                 $("#eventsList").html("");
