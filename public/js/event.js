@@ -95,98 +95,103 @@ $(document).ready(function(){
   });
 
   //get event posts
-  var newsData = view_auth_data;
-  newsData.option = 0;
-  newsData.max_pid = 0;
-  $.ajax({
-   url:"/geteventpost",
-   data:JSON.stringify(newsData),
-   type:"POST",
-   contentType: 'application/json',
-   success:function(data){
-     console.log("News:");
-     console.log(data);
-     if(data.pidsets.length == 0){
-      $("#contentBody").find(".well").show();
-      $("#circularG").hide();
-     }else{
-      viewpost(data.pidsets,2,newsData);
+  if(!checkEvent(localStorage.eid)){
+    var newsData = view_auth_data;
+    newsData.option = 0;
+    newsData.max_pid = 0;
+    $.ajax({
+     url:"/geteventpost",
+     data:JSON.stringify(newsData),
+     type:"POST",
+     contentType: 'application/json',
+     success:function(data){
+       console.log("News:");
+       console.log(data);
+       if(data.pidsets.length == 0){
+        $("#contentBody").find(".well").show();
+        $("#circularG").hide();
+       }else{
+        viewpost(data.pidsets,2,newsData);
+       }
      }
-   }
-  });
+    });
 
-  $.ajax({
-    url:"/geteventmanagers",
-    data:JSON.stringify(view_auth_data),
-    type:"POST",
-    contentType: 'application/json',
-    success:function(data){
-      console.log("here");
-      console.log(data);
-      //$("#membersNumber").html(data.members.length);
-      for(var i = 0; i < data.members.length;i++){
-        if(data.members[i] == localStorage.uid){
-          isManager = true;
-          break;
+    $.ajax({
+      url:"/geteventmanagers",
+      data:JSON.stringify(view_auth_data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(data){
+        console.log("here");
+        console.log(data);
+        //$("#membersNumber").html(data.members.length);
+        for(var i = 0; i < data.members.length;i++){
+          if(data.members[i] == localStorage.uid){
+            isManager = true;
+            break;
+          }
+        }
+        if(!isManager){
+          $("#eventManage").hide();
+        }
+        else{
+          $("#eventManage").show();
         }
       }
-      if(!isManager){
-        $("#eventManage").hide();
-      }
-      else{
-        $("#eventManage").show();
-      }
-    }
-  });
-  //get event members
-  $.ajax({
-    url:"/geteventmembers",
-    data:JSON.stringify(view_auth_data),
-    type:"POST",
-    contentType: 'application/json',
-    success:function(data){
-      $("#membersNumber").html(data.members.length);
-      for(var i = 0; i < data.members.length;i++){
-        if(data.members[i] == localStorage.uid){
-          isMember = true;
-          break;
+    });
+    //get event members
+    $.ajax({
+      url:"/geteventmembers",
+      data:JSON.stringify(view_auth_data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(data){
+        $("#membersNumber").html(data.members.length);
+        for(var i = 0; i < data.members.length;i++){
+          if(data.members[i] == localStorage.uid){
+            isMember = true;
+            break;
+          }
         }
-      }
-      if(!isMember){
-        $("#eventManage").hide();
-        $("#profileEdit").hide();
-        $("#createPost").hide();
-        $("#profileModal").find(".modal-footer").hide();
-        $("#eventManage").after('<a id = "settingJoinEvent"><i class="icon-plus"></i>&nbsp;&nbsp;Join Event</a>');
-        $("#settingJoinEvent").click(function(){
-          var data = {};
-          data = auth_data;
-          data.eid = localStorage.eid;
-          data.content = "Could you add me into your event? :)";
-          $("#settingJoinEvent").css({"pointer-events":"none","cursor":"default","color":"#ccc"});
-          $("#settingJoinEvent").html("sending....");
-          $.ajax({
-            url:"/joinevent",
-            data:JSON.stringify(data),
-            type:"POST",
-            contentType: 'application/json',
-            success:function(result){
-              if(result.status == "successful"){
-                $("#settingJoinEvent").html("request pending");
-              }else{
-                $("#settingJoinEvent").html("request failed");
+        if(!isMember){
+          $("#eventManage").hide();
+          $("#profileEdit").hide();
+          $("#createPost").hide();
+          $("#profileModal").find(".modal-footer").hide();
+          $("#eventManage").after('<a id = "settingJoinEvent"><i class="icon-plus"></i>&nbsp;&nbsp;Join Event</a>');
+          $("#settingJoinEvent").click(function(){
+            var data = {};
+            data = auth_data;
+            data.eid = localStorage.eid;
+            data.content = "Could you add me into your event? :)";
+            $("#settingJoinEvent").css({"pointer-events":"none","cursor":"default","color":"#ccc"});
+            $("#settingJoinEvent").html("sending....");
+            $.ajax({
+              url:"/joinevent",
+              data:JSON.stringify(data),
+              type:"POST",
+              contentType: 'application/json',
+              success:function(result){
+                if(result.status == "successful"){
+                  $("#settingJoinEvent").html("request pending");
+                }else{
+                  $("#settingJoinEvent").html("request failed");
+                }
               }
-            }
+            });
+            return false;
           });
-          return false;
-        });
-      }else{
-        //$("#eventManage").hide();
-        $("#eventManage").after('<a href="#quitModal" data-toggle="modal" ><i class="icon-remove"></i>&nbsp;&nbsp;Quit Event</a>');
+        }else{
+          //$("#eventManage").hide();
+          $("#eventManage").after('<a href="#quitModal" data-toggle="modal" ><i class="icon-remove"></i>&nbsp;&nbsp;Quit Event</a>');
+        }
       }
-    }
-  });
-  
+    });
+  }
+  else{
+    //TODO: add warning message
+    flag_displaymember=false;
+  }
   //Adjust posting Area width
   $('#postArea').css({'width':$('#postModal').width()*0.9,'height':"80px"});
 
@@ -401,32 +406,31 @@ $("body").delegate(".memberItem", 'click', function() {
     }
     if(flag_displaymember){
     //get user's friends information
-    flag_displaymember=false;
-    $("#squaresWaveG-member").show();                    
-    $.ajax({
-           url:"/geteventmembers",
-           data:JSON.stringify(view_auth_data),
-           type:"POST",
-           contentType: 'application/json',
-           success:function(data){
-           console.log("members:");
-           console.log(data);
-           $("#membersHead").find("font").html("("+data.members.length+")");
-           var membersData = {};
-           membersData.uidList = data.members;
-           membersData.session_key = localStorage.session_key;
-           membersData.uid = localStorage.uid;
-           if(membersData.uidList.length == 0){
-              $("#membersList").append("<strong style = 'margin-left:15%;color:white;'>No member yet.</strong>");
-              $("#squaresWaveG-member").hide();
-            }else{
-              userlist(membersData,"event");
-            }
-           }
-      });//ajax
-    
+      flag_displaymember=false;
+      $("#squaresWaveG-member").show();                    
+      $.ajax({
+             url:"/geteventmembers",
+             data:JSON.stringify(view_auth_data),
+             type:"POST",
+             contentType: 'application/json',
+             success:function(data){
+             console.log("members:");
+             console.log(data);
+             $("#membersHead").find("font").html("("+data.members.length+")");
+             var membersData = {};
+             membersData.uidList = data.members;
+             membersData.session_key = localStorage.session_key;
+             membersData.uid = localStorage.uid;
+             if(membersData.uidList.length == 0){
+                $("#membersList").append("<strong style = 'margin-left:15%;color:white;'>No member yet.</strong>");
+                $("#squaresWaveG-member").hide();
+              }else{
+                userlist(membersData,"event");
+              }
+             }
+        });//ajax
     }//if flag
-    });
+  });
 
   $('body').delegate('.tagHead','mouseover',function(){
     var tagsGroup = $(this).closest(".tagsGroup");

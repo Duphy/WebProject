@@ -528,7 +528,7 @@ exports.viewSelfPosts = function(req, res) {
 exports.viewUserPosts = function(req, res) {
     var output;
     var maxp=req.body.max_pid;
-    if(maxp==0);
+    if(maxp==0)
     	maxp = max_pid;
     var pack = lib.createViewUserPack(2, req.body.session_key,
 	    parseInt(req.body.uid), parseInt(req.body.view_uid), maxp);
@@ -990,8 +990,11 @@ exports.viewEventManagers = function(req, res) {
 
 exports.viewEventPosts = function(req, res) {
     var output;
+    var maxp=req.body.max_pid;
+    if(maxp==0)
+    	maxp = max_pid;
     var pack = lib.createViewEventPack(2, req.body.session_key,
-	    parseInt(req.body.uid), helper.decToHex(req.body.eid), max_pid);
+	    parseInt(req.body.uid), helper.decToHex(req.body.eid), maxp);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	//console.log(pkg);
