@@ -415,6 +415,9 @@ $(document).ready(function(){
               );
               $('#pictureCancel').removeAttr("disabled");
               $('#pictureSubmit').removeAttr("disabled");
+              $('#pictureDescArea').show();
+              $('#pictureTags').show();
+              $('#pictureSubmit').attr("picturename",data.files[0].name);
             },1000);
           }
         }).error(function(jqXHR, textStatus, errorThrown){
@@ -451,12 +454,35 @@ $(document).ready(function(){
   });
 
   $("#pictureSubmit").click(function(){
-    //TO DO: submit the picture just uploaded.
+    var description = $("#pictureDescArea").val();
+    var tags = $('#pictureTags').tagsinput('items');
+    if(tags==""){
+      tags=[];
+    }
+    var eid = "0000000000000000";
+    var visibility = 0;
+    var tags = tags;
+    var data = {};
+    var d = new Date();
+    data.content = description;
+    data.eid = eid;
+    data.visibility = visibility;
+    data.tags = tags;
+    data.date = d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+    data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
+    data.session_key = localStorage.session_key;
+    data.uid = localStorage.uid;
+    data.pics = $(this).attr("picturename");
+    $("#floatingBarsG-picture").show();
+    createPost(data);
     return false;
   });
 
   $("#pictureCancel").click(function(){
     //TO DO: remove the picture just uploaded.
+    $("#pictureDescArea").val("");
+    $("#pictureTags").val("");
+    $("#pictureSubmit").("picturename","");
     return false;
   });
 
@@ -685,6 +711,7 @@ $(document).ready(function(){
 			data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
 			data.session_key = localStorage.session_key;
 			data.uid = localStorage.uid;
+      data.pics = "";
       $("#floatingBarsG-post").show();
       createPost(data);
 		}

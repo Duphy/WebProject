@@ -1883,6 +1883,42 @@ exports.uploadAvarta = function(req, res){
 		}
 	});
 }
+
+exports.uploadPicture = function(req, res){
+	fs.readFile(req.files.image.path, function(err, data){
+		var imageName = req.files.image.name;
+		var imgsize =1;
+		/// If there's an error
+		if(!imageName){
+			console.log("There was an error.")
+			res.send({status:"unsuccessful"});
+		}else{
+			var path = dataPath +req.body.uid+"/tmp/";
+			console.log("path: "+path);
+			fs.readdir(path, function(err){
+				if(err){
+					console.log("not exists");
+					fs.mkdir(path,function(err){
+						if(!err){
+							console.log("created dir");
+							var imagePath = path + imageName;
+							fs.writeFileSync(imagePath, data);
+							res.send({status:"successful"});
+						}else{
+							res.send({status:"unsuccessful"});
+						}
+					});
+				}else{
+					console.log("exists");
+					var imagePath = path + imageName;
+					fs.writeFileSync(imagePath, data);
+					res.send({status:"successful"});
+				}
+			});
+		}
+	});
+}
+
 /*sanitizer tags*/
 function parseTags(tags){
 	var results=[];
