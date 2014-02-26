@@ -191,12 +191,20 @@ function renderPost(post){
     '<div class = "offset1 span10 offset2">'+
     '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+post.postContent+'</pre>'+
     '</div>'+
-    '</div>'+
-  '<div class = "row-fluid shareButtons" style = "margin-top:10px;">'+
-    /*'<div class = "offset1 span1"><button class = "btn button" style = "width:50px;"><i class = "icon-thumbs-up"></i>0</button></div>'+
-    '<div class = "span1"><button class = "btn button" style = "width:50px;margin-left:10px;"><i class = "icon-share"></i></button></div>';
-    html=html+*/
-  '</div>';
+    '</div>';
+    //TO DO: add post picture here.
+    if(false){
+      html = html + 
+      '<div class="row-fluid" style = "margin-left:2%;">'+
+        '<img src = "#" style = "width:96%;">'+
+      '</div>';
+    }
+    html = html +
+    '<div class = "row-fluid shareButtons" style = "margin-top:10px;">'+
+      /*'<div class = "offset1 span1"><button class = "btn button" style = "width:50px;"><i class = "icon-thumbs-up"></i>0</button></div>'+
+      '<div class = "span1"><button class = "btn button" style = "width:50px;margin-left:10px;"><i class = "icon-share"></i></button></div>';
+      html=html+*/
+    '</div>';
     if(post.replies_no > 0){
       html = html +
         '<div class = "row-fluid repliesArea" style = "margin-top:10px;">'+
