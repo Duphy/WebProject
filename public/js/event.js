@@ -820,8 +820,9 @@ $("body").delegate(".memberItem", 'click', function() {
   $('body').delegate('.eventResponse','click',function(){
     console.log("read event response");
     flag_displayevent = true;
-    if(notification.prev() && notification.prev().hasClass("divider")){
-        notification.prev().remove();
+    var notification = $(this).closest('.notificationItem');
+    if($(notification).prev() && $(notification).prev().hasClass("divider")){
+        $(notification).prev().remove();
     };
     notification.remove();
     removeNotification();
