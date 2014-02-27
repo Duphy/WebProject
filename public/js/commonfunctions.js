@@ -1029,14 +1029,14 @@ function friendRequestNotification(userName, userId, eventId, postId, action, se
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem friendRequestNotification unread">'+
                 '<i class="icon-user"></i>'+
                 '&nbsp;&nbsp;<span class = "websiteFont"><a class = "userName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have approved your friend request.</span>&nbsp;'+
-                '<button class = "btn btn-primary pull-right friendResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '<button class = "btn btn-primary pull-right friendResponse button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 1:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem friendRequestNotification unread">'+
                 '<i class="icon-user"></i>'+
                 '&nbsp;&nbsp;<span class = "websiteFont"><a class = "usernName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have rejected your friend request.</span>&nbsp;'+
-                '<button class = "btn btn-primary pull-right friendResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '<button class = "btn btn-primary pull-right friendResponse button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 2:
@@ -1044,7 +1044,7 @@ function friendRequestNotification(userName, userId, eventId, postId, action, se
                 '<i class="icon-user"></i>'+
                 '&nbsp;&nbsp;<span class = "websiteFont"><a class = "userName user'+userId+'" uid = "'+userId+'">'+userName+'</a> sends a friend request to you.</span>&nbsp;&nbsp;'+
                 '<button class = "btn pull-right rejectFriendRequest" style = "border-radius:15px;padding:2px 6px 3px;"><i class = "icon-remove"></i></button>'+
-                '<button class = "btn btn-success pull-right approveFriendRequest" style = "border-radius:15px;padding:2px 6px 3px;margin-right:3px;"><i class = "icon-ok icon-white"></i></button>'+
+                '<button class = "btn btn-success pull-right approveFriendRequest button" style = "border-radius:15px;padding:2px 6px 3px;margin-right:3px;"><i class = "icon-ok icon-white"></i></button>'+
              '</li>';
       break;
   }
@@ -1058,14 +1058,14 @@ function eventJoinRequestNotification(userName, userId, postId, eventName, event
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
                 '<p class = "span10 websiteFont" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> has approved your event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
-                '<button class = "btn btn-primary pull-right span2 eventResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '<button class = "btn btn-primary pull-right span2 eventResponse button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 1:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
                 '<p class = "span10 websiteFont" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> has rejected your event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
-                '<button class = "btn btn-primary pull-right span2 eventResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '<button class = "btn btn-primary pull-right span2 eventResponse button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 2:
@@ -1073,7 +1073,7 @@ function eventJoinRequestNotification(userName, userId, postId, eventName, event
                 '<p class = "span9 websiteFont" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> send a event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
                 '<button class = "btn pull-right rejectEventJoinRequest span1" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-remove"></i></button>'+
-                '<button class = "btn btn-success pull-right approveEventJoinRequest span1" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;margin-right:3px;"><i class = "icon-ok icon-white"></i></button>'+
+                '<button class = "btn btn-success pull-right approveEventJoinRequest span1 button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;margin-right:3px;"><i class = "icon-ok icon-white"></i></button>'+
              '</li>';
       break;
   }
@@ -1084,7 +1084,7 @@ function postReplyNotification(userName, userId, eventId, post, postId ,seqNo){
   var html = '<li seqNo= "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem postReplyNotification unread websiteFont">'+
                 '<i class="icon-list"></i>'+
                 '&nbsp;&nbsp;<a id = "'+userId+'">'+userName+'</a> has replied to your post <a class = "postName" id = "'+postId+'">'+post+'</a>.'+
-                '<button class = "btn pull-right btn-primary" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+               
+                '<button class = "btn pull-right btn-primary button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+               
              '</li>';
   return html;
 }
