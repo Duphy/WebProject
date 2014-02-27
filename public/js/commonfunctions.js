@@ -264,8 +264,8 @@ function renderPost(post){
     '</div>'+
     '<div class= "span11" style = "padding-left:10px;padding-right:20px;">'+
     '<textarea class = "input-block-level replyInput" replyToUid = "'+post.uid+'" replyToName = "'+post.poster_name+'" type = "text" placeholder = "Add Comments here..." style = "min-height:70px;border-radius:0px;"></textarea>'+
-    '<button class = "btn replyCancel pull-right span2 button" style = "margin-left:10px;">Cancel</button>'+
-    '<button class = "btn btn-success replySubmit pull-right span2 button" disabled>Post</button>'+
+    '<button class = "btn replyCancel pull-right button" style = "margin-left:10px;">Cancel</button>'+
+    '<button class = "btn btn-success replySubmit pull-right button" disabled>Post</button>'+
     '</div>'+
     '</div>'+
   '</div>';
