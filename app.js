@@ -15,10 +15,13 @@ var routes = require('./routes');
 var mkdirp = require("mkdirp");
 var rimraf = require("rimraf");
 var fs = require('fs');
-var redis = require('redis');
 
 var app = express();
-//var redisClient = redis.createClient();
+//var redis = require('redis');
+// redisClient = redis.createClient();
+// redisClient.on("error", function (err) {
+//     console.log("Error " + err);
+// });
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -241,16 +244,16 @@ function notificationHandler(notifications,uid){
 		}
 	}else{
 		console.log("cannot find socket!!!!");
-		if(notificationsPool[uid]){
-			console.log("pool is not empty!!!!");
-			var newNotificationsList = notificationsPool[uid];
-			for(var j = 0;j < notifications[1].length;j++){
-				newNotificationsList.push(notifications[1][j]);
-			}
-			notificationsPool[uid] = newNotificationsList;
-		}else{
-			notificationsPool[uid] = notifications[1];
+	}
+	if(notificationsPool[uid]){
+		console.log("pool is not empty!!!!");
+		var newNotificationsList = notificationsPool[uid];
+		for(var j = 0;j < notifications[1].length;j++){
+			newNotificationsList.push(notifications[1][j]);
 		}
+		notificationsPool[uid] = newNotificationsList;
+	}else{
+		notificationsPool[uid] = notifications[1];
 	}
 	console.log("finished handling");
 }
@@ -265,13 +268,17 @@ function timeoutHandler(uid){
 }
 function clearNotificationHandler(uid,seq){
 	if(notificationsPool[uid]){
-		var notificationsList = notificationsPool[uid];
-		for(var i = 0; i < notificationsList.length;i++){
-			if(notificationsList[i][1] == seq){
-				notificationsList.splice(i,1);
+		if(seq == -1){
+			notificationsPool[uid] = [];
+		}else{
+			var notificationsList = notificationsPool[uid];
+			for(var i = 0; i < notificationsList.length;i++){
+				if(notificationsList[i][1] == seq){
+					notificationsList.splice(i,1);
+				}
 			}
-		}
-		notificationsPool[uid] = notificationsList;
+			notificationsPool[uid] = notificationsList;
+		}	
 	}
 }
 function sendNotification(notification,socket){
@@ -533,10 +540,10 @@ function chatToUser(session_key, uid, seq, to_uid, content){
     },null,true);
 }
 
-service.setClearNotificationHandelr(clearNotificationHandler);
+service.setClearNotificationHandler(clearNotificationHandler);
 service.helper.set_noti_handle(notificationHandler);
 
-service.setClearChatHandelr(clearChatHandler);
+service.setClearChatHandler(clearChatHandler);
 service.helper.set_chat_handle(chatHandler);
 
 service.helper.set_timeout_handle(timeoutHandler);

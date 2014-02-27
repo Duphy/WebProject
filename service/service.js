@@ -63,10 +63,10 @@ exports.signUp = function(req, res) {
     });
 }
 
-exports.setClearNotificationHandelr = function(handler){
+exports.setClearNotificationHandler = function(handler){
 	clearNotificationHandler = handler;
 }
-exports.setClearChatHandelr = function(handler){
+exports.setClearChatHandler = function(handler){
 	clearChatHandler = handler;
 }
 function loginAuth(req, res) {
@@ -107,6 +107,8 @@ exports.logout = function(req, res) {
 	if (pkg[1][0]) {
 	    status = "successful";
 	}
+	//clear the whole notificationPool
+	clearNotificationHandler(req.body.uid,-1);
 	res.send({
 	    "status" : status
 	});
