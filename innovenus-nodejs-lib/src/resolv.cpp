@@ -5,26 +5,10 @@
 #include <v8.h>
 #include <node.h>
 #include <cstdio>
-#include <cstring>
 #include <cstdlib>
 #include <sstream>
+#include <node_buffer.h>
 #include "common.h"
-
-#ifdef _WIN32
-#include <direct.h>
-#include <io.h>
-#elif _LINUX || __APPLE__ || linux
-#include <stdarg.h>
-#include <sys/stat.h>
-#endif
-
-#ifdef _WIN32
-#define ACCESS _access
-#define MKDIR(a) _mkdir((a))
-#elif _LINUX || __APPLE__ || linux
-#define ACCESS access
-#define MKDIR(a) mkdir((a),0755)
-#endif
 
 #define HEADER_LENGTH	22
 typedef struct s_response_header {
@@ -54,66 +38,10 @@ static Local<Array> formJSHeader(const response_header *header) {
 	return ans;
 }
 
-static bool CreateDir(std::string path) {
-	int i = 0;
-	int iRet;
-	int iLen = path.length();
-	//在末尾加/
-	if (path[path.length() - 1] != '/')
-		path += '/';
-
-	// 创建目录
-	for (i = 0; i < iLen; i++) {
-		if (path[i] == '/') {
-			//如果不存在,创建
-			iRet = ACCESS(path.substr(0, i).c_str(), 0);
-			if (iRet != 0) {
-				iRet = MKDIR(path.substr(0, i).c_str());
-				if (iRet != 0) {
-					return false;
-				}
-			}
-		}
-	}
-
-	return true;
-}
-static Local<String> JSreadFile(const char *buf, int &pointer,
-		std::string path) {
-	int64_t length = readInteger(buf, pointer, 4);
-	int i;
-	for (i = path.length() - 1; i >= 0; i--)
-		if (path[i] == '/')
-			break;
-	std::string folder(path.begin(), path.begin() + i + 1);
-	if (!CreateDir(folder))
-		return String::New("");
-	if (ACCESS(path.c_str(), 0) == 0)
-		return String::New(path.substr(7).c_str());
-	else if (length == 0)
-		return String::New("");
-	else {
-		char *avarta = new char[length];
-		readBytes(avarta, buf, pointer, length);
-
-		FILE *file = fopen(path.c_str(), "wb");
-		if ((file == NULL) || (fwrite(avarta, 1, length, file) != length)) {
-			if (file != NULL)
-				fclose(file);
-			delete[] avarta;
-			return String::New("");
-		} else {
-			fclose(file);
-			delete[] avarta;
-			return String::New(path.substr(7).c_str());
-		}
-	}
-}
-
 /**
  * Array: uid (int32)
  */
-Local<Array> resolvUIDs(char *pack, int &pointer) {
+Local<Array> resolvUIDs(const char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
 	for (uint32_t i = 0; i < num; i++)
@@ -124,7 +52,7 @@ Local<Array> resolvUIDs(char *pack, int &pointer) {
 /**
  * Array: EventID (string)
  */
-Local<Array> resolvEventIDs(char *pack, int &pointer) {
+Local<Array> resolvEventIDs(const char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
 	for (uint32_t i = 0; i < num; i++)
@@ -137,7 +65,7 @@ Local<Array> resolvEventIDs(char *pack, int &pointer) {
  * - 1: eventid (string)
  * - 2: postid (string)
  */
-Local<Array> resolvPosting(char *pack, int &pointer) {
+Local<Array> resolvPosting(const char *pack, int &pointer) {
 	Local<Array> ans = Array::New(3);
 	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	ans->Set(1, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
@@ -148,7 +76,7 @@ Local<Array> resolvPosting(char *pack, int &pointer) {
 /**
  * Array: posting (::resolvPosting)
  */
-Local<Array> resolvPostings(char *pack, int &pointer) {
+Local<Array> resolvPostings(const char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
 	for (uint32_t i = 0; i < num; i++)
@@ -159,7 +87,7 @@ Local<Array> resolvPostings(char *pack, int &pointer) {
 /**
  * Array: tag_string (string)
  */
-Local<Array> resolvTags(char *pack, int &pointer) {
+Local<Array> resolvTags(const char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	uint32_t length;
 	Local<Array> ans = Array::New(num);
@@ -181,7 +109,7 @@ Local<Array> resolvTags(char *pack, int &pointer) {
  * - 7: reply_time (int32)
  * - 8: visibility (int8)
  */
-Local<Array> resolvReply(char *pack, int &pointer) {
+Local<Array> resolvReply(const char *pack, int &pointer) {
 	Local<Array> ans = Array::New(9);
 	uint32_t replyer_name_len, reply_to_name_len, reply_content_len;
 	ans->Set(0, JSreadInteger(pack, pointer, RID_LENGTH));
@@ -202,7 +130,7 @@ Local<Array> resolvReply(char *pack, int &pointer) {
 /**
  * Array: reply (::resolvReply)
  */
-Local<Array> resolvReplies(char *pack, int &pointer) {
+Local<Array> resolvReplies(const char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
 	for (uint32_t i = 0; i < num; i++)
@@ -220,7 +148,7 @@ Local<Array> resolvReplies(char *pack, int &pointer) {
  * - 6: tags (::resolvTags)
  * - 7: friends (::resolvUIDs)
  */
-Local<Array> resolvUserSimpleOtherPack(char *pack, int &pointer) {
+Local<Array> resolvUserSimpleOtherPack(const char *pack, int &pointer) {
 	Local<Array> ans = Array::New(8);
 	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	uint32_t length;
@@ -243,7 +171,7 @@ Local<Array> resolvUserSimpleOtherPack(char *pack, int &pointer) {
  * 1: weight (int64)
  * \todo TODO: int64
  */
-Local<Array> resolvWeightedTag(char *pack, int &pointer) {
+Local<Array> resolvWeightedTag(const char *pack, int &pointer) {
 	Local<Array> ans = Array::New(2);
 	uint32_t length = readInteger(pack, pointer, 1);
 	ans->Set(0, JSreadString(pack, pointer, length));
@@ -254,7 +182,7 @@ Local<Array> resolvWeightedTag(char *pack, int &pointer) {
 /**
  * Array: weighted_tags (::resolvWeightedTags)
  */
-Local<Array> resolvWeightedTags(char *pack, int &pointer) {
+Local<Array> resolvWeightedTags(const char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
 	for (uint32_t i = 0; i < num; i++)
@@ -265,7 +193,7 @@ Local<Array> resolvWeightedTags(char *pack, int &pointer) {
 /**
  * Array: honor (int8)
  */
-Local<Array> resolvHonors(char *pack, int &pointer) {
+Local<Array> resolvHonors(const char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 1);
 	Local<Array> ans = Array::New(num);
 	for (uint32_t i = 0; i < num; i++)
@@ -283,7 +211,7 @@ Local<Array> resolvHonors(char *pack, int &pointer) {
  * - 6: rating (int32)
  * - 7: honors (::resolvHonors)
  */
-Local<Array> resolvEventSimpleOtherPack(char *pack, int &pointer) {
+Local<Array> resolvEventSimpleOtherPack(const char *pack, int &pointer) {
 	Local<Array> ans = Array::New(8);
 	ans->Set(0, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 	uint32_t length = readInteger(pack, pointer, 1);
@@ -313,7 +241,7 @@ Local<Array> resolvEventSimpleOtherPack(char *pack, int &pointer) {
  * - 10: state (string)
  * - 11: country (string)
  */
-Local<Array> resolvUserSimplePack(char *pack, int &pointer) {
+Local<Array> resolvUserSimplePack(const char *pack, int &pointer) {
 	Local<Array> ans = Array::New(12);
 	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	uint32_t length = readInteger(pack, pointer, 1);
@@ -343,7 +271,7 @@ Local<Array> resolvUserSimplePack(char *pack, int &pointer) {
  * - 3: message_notification_setting (int8)
  * - 4: strangers_message_setting (int8)
  */
-Local<Array> resolvUserSettingPack(char *pack, int &pointer) {
+Local<Array> resolvUserSettingPack(const char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 1);
 	Local<Array> ans = Array::New();
 	for (uint32_t i = 0; i < num; i++) {
@@ -365,7 +293,7 @@ Local<Array> resolvUserSettingPack(char *pack, int &pointer) {
  * - 8: description (string)
  * - 9: with_users (::resolvUIDs)
  */
-Local<Array> resolvSchedule(char *pack, int &pointer) {
+Local<Array> resolvSchedule(const char *pack, int &pointer) {
 	Local<Array> ans = Array::New(10);
 	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	ans->Set(1, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
@@ -385,7 +313,7 @@ Local<Array> resolvSchedule(char *pack, int &pointer) {
 /**
  * Array: schedule (::resolvSchedule)
  */
-Local<Array> resolvSchedules(char *pack, int &pointer) {
+Local<Array> resolvSchedules(const char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
 	for (uint32_t i = 0; i < num; i++)
@@ -397,7 +325,7 @@ Local<Array> resolvSchedules(char *pack, int &pointer) {
  * - 0: attribute (int8)
  * - 1: success (boolean)
  */
-Local<Array> resolvUpdate(char *pack, int &pointer) {
+Local<Array> resolvUpdate(const char *pack, int &pointer) {
 	Local<Array> ans = Array::New(2);
 	ans->Set(0, JSreadInteger(pack, pointer, 1));
 	ans->Set(1, JSreadBool(pack, pointer));
@@ -407,7 +335,7 @@ Local<Array> resolvUpdate(char *pack, int &pointer) {
 /**
  * Array: update (::resolvUpdate)
  */
-Local<Array> resolvUpdates(char *pack, int &pointer) {
+Local<Array> resolvUpdates(const char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 1);
 	Local<Array> ans = Array::New(num);
 	for (uint32_t i = 0; i < num; i++)
@@ -424,7 +352,7 @@ Local<Array> resolvUpdates(char *pack, int &pointer) {
  * - 5: action (int8)
  * - 6: msg (string)
  */
-Local<Array> resolvNotification(char *pack, int &pointer) {
+Local<Array> resolvNotification(const char *pack, int &pointer) {
 	Local<Array> ans = Array::New(7);
 	uint32_t msg_len;
 	ans->Set(0, JSreadInteger(pack, pointer, 1));
@@ -441,7 +369,7 @@ Local<Array> resolvNotification(char *pack, int &pointer) {
 /**
  * Array: notification (::resolvNotification)
  */
-Local<Array> resolvNotifications(char *pack, int &pointer) {
+Local<Array> resolvNotifications(const char *pack, int &pointer) {
 	uint32_t num = readInteger(pack, pointer, 4);
 	Local<Array> ans = Array::New(num);
 	for (uint32_t i = 0; i < num; i++)
@@ -619,8 +547,8 @@ Local<Array> resolvAdvertisements(const char *pack, int &pointer) {
  * 		- 0: picid (string)
  * 		- 1: picture_path (string)
  */
-Handle<Value> resolvViewPack(char *pack, const response_header &header) {
-	int pointer = HEADER_LENGTH * 2, mode;
+Handle<Value> resolvViewPack(const char *pack, const response_header &header) {
+	int pointer = HEADER_LENGTH, mode;
 	int64_t length;
 	Local<Array> ans;
 	switch (header.subtype) {
@@ -771,6 +699,7 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 		}
 		break;
 	case 30: // View pubpage
+		ans = Array::New(2);
 		ans->Set(0, JSreadAsciiString(pack, pointer, EVENTID_LENGTH)); // eid
 		mode = readInteger(pack, pointer, 1);
 		ans->Set(1, Integer::New(mode)); // subtype2
@@ -798,6 +727,7 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 		}
 		break;
 	case 31: // View advertisement
+		ans = Array::New(10);
 		ans->Set(0, JSreadAsciiString(pack, pointer, ADID_LENGTH));
 		ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
 		ans->Set(2, JSreadAsciiString(pack, pointer, PUBID_LENGTH));
@@ -813,8 +743,10 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
 		break;
 	case 40: // View picture
 	{
+		ans = Array::New(2);
 		char picid[PICID_LENGTH * 2 + 1];
 		readAsciiString(picid, pack, pointer, PICID_LENGTH);
+		picid[PICID_LENGTH * 2] = 0;
 		ans->Set(0, String::New(picid, PICID_LENGTH));
 		std::ostringstream os;
 		os << "public/data/post/" << picid << ".jpg";
@@ -839,8 +771,8 @@ Handle<Value> resolvViewPack(char *pack, const response_header &header) {
  * - \b "1 2 Search posting"
  * 		- Array: posting (::resolvPosting)
  */
-Handle<Value> resolvSearchPack(char *pack, const response_header &header) {
-	int pointer = HEADER_LENGTH * 2;
+Handle<Value> resolvSearchPack(const char *pack, const response_header &header) {
+	int pointer = HEADER_LENGTH;
 	switch (header.subtype) {
 	case 0:			//Search User
 		return resolvUIDs(pack, pointer);
@@ -920,8 +852,8 @@ Handle<Value> resolvSearchPack(char *pack, const response_header &header) {
  *		- \b "else"
  * 			- 1: reason (int8)
  */
-Local<Array> resolvCreatePack(char *pack, const response_header &header) {
-	int pointer = HEADER_LENGTH * 2;
+Local<Array> resolvCreatePack(const char *pack, const response_header &header) {
+	int pointer = HEADER_LENGTH;
 	bool succ;
 	Local<Array> ans = Array::New(1);
 	int type, length;
@@ -1064,8 +996,8 @@ Local<Array> resolvCreatePack(char *pack, const response_header &header) {
  * 		- 0: eid (string)
  * 		- 1: updates (::resolvUpdates)
  */
-Local<Array> resolvUpdatePack(char *pack, const response_header &header) {
-	int pointer = HEADER_LENGTH * 2, mode;
+Local<Array> resolvUpdatePack(const char *pack, const response_header &header) {
+	int pointer = HEADER_LENGTH, mode;
 	bool succ;
 	Local<Array> ans;
 	switch (header.subtype) {
@@ -1149,8 +1081,8 @@ Local<Array> resolvUpdatePack(char *pack, const response_header &header) {
  * 		- 3: pid (string)
  * 		- 4: acknowledgement (int8)
  */
-Local<Array> resolvReplyPack(char *pack, const response_header &header) {
-	int pointer = HEADER_LENGTH * 2;
+Local<Array> resolvReplyPack(const char *pack, const response_header &header) {
+	int pointer = HEADER_LENGTH;
 	Local<Array> ans = Array::New(5);
 	ans->Set(0, JSreadInteger(pack, pointer, UID_LENGTH));
 	ans->Set(1, JSreadInteger(pack, pointer, UID_LENGTH));
@@ -1198,8 +1130,8 @@ Local<Array> resolvReplyPack(char *pack, const response_header &header) {
  * 		- 1: ad_id (string)
  * 		- 2: success (boolean)
  */
-Local<Array> resolvDeletePack(char *pack, const response_header &header) {
-	int pointer = HEADER_LENGTH * 2;
+Local<Array> resolvDeletePack(const char *pack, const response_header &header) {
+	int pointer = HEADER_LENGTH;
 	Local<Array> ans;
 	switch (header.subtype) {
 	case 0: //delete friends
@@ -1268,8 +1200,8 @@ Local<Array> resolvDeletePack(char *pack, const response_header &header) {
  * 		- \b "if not success"
  * 			- 1:reason (int8)
  */
-Local<Array> resolvValidationPack(char *pack, const response_header &header) {
-	int pointer = HEADER_LENGTH * 2;
+Local<Array> resolvValidationPack(const char *pack, const response_header &header) {
+	int pointer = HEADER_LENGTH;
 	Local<Array> ans = Array::New(1);
 	bool succ = readBool(pack, pointer);
 	ans->Set(0, Boolean::New(succ));
@@ -1295,8 +1227,8 @@ Local<Array> resolvValidationPack(char *pack, const response_header &header) {
  * 		- 0: eventid (string)
  * 		- 1: success (boolean)
  */
-Local<Array> resolvQuitPack(char *pack, const response_header &header) {
-	int pointer = HEADER_LENGTH * 2;
+Local<Array> resolvQuitPack(const char *pack, const response_header &header) {
+	int pointer = HEADER_LENGTH;
 	Local<Array> ans;
 	switch (header.subtype) {
 	case 1: //Quit
@@ -1317,8 +1249,8 @@ Local<Array> resolvQuitPack(char *pack, const response_header &header) {
  * - \todo \b "10 6 New feature suggestion"
  * - \todo \b "10 15 System polling"
  */
-Handle<Value> resolvSuggestionPack(char *pack, const response_header &header) {
-	int pointer = HEADER_LENGTH * 2;
+Handle<Value> resolvSuggestionPack(const char *pack, const response_header &header) {
+	int pointer = HEADER_LENGTH;
 	switch (header.subtype) {
 	case 0: //TODO friend suggestion
 		break;
@@ -1363,8 +1295,8 @@ Handle<Value> resolvSuggestionPack(char *pack, const response_header &header) {
  * 			- 4: send_date (int32)
  * 			- 5: send_time (int32)
  */
-Local<Object> resolvMessagePack(char *pack, const response_header &header) {
-	int pointer = HEADER_LENGTH * 2, content_len;
+Local<Object> resolvMessagePack(const char *pack, const response_header &header) {
+	int pointer = HEADER_LENGTH, content_len;
 	Local<Array> ans = Array::New(1);
 	uint32_t direction = readInteger(pack, pointer, 1);
 	ans->Set(0, Integer::New(direction));
@@ -1424,11 +1356,9 @@ Local<Object> resolvMessagePack(char *pack, const response_header &header) {
  * 		- \b "12 Message" (::resolvMessagePack)
  */
 Handle<Value> resolvPack(const Arguments& args) {
-	char* pack = new char[args[0]->ToString()->Length()];
+	const char *pack = node::Buffer::Data(args[0]);
 	Local<Array> package = Array::New(2);
 	response_header header;
-	args[0]->ToString()->WriteAscii(pack, 0, args[0]->ToString()->Length());
-	encode(pack, args[0]->ToString()->Length() / 2);
 	extract_header(pack, &header);
 	package->Set(0, formJSHeader(&header));
 	switch (header.type) {
@@ -1466,7 +1396,6 @@ Handle<Value> resolvPack(const Arguments& args) {
 		package->Delete(1);
 		break;
 	}
-	delete[] pack;
 	return package;
 }
 
@@ -1478,11 +1407,8 @@ Handle<Value> resolvPack(const Arguments& args) {
  * 	- 4: subtype
  */
 Handle<Value> resolvSTCHeader(const Arguments& args) {
-	char* pack = new char[HEADER_LENGTH * 2];
+	const char* pack = node::Buffer::Data(args[0]);
 	response_header header;
-	args[0]->ToString()->WriteAscii(pack, 0, HEADER_LENGTH * 2);
-	encode(pack, HEADER_LENGTH);
 	extract_header(pack, &header);
-	delete[] pack;
 	return formJSHeader(&header);
 }

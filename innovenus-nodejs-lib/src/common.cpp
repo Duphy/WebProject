@@ -1,8 +1,8 @@
-#include <node.h>
 #include <v8.h>
 #include <vector>
 #include <cstring>
 #include <cstdio>
+#include <node_buffer.h>
 
 #include "common.h"
 #include "resolv.h"
@@ -11,22 +11,22 @@
 void encode(char *pack, uint32_t length) {
 	int x = 97;
 	for (uint32_t i = 4; i < length; i++) {
-		pack[i << 1] = formHexBit((resolvHexBit(pack[i << 1]) ^ (x >> 4)));
-		pack[(i << 1) | 1] = formHexBit((resolvHexBit(pack[(i << 1) | 1]) ^ (x & 0xF)));
+		pack[i] ^= x;
 		if (x > 123) x = 97;
 	}
 }
 void encode(std::string &pack, uint32_t length) {
 	unsigned int x = 97;
-	for (std::string::iterator it = pack.begin() + 4 * 2; it != pack.end();) {
-		*it = formHexBit((resolvHexBit(*it) ^ (x >> 4)));
-		it++;
-		*it = formHexBit((resolvHexBit(*it) ^ (x & 0xF)));
-		it++;
+	for (std::string::iterator it = pack.begin() + 4; it != pack.end(); it++) {
+		*it ^= x;
 		if (x > 123) x = 97;
 	}
 }
-
+Handle<Value> encode(const Arguments& args) {
+	char* pack = node::Buffer::Data(args[0]);
+	encode(pack, node::Buffer::Length(args[0]));
+	return Undefined();
+}
 #define ExportJSFunction(x) exports->Set(sym(#x),FunctionTemplate::New(x)->GetFunction());
 
 void init(Handle<Object> exports) {
@@ -77,6 +77,8 @@ void init(Handle<Object> exports) {
 	ExportJSFunction(resolvPack)
 	ExportJSFunction(resolvSTCHeader)
 	ExportJSFunction(resolvCTSHeader)
+
+	ExportJSFunction(encode)
 }
 
 NODE_MODULE(lib, init)

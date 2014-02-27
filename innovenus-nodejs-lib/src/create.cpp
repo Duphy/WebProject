@@ -3,7 +3,7 @@
  */
 
 #include <v8.h>
-#include <node.h>
+#include <node_buffer.h>
 #include <cstdio>
 #include <string>
 #include "common.h"
@@ -48,7 +48,7 @@ static const std::string elength("'s length error");
 static const std::string eelem("element of ");
 
 #define SetHeadAndReturn(_session_key_index, _type, _subtype) {std::string tmp(""); \
-	tmp += convert_int_to_hex_string(code.length() / 2 + HEADER_LENGTH, 4); \
+	tmp += convert_int_to_hex_string(code.length() + HEADER_LENGTH, 4); \
 	if (_session_key_index != -1) { \
 		if (args[_session_key_index]->IsUndefined()) \
 			throw myerr(("session_key" + eundef).data()); \
@@ -59,14 +59,13 @@ static const std::string eelem("element of ");
 		tmp += convert_ascii_string_to_hex_string(args[_session_key_index]->ToString()); \
 	} else \
 		tmp += convert_ascii_string_to_hex_string(String::New(DUMB_SESSION_KEY)); \
-	tmp += convert_int_to_hex_string(1, 1); \
-	tmp += convert_int_to_hex_string(0, 3); \
-	tmp += convert_int_to_hex_string(_type, 1); \
-	tmp += convert_int_to_hex_string(_subtype, 1); \
-	code = tmp + code; \
-	encode(code, code.length() >> 1); \
-	HandleScope scope; \
-	return scope.Close(String::New(code.data())); \
+		tmp += convert_int_to_hex_string(1, 1); \
+		tmp += convert_int_to_hex_string(0, 3); \
+		tmp += convert_int_to_hex_string(_type, 1); \
+		tmp += convert_int_to_hex_string(_subtype, 1); \
+		code = tmp + code + "\0"; \
+		HandleScope scope; \
+		return scope.Close(node::Buffer::New(code.data(), code.length())->handle_); \
 	}
 
 #define BEGIN try{
@@ -87,27 +86,24 @@ public:
 	}
 };
 static std::string convert_int_to_hex_string(int64_t a, unsigned int length) {
-	char tmp[17] = { '\0' };
+	char tmp[8];
 	for (unsigned int i = 0; i < length; i++) {
-		tmp[(length - i - 1) * 2 + 1] = formHexBit(a & 0xF);
-		a >>= 4;
-		tmp[(length - i - 1) * 2] = formHexBit(a & 0xF);
-		a >>= 4;
+		tmp[length - i - 1] = a & 0xFF;
+		a >>= 8;
 	}
-	return std::string(tmp);
+	return std::string(tmp, length);
 }
 static std::string convert_string_to_hex_string(Handle<String> src) {
 	int length = src->Length();
-	char *tmp = new char[length * 4 + 1];
+	char *tmp = new char[length * 2 + 1];
 	src->Write((uint16_t*) tmp, 0, length);
-	for (int i = length - 1; i >= 0; i--) {
-		tmp[i * 4 + 3] = formHexBit(tmp[i * 2] & 0xF);
-		tmp[i * 4 + 2] = formHexBit((tmp[i * 2] >> 4) & 0xF);
-		tmp[i * 4 + 0] = formHexBit((tmp[i * 2 + 1] >> 4) & 0xF);
-		tmp[i * 4 + 1] = formHexBit(tmp[i * 2 + 1] & 0xF);
+	char swap;
+	for (int i = 0; i < length; i++) {
+		swap = tmp[i << 1];
+		tmp[i << 1] = tmp[(i << 1) | 1];
+		tmp[(i << 1) | 1] = swap;
 	}
-	tmp[length * 4] = '\0';
-	std::string ans(tmp);
+	std::string ans(tmp, length * 2);
 	delete[] tmp;
 	return ans;
 }
@@ -115,7 +111,6 @@ static std::string convert_ascii_string_to_hex_string(Handle<String> src) {
 	unsigned int length = src->Length();
 	char *tmp = new char[length + 1];
 	src->WriteAscii(tmp);
-#ifdef TYPE_CHECK
 	for (unsigned int i = 0; i < length; i++) {
 		if (!(((tmp[i] <= '9') && (tmp[i] >= '0'))
 				|| ((tmp[i] <= 'F') && (tmp[i] >= 'A'))
@@ -125,9 +120,9 @@ static std::string convert_ascii_string_to_hex_string(Handle<String> src) {
 		if ((tmp[i] >= 'A') && (tmp[i] <= 'F'))
 			tmp[i] = tmp[i] - 'A' + 'a';
 	}
-#endif
-	tmp[length] = '\0';
-	std::string ans(tmp);
+	for (unsigned int i = 0; i < (length >> 1); i++)
+		tmp[i] = resolvHexBit(tmp[i << 1]) << 4 | resolvHexBit(tmp[(i << 1) | 1]);
+	std::string ans(tmp, length >> 1);
 	delete[] tmp;
 	return ans;
 }
@@ -324,16 +319,12 @@ static inline void Add(std::string& code, const int type,
 			throw myerr("Can't open file");
 		ifs.seekg(0, std::ios_base::end);
 		uint32_t size = ifs.tellg();
-		unsigned char *buf = new unsigned char[size];
+		char *buf = new char[size];
 		ifs.seekg(0, std::ios_base::beg);
-		ifs.read((char*) buf, size);
+		ifs.read(buf, size);
 		ifs.close();
 		code += convert_int_to_hex_string(size, type & SPECIAL_MASK);
-		unsigned char *end = buf + size;
-		for (unsigned char *p = buf; p != end; p++) {
-			code += formHexBit(*p >> 4);
-			code += formHexBit((*p) & 0xF);
-		}
+		code += std::string(buf, size);
 		delete[] buf;
 	}
 }
@@ -1765,21 +1756,20 @@ typedef struct s_header {
 	char session_key[SESSION_KEY_LENGTH * 2];
 	int type, subtype;
 } header;
-static void extract_header(const char *buf, header* ans) {
-	ans->length = 0;
+static void extract_header(const char *buf, header &ans) {
 	int pointer = 0;
-	ans->length = readInteger(buf, pointer, 4);
-	readAsciiString(ans->session_key, buf, pointer, SESSION_KEY_LENGTH);
+	ans.length = readInteger(buf, pointer, 4);
+	readAsciiString(ans.session_key, buf, pointer, SESSION_KEY_LENGTH);
 	readBytes(NULL, buf, pointer, 4);
-	ans->type = readInteger(buf, pointer, 1);
-	ans->subtype = readInteger(buf, pointer, 1);
+	ans.type = readInteger(buf, pointer, 1);
+	ans.subtype = readInteger(buf, pointer, 1);
 }
-static Local<Array> formJSHeader(const header *header) {
+static Local<Array> formJSHeader(const header &header) {
 	Local<Array> ans = Array::New(5);
-	ans->Set(0, Integer::New(header->length));
-	ans->Set(1, String::New(header->session_key, SESSION_KEY_LENGTH * 2));
-	ans->Set(2, Integer::New(header->type));
-	ans->Set(3, Integer::New(header->subtype));
+	ans->Set(0, Integer::New(header.length));
+	ans->Set(1, String::New(header.session_key, SESSION_KEY_LENGTH * 2));
+	ans->Set(2, Integer::New(header.type));
+	ans->Set(3, Integer::New(header.subtype));
 	return ans;
 }
 
@@ -1790,11 +1780,8 @@ static Local<Array> formJSHeader(const header *header) {
  * 	- 3: subtype
  */
 Handle<Value> resolvCTSHeader(const Arguments& args) {
-	char* pack = new char[HEADER_LENGTH * 2];
+	const char* pack = node::Buffer::Data(args[0]);
 	header header;
-	args[0]->ToString()->WriteAscii(pack, 0, HEADER_LENGTH * 2);
-	encode(pack, HEADER_LENGTH);
-	extract_header(pack, &header);
-	delete[] pack;
-	return formJSHeader(&header);
+	extract_header(pack, header);
+	return formJSHeader(header);
 }
