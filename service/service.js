@@ -692,22 +692,26 @@ exports.viewSelfCircatags = function(req, res) {
 }
 exports.viewPictures = function(req,res){
 	var output;
-	for(var i=0;i<req.body.picids.length;i++){
-		var pack = lib.createViewPicturePack(req.body.session_key,
-			parseInt(req.body.uid),req.body.picids[i]);
-		helper.connectAndSend(pack, function(data){
-			var pkg = lib.resolvPack(data);
-			output = {
-			    "pics" : pkg[1][1]
-			};
-			res.send(output);
-		    }, function() {
-				res.send({
-				    status : "timeout"
-				});
-		   }
-		);
-	}
+	// for(var i=0;i<req.body.picids.length;i++){
+	// 	var pack = lib.createViewPicturePack(req.body.session_key,
+	// 		parseInt(req.body.uid),req.body.picids[i]);
+	// 	helper.connectAndSend(pack, function(data){
+	// 		var pkg = lib.resolvPack(data);
+	// 		output = {
+	// 		    "pics" : pkg[1][1]
+	// 		};
+	// 		res.send(output);
+	// 	    }, function() {
+	// 			res.send({
+	// 			    status : "timeout"
+	// 			});
+	// 	   }
+	// 	);
+	// }
+	var pic=[];
+	pic.push(default_avarta);
+	output = {"pics" : pic};
+	res.send(output);
 }
 exports.viewCommonFriends = function(req,res){
 	var pack = createViewUserPack(9, req.body.session_key,

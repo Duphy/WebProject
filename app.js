@@ -515,9 +515,10 @@ function chatToEvent(session_key, uid, seq, eid, content){
 	// console.log("I got the chat!!!!!!!!!!!!!!!!!!!");
 	var status = "unsuccessful";
 	var pack = service.lib.createMessageToEventPack(session_key,parseInt(uid), parseInt(seq), service.helper.decToHex(eid), content);
-	    service.helper.connectAndSend(pack, function(){
-	 	    var output = {"status":"successful"};
-		},null,true);
+    service.helper.connectAndSend(pack, function(){
+ 	    var output = {"status":"successful"};
+ 	    res.send(output);
+	},null,true);
 }
 
 function chatToUser(session_key, uid, seq, to_uid, content){
@@ -525,29 +526,9 @@ function chatToUser(session_key, uid, seq, to_uid, content){
     var status = "unsuccessful";
     var pack = service.lib.createMessageToUserPack(session_key,parseInt(uid), parseInt(seq), parseInt(to_uid), content);
     service.helper.connectAndSend(pack, function(data){
-    var output = {"status":"successful"};
-      //  var pkg = [[0,0,0,0],[0,seq,1]];
-    	//chatHandler(pkg,uid);
-    //	console.log(socketsList);
-    //	console.log(uid);
-    	//console.log(socketsList[uid]);
-    	//console.log(socketsList[uid].disconnected);
-//                                  console.log(content);
-//                                  console.log(pkg);
-//	    if(socketsList[uid] && !socketsList[uid].disconnected){
-//			console.log("find socket!!!!");
-//			sendChat(pkg,socketsList[uid]);
-//		}else{
-//			console.log("cannot find socket!!!!");
-//			if(personalChatPool[uid]){
-//				personalChatPool[uid].push(pkg);
-//			}else{
-//				personalChatPool[uid] = [];
-//                personalChatPool[uid] = pkg;
-//			}
-//		}
-//    	clearChatHandler(uid,seq);
-       },null,true);
+    	var output = {"status":"successful"};
+    	res.send(output);
+    },null,true);
 }
 
 service.setClearNotificationHandelr(clearNotificationHandler);
