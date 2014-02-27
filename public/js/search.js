@@ -519,7 +519,7 @@ function search(val,type){
           contentType: 'application/json',
           success:function(data){
             console.log(data);
-            if(data.uids.length != 0){
+            if(data.uids && data.uids.length != 0){
               var friendsData = {};
               friendsData.session_key = localStorage.session_key;
               friendsData.uid = localStorage.uid;
@@ -640,7 +640,7 @@ function search(val,type){
         type:"POST",
         contentType: 'application/json',
         success:function(data){
-          if(data.eids.length != 0){
+          if(data.eids && data.eids.length != 0){
             var eventData = {};
             eventData.session_key = localStorage.session_key;
             eventData.uid = localStorage.uid;
@@ -707,7 +707,7 @@ function search(val,type){
       success:function(data){
         console.log("searchpost result:");
         console.log(data);
-        if(data.pidsets.length > 0){
+        if(data.pidsets && data.pidsets.length > 0){
           viewpost(data.pidsets);
         }else{
           $("#loadMoreButton").hide();

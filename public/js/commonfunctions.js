@@ -871,7 +871,7 @@ function searchUser(searchData,loadOrder){
     type:"POST",
     contentType: 'application/json',
     success:function(data){
-      if(data.uids.length != 0){
+      if(data.uids && data.uids.length != 0){
         console.log(searchData.filter);
         console.log("searchuser byfilter result:");
         console.log(data);
@@ -959,7 +959,7 @@ function searchEvents(searchData,loadOrder){
     type:"POST",
     contentType: 'application/json',
     success:function(data){
-      if(data.eids.length != 0){
+      if(data.eids && data.eids.length != 0){
         console.log("searcheventbyfilter result:");
         console.log(data);
         var eventsData = {};
