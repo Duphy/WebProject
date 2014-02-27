@@ -1,3 +1,7 @@
+.websiteFont{
+	font-family: 'Lato', sans-serif;font-weight:300;
+}
+
 .length-limited {
 	border:none;
 	background-color: white;

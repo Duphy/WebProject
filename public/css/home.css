@@ -1,3 +1,7 @@
+.websiteFont{
+	font-family: 'Lato', sans-serif;font-weight:300;
+}
+
 #friendsHead{
 	color: #afdefa;
 	background: #0d77b6;
@@ -704,4 +708,9 @@ background-color:#FFFFFF}
 
 #homeNav.active{
 	font-weight: bold;
+}
+
+.replyInput{
+	min-height: 70px;
+	border-radius: 0px;
 }

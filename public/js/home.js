@@ -12,6 +12,9 @@ var flag_displayevent=true;
 localStorage.common_friends = "";
 
 $(document).ready(function(){ 
+
+  $(".imgLiquidFill").imgLiquid();
+
   //set authentication data
   var auth_data = {};
   auth_data.session_key = localStorage.session_key;
@@ -416,7 +419,7 @@ $(document).ready(function(){
               $('#pictureCancel').removeAttr("disabled");
               $('#pictureSubmit').removeAttr("disabled");
               $('#pictureDescArea').show();
-              $('#pictureTags').show();
+              $('#pictureTags').parent().show();
               $('#pictureSubmit').attr("picturename",data.files[0].name);
             },1000);
           }
@@ -481,9 +484,8 @@ $(document).ready(function(){
   $("#pictureCancel").click(function(){
     //TO DO: remove the picture just uploaded.
     $("#pictureDescArea").val("");
-    $("#pictureTags").val("");
+    $("#pictureTags").tagsinput("removeAll");
     $("#pictureSubmit").attr("picturename","");
-    return false;
   });
 
 
