@@ -329,7 +329,7 @@ function createPost(data){
             type:"POST",
             contentType:"application/json",
             success:function(data){
-              if(data.picture && data.picture.length > 0){
+              if(data.pics && data.pics.length > 0){
                 console.log("picture url is:");
                 console.log(data.picture[0]);
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
@@ -806,7 +806,7 @@ function viewpost(pids,char,newsData){
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
-                          if(data.picture && data.picture.length > 0){
+                          if(data.pics && data.pics.length > 0){
                             console.log("picture url is:");
                             console.log(data.picture[0]);
                             var postid = element.uid+""+element.eid+""+element.pid;
