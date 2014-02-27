@@ -1072,7 +1072,7 @@ function eventJoinRequestNotification(userName, userId, postId, eventName, event
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
                 '<p class = "span9 websiteFont" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> send a event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
-                '<button class = "btn pull-right rejectEventJoinRequestRequest span1" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-remove"></i></button>'+
+                '<button class = "btn pull-right rejectEventJoinRequest span1" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-remove"></i></button>'+
                 '<button class = "btn btn-success pull-right approveEventJoinRequest span1" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;margin-right:3px;"><i class = "icon-ok icon-white"></i></button>'+
              '</li>';
       break;
@@ -1095,7 +1095,7 @@ function removeNotification(){
   console.log(($("#notificationNumber").html()).trim());
   if(newNotificationNumber == 0){
     $("#notificationNumber").css({"color":"black","font-weight":"normal"});
-    $("#notificationList").html("<li tabindex='-1' style = 'text-align:center;'>No New Notification.</li>");
+    $("#notificationList").html("<li class = 'websiteFont' tabindex='-1' style = 'text-align:center;'>No New Notification.</li>");
   }
 }
 
