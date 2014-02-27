@@ -526,7 +526,7 @@ function chatToEvent(session_key, uid, seq, eid, content){
 	var pack = service.lib.createMessageToEventPack(session_key,parseInt(uid), parseInt(seq), service.helper.decToHex(eid), content);
     service.helper.connectAndSend(pack, function(){
  	    var output = {"status":"successful"};
- 	    res.send(output);
+ //	    res.send(output);
 	},null,true);
 }
 
@@ -536,7 +536,7 @@ function chatToUser(session_key, uid, seq, to_uid, content){
     var pack = service.lib.createMessageToUserPack(session_key,parseInt(uid), parseInt(seq), parseInt(to_uid), content);
     service.helper.connectAndSend(pack, function(data){
     	var output = {"status":"successful"};
-    	res.send(output);
+//    	res.send(output);
     },null,true);
 }
 
