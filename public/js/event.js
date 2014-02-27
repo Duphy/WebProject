@@ -678,19 +678,18 @@ $("body").delegate(".memberItem", 'click', function() {
     data.eid = localStorage.eid;
     data.uid = localStorage.uid;
     data.session_key = localStorage.session_key;
-    // $.ajax({
-    //   url:"/quitevent",
-    //   data:JSON.stringify(data),
-    //   type:"POST",
-    //   contentType: 'application/json',
-    //   success:function(result){
-    //     if(result.status = "sccessful"){
-    //       $("#floatingBarsG-quit").show();
-    //       window.location = "/home";
-    //     }
-    //   }
-    // });
-    window.location = "/home";
+    $.ajax({
+      url:"/quitevent",
+      data:JSON.stringify(data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(result){
+        if(result.status = "sccessful"){
+          $("#floatingBarsG-quit").show();
+          window.location = "/home";
+        }
+      }
+    });
     return false;
   });
 
