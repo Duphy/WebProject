@@ -279,9 +279,11 @@ function sendNotification(notification,socket){
     console.log(notification);
 	switch(notification[0]){
 		case 0:
+			console.log("send friend notification!!!!!!!!!!!!!!!!!");
 			socket.emit("friend request",notification[2],notification[2],notification[3],notification[4],notification[5],notification[1]);
 			break;
 		case 1:
+			console.log("send event notification!!!!!!!!!!!!!!!!!");
 			socket.emit("event membership request",notification[2],notification[2],notification[4],service.helper.hexToDec(notification[3]),service.helper.hexToDec(notification[3]),notification[5],notification[1]);
 			break;
 		case 2:
