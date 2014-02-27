@@ -12,6 +12,9 @@ var flag_displayevent=true;
 localStorage.common_friends = "";
 
 $(document).ready(function(){ 
+
+  $(".imgLiquidFill").imgLiquid();
+
   //set authentication data
   var auth_data = {};
   auth_data.session_key = localStorage.session_key;

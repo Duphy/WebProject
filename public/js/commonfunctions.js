@@ -263,7 +263,7 @@ function renderPost(post){
     '<img class = "selfProfileSmallAvarta" src = '+localStorage.self_small_avarta+' style = "width:36px;height:36px;border-radius:18px;margin-left:10px;">'+
     '</div>'+
     '<div class= "span11" style = "padding-left:10px;padding-right:20px;">'+
-    '<textarea class = "input-block-level replyInput" replyToUid = "'+post.uid+'" replyToName = "'+post.poster_name+'" type = "text" placeholder = "Add Comments here..." style = "min-height:70px;"></textarea>'+
+    '<textarea class = "input-block-level replyInput" replyToUid = "'+post.uid+'" replyToName = "'+post.poster_name+'" type = "text" placeholder = "Add Comments here..." style = "min-height:70px;border-radius:0px;"></textarea>'+
     '<button class = "btn replyCancel pull-right span2 button" style = "margin-left:10px;">Cancel</button>'+
     '<button class = "btn btn-success replySubmit pull-right span2 button" disabled>Post</button>'+
     '</div>'+
@@ -318,22 +318,22 @@ function createPost(data){
         $('#floatingBarsG-post').hide();
         $("#contentBody").find(".well").hide();
         $("#postSubmit").removeAttr("disabled");
-        if(result.post.pics){
+        if(result.post.picids && result.post.picids.length > 0){
           var pictureData  = {};
           pictureData.session_key = localStorage.session_key;
           pictureData.uid = localStorage.uid;
-          pictureData.picids = post.pics;
+          pictureData.picids = result.post.picids;
           $.ajax({
             url:'/getpictures',
             data:JSON.stringify(pictureData),
             type:"POST",
             contentType:"application/json",
             success:function(data){
-              if(data.picture){
+              if(data.picture && data.picture.length > 0){
                 console.log("picture url is:");
-                console.log(data.picture);
+                console.log(data.picture[0]);
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
-                $("#"+postid).find(".pictureArea").append("<img src = '"+data.picture+"' style = 'width:96%;'/>");
+                $("#"+postid).find(".pictureArea").append("<img src = '"+data.picture[0]+"' style = 'width:96%;'/>");
               }else{
                 console.log("failed to get the picture of this post");
               }
@@ -791,7 +791,7 @@ function viewpost(pids,char,newsData){
                       $('#left-column').append(renderPost(element));
                     }
                     //retrieve the pics of the element if any.
-                    if(element.pics.length > 0){
+                    if(element.picids && element.picids.length > 0){
                       console.log("element:");
                       console.log(element);
                       console.log(element.pics);
@@ -799,16 +799,18 @@ function viewpost(pids,char,newsData){
                       var pictureData  = {};
                       pictureData.session_key = localStorage.session_key;
                       pictureData.uid = localStorage.uid;
-                      pictureData.picids = element.pics;
+                      pictureData.picids = element.picids;
                       $.ajax({
                         url:'/getpictures',
                         data:JSON.stringify(pictureData),
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
-                          if(data.picture){
+                          if(data.picture && data.picture.length > 0){
+                            console.log("picture url is:");
+                            console.log(data.picture[0]);
                             var postid = element.uid+""+element.eid+""+element.pid;
-                            $("#"+postid).find(".pictureArea").append("<img src = '"+data.picture+"' style = 'width:96%;'/>");
+                            $("#"+postid).find(".pictureArea").append("<img src = '"+data.picture[0]+"' style = 'width:96%;'/>");
                           }else{
                             console.log("failed to get the picture of this post");
                           }
@@ -1026,21 +1028,21 @@ function friendRequestNotification(userName, userId, eventId, postId, action, se
     case 0:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem friendRequestNotification unread">'+
                 '<i class="icon-user"></i>'+
-                '&nbsp;&nbsp;<span><a class = "userName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have approved your friend request.</span>&nbsp;'+
+                '&nbsp;&nbsp;<span class = "websiteFont"><a class = "userName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have approved your friend request.</span>&nbsp;'+
                 '<button class = "btn btn-primary pull-right friendResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 1:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem friendRequestNotification unread">'+
                 '<i class="icon-user"></i>'+
-                '&nbsp;&nbsp;<span><a class = "usernName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have rejected your friend request.</span>&nbsp;'+
+                '&nbsp;&nbsp;<span class = "websiteFont"><a class = "usernName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have rejected your friend request.</span>&nbsp;'+
                 '<button class = "btn btn-primary pull-right friendResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 2:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem friendRequestNotification unread">'+
                 '<i class="icon-user"></i>'+
-                '&nbsp;&nbsp;<span><a class = "userName user'+userId+'" uid = "'+userId+'">'+userName+'</a> sends a friend request to you.</span>&nbsp;&nbsp;'+
+                '&nbsp;&nbsp;<span class = "websiteFont"><a class = "userName user'+userId+'" uid = "'+userId+'">'+userName+'</a> sends a friend request to you.</span>&nbsp;&nbsp;'+
                 '<button class = "btn pull-right rejectFriendRequest" style = "border-radius:15px;padding:2px 6px 3px;"><i class = "icon-remove"></i></button>'+
                 '<button class = "btn btn-success pull-right approveFriendRequest" style = "border-radius:15px;padding:2px 6px 3px;margin-right:3px;"><i class = "icon-ok icon-white"></i></button>'+
              '</li>';
@@ -1054,21 +1056,21 @@ function eventJoinRequestNotification(userName, userId, postId, eventName, event
   switch(action){
     case 0:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
-                '<p class = "span10" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
+                '<p class = "span10 websiteFont" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> has approved your event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
                 '<button class = "btn btn-primary pull-right span2 eventResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 1:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
-                '<p class = "span10" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
+                '<p class = "span10 websiteFont" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> has rejected your event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
                 '<button class = "btn btn-primary pull-right span2 eventResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 2:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
-                '<p class = "span9" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
+                '<p class = "span9 websiteFont" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> send a event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
                 '<button class = "btn pull-right rejectEventJoinRequestRequest span1" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-remove"></i></button>'+
                 '<button class = "btn btn-success pull-right approveEventJoinRequest span1" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;margin-right:3px;"><i class = "icon-ok icon-white"></i></button>'+
@@ -1079,7 +1081,7 @@ function eventJoinRequestNotification(userName, userId, postId, eventName, event
 }
 
 function postReplyNotification(userName, userId, eventId, post, postId ,seqNo){
-  var html = '<li seqNo= "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem postReplyNotification unread">'+
+  var html = '<li seqNo= "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem postReplyNotification unread websiteFont">'+
                 '<i class="icon-list"></i>'+
                 '&nbsp;&nbsp;<a id = "'+userId+'">'+userName+'</a> has replied to your post <a class = "postName" id = "'+postId+'">'+post+'</a>.'+
                 '<button class = "btn pull-right btn-primary" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+               
