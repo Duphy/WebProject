@@ -794,8 +794,8 @@ function viewpost(pids,char,newsData){
                     if(element.picids && element.picids.length > 0){
                       console.log("element:");
                       console.log(element);
-                      console.log(element.pics);
-                      console.log(element.pics.length);
+                      console.log(element.picids);
+                      console.log(element.picids.length);
                       var pictureData  = {};
                       pictureData.session_key = localStorage.session_key;
                       pictureData.uid = localStorage.uid;
