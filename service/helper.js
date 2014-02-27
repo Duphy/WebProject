@@ -14,7 +14,7 @@ function UserSocket() {
     var self = this;
     this.timer = null;
     this.queue = [];
-    this.msg = "";
+    this.msg = null;
     this.uid = null;
     this.session_key = null;
     this.handle = null;
@@ -22,7 +22,7 @@ function UserSocket() {
     this.retry_count = 0;
     this.pack_length = 0;
     this.data_length = 0;
-    this.retval = "";
+    this.retval = new Buffer(0);
     this.connected = false;
     this.timeout = function() {
 	self.timer = null;
@@ -30,35 +30,37 @@ function UserSocket() {
 	console.log("timeout, uid: " + self.uid);
 	self.conn.destroy();
 	self.connected = false;
-	self.retval = "";
+	self.retval = new Buffer(0);
 	self.pack_length = 0;
 	self.data_length = 0;
 	if (self.retry_count > retrylimit) {
-	    console.log("final timeout, uid: " + self.uid + "\n\t" + self.msg);
+	    console.log("final timeout, uid: " + self.uid);
+	    lib.encode(self.msg);
+	    console.log(self.msg);
 	    self.retry_count = 0;
 	    if (self.timeout_handle != null)
 		self.timeout_handle();
-	    self.msg = "";
+	    self.msg = null;
 	    self.nextTask();
 	} else
 	    self.conn.connect(port, host, function() {
 		self.connected = true;
 		self.timer = setTimeout(self.timeout, timelimit);
-		self.conn.write(self.msg, "hex");
+		self.conn.write(self.msg);
 	    });
     };
     this.conn = new net.Socket();
-    this.conn.setEncoding("hex");
     this.conn.on("data", function(data) {
 	self.conn.pause();
-	self.retval += data;
-	self.data_length += data.length / 2;
+	self.retval = Buffer.concat([self.retval, data]);
+	self.data_length += data.length;
 	if ((self.pack_length == 0) && (self.data_length >= 18))
 	    self.pack_length = lib.resolvSTCHeader(self.retval)[0];
 	while ((self.pack_length != 0)
 		&& (self.pack_length <= self.data_length)) {
-	    var tmp = self.retval.substr(0, self.pack_length * 2);
-	    self.retval = self.retval.substr(self.pack_length * 2);
+	    var tmp = self.retval.slice(0, self.pack_length);
+	    lib.encode(tmp);
+	    self.retval = self.retval.slice(self.pack_length);
 	    self.data_length -= self.pack_length;
 	    if (self.data_length >= 18) {
 		self.pack_length = lib.resolvSTCHeader(self.retval)[0];
@@ -88,7 +90,7 @@ function UserSocket() {
 		clearTimeout(self.timer);
 		self.timer = null;
 		self.handle(tmp);
-		self.msg = "";
+		self.msg = null;
 		self.handle = null;
 	    }
 	}
@@ -102,8 +104,8 @@ function UserSocket() {
 	    clearTimeout(self.timer);
 	    self.timer = null;
 	}
-	self.msg = "";
-	self.reval = "";
+	self.msg = null;
+	self.reval = new Buffer(0);
 	self.data_length = 0;
 	self.pack_length = 0;
 	self.connected = false;
@@ -131,18 +133,19 @@ UserSocket.prototype.nextTask = function() {
     var self = this;
     if (self.queue.length == 0)
 	return;
-    if (self.msg != "")
+    if (self.msg != null)
 	return;
     self.msg = self.queue[0][0];
+    lib.encode(self.msg);
     self.handle = self.queue[0][1];
     self.timeout_handle = self.queue[0][2];
     var no_response = self.queue[0][3];
     self.queue.shift();
     if (self.connected) {
 	self.timer = setTimeout(self.timeout, timelimit);
-	self.conn.write(self.msg, "hex");
+	self.conn.write(self.msg);
 	if (no_response) {
-	    self.msg = "";
+	    self.msg = null;
 	    clearTimeout(self.timer);
 	    self.timer = null;
 	    if (self.handle != null)
@@ -153,9 +156,9 @@ UserSocket.prototype.nextTask = function() {
 	self.conn.connect(port, host, function() {
 	    self.connected = true;
 	    self.timer = setTimeout(self.timeout, timelimit);
-	    self.conn.write(self.msg, "hex");
+	    self.conn.write(self.msg);
 	    if (no_response) {
-		self.msg = "";
+		self.msg = null;
 		clearTimeout(self.timer);
 		self.timer = null;
 		if (self.handle != null)
@@ -166,9 +169,10 @@ UserSocket.prototype.nextTask = function() {
     }
 }
 exports.connectAndSend = function(msg, callback, error_callback, no_response) {
-    if (msg == "")
+    if (msg == null)
 	return;
     var task = new Array(4);
+    var session_key = lib.resolvCTSHeader(msg)[1];
     task[0] = msg;
     if ((typeof callback == "undefined") || (callback == null))
 	task[1] = function(data) {};
@@ -182,7 +186,6 @@ exports.connectAndSend = function(msg, callback, error_callback, no_response) {
 	task[3] = false;
     else
 	task[3] = true;
-    var session_key = lib.resolvCTSHeader(msg)[1];
     if (typeof conns[session_key] == "undefined")
 	conns[session_key] = new UserSocket();
     conns[session_key].queue.push(task);
