@@ -423,14 +423,12 @@ function storeUserChat(uid,sender_uid, data){
 					var chatPath = path + sender_uid;//public/data/uid/sender_uid
 					//service.fs.writeFileSync(chatPath, data,);
 					service.fs.appendFileSync(chatPath, data + "\n");
-					//res.send({status:"successful"});
 			    }
 			});
 		}else{
 			console.log("dir exists.");
 			var chatPath = path + sender_uid;//public/data/uid/sender_uid
 			service.fs.appendFileSync(chatPath, data + "\n");
-			//res.send({status:"successful"});
 		}
 	});
 }
@@ -447,14 +445,12 @@ function storeEventChat(uid,sender_uid, data){
 					var chatPath = path + sender_uid;//public/data/uid/sender_uid
 					//service.fs.writeFileSync(chatPath, data,);
 					service.fs.appendFileSync(chatPath, data + "\n");
-					//res.send({status:"successful"});
 			    }
 			});
 		}else{
 			console.log("dir exists.");
 			var chatPath = path + sender_uid;//public/data/uid/sender_uid
 			service.fs.appendFileSync(chatPath, data + "\n");
-			//res.send({status:"successful"});
 		}
 	});
 }
@@ -526,7 +522,7 @@ function chatToEvent(session_key, uid, seq, eid, content){
 	var pack = service.lib.createMessageToEventPack(session_key,parseInt(uid), parseInt(seq), service.helper.decToHex(eid), content);
     service.helper.connectAndSend(pack, function(){
  	    var output = {"status":"successful"};
- //	    res.send(output);
+
 	},null,true);
 }
 
@@ -536,7 +532,7 @@ function chatToUser(session_key, uid, seq, to_uid, content){
     var pack = service.lib.createMessageToUserPack(session_key,parseInt(uid), parseInt(seq), parseInt(to_uid), content);
     service.helper.connectAndSend(pack, function(data){
     	var output = {"status":"successful"};
-//    	res.send(output);
+
     },null,true);
 }
 

@@ -488,7 +488,6 @@ $(document).ready(function(){
     $("#pictureSubmit").attr("picturename","");
   });
 
-
   //retrieve self big avarta
 	$.ajax({
 	 	url:'/getselfavarta',
@@ -501,6 +500,7 @@ $(document).ready(function(){
     }
 	});
 
+  //retrieve self small avarta
   $.ajax({
     url:'/getselfsmallavarta',
     data:JSON.stringify(selfAvartaData),
