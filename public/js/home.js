@@ -12,6 +12,9 @@ var flag_displayevent=true;
 localStorage.common_friends = "";
 
 $(document).ready(function(){ 
+
+  $(".imgLiquidFill").imgLiquid();
+
   //set authentication data
   var auth_data = {};
   auth_data.session_key = localStorage.session_key;
@@ -416,7 +419,7 @@ $(document).ready(function(){
               $('#pictureCancel').removeAttr("disabled");
               $('#pictureSubmit').removeAttr("disabled");
               $('#pictureDescArea').show();
-              $('#pictureTags').show();
+              $('#pictureTags').parent().show();
               $('#pictureSubmit').attr("picturename",data.files[0].name);
             },1000);
           }
@@ -481,11 +484,9 @@ $(document).ready(function(){
   $("#pictureCancel").click(function(){
     //TO DO: remove the picture just uploaded.
     $("#pictureDescArea").val("");
-    $("#pictureTags").val("");
+    $("#pictureTags").tagsinput("removeAll");
     $("#pictureSubmit").attr("picturename","");
-    return false;
   });
-
 
   //retrieve self big avarta
 	$.ajax({
@@ -499,6 +500,7 @@ $(document).ready(function(){
     }
 	});
 
+  //retrieve self small avarta
   $.ajax({
     url:'/getselfsmallavarta',
     data:JSON.stringify(selfAvartaData),
@@ -1114,8 +1116,9 @@ $(document).ready(function(){
   $('body').delegate('.eventResponse','click',function(){
     console.log("read event response");
     flag_displayevent = true;
-    if(notification.prev() && notification.prev().hasClass("divider")){
-        notification.prev().remove();
+    var notification = $(this).closest('.notificationItem');
+    if($(notification).prev() && $(notification).prev().hasClass("divider")){
+        $(notification).prev().remove();
     };
     notification.remove();
     removeNotification();

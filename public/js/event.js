@@ -678,19 +678,18 @@ $("body").delegate(".memberItem", 'click', function() {
     data.eid = localStorage.eid;
     data.uid = localStorage.uid;
     data.session_key = localStorage.session_key;
-    // $.ajax({
-    //   url:"/quitevent",
-    //   data:JSON.stringify(data),
-    //   type:"POST",
-    //   contentType: 'application/json',
-    //   success:function(result){
-    //     if(result.status = "sccessful"){
-    //       $("#floatingBarsG-quit").show();
-    //       window.location = "/home";
-    //     }
-    //   }
-    // });
-    window.location = "/home";
+    $.ajax({
+      url:"/quitevent",
+      data:JSON.stringify(data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(result){
+        if(result.status = "sccessful"){
+          $("#floatingBarsG-quit").show();
+          window.location = "/home";
+        }
+      }
+    });
     return false;
   });
 
@@ -821,8 +820,9 @@ $("body").delegate(".memberItem", 'click', function() {
   $('body').delegate('.eventResponse','click',function(){
     console.log("read event response");
     flag_displayevent = true;
-    if(notification.prev() && notification.prev().hasClass("divider")){
-        notification.prev().remove();
+    var notification = $(this).closest('.notificationItem');
+    if($(notification).prev() && $(notification).prev().hasClass("divider")){
+        $(notification).prev().remove();
     };
     notification.remove();
     removeNotification();

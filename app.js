@@ -15,10 +15,13 @@ var routes = require('./routes');
 var mkdirp = require("mkdirp");
 var rimraf = require("rimraf");
 var fs = require('fs');
-var redis = require('redis');
 
 var app = express();
-//var redisClient = redis.createClient();
+//var redis = require('redis');
+// redisClient = redis.createClient();
+// redisClient.on("error", function (err) {
+//     console.log("Error " + err);
+// });
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -241,16 +244,16 @@ function notificationHandler(notifications,uid){
 		}
 	}else{
 		console.log("cannot find socket!!!!");
-		if(notificationsPool[uid]){
-			console.log("pool is not empty!!!!");
-			var newNotificationsList = notificationsPool[uid];
-			for(var j = 0;j < notifications[1].length;j++){
-				newNotificationsList.push(notifications[1][j]);
-			}
-			notificationsPool[uid] = newNotificationsList;
-		}else{
-			notificationsPool[uid] = notifications[1];
+	}
+	if(notificationsPool[uid]){
+		console.log("pool is not empty!!!!");
+		var newNotificationsList = notificationsPool[uid];
+		for(var j = 0;j < notifications[1].length;j++){
+			newNotificationsList.push(notifications[1][j]);
 		}
+		notificationsPool[uid] = newNotificationsList;
+	}else{
+		notificationsPool[uid] = notifications[1];
 	}
 	console.log("finished handling");
 }
@@ -265,13 +268,17 @@ function timeoutHandler(uid){
 }
 function clearNotificationHandler(uid,seq){
 	if(notificationsPool[uid]){
-		var notificationsList = notificationsPool[uid];
-		for(var i = 0; i < notificationsList.length;i++){
-			if(notificationsList[i][1] == seq){
-				notificationsList.splice(i,1);
+		if(seq == -1){
+			notificationsPool[uid] = [];
+		}else{
+			var notificationsList = notificationsPool[uid];
+			for(var i = 0; i < notificationsList.length;i++){
+				if(notificationsList[i][1] == seq){
+					notificationsList.splice(i,1);
+				}
 			}
-		}
-		notificationsPool[uid] = notificationsList;
+			notificationsPool[uid] = notificationsList;
+		}	
 	}
 }
 function sendNotification(notification,socket){
@@ -279,9 +286,11 @@ function sendNotification(notification,socket){
     console.log(notification);
 	switch(notification[0]){
 		case 0:
+			console.log("send friend notification!!!!!!!!!!!!!!!!!");
 			socket.emit("friend request",notification[2],notification[2],notification[3],notification[4],notification[5],notification[1]);
 			break;
 		case 1:
+			console.log("send event notification!!!!!!!!!!!!!!!!!");
 			socket.emit("event membership request",notification[2],notification[2],notification[4],service.helper.hexToDec(notification[3]),service.helper.hexToDec(notification[3]),notification[5],notification[1]);
 			break;
 		case 2:
@@ -414,14 +423,12 @@ function storeUserChat(uid,sender_uid, data){
 					var chatPath = path + sender_uid;//public/data/uid/sender_uid
 					//service.fs.writeFileSync(chatPath, data,);
 					service.fs.appendFileSync(chatPath, data + "\n");
-					//res.send({status:"successful"});
 			    }
 			});
 		}else{
 			console.log("dir exists.");
 			var chatPath = path + sender_uid;//public/data/uid/sender_uid
 			service.fs.appendFileSync(chatPath, data + "\n");
-			//res.send({status:"successful"});
 		}
 	});
 }
@@ -438,14 +445,12 @@ function storeEventChat(uid,sender_uid, data){
 					var chatPath = path + sender_uid;//public/data/uid/sender_uid
 					//service.fs.writeFileSync(chatPath, data,);
 					service.fs.appendFileSync(chatPath, data + "\n");
-					//res.send({status:"successful"});
 			    }
 			});
 		}else{
 			console.log("dir exists.");
 			var chatPath = path + sender_uid;//public/data/uid/sender_uid
 			service.fs.appendFileSync(chatPath, data + "\n");
-			//res.send({status:"successful"});
 		}
 	});
 }
@@ -515,9 +520,10 @@ function chatToEvent(session_key, uid, seq, eid, content){
 	// console.log("I got the chat!!!!!!!!!!!!!!!!!!!");
 	var status = "unsuccessful";
 	var pack = service.lib.createMessageToEventPack(session_key,parseInt(uid), parseInt(seq), service.helper.decToHex(eid), content);
-	    service.helper.connectAndSend(pack, function(){
-	 	    var output = {"status":"successful"};
-		},null,true);
+    service.helper.connectAndSend(pack, function(){
+ 	    var output = {"status":"successful"};
+
+	},null,true);
 }
 
 function chatToUser(session_key, uid, seq, to_uid, content){
@@ -525,35 +531,15 @@ function chatToUser(session_key, uid, seq, to_uid, content){
     var status = "unsuccessful";
     var pack = service.lib.createMessageToUserPack(session_key,parseInt(uid), parseInt(seq), parseInt(to_uid), content);
     service.helper.connectAndSend(pack, function(data){
-    var output = {"status":"successful"};
-      //  var pkg = [[0,0,0,0],[0,seq,1]];
-    	//chatHandler(pkg,uid);
-    //	console.log(socketsList);
-    //	console.log(uid);
-    	//console.log(socketsList[uid]);
-    	//console.log(socketsList[uid].disconnected);
-//                                  console.log(content);
-//                                  console.log(pkg);
-//	    if(socketsList[uid] && !socketsList[uid].disconnected){
-//			console.log("find socket!!!!");
-//			sendChat(pkg,socketsList[uid]);
-//		}else{
-//			console.log("cannot find socket!!!!");
-//			if(personalChatPool[uid]){
-//				personalChatPool[uid].push(pkg);
-//			}else{
-//				personalChatPool[uid] = [];
-//                personalChatPool[uid] = pkg;
-//			}
-//		}
-//    	clearChatHandler(uid,seq);
-       },null,true);
+    	var output = {"status":"successful"};
+
+    },null,true);
 }
 
-service.setClearNotificationHandelr(clearNotificationHandler);
+service.setClearNotificationHandler(clearNotificationHandler);
 service.helper.set_noti_handle(notificationHandler);
 
-service.setClearChatHandelr(clearChatHandler);
+service.setClearChatHandler(clearChatHandler);
 service.helper.set_chat_handle(chatHandler);
 
 service.helper.set_timeout_handle(timeoutHandler);

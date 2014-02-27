@@ -1,4 +1,4 @@
-var socket = io.connect('http://circatag.com');
+var socket = io.connect('localhost');
 console.log("client socket connected!");
 socket.emit("uid",localStorage.uid);
 socket.on("friend request",function(name, uid, eid, pid, action, seq){
@@ -160,6 +160,21 @@ socket.on("receive event chat",function(eid, s_uid, message, date, time){
 					    '</div>'+
 					  '</div>'
 					);
+					var data = {};
+			        data.uid = localStorage.uid;
+			        data.session_key = localStorage.session_key;
+			        data.view_uid = s_uid;
+			        $.ajax({
+			          url:'/getusersmallavarta',
+			          data:JSON.stringify(data),
+			          type:"POST",
+			          contentType:"application/json",
+			          success:function(result){
+			            localStorage.setItem("avarta"+s_uid,result.avarta);
+			            $(".chatAvarta"+s_uid).attr("src",result.avarta);
+			          }
+			        });
+
 				}else{
 					$(element).find(".chat-window-content").append(
 					  '<div class = "chat-message" uid = "'+s_uid+'">'+
