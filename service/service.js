@@ -709,7 +709,7 @@ exports.viewPictures = function(req,res){
 	// 	);
 	// }
 	var pic=[];
-	pic.push(default_avarta);
+	pic.push("/img/test.jpg");
 	output = {"pics" : pic};
 	res.send(output);
 }
