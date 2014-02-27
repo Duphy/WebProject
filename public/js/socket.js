@@ -160,6 +160,21 @@ socket.on("receive event chat",function(eid, s_uid, message, date, time){
 					    '</div>'+
 					  '</div>'
 					);
+					var data = {};
+			        data.uid = localStorage.uid;
+			        data.session_key = localStorage.session_key;
+			        data.view_uid = s_uid;
+			        $.ajax({
+			          url:'/getusersmallavarta',
+			          data:JSON.stringify(data),
+			          type:"POST",
+			          contentType:"application/json",
+			          success:function(result){
+			            localStorage.setItem("avarta"+s_uid,result.avarta);
+			            $(".chatAvarta"+s_uid).attr("src",result.avarta);
+			          }
+			        });
+
 				}else{
 					$(element).find(".chat-window-content").append(
 					  '<div class = "chat-message" uid = "'+s_uid+'">'+
