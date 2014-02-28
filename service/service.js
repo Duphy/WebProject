@@ -692,6 +692,28 @@ exports.viewSelfCircatags = function(req, res) {
 	});
     });
 }
+
+exports.viewPicture = function(){
+	var output;
+	var pack = lib.createViewPicturePack(req.body.session_key,
+		parseInt(req.body.uid),req.body.picid);
+	helper.connectAndSend(pack, function(data){
+		var pkg = lib.resolvPack(data);
+		output = {
+			"status" : "successful",
+		    "pics" : pkg[1][1]
+		};
+		res.send(output);
+	    }, function() {
+			res.send({
+			    "status" : "timeout"
+			});
+	   }
+	);
+}
+
+
+//TO DO: to be discussed.
 exports.viewPictures = function(req,res){
 	var output;
 	// for(var i=0;i<req.body.picids.length;i++){
@@ -710,10 +732,6 @@ exports.viewPictures = function(req,res){
 	// 	   }
 	// 	);
 	// }
-	var pic=[];
-	pic.push("/img/test.jpg");
-	output = {"pics" : pic};
-	res.send(output);
 }
 exports.viewCommonFriends = function(req,res){
 	var pack = createViewUserPack(9, req.body.session_key,
