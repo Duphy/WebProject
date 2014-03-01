@@ -948,7 +948,9 @@ $(document).ready(function(){
   
   $('body').delegate('.postImage','click',function(){
     var source = $(this).attr('src');
-    $('#imageModal').find('.image-wrapper img').attr('src',source);
+    var url = "url("+window.location.origin+"/"+source+")";
+    console.log(url);
+    $('#imageModal').find('.imgLiquidFill').css('background-image',url);
   });
 
   $('body').delegate('#postArea','keyup',function(){
