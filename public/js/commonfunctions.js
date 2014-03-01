@@ -322,18 +322,20 @@ function createPost(data){
           var pictureData  = {};
           pictureData.session_key = localStorage.session_key;
           pictureData.uid = localStorage.uid;
-          pictureData.picids = result.post.picids;
+
+          //TO DO: to be changed to support multiple pictures in one post.
+          pictureData.picid = result.post.picids[0];
           $.ajax({
-            url:'/getpictures',
+            url:'/getpicture',
             data:JSON.stringify(pictureData),
             type:"POST",
             contentType:"application/json",
             success:function(data){
-              if(data.pics && data.pics.length > 0){
+              if(data.pics){
                 console.log("picture url is:");
-                console.log(data.pics[0]);
+                console.log(data.pics);
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
-                $("#"+postid).find(".pictureArea").append("<img class ='postImage' data-toggle='modal' href ='#imageModal' src = '"+data.pics[0]+"' style = 'width:96%;'/>");
+                $("#"+postid).find(".pictureArea").append("<img class ='postImage' data-toggle='modal' href ='#imageModal' src = '"+data.pics+"' style = 'width:96%;'/>");
               }else{
                 console.log("failed to get the picture of this post");
               }
@@ -799,18 +801,18 @@ function viewpost(pids,char,newsData){
                       var pictureData  = {};
                       pictureData.session_key = localStorage.session_key;
                       pictureData.uid = localStorage.uid;
-                      pictureData.picids = element.picids;
+                      pictureData.picid = element.picids[0];
                       $.ajax({
-                        url:'/getpictures',
+                        url:'/getpicture',
                         data:JSON.stringify(pictureData),
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
-                          if(data.pics && data.pics.length > 0){
+                          if(data.pics){
                             console.log("picture url is:");
-                            console.log(data.pics[0]);
+                            console.log(data.pics);
                             var postid = element.uid+""+element.eid+""+element.pid;
-                            $("#"+postid).find(".pictureArea").append("<img class = 'postImage' data-toggle='modal' href ='#imageModal' src = '"+data.pics[0]+"' style = 'width:96%;'/>");
+                            $("#"+postid).find(".pictureArea").append("<img class = 'postImage' data-toggle='modal' href ='#imageModal' src = '"+data.pics+"' style = 'width:96%;'/>");
                           }else{
                             console.log("failed to get the picture of this post");
                           }
