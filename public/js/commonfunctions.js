@@ -334,7 +334,6 @@ function createPost(data){
                 console.log(data.pics);
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
                 $("#"+postid).find(".pictureArea").append("<img class ='postImage' data-toggle='modal' href ='#imageModal' src = '"+data.pics+"' style = 'width:96%;'/>");
-                $("#pictureSubmit").removeAttr("disabled");
                 $('#pictureCancel').removeAttr("disabled");
                 $('#floatingBarsG-picture').hide();
                 $('#pictureDescArea').val("");

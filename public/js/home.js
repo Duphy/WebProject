@@ -28,13 +28,6 @@ $(document).ready(function(){
   $(".bootstrap-tagsinput").css("border-radius","0px");
   $(".bootstrap-tagsinput").find("input").attr("placeholder","Add").attr("size",8);
   $(".bootstrap-tagsinput").find("input").limit('14');
-  $('body').delegate('#postArea','keyup',function(){
-    if($(this).val() == ""){
-      $("#postSubmit").attr('disabled','disabled');
-    }else{
-     $("#postSubmit").removeAttr('disabled');
-    }
-  });
 
   //load tags
   renderSubNavBar();
@@ -421,6 +414,7 @@ $(document).ready(function(){
               $('#pictureDescArea').show();
               $('#pictureTags').parent().show();
               $('#pictureSubmit').attr("picturename",data.files[0].name);
+              $('#previewImageArea').html("");
               $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '"/>');
             },1000);
           }
@@ -454,6 +448,7 @@ $(document).ready(function(){
     },
     done:function(e,data){  
         console.log("upload done.");    
+        $("#pictureFileupload").removeAttr("disabled");
     }
   });
 
@@ -950,6 +945,19 @@ $(document).ready(function(){
     return false;
   });
   
+  $('body').delegate('.postImage','click',function(){
+    var source = $(this).attr('src');
+    $('#imageModal').find('.image-wrapper img').attr('src',source);
+  });
+
+  $('body').delegate('#postArea','keyup',function(){
+    if($(this).val() == ""){
+      $("#postSubmit").attr('disabled','disabled');
+    }else{
+     $("#postSubmit").removeAttr('disabled');
+    }
+  });
+
   $('body').delegate('.replyInput','focus',function(){
     var replyToName = $(this).attr("replyToName");
     $(this).attr('placeholder','Reply to '+replyToName+":");
