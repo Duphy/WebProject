@@ -301,12 +301,10 @@ function createPost(data){
     contentType: 'application/json',
     success:function(result){
       if(result.status == "successful"){
-        if(postOrder == 0){
-          $('#left-column').prepend(renderPost(result.post));
-          postOrder = 1;
-        }else{
+        if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
           $('#right-column').prepend(renderPost(result.post));
-          postOrder = 0;
+        }else{
+          $('#left-column').prepend(renderPost(result.post));
         }
         $('#postArea').val("");
         $('#postModal').modal("hide");
@@ -336,6 +334,13 @@ function createPost(data){
                 console.log(data.pics);
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
                 $("#"+postid).find(".pictureArea").append("<img class ='postImage' data-toggle='modal' href ='#imageModal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                $('#pictureCancel').removeAttr("disabled");
+                $('#floatingBarsG-picture').hide();
+                $('#pictureDescArea').val("");
+                $("#pictureTags").tagsinput('removeAll');
+                $("#pictureTags").tagsinput('add','picture');
+                $("#previewImageArea").hide();
+                $("#pictureCancel").trigger('click');
               }else{
                 console.log("failed to get the picture of this post");
               }

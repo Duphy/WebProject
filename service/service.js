@@ -10,6 +10,7 @@ exports.sanitizer = sanitizer;
 var dataPath = __dirname.replace("service","") + "public/data/";
 exports.dataPath = dataPath;
 var gm = require("gm");
+var rimraf = require("rimraf");
 var default_avarta = "/img/circa.png";
 var default_eventAvarta = "/img/event_default.png";
 var clearNotificationHandler;
@@ -157,9 +158,10 @@ exports.createPost = function(req, res) {
 	var pkg = lib.resolvPack(data);
 	if (pkg[1][0]) {
 	    var pidset = pkg[1][1];
-	    for(var j =0;j<pic_paths.length;j++){
-		    fs.unlinkSync(pic_paths[j]);
-		}
+	    console.log("try to remove directory");
+	    rimraf(dataPath+req.body.uid+'/tmp/', function(err){
+				console.log("remove directory successfully");
+		});
 	    var pack = lib.createViewPostingPack(req.body.session_key,
 		    parseInt(req.body.uid), pidset[0], pidset[1], pidset[2]);
 	    var output;

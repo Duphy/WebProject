@@ -35,7 +35,7 @@ $(document).ready(function(){
      $("#postSubmit").removeAttr('disabled');
     }
   });
-
+  
   //load tags
   renderSubNavBar();
 
@@ -421,7 +421,7 @@ $(document).ready(function(){
               $('#pictureDescArea').show();
               $('#pictureTags').parent().show();
               $('#pictureSubmit').attr("picturename",data.files[0].name);
-              $('#previewImageArea').append('<img src="' + URL.createObjectURL(data.files[0]) + '"/>');
+              $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '"/>');
             },1000);
           }
         }).error(function(jqXHR, textStatus, errorThrown){
@@ -458,6 +458,8 @@ $(document).ready(function(){
   });
 
   $("#pictureSubmit").click(function(){
+    $(this).attr("disabled","disabled");
+    $('#pictureCancel').attr("disabled","disabled");
     var description = $("#pictureDescArea").val();
     var tags = $('#pictureTags').tagsinput('items');
     if(tags==""){
