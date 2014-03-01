@@ -411,7 +411,7 @@ $(document).ready(function(){
           if(result.status == "successful"){
             setTimeout(function(){
               $('#pictureProgress').hide();
-              $('#pictureNotice').html("finished!").css("color",'green');
+              $('#pictureNotice').html("finished! Preview your picture below.").css("color",'green');
               $('#pictureProgress .bar').css(
                   'width',
                   '0%'
@@ -421,6 +421,7 @@ $(document).ready(function(){
               $('#pictureDescArea').show();
               $('#pictureTags').parent().show();
               $('#pictureSubmit').attr("picturename",data.files[0].name);
+              $('#previewImageArea').append('<img src="' + URL.createObjectURL(data.files[0]) + '"/>');
             },1000);
           }
         }).error(function(jqXHR, textStatus, errorThrown){
@@ -476,6 +477,7 @@ $(document).ready(function(){
     data.session_key = localStorage.session_key;
     data.uid = localStorage.uid;
     data.pics = [$(this).attr("picturename")];
+    console.log("pciture name: "+data.pics);
     $("#floatingBarsG-picture").show();
     createPost(data);
     return false;
