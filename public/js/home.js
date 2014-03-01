@@ -35,7 +35,7 @@ $(document).ready(function(){
      $("#postSubmit").removeAttr('disabled');
     }
   });
-
+  
   //load tags
   renderSubNavBar();
 
