@@ -256,6 +256,7 @@ $(document).ready(function(){
     },
     done:function(e,data){  
         console.log("upload done.");    
+        $("#fileupload").removeAttr('disabled');
     }
   });
 
