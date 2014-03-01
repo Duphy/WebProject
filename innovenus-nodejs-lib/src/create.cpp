@@ -323,7 +323,7 @@ static inline void Add(std::string& code, const int type,
 		ifs.seekg(0, std::ios_base::beg);
 		ifs.read(buf, size);
 		ifs.close();
-		code += convert_int_to_hex_string(size, type & SPECIAL_MASK);
+		code += convert_int_to_hex_string(size, 4);
 		code += std::string(buf, size);
 		delete[] buf;
 	}
