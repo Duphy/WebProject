@@ -197,6 +197,7 @@ $(document).ready(function(){
 				success:function(data){
 					console.log(data);
 					if(data.status == "successful"){
+						console.log("sigup: successfully create new user.");
                     	var data = {};
                     	data.email = email;
                     	data.password = password;
@@ -208,36 +209,39 @@ $(document).ready(function(){
 						success:function(data){
 							$('#loginAlert').hide();
 							if(data.status == "successful"){
-								console.log("sigup successful");
-								localStorage.session_key = data.session_key;
-								localStorage.uid = data.uid;
+								console.log("sigup: successfully get session_key.");
 								var auth_data = {};
-								auth_data.session_key = localStorage.session_key;
-								auth_data.uid = localStorage.uid;
+								auth_data.session_key = data.session_key;
+								auth_data.uid = data.uid;
 								$.ajax({
 								    url:"/getselfinfo",
 								    data:JSON.stringify(auth_data),
 								    type:"POST",
 								    contentType: 'application/json',
 								    success:function(data){
-								    console.log("self data:");
-								    console.log(data);
-								    localStorage.username = data.realname;
-									localStorage.usernickname = data.nickname;
-								    localStorage.raw_birthday = data.birthday;
-								    localStorage.usertags = data.tags;
-								    localStorage.hiddentags= data.hidden_tags;
-								    localStorage.honors = data.honors;
-								    localStorage.gender = data.raw_gender;
-								    localStorage.city = data.city;
-								    localStorage.state = data.state;
-								    localStorage.country = data.country;
-								    console.log("ready to go home");
-								    $("#floatingBarsG-signup").hide();
-								    $("#submitCreateAccount").removeAttr('disabled');
-								    localStorage.search_tag_option = "user";
-								    localStorage.search_tag_content = "";
-								    window.location = "/search";
+									    console.log("self data:");
+									    console.log(data);
+									    console.log("sigup: successfully get self information.");
+									   	localStorage.session_key = auth_data.session_key;
+										localStorage.uid = auth_data.uid;
+									    localStorage.username = data.realname;
+										localStorage.usernickname = data.nickname;
+									    localStorage.raw_birthday = data.birthday;
+									    localStorage.usertags = data.tags;
+									    localStorage.hiddentags= data.hidden_tags;
+									    localStorage.honors = data.honors;
+									    localStorage.gender = data.raw_gender;
+									    localStorage.city = data.city;
+									    localStorage.state = data.state;
+									    localStorage.country = data.country;
+									    localStorage.self_small_avarta = "";
+									    localStorage.self_big_avarta = "";
+									    console.log("ready to go home");
+									    $("#floatingBarsG-signup").hide();
+									    $("#submitCreateAccount").removeAttr('disabled');
+									    localStorage.search_tag_option = "user";
+									    localStorage.search_tag_content = "";
+									    window.location = "/search";
 								    }
 								});
 							}
@@ -290,20 +294,20 @@ $(document).ready(function(){
 				success:function(data){
 					console.log(data);
 					if(data.status == "successful"){
-						console.log("login successful");
-						localStorage.session_key = data.session_key;
-						localStorage.uid = data.uid;
+						console.log("login: successfully get session_key.");
 						var auth_data = {};
-						auth_data.session_key = localStorage.session_key;
-						auth_data.uid = localStorage.uid;
+						auth_data.session_key = data.session_key;
+						auth_data.uid = data.uid;
 						$.ajax({
 							url:"/getselfinfo",
 							data:JSON.stringify(auth_data),
 							type:"POST",
 							contentType: 'application/json',
 							success:function(data){
-								console.log("self data:");
+								console.log("login: successfully get self information.");
                                 console.log(data);
+                                localStorage.session_key = auth_data.session_key;
+								localStorage.uid = auth_data.uid;
 								localStorage.username = data.realname;
 								localStorage.usernickname = data.nickname;
 						        localStorage.birthday = data.birthday;
@@ -315,12 +319,27 @@ $(document).ready(function(){
 						        localStorage.city = data.city;
 						        localStorage.state = data.state;
 						        localStorage.country = data.country;
-						        console.log("ready to go home");
-						        $("#floatingBarsG-login").hide();
-						        $("#login").removeAttr("disabled");
 						        localStorage.search_tag_option = "user";
 						        localStorage.search_tag_content = "";
-								window.location = "/search";
+						        localStorage.self_small_avarta = "";
+								localStorage.self_big_avarta = "";
+						        $.ajax({
+						        	url:"/getselffriendsinfo",
+									data:JSON.stringify(auth_data),
+									type:"POST",
+									contentType: 'application/json',
+									success:function(data){
+										console.log("login: successfully get friends information. Ready to go home.");
+						        		$("#floatingBarsG-login").hide();
+						        		$("#login").removeAttr("disabled");
+						        		if(data.friend_uids.length>7){
+						        			window.location = "/home";
+						        		}
+										else{
+											window.location = "/search";
+										}	
+									}
+						        });
 							}
 						});
 					}else{

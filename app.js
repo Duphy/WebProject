@@ -12,15 +12,16 @@ var http = require('http');
 var path = require('path');
 var service = require('./service/service'); 
 var routes = require('./routes');
+var mkdirp = require("mkdirp");
+var rimraf = require("rimraf");
 var fs = require('fs');
-var mongo = require('./service/mongo');
-var redis = require('redis');
-
-//TO DO: to be configured 
-//mongoose.connect('mongodb://localhost/test');
 
 var app = express();
-//var redisClient = redis.createClient();
+//var redis = require('redis');
+// redisClient = redis.createClient();
+// redisClient.on("error", function (err) {
+//     console.log("Error " + err);
+// });
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -85,6 +86,9 @@ app.post('/getuserposts',express.bodyParser(),service.viewUserPosts);
 app.post('/getselfevents',express.bodyParser(),service.viewSelfEvents);
 app.post('/getuserevents',express.bodyParser(),service.viewUserEvents);
 app.post('/getselfcircatags',express.bodyParser(),service.viewSelfCircatags);
+app.post('/getpicture',express.bodyParser(), service.viewPicture);
+app.post('/getpictures',express.bodyParser(),service.viewPictures);
+app.post('/getcommonfriends',express.bodyParser(),service.viewCommonFriends);
 
 app.post('/getuseravarta',express.bodyParser(),service.viewUserAvarta);
 app.post('/getusersmallavarta',express.bodyParser(),service.viewUserSmallAvarta);
@@ -93,7 +97,7 @@ app.post('/getselfsmallavarta',express.bodyParser(),service.viewSelfSmallAvarta)
 app.post('/geteventavarta',express.bodyParser(),service.viewEventAvarta);
 app.post('/geteventsmallavarta',express.bodyParser(),service.viewEventSmallAvarta);
 app.post('/getusercircatags',express.bodyParser(),service.viewUserCircatags);
-app.post('/getpostcontent',express.bodyParser(),service.viewPostContent);
+//app.post('/getpostcontent',express.bodyParser(),service.viewPostContent);
 app.post('/getpostscontent',express.bodyParser(),service.viewPostsContent);
 app.post('/geteventinfo',express.bodyParser(),service.viewEventInfo);
 app.post('/geteventsinfo',express.bodyParser(),service.viewEventsInfo);
@@ -148,6 +152,7 @@ app.post('/deleteeventmanager',express.bodyParser(), service.deleteEventManager)
 app.post('/responsetonotification', express.bodyParser(), service.responseNoti);
 
 //upload Avarta
+app.post('/uploadpostpicture',service.uploadPicture);
 app.post('/uploadavarta',service.uploadAvarta);
 /*************** End *****************/
 
@@ -183,20 +188,12 @@ io.on('connection',function(socket){
 				throw err;
 			}
 		});
+		readUserChat(uid);
+		readEventChat(uid);
 	});
 
 	socket.on('get user chat',function(session_key, uid, seq, c_uid, content){
 		chatToUser(session_key, uid, seq, c_uid, content);
-  		// var now = new Date();
-		// var chat = new mongo.friendchat({selfUid:uid,date:now,content:content,friendUid:c_uid});
-		// chat.save(function(err){
-		//     if (err){
-		//     	console.log("chat save error "+uid+" "+c_uid);
-		//     	throw err;
-		//     }else{
-		//     	console.log("chat save successfully "+uid+" "+c_uid);
-		//     }
-		// });
 	});
 
 	socket.on('get event chat',function(session_key,uid, seq, eid,content){
@@ -241,7 +238,6 @@ io.on('connection',function(socket){
 function notificationHandler(notifications,uid){
 	console.log("get notifications!");
 	var uid = notifications[0][2];
-	console.log("user id is: "+uid);
 	if(socketsList[uid] && !socketsList[uid].disconnected){
 		console.log("find socket!!!!");
 		for(var i = 0;i < notifications[1].length;i++){
@@ -249,16 +245,16 @@ function notificationHandler(notifications,uid){
 		}
 	}else{
 		console.log("cannot find socket!!!!");
-		if(notificationsPool[uid]){
-			console.log("pool is not empty!!!!");
-			var newNotificationsList = notificationsPool[uid];
-			for(var j = 0;j < notifications[1].length;j++){
-				newNotificationsList.push(notifications[1][j]);
-			}
-			notificationsPool[uid] = newNotificationsList;
-		}else{
-			notificationsPool[uid] = notifications[1];
+	}
+	if(notificationsPool[uid]){
+		console.log("pool is not empty!!!!");
+		var newNotificationsList = notificationsPool[uid];
+		for(var j = 0;j < notifications[1].length;j++){
+			newNotificationsList.push(notifications[1][j]);
 		}
+		notificationsPool[uid] = newNotificationsList;
+	}else{
+		notificationsPool[uid] = notifications[1];
 	}
 	console.log("finished handling");
 }
@@ -273,13 +269,17 @@ function timeoutHandler(uid){
 }
 function clearNotificationHandler(uid,seq){
 	if(notificationsPool[uid]){
-		var notificationsList = notificationsPool[uid];
-		for(var i = 0; i < notificationsList.length;i++){
-			if(notificationsList[i][1] == seq){
-				notificationsList.splice(i,1);
+		if(seq == -1){
+			notificationsPool[uid] = [];
+		}else{
+			var notificationsList = notificationsPool[uid];
+			for(var i = 0; i < notificationsList.length;i++){
+				if(notificationsList[i][1] == seq){
+					notificationsList.splice(i,1);
+				}
 			}
-		}
-		notificationsPool[uid] = notificationsList;
+			notificationsPool[uid] = notificationsList;
+		}	
 	}
 }
 function sendNotification(notification,socket){
@@ -287,9 +287,11 @@ function sendNotification(notification,socket){
     console.log(notification);
 	switch(notification[0]){
 		case 0:
+			console.log("send friend notification!!!!!!!!!!!!!!!!!");
 			socket.emit("friend request",notification[2],notification[2],notification[3],notification[4],notification[5],notification[1]);
 			break;
 		case 1:
+			console.log("send event notification!!!!!!!!!!!!!!!!!");
 			socket.emit("event membership request",notification[2],notification[2],notification[4],service.helper.hexToDec(notification[3]),service.helper.hexToDec(notification[3]),notification[5],notification[1]);
 			break;
 		case 2:
@@ -306,18 +308,6 @@ function chatHandler(chat,uid){
 	console.log("get chat!");
 	console.log(chat);
 
-	//save to mongodb
-	//TO DO:need to convert date and time to Date object
-	// var chatItem = new mongo.friendchat({selfUid:uid,date:now,content:content,friendUid:c_uid});
-	// chatItem.save(function(err){
-	//     if (err){
-	//     	console.log("chat save error "+uid+" "+c_uid);
-	//     	throw err;
-	//     }else{
-	//     	console.log("chat save successfully "+uid+" "+c_uid);
-	//     }
-	// });
-
 	var uid = chat[0][2];
 	console.log("user id is: "+uid);
     //console.log(socketsList[uid]);
@@ -327,17 +317,10 @@ function chatHandler(chat,uid){
 	 	console.log("find socket!!!!");
         sendChat(chat,socketsList[uid]);
     }
-	//  }else{
-	//  	console.log("cannot find socket!!!!");
-	//  	if(personalChatPool[uid]){
-	//  		console.log("pool is not empty!!!!");
-	//  		var newChatList = personalChatPool[uid];
- //             newChatList.push(chat);
-	//  		personalChatPool[uid] = newChatList;
-	//  	}else{
-	//  		personalChatPool[uid] = chat;
-	//  	}
-	// }
+    else{//socket close store it in the disk
+    	console.log("cannot find socket");
+    	saveChat(chat);
+    }
 	console.log("finished handling");
 }
 function clearChatHandler(uid,seq){
@@ -384,14 +367,164 @@ function sendChat(chat,socket){
 			break;
 	}
 }
+function saveChat(chat){
+	switch(chat[0][4]){
+		case 0:
+			switch(chat[1][0]){
+                case 0:
+                	//do nothing
+                    //socket.emit("send user chat",chat[1][1],chat[1][2]);//seq status
+                    break;
+                case 1:
+                	var data = {};
+                	var uid = chat[0][2];
+                	data.sender_uid = chat[1][1];
+                	data.content = chat[1][2];
+                	data.date = chat[1][3];
+                	data.time = chat[1][4];
+                	storeUserChat(uid, data.sender_uid, JSON.stringify(data));
+                    //socket.emit("receive user chat",chat[1][1],service.sanitizer.escape(chat[1][2]),chat[1][3],chat[1][4]);//s_uid, message, date, time
+                    //socket.emit("receive user chat",1235760,"hello world",20110811,48636);//s_uid, message, date, time
+                    break;
+            }
+			break;
+		case 1:
+            switch(chat[1][0]){
+                case 0:
+                    //socket.emit("send event chat",chat[1][1],chat[1][2]);//seq status
+                    break;
+                case 1:
+                    //socket.emit("receive event chat",service.helper.hexToDec(chat[1][1]),chat[1][2],service.sanitizer.escape(chat[1][3]),chat[1][4],chat[1][5]);//eid,s_uid, message, date, time
+                    var data = {};
+                	var uid = chat[0][2];
+                	data.eid = chat[1][1];
+                	data.sender_uid = chat[1][2];
+                	data.content = chat[1][3];
+                	data.date = chat[1][4];
+                	data.time = chat[1][5];
+                	storeEventChat(uid, data.eid, JSON.stringify(data));
+                    break;
+            }
+			break;
+		default:
+			console.log("no matched chat type!");
+			break;
+	}
+}
+function storeUserChat(uid,sender_uid, data){
+	var path = service.dataPath +uid+"/chat/user/";
+	service.fs.readdir(path, function(err){
+		if(err){
+			console.log("dir does not exists.");
+			mkdirp(path, function(err){
+			    if(err){
+			    	console.log("created dir unsuccessfully.");
+			    }else{
+			   		console.log("created dir");
+					var chatPath = path + sender_uid;//public/data/uid/sender_uid
+					//service.fs.writeFileSync(chatPath, data,);
+					service.fs.appendFileSync(chatPath, data + "\n");
+			    }
+			});
+		}else{
+			console.log("dir exists.");
+			var chatPath = path + sender_uid;//public/data/uid/sender_uid
+			service.fs.appendFileSync(chatPath, data + "\n");
+		}
+	});
+}
+function storeEventChat(uid,sender_uid, data){
+	var path = service.dataPath +uid+"/chat/event/";
+	service.fs.readdir(path, function(err){
+		if(err){
+			console.log("dir does not exists.");
+			mkdirp(path, function(err){
+			    if(err){
+			    	console.log("created dir unsuccessfully.");
+			    }else{
+			   		console.log("created dir");
+					var chatPath = path + sender_uid;//public/data/uid/sender_uid
+					//service.fs.writeFileSync(chatPath, data,);
+					service.fs.appendFileSync(chatPath, data + "\n");
+			    }
+			});
+		}else{
+			console.log("dir exists.");
+			var chatPath = path + sender_uid;//public/data/uid/sender_uid
+			service.fs.appendFileSync(chatPath, data + "\n");
+		}
+	});
+}
+function readUserChat(uid){
+	console.log("enter readUserChat function.");
+	var path = service.dataPath+uid+"/chat/user/";
+	var chats=[];
+	fs.readdir(path, function(err,files){
+		if(err){
+			console.log("not exists");
+		}
+		else{
+			for (var i in files){
+				console.log("the file[i] are:");
+				console.log(path+files[i]);
+				fs.readFileSync(path+files[i]).toString().split('\n').forEach(function (line) {
+					if(line != ""){
+						console.log("message :"+line);
+						var chat = JSON.parse(line);
+						if(socketsList[uid] && !socketsList[uid].disconnected){
+							socketsList[uid].emit("receive user chat",chat.sender_uid,
+							service.sanitizer.escape(chat.content),
+							chat.date,chat.time);//s_uid, message, date, time
+							console.log("finished send one chat message.");
+						}
+					}
+		        });
+			}
+			rimraf(path, function(err){
+				console.log("remove directory successfully");
+			});
+		}
+	});
+}
 
+function readEventChat(uid){
+	var path = service.dataPath+uid+"/chat/event/";
+	var chats=[];
+	service.fs.readdir(path, function(err,files){
+		if(err){
+			console.log("not exists");
+			//do nothing
+		}
+		else{
+			for (var i in files){
+				console.log("the file[i] are:");
+				console.log(path+files[i]);
+				fs.readFileSync(path+files[i]).toString().split('\n').forEach(function (line) {
+					if(line != ""){
+						console.log("message :"+line);
+						var chat = JSON.parse(line);
+						if(socketsList[uid] && !socketsList[uid].disconnected){
+							socketsList[uid].emit("receive event chat",chat.eid, chat.sender_uid,
+							service.sanitizer.escape(chat.content),
+							chat.date,chat.time);//s_uid, message, date, time
+						}
+					}
+		        });
+			}
+			rimraf(path, function(err){
+				console.log("remove directory successfully");
+			});
+		}
+	});
+}
 function chatToEvent(session_key, uid, seq, eid, content){
 	// console.log("I got the chat!!!!!!!!!!!!!!!!!!!");
 	var status = "unsuccessful";
 	var pack = service.lib.createMessageToEventPack(session_key,parseInt(uid), parseInt(seq), service.helper.decToHex(eid), content);
-	    service.helper.connectAndSend(pack, function(){
-	 	    var output = {"status":"successful"};
-		},null,true);
+    service.helper.connectAndSend(pack, function(){
+ 	    var output = {"status":"successful"};
+
+	},null,true);
 }
 
 function chatToUser(session_key, uid, seq, to_uid, content){
@@ -399,35 +532,15 @@ function chatToUser(session_key, uid, seq, to_uid, content){
     var status = "unsuccessful";
     var pack = service.lib.createMessageToUserPack(session_key,parseInt(uid), parseInt(seq), parseInt(to_uid), content);
     service.helper.connectAndSend(pack, function(data){
-    var output = {"status":"successful"};
-      //  var pkg = [[0,0,0,0],[0,seq,1]];
-    	//chatHandler(pkg,uid);
-    //	console.log(socketsList);
-    //	console.log(uid);
-    	//console.log(socketsList[uid]);
-    	//console.log(socketsList[uid].disconnected);
-//                                  console.log(content);
-//                                  console.log(pkg);
-//	    if(socketsList[uid] && !socketsList[uid].disconnected){
-//			console.log("find socket!!!!");
-//			sendChat(pkg,socketsList[uid]);
-//		}else{
-//			console.log("cannot find socket!!!!");
-//			if(personalChatPool[uid]){
-//				personalChatPool[uid].push(pkg);
-//			}else{
-//				personalChatPool[uid] = [];
-//                personalChatPool[uid] = pkg;
-//			}
-//		}
-//    	clearChatHandler(uid,seq);
-       },null,true);
+    	var output = {"status":"successful"};
+
+    },null,true);
 }
 
-service.setClearNotificationHandelr(clearNotificationHandler);
+service.setClearNotificationHandler(clearNotificationHandler);
 service.helper.set_noti_handle(notificationHandler);
 
-service.setClearChatHandelr(clearChatHandler);
+service.setClearChatHandler(clearChatHandler);
 service.helper.set_chat_handle(chatHandler);
 
 service.helper.set_timeout_handle(timeoutHandler);

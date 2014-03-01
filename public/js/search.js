@@ -19,6 +19,19 @@ $(document).ready(function(){
   auth_data.uid = localStorage.uid;
   auth_data.session_key = localStorage.session_key;
 
+  if(localStorage.self_small_avarta == ""){
+    $.ajax({
+      url:'/getselfsmallavarta',
+      data:JSON.stringify(auth_data),
+      type:"POST",
+      contentType:"application/json",
+      success:function(data){
+        localStorage.self_small_avarta = data.avarta;
+        $(".selfProfileSmallAvarta").attr("src",data.avarta);
+      }
+    });
+  }
+
    //TO DO: add the case handler for no matched result.
   if(localStorage.search_tag_option!=""){
       switch(localStorage.search_tag_option){
@@ -282,7 +295,7 @@ $(document).on('click', ".joinevent", function() {
         $(chatArea).append(
           '<div class = "chat-message" uid = "'+localStorage.uid+'">'+
             '<div class = "chat-gravatar-wrapper">'+
-              '<img src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
+              '<img class = "chatAvarta'+localStorage.uid+'" src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
             '</div>'+
             '<div class = "chat-text-wrapper">'+
               '<p>'+content+'</p>'+            
@@ -406,8 +419,9 @@ $(document).on('click', ".joinevent", function() {
   $('body').delegate('.eventResponse','click',function(){
     console.log("read event response");
     flag_displayevent = true;
-    if(notification.prev() && notification.prev().hasClass("divider")){
-        notification.prev().remove();
+    var notification = $(this).closest('.notificationItem');
+    if($(notification).prev() && $(notification).prev().hasClass("divider")){
+        $(notification).prev().remove();
     };
     notification.remove();
     removeNotification();
@@ -505,7 +519,7 @@ function search(val,type){
           contentType: 'application/json',
           success:function(data){
             console.log(data);
-            if(data.uids.length != 0){
+            if(data.uids && data.uids.length != 0){
               var friendsData = {};
               friendsData.session_key = localStorage.session_key;
               friendsData.uid = localStorage.uid;
@@ -626,7 +640,7 @@ function search(val,type){
         type:"POST",
         contentType: 'application/json',
         success:function(data){
-          if(data.eids.length != 0){
+          if(data.eids && data.eids.length != 0){
             var eventData = {};
             eventData.session_key = localStorage.session_key;
             eventData.uid = localStorage.uid;
@@ -693,7 +707,7 @@ function search(val,type){
       success:function(data){
         console.log("searchpost result:");
         console.log(data);
-        if(data.pidsets.length > 0){
+        if(data.pidsets && data.pidsets.length > 0){
           viewpost(data.pidsets);
         }else{
           $("#loadMoreButton").hide();

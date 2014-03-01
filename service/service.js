@@ -4,9 +4,11 @@ var lib = exports.lib;
 exports.helper = require("./helper");
 var helper = exports.helper;
 var fs = require("fs");
+exports.fs = fs;
 var sanitizer = require("sanitizer");
 exports.sanitizer = sanitizer;
 var dataPath = __dirname.replace("service","") + "public/data/";
+exports.dataPath = dataPath;
 var gm = require("gm");
 var default_avarta = "/img/circa.png";
 var default_eventAvarta = "/img/event_default.png";
@@ -40,8 +42,8 @@ exports.signUp = function(req, res) {
 	    req.body.country, tags, hidden_tags);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log("signup feedback:");
-	console.log(pkg);
+	//console.log("signup feedback:");
+	//console.log(pkg);
 	if (pkg[1][0]) {
 	    output = {
 		"status" : "successful",
@@ -61,10 +63,10 @@ exports.signUp = function(req, res) {
     });
 }
 
-exports.setClearNotificationHandelr = function(handler){
+exports.setClearNotificationHandler = function(handler){
 	clearNotificationHandler = handler;
 }
-exports.setClearChatHandelr = function(handler){
+exports.setClearChatHandler = function(handler){
 	clearChatHandler = handler;
 }
 function loginAuth(req, res) {
@@ -105,6 +107,8 @@ exports.logout = function(req, res) {
 	if (pkg[1][0]) {
 	    status = "successful";
 	}
+	//clear the whole notificationPool
+	clearNotificationHandler(req.body.uid,-1);
 	res.send({
 	    "status" : status
 	});
@@ -124,7 +128,6 @@ exports.createEvent = function(req, res) {
 	    req.body.city, req.body.tags);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log(pkg);
 	var eid;
 	if (pkg[1][0] == 1) {
 	    status = "successful";
@@ -142,14 +145,21 @@ exports.createEvent = function(req, res) {
 }
 exports.createPost = function(req, res) {
     console.log("creater uid: " + req.body.uid);
+    var pic_paths=[];
+    for(var i =0;i<req.body.pics.length;i++){
+    	var path = dataPath+req.body.uid+'/tmp/'+req.body.pics[i];
+    	pic_paths.push(path);
+    }
     var pack = lib.createCreatePostingPack(req.body.session_key,
 	    parseInt(req.body.uid), helper.decToHex(req.body.eid), req.body.content,
-	    parseInt(req.body.visibility), req.body.tags);
+	    parseInt(req.body.visibility), req.body.tags,pic_paths);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	if (pkg[1][0]) {
 	    var pidset = pkg[1][1];
-	    console.log(pidset);
+	    for(var j =0;j<pic_paths.length;j++){
+		    fs.unlinkSync(pic_paths[j]);
+		}
 	    var pack = lib.createViewPostingPack(req.body.session_key,
 		    parseInt(req.body.uid), pidset[0], pidset[1], pidset[2]);
 	    var output;
@@ -165,9 +175,9 @@ exports.createPost = function(req, res) {
 			"rid" : reply_set[i][0],
 			"replier_uid" : reply_set[i][1],
 			"replyto_uid" : reply_set[i][2],
-			"replier_name" : sanitizer.sanitize(reply_set[i][3]),
-			"replyto_name" : sanitizer.sanitize(reply_set[i][4]),
-			"replyContent" : sanitizer.sanitize(reply_set[i][5]),
+			"replier_name" : sanitizer.escape(reply_set[i][3]),
+			"replyto_name" : sanitizer.escape(reply_set[i][4]),
+			"replyContent" : sanitizer.escape(reply_set[i][5]),
 			"date" : time[0],
 			"time" : time[1],
 			"visibility" : reply_set[i][8]
@@ -179,13 +189,14 @@ exports.createPost = function(req, res) {
 		    "eid" : helper.hexToDec(pkg[1][2]),
 		    "date" : pkg[1][3],
 		    "time" : pkg[1][4],
-		    "poster_name" : sanitizer.sanitize(pkg[1][5]),
-		    "event_name" : sanitizer.sanitize(pkg[1][6]),
-		    "postContent" : sanitizer.sanitize(pkg[1][7]),
+		    "poster_name" : sanitizer.escape(pkg[1][5]),
+		    "event_name" : sanitizer.escape(pkg[1][6]),
+		    "postContent" : sanitizer.escape(pkg[1][7]),
 		    "visibility" : pkg[1][8],
 		    "tags" : parseTags(pkg[1][9]),
 		    "replies_no" : reply_set.length,
-		    "replies" : replies
+		    "replies" : replies,
+		    "picids": pkg[1][11]
 		};
 		res.send({
 		    status : "successful",
@@ -217,8 +228,6 @@ exports.createReply = function(req, res) {
 	    parseInt(req.body.visibility));
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log("reply package:");
-	console.log(pkg);
 	if (pkg[1][4] == 0) {
 	    var output = {
 		"poster_uid" : pkg[1][0],
@@ -249,8 +258,6 @@ exports.createFriendRequest = function(req, res) {
 	    req.body.content);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-    console.log("send friend request");
-	console.log(pkg);
 	if (pkg[1][0] == 1) {
 	    var output = {
 		"type" : pkg[1][1],
@@ -277,8 +284,6 @@ exports.createJoinEventRequest = function(req, res) {
 	    parseInt(req.body.uid), helper.decToHex(req.body.eid), req.body.content);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-                          console.log("send event request");
-                          console.log(pkg);
 	if (pkg[1][0] == 1) {
 	    var output = {
 		"type" : pkg[1][1],
@@ -306,7 +311,6 @@ exports.createEventInvitationRequest = function(req, res) {
 	    helper.decToHex(req.body.eid), req.body.content);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log(pkg);
 	if (pkg[1][0] == 1) {
 	    var output = {
 		"type" : pkg[1][1],
@@ -377,8 +381,8 @@ exports.viewSelfInfo = function(req, res) {
 	var gender = helper.print_gender(pkg[1][1][8]);
 	var output = {
 	    "status" : "successful",
-	    "realname" : sanitizer.sanitize(pkg[1][1][1]),
-	    "nickname" : sanitizer.sanitize(pkg[1][1][2]),
+	    "realname" : sanitizer.escape(pkg[1][1][1]),
+	    "nickname" : sanitizer.escape(pkg[1][1][2]),
 	    "birthday" : birthday,
 	    "raw_birthday" : pkg[1][1][3],
 	    "tags" : parseTags(pkg[1][1][4]),
@@ -387,9 +391,9 @@ exports.viewSelfInfo = function(req, res) {
 	    "honors" : pkg[1][1][7],
 	    "gender" : gender,
 	    "raw_gender" : pkg[1][1][8],
-	    "city" : sanitizer.sanitize(pkg[1][1][9]),
-	    "state" : sanitizer.sanitize(pkg[1][1][10]),
-	    "country" : sanitizer.sanitize(pkg[1][1][11])
+	    "city" : sanitizer.escape(pkg[1][1][9]),
+	    "state" : sanitizer.escape(pkg[1][1][10]),
+	    "country" : sanitizer.escape(pkg[1][1][11])
 	};
 	res.send(output);
     }, function() {
@@ -410,14 +414,14 @@ exports.viewUserInfo = function(req, res) {
 	output = {
 	    "status" : "successful",
 	    "uid" : pkg[1][2][0],
-	    "realname" : sanitizer.sanitize(pkg[1][2][1]),
-	    "nickname" : sanitizer.sanitize(pkg[1][2][2]),
+	    "realname" : sanitizer.escape(pkg[1][2][1]),
+	    "nickname" : sanitizer.escape(pkg[1][2][2]),
 	    "birthday" : birthday,
 	    "raw_birthday" : pkg[1][2][3],
 	    "tags" : parseTags(pkg[1][2][6]),
 	    "gender" : gender,
 	    "raw_gender" : pkg[1][2][4],
-	    "city" : sanitizer.sanitize(pkg[1][2][5]),
+	    "city" : sanitizer.escape(pkg[1][2][5]),
 	    "common_friends" : pkg[1][2][7]
 	};
 	res.send(output);
@@ -442,12 +446,12 @@ exports.viewUsersInfo = function(req, res) {
 	    results[counter] = {
 		"status" : "successful",
 		"uid" : pkg[1][2][0],
-		"realname" : sanitizer.sanitize(pkg[1][2][1]),
-		"nickname" : sanitizer.sanitize(pkg[1][2][2]),
+		"realname" : sanitizer.escape(pkg[1][2][1]),
+		"nickname" : sanitizer.escape(pkg[1][2][2]),
 		"birthday" : pkg[1][2][3],
 		"tags" : parseTags(pkg[1][2][6]),
 		"gender" : gender,
-		"city" : sanitizer.sanitize(pkg[1][2][5]),
+		"city" : sanitizer.escape(pkg[1][2][5]),
 		"common_friends" : pkg[1][2][7]
 	    };
 	    counter++;
@@ -518,8 +522,8 @@ exports.viewSelfPosts = function(req, res) {
 	    parseInt(req.body.uid), max_pid);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log("self posts:");
-	console.log(pkg);
+	//console.log("self posts:");
+	//console.log(pkg);
 	output = {
 	    "pidsets" : pkg[1][1]
 	};
@@ -533,9 +537,11 @@ exports.viewSelfPosts = function(req, res) {
 
 exports.viewUserPosts = function(req, res) {
     var output;
+    var maxp=req.body.max_pid;
+    if(maxp==0)
+    	maxp = max_pid;
     var pack = lib.createViewUserPack(2, req.body.session_key,
-	    parseInt(req.body.uid), parseInt(req.body.view_uid), max_pid);
-
+	    parseInt(req.body.uid), parseInt(req.body.view_uid), maxp);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	output = {
@@ -598,7 +604,7 @@ exports.viewSelfSchedule = function(req, res) {
     var output;
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
-	console.log(data);
+	//console.log(data);
 	var schedules = [];
 	var schedules_set = pkg[1][1];
 	for (var i = 0; i < schedules_set.length; i++) {
@@ -627,8 +633,13 @@ exports.viewSelfSchedule = function(req, res) {
 }
 exports.viewUserNews = function(req, res) {
     var output;
+    var maxp=req.body.max_pid;
+    if(maxp==0)
+    	maxp = max_pid;
+    console.log("max pid is ");
+    console.log(maxp);
     var pack = lib.createMassViewPack(0, parseInt(req.body.option),
-	    req.body.session_key, parseInt(req.body.uid), max_pid);
+	    req.body.session_key, parseInt(req.body.uid), maxp);
     //console.log(pack);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
@@ -682,6 +693,62 @@ exports.viewSelfCircatags = function(req, res) {
     });
 }
 
+exports.viewPicture = function(req,res){
+	var output;
+	var pack = lib.createViewPicturePack(req.body.session_key,
+		parseInt(req.body.uid),req.body.picid);
+	helper.connectAndSend(pack, function(data){
+		var pkg = lib.resolvPack(data);
+		output = {
+			"status" : "successful",
+		    "pics" : pkg[1][1]
+		};
+		res.send(output);
+	    }, function() {
+			res.send({
+			    "status" : "timeout"
+			});
+	   }
+	);
+}
+
+
+//TO DO: to be discussed.
+exports.viewPictures = function(req,res){
+	var output;
+	// for(var i=0;i<req.body.picids.length;i++){
+	// 	var pack = lib.createViewPicturePack(req.body.session_key,
+	// 		parseInt(req.body.uid),req.body.picids[i]);
+	// 	helper.connectAndSend(pack, function(data){
+	// 		var pkg = lib.resolvPack(data);
+	// 		output = {
+	// 		    "pics" : pkg[1][1]
+	// 		};
+	// 		res.send(output);
+	// 	    }, function() {
+	// 			res.send({
+	// 			    status : "timeout"
+	// 			});
+	// 	   }
+	// 	);
+	// }
+}
+exports.viewCommonFriends = function(req,res){
+	var pack = createViewUserPack(9, req.body.session_key,
+	    parseInt(req.body.uid), parseInt(req.body.view_uid));
+	var output;
+    helper.connectAndSend(pack, function(data) {
+		var pkg = lib.resolvPack(data);
+		output = {
+		    "common_friends" : pkg[1][2]
+		};
+		res.send(output);
+	    }, function() {
+		res.send({
+		    status : "timeout"
+		});
+    });
+}
 exports.viewUserCircatags = function(req, res) {
     var pack = lib.createViewUserPack(18, req.body.session_key,
 	    parseInt(req.body.uid), parseInt(req.body.view_uid));
@@ -728,7 +795,7 @@ exports.viewSelfAvarta = function(req,res){
     var output;
     helper.connectAndSend(pack,function(data){
         var pkg = lib.resolvPack(data);
-        console.log(pkg);
+        //console.log(pkg);
 		if(!pkg[1][3]){
 			avarta = default_avarta;
 		}
@@ -779,7 +846,7 @@ exports.viewSelfSmallAvarta = function(req,res){
     var output;
     helper.connectAndSend(pack,function(data){
         var pkg = lib.resolvPack(data);
-        console.log(pkg);
+        //console.log(pkg);
 		if(!pkg[1][3]){
 			avarta = default_avarta;
 		}
@@ -828,7 +895,7 @@ exports.viewUserAvarta = function(req,res){
     var output;
     helper.connectAndSend(pack,function(data){
         var pkg = lib.resolvPack(data);
-        console.log(pkg);
+        //console.log(pkg);
         //var time = helper.UTCtimeTransform(pkg[1][0],pkg[1][1]);
 		if(!pkg[1][4]){
 			avarta = default_avarta;
@@ -871,7 +938,7 @@ exports.viewUserSmallAvarta = function(req,res){
     var output;
     helper.connectAndSend(pack,function(data){
         var pkg = lib.resolvPack(data);
-        console.log(pkg);
+        //console.log(pkg);
         //var time = helper.UTCtimeTransform(pkg[1][0],pkg[1][1]);
                           if(!pkg[1][4]){
                           avarta = default_avarta;
@@ -894,7 +961,7 @@ exports.viewUserSmallAvarta = function(req,res){
 exports.viewEventInfo = function(req, res) {
     var output;
     var eid = helper.decToHex(req.body.eid);
-    console.log(eid);
+    //console.log(eid);
     var pack = lib.createViewEventPack(4, req.body.session_key,
 	    parseInt(req.body.uid), eid);
     helper.connectAndSend(pack, function(data) {
@@ -904,11 +971,11 @@ exports.viewEventInfo = function(req, res) {
 	output = {
 	    "status" : "successful",
 	    "eid" : helper.hexToDec(pkg[1][2][0]),
-	    "name" : sanitizer.sanitize(pkg[1][2][1]),
+	    "name" : sanitizer.escape(pkg[1][2][1]),
 	    "creator" : pkg[1][2][2],
-	    "description" : sanitizer.sanitize(pkg[1][2][3]),
+	    "description" : sanitizer.escape(pkg[1][2][3]),
 	    "tags" : parseTags(pkg[1][2][4]),
-	    "city" : sanitizer.sanitize(pkg[1][2][5]),
+	    "city" : sanitizer.escape(pkg[1][2][5]),
 	    "rating" : pkg[1][2][6],
 	    "honors" : pkg[1][2][7]
 	};
@@ -925,33 +992,33 @@ exports.viewEventsInfo = function(req, res) {
     var results = [];
     var pack;
     for (var i = 0; i < eidList.length; i++) {
-	var pack = lib.createViewEventPack(4, req.body.session_key,
-		parseInt(req.body.uid), helper.decToHex(eidList[i]));
-	helper.connectAndSend(pack, function(data) {
-	    var pkg = lib.resolvPack(data);
-	    results[counter] = {
-		"status" : "successful",
-		"eid" : helper.hexToDec(pkg[1][2][0]),
-		"name" : sanitizer.sanitize(pkg[1][2][1]),
-		"creator" : pkg[1][2][2],
-		"description" : sanitizer.sanitize(pkg[1][2][3]),
-		"tags" : parseTags(pkg[1][2][4]),
-		"city" : sanitizer.sanitize(pkg[1][2][5]),
-		"rating" : pkg[1][2][6],
-		"honors" : pkg[1][2][7]
-	    };
-	    counter++;
-	    if (counter == eidList.length) {
-		res.send({
-		    status : "successful",
-		    source : results
+		var pack = lib.createViewEventPack(4, req.body.session_key,
+			parseInt(req.body.uid), helper.decToHex(eidList[i]));
+		helper.connectAndSend(pack, function(data) {
+		    var pkg = lib.resolvPack(data);
+		    results[counter] = {
+			"status" : "successful",
+			"eid" : helper.hexToDec(pkg[1][2][0]),
+			"name" : sanitizer.escape(pkg[1][2][1]),
+			"creator" : pkg[1][2][2],
+			"description" : sanitizer.escape(pkg[1][2][3]),
+			"tags" : parseTags(pkg[1][2][4]),
+			"city" : sanitizer.escape(pkg[1][2][5]),
+			"rating" : pkg[1][2][6],
+			"honors" : pkg[1][2][7]
+		    };
+		    counter++;
+		    if (counter == eidList.length) {
+			res.send({
+			    status : "successful",
+			    source : results
+			});
+		    }
+		}, function() {
+		    res.send({
+			status : "timeout"
+		    });
 		});
-	    }
-	}, function() {
-	    res.send({
-		status : "timeout"
-	    });
-	});
     }
 }
 exports.viewEventMembers = function(req, res) {
@@ -989,8 +1056,11 @@ exports.viewEventManagers = function(req, res) {
 
 exports.viewEventPosts = function(req, res) {
     var output;
+    var maxp=req.body.max_pid;
+    if(maxp==0)
+    	maxp = max_pid;
     var pack = lib.createViewEventPack(2, req.body.session_key,
-	    parseInt(req.body.uid), helper.decToHex(req.body.eid), max_pid);
+	    parseInt(req.body.uid), helper.decToHex(req.body.eid), maxp);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	//console.log(pkg);
@@ -1144,9 +1214,9 @@ exports.viewPostContent = function(req, res) {
 		"rid" : reply_set[i][0],
 		"replier_uid" : reply_set[i][1],
 		"replyto_uid" : reply_set[i][2],
-		"replier_name" : sanitizer.sanitize(reply_set[i][3]),
-		"replyto_name" : sanitizer.sanitize(reply_set[i][4]),
-		"replyContent" : sanitizer.sanitize(reply_set[i][5]),
+		"replier_name" : sanitizer.escape(reply_set[i][3]),
+		"replyto_name" : sanitizer.escape(reply_set[i][4]),
+		"replyContent" : sanitizer.escape(reply_set[i][5]),
 		"date" : reply_set[i][6],
 		"time" : reply_set[i][7],
 		"visibility" : reply_set[i][8]
@@ -1158,13 +1228,14 @@ exports.viewPostContent = function(req, res) {
 	    "eid" : helper.hexToDec(pkg[1][2]),
 	    "date" : pkg[1][3],
 	    "time" : pkg[1][4],
-	    "poster_name" : sanitizer.sanitize(pkg[1][5]),
-	    "event_name" : sanitizer.sanitize(pkg[1][6]),
-	    "postContent" : sanitizer.sanitize(pkg[1][7]),
+	    "poster_name" : sanitizer.escape(pkg[1][5]),
+	    "event_name" : sanitizer.escape(pkg[1][6]),
+	    "postContent" : sanitizer.escape(pkg[1][7]),
 	    "visibility" : pkg[1][8],
 	    "tags" : parseTags(pkg[1][9]),
 	    "replies_no" : reply_set.length,
-	    "replies" : replies
+	    "replies" : replies,
+	    "picids":pkg[1][11]
 	};
 	res.send({
 	    status : "successful",
@@ -1204,9 +1275,9 @@ exports.viewPostsContent = function(req, res) {
 		"rid" : reply_set[i][0],
 		"replier_uid" : reply_set[i][1],
 		"replyto_uid" : reply_set[i][2],
-		"replier_name" : sanitizer.sanitize(reply_set[i][3]),
-		"replyto_name" : sanitizer.sanitize(reply_set[i][4]),
-		"replyContent" : sanitizer.sanitize(reply_set[i][5]),
+		"replier_name" : sanitizer.escape(reply_set[i][3]),
+		"replyto_name" : sanitizer.escape(reply_set[i][4]),
+		"replyContent" : sanitizer.escape(reply_set[i][5]),
 		"date" : reply_set[i][6],
 		"time" : reply_set[i][7],
 		"visibility" : reply_set[i][8]
@@ -1218,13 +1289,14 @@ exports.viewPostsContent = function(req, res) {
 	    "eid" : helper.hexToDec(pkg[1][2]),
 	    "date" : pkg[1][3],
 	    "time" : pkg[1][4],
-	    "poster_name" : sanitizer.sanitize(pkg[1][5]),
-	    "event_name" : sanitizer.sanitize(pkg[1][6]),
-	    "postContent" : sanitizer.sanitize(pkg[1][7]),
+	    "poster_name" : sanitizer.escape(pkg[1][5]),
+	    "event_name" : sanitizer.escape(pkg[1][6]),
+	    "postContent" : sanitizer.escape(pkg[1][7]),
 	    "visibility" : pkg[1][8],
 	    "tags" : parseTags(pkg[1][9]),
 	    "replies_no" : reply_set.length,
-	    "replies" : replies
+	    "replies" : replies, 
+	    "picids": pkg[1][11]
 	};
 	counter++;
 	if (counter == pidList.length)
@@ -1374,9 +1446,9 @@ exports.searchPost = function(req, res) {
 	    parseInt(req.body.uid), req.body.filter, parseInt(req.body.range),
 	    parseInt(req.body.option));
     helper.connectAndSend(pack, function(data) {
-                          console.log(data);
+    console.log(data);
 	var pkg = lib.resolvPack(data);
-                          console.log(pkg);
+    console.log(pkg);
 	var output = {
 	    "pidsets" : pkg[1]
 	};
@@ -1843,12 +1915,48 @@ exports.uploadAvarta = function(req, res){
 		}
 	});
 }
+
+exports.uploadPicture = function(req, res){
+	fs.readFile(req.files.image.path, function(err, data){
+		var imageName = req.files.image.name;
+		var imgsize =1;
+		/// If there's an error
+		if(!imageName){
+			console.log("There was an error.")
+			res.send({status:"unsuccessful"});
+		}else{
+			var path = dataPath +req.body.uid+"/tmp/";
+			console.log("path: "+path);
+			fs.readdir(path, function(err){
+				if(err){
+					console.log("not exists");
+					fs.mkdir(path,function(err){
+						if(!err){
+							console.log("created dir");
+							var imagePath = path + imageName;
+							fs.writeFileSync(imagePath, data);
+							res.send({status:"successful"});
+						}else{
+							res.send({status:"unsuccessful"});
+						}
+					});
+				}else{
+					console.log("exists");
+					var imagePath = path + imageName;
+					fs.writeFileSync(imagePath, data);
+					res.send({status:"successful"});
+				}
+			});
+		}
+	});
+}
+
 /*sanitizer tags*/
 function parseTags(tags){
 	var results=[];
 	if(tags){
 		for(var i=0;i<tags.length;i++)
-			results[i] = sanitizer.sanitize(tags[i]);
+			results[i] = sanitizer.escape(tags[i]);
 	}
 	return results;
 }

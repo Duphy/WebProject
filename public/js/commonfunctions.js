@@ -192,11 +192,13 @@ function renderPost(post){
     '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+post.postContent+'</pre>'+
     '</div>'+
     '</div>'+
-  '<div class = "row-fluid shareButtons" style = "margin-top:10px;">'+
-    /*'<div class = "offset1 span1"><button class = "btn button" style = "width:50px;"><i class = "icon-thumbs-up"></i>0</button></div>'+
-    '<div class = "span1"><button class = "btn button" style = "width:50px;margin-left:10px;"><i class = "icon-share"></i></button></div>';
-    html=html+*/
-  '</div>';
+    '<div class="row-fluid pictureArea" style = "margin-left:2%;">'+
+    '</div>'+
+    '<div class = "row-fluid shareButtons" style = "margin-top:10px;">'+
+      /*'<div class = "offset1 span1"><button class = "btn button" style = "width:50px;"><i class = "icon-thumbs-up"></i>0</button></div>'+
+      '<div class = "span1"><button class = "btn button" style = "width:50px;margin-left:10px;"><i class = "icon-share"></i></button></div>';
+      html=html+*/
+    '</div>';
     if(post.replies_no > 0){
       html = html +
         '<div class = "row-fluid repliesArea" style = "margin-top:10px;">'+
@@ -261,9 +263,9 @@ function renderPost(post){
     '<img class = "selfProfileSmallAvarta" src = '+localStorage.self_small_avarta+' style = "width:36px;height:36px;border-radius:18px;margin-left:10px;">'+
     '</div>'+
     '<div class= "span11" style = "padding-left:10px;padding-right:20px;">'+
-    '<textarea class = "input-block-level replyInput" replyToUid = "'+post.uid+'" replyToName = "'+post.poster_name+'" type = "text" placeholder = "Add Comments here..." style = "min-height:70px;"></textarea>'+
-    '<button class = "btn replyCancel pull-right span2 button" style = "margin-left:10px;">Cancel</button>'+
-    '<button class = "btn btn-success replySubmit pull-right span2 button" disabled>Post</button>'+
+    '<textarea class = "input-block-level replyInput" replyToUid = "'+post.uid+'" replyToName = "'+post.poster_name+'" type = "text" placeholder = "Add Comments here..." style = "min-height:70px;border-radius:0px;"></textarea>'+
+    '<button class = "btn replyCancel pull-right button" style = "margin-left:10px;">Cancel</button>'+
+    '<button class = "btn btn-success replySubmit pull-right button" disabled>Post</button>'+
     '</div>'+
     '</div>'+
   '</div>';
@@ -316,6 +318,30 @@ function createPost(data){
         $('#floatingBarsG-post').hide();
         $("#contentBody").find(".well").hide();
         $("#postSubmit").removeAttr("disabled");
+        if(result.post.picids && result.post.picids.length > 0){
+          var pictureData  = {};
+          pictureData.session_key = localStorage.session_key;
+          pictureData.uid = localStorage.uid;
+
+          //TO DO: to be changed to support multiple pictures in one post.
+          pictureData.picid = result.post.picids[0];
+          $.ajax({
+            url:'/getpicture',
+            data:JSON.stringify(pictureData),
+            type:"POST",
+            contentType:"application/json",
+            success:function(data){
+              if(data.pics){
+                console.log("picture url is:");
+                console.log(data.pics);
+                var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                $("#"+postid).find(".pictureArea").append("<img class ='postImage' data-toggle='modal' href ='#imageModal' src = '"+data.pics+"' style = 'width:96%;'/>");
+              }else{
+                console.log("failed to get the picture of this post");
+              }
+            }
+          });
+        }
       }
     }
   });
@@ -723,7 +749,7 @@ function renderEventUpdate(){
 
 /************* general functions **********/
 
-function viewpost(pids){
+function viewpost(pids,char,newsData){
     if(pids.length != 0){
         $("#contentBody").find(".well").hide();
         $("#loadMoreButton").hide();
@@ -752,6 +778,7 @@ function viewpost(pids){
            //console.log(result);
             if(result.status == "successful"){
               $("#contentBody").find(".well").hide();
+              console.log(result.source);
               $.each(result.source,function(index,element){
                     var postAvartaData = {};
                     postAvartaData.session_key = localStorage.session_key;
@@ -765,6 +792,34 @@ function viewpost(pids){
                     }else{
                       $('#left-column').append(renderPost(element));
                     }
+                    //retrieve the pics of the element if any.
+                    if(element.picids && element.picids.length > 0){
+                      console.log("element:");
+                      console.log(element);
+                      console.log(element.picids);
+                      console.log(element.picids.length);
+                      var pictureData  = {};
+                      pictureData.session_key = localStorage.session_key;
+                      pictureData.uid = localStorage.uid;
+                      pictureData.picid = element.picids[0];
+                      $.ajax({
+                        url:'/getpicture',
+                        data:JSON.stringify(pictureData),
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                          if(data.pics){
+                            console.log("picture url is:");
+                            console.log(data.pics);
+                            var postid = element.uid+""+element.eid+""+element.pid;
+                            $("#"+postid).find(".pictureArea").append("<img class = 'postImage' data-toggle='modal' href ='#imageModal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                          }else{
+                            console.log("failed to get the picture of this post");
+                          }
+                        }
+                      });
+                    }
+                    //retrieve the avatar of the poster
                     $.ajax({
                            url:'/getuseravarta',
                            data:JSON.stringify(postAvartaData),
@@ -798,7 +853,7 @@ function viewpost(pids){
               $("#circularG").hide();
               $(window).scroll(function(){
                 if($(window).scrollTop() + $(window).height() == $(document).height() && loadingFlag){
-                  getMorePosts();
+                  getMorePosts(char,newsData);
                 }
               });
             }
@@ -818,7 +873,7 @@ function searchUser(searchData,loadOrder){
     type:"POST",
     contentType: 'application/json',
     success:function(data){
-      if(data.uids.length != 0){
+      if(data.uids && data.uids.length != 0){
         console.log(searchData.filter);
         console.log("searchuser byfilter result:");
         console.log(data);
@@ -906,7 +961,7 @@ function searchEvents(searchData,loadOrder){
     type:"POST",
     contentType: 'application/json',
     success:function(data){
-      if(data.eids.length != 0){
+      if(data.eids && data.eids.length != 0){
         console.log("searcheventbyfilter result:");
         console.log(data);
         var eventsData = {};
@@ -975,23 +1030,23 @@ function friendRequestNotification(userName, userId, eventId, postId, action, se
     case 0:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem friendRequestNotification unread">'+
                 '<i class="icon-user"></i>'+
-                '&nbsp;&nbsp;<span><a class = "userName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have approved your friend request.</span>&nbsp;'+
-                '<button class = "btn btn-primary pull-right friendResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '&nbsp;&nbsp;<span class = "websiteFont"><a class = "userName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have approved your friend request.</span>&nbsp;'+
+                '<button class = "btn btn-primary pull-right friendResponse button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 1:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem friendRequestNotification unread">'+
                 '<i class="icon-user"></i>'+
-                '&nbsp;&nbsp;<span><a class = "usernName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have rejected your friend request.</span>&nbsp;'+
-                '<button class = "btn btn-primary pull-right friendResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '&nbsp;&nbsp;<span class = "websiteFont"><a class = "usernName user'+userId+'" uid = "'+userId+'">'+userName+'</a> have rejected your friend request.</span>&nbsp;'+
+                '<button class = "btn btn-primary pull-right friendResponse button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 2:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem friendRequestNotification unread">'+
                 '<i class="icon-user"></i>'+
-                '&nbsp;&nbsp;<span><a class = "userName user'+userId+'" uid = "'+userId+'">'+userName+'</a> sends a friend request to you.</span>&nbsp;&nbsp;'+
+                '&nbsp;&nbsp;<span class = "websiteFont"><a class = "userName user'+userId+'" uid = "'+userId+'">'+userName+'</a> sends a friend request to you.</span>&nbsp;&nbsp;'+
                 '<button class = "btn pull-right rejectFriendRequest" style = "border-radius:15px;padding:2px 6px 3px;"><i class = "icon-remove"></i></button>'+
-                '<button class = "btn btn-success pull-right approveFriendRequest" style = "border-radius:15px;padding:2px 6px 3px;margin-right:3px;"><i class = "icon-ok icon-white"></i></button>'+
+                '<button class = "btn btn-success pull-right approveFriendRequest button" style = "border-radius:15px;padding:2px 6px 3px;margin-right:3px;"><i class = "icon-ok icon-white"></i></button>'+
              '</li>';
       break;
   }
@@ -1003,24 +1058,24 @@ function eventJoinRequestNotification(userName, userId, postId, eventName, event
   switch(action){
     case 0:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
-                '<p class = "span10" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
+                '<p class = "span10 websiteFont" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> has approved your event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
-                '<button class = "btn btn-primary pull-right span2 eventResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '<button class = "btn btn-primary pull-right span2 eventResponse button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 1:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
-                '<p class = "span10" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
+                '<p class = "span10 websiteFont" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> has rejected your event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
-                '<button class = "btn btn-primary pull-right span2 eventResponse" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
+                '<button class = "btn btn-primary pull-right span2 eventResponse button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+
               '</li>';
       break;
     case 2:
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
-                '<p class = "span9" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
+                '<p class = "span9 websiteFont" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> send a event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
-                '<button class = "btn pull-right rejectEventJoinRequestRequest span1" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-remove"></i></button>'+
-                '<button class = "btn btn-success pull-right approveEventJoinRequest span1" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;margin-right:3px;"><i class = "icon-ok icon-white"></i></button>'+
+                '<button class = "btn pull-right rejectEventJoinRequest span1" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-remove"></i></button>'+
+                '<button class = "btn btn-success pull-right approveEventJoinRequest span1 button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;margin-right:3px;"><i class = "icon-ok icon-white"></i></button>'+
              '</li>';
       break;
   }
@@ -1028,10 +1083,10 @@ function eventJoinRequestNotification(userName, userId, postId, eventName, event
 }
 
 function postReplyNotification(userName, userId, eventId, post, postId ,seqNo){
-  var html = '<li seqNo= "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem postReplyNotification unread">'+
+  var html = '<li seqNo= "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem postReplyNotification unread websiteFont">'+
                 '<i class="icon-list"></i>'+
                 '&nbsp;&nbsp;<a id = "'+userId+'">'+userName+'</a> has replied to your post <a class = "postName" id = "'+postId+'">'+post+'</a>.'+
-                '<button class = "btn pull-right btn-primary" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+               
+                '<button class = "btn pull-right btn-primary button" style = "border-radius:15px;padding:2px 6px 3px;width:30px;height:28px;"><i class = "icon-thumbs-up icon-white"></i></button>'+               
              '</li>';
   return html;
 }
@@ -1042,7 +1097,7 @@ function removeNotification(){
   console.log(($("#notificationNumber").html()).trim());
   if(newNotificationNumber == 0){
     $("#notificationNumber").css({"color":"black","font-weight":"normal"});
-    $("#notificationList").html("<li tabindex='-1' style = 'text-align:center;'>No New Notification.</li>");
+    $("#notificationList").html("<li class = 'websiteFont' tabindex='-1' style = 'text-align:center;'>No New Notification.</li>");
   }
 }
 
@@ -1117,9 +1172,9 @@ function renderChatBox(type, id, chatBoxNumber){
     '</div>'+
     '<div class = "chat-window-text-box-wrapper">';
     if(type == "user"){
-      html = html + '<textarea turn = 0 rows="1" class="friendTextBox chat-window-text-box" style = "overflow:hidden;word-wrap:break-word;resize:none;height:26px;"></textarea>';
+      html = html + '<textarea turn = 0 rows="1" class="friendTextBox chat-window-text-box" style = "overflow:hidden;word-wrap:break-word;resize:none;max-height:50px;"></textarea>';
     }else{
-      html = html + '<textarea turn = 0 rows="1" class="eventtTextBox chat-window-text-box" style = "overflow:hidden;word-wrap:break-word;resize:none;height:26px;"></textarea>';
+      html = html + '<textarea turn = 0 rows="1" class="eventtTextBox chat-window-text-box" style = "overflow:hidden;word-wrap:break-word;resize:none;max-height:50px;"></textarea>';
     }
     html = html +
     '</div>'+
@@ -1129,6 +1184,7 @@ function renderChatBox(type, id, chatBoxNumber){
 
 function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
   $("#chatArea").append(renderChatBox("user", friendUid, chatBoxNumber));
+  $(".chat-window-text-box").elastic();
   var userData = {};
   userData.session_key = session_key;
   userData.uid = selfUid;
@@ -1162,6 +1218,7 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
 
 function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
   $("#chatArea").append(renderChatBox("event", eventEid, chatBoxNumber));
+  $(".chat-window-text-box").elastic();
   var eventData = {};
   eventData.session_key = session_key;
   eventData.uid = selfUid;
@@ -1179,7 +1236,7 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
   });
 }
 
-function getMorePosts(){
+function getMorePosts(char,newsData){
   if(postCounter<pidsets.length){
     loadingFlag = false;
     $("#loadMoreButton").hide();
@@ -1194,6 +1251,40 @@ function getMorePosts(){
       postData.uidList[i-postCounter] = pidsets[i][0];
       postData.eidList[i-postCounter] = pidsets[i][1];
       postData.pidList[i-postCounter] = pidsets[i][2];
+    }
+    if(postCounter+6>=pidsets.length){
+      console.log("postCounter");
+      console.log(postCounter);
+      var posturl;
+      switch (char){
+        case 0://self
+          posturl = "/getusernews"
+          break;
+        case 1://user
+          posturl = "/getuserposts"
+          break;
+        case 2://event
+          posturl = "/geteventpost"
+          break;
+        default:
+      }
+      newsData.max_pid = pidsets[pidsets.length-1][2];
+      console.log("Max pid");
+      console.log(newsData.max_pid);
+      $.ajax({
+        url:posturl,
+        data:JSON.stringify(newsData),
+        type:"POST",
+        contentType: 'application/json',
+        success:function(data){
+          console.log("More post:");
+          //console.log(data);
+          pidsets.concat(data.pidsets);
+          for(var j=0;j<data.pidsets.length;j++)
+            pidsets.push(data.pidsets[j]);
+          console.log(pidsets);
+        }
+      });
     }
     postCounter = Math.min(postCounter+6,pidsets.length);
     $.ajax({

@@ -20,6 +20,9 @@ var flag_displayfriend=true;
 var chatBoxNumber = 0;
  
 $(document).ready(function(){
+  $("#circularG").show();
+  $("#homeNav").removeClass("active");
+  $("#searchNav").removeClass("active");
   var auth_data = {};
   auth_data.session_key = localStorage.session_key;
   auth_data.uid = localStorage.uid;
@@ -118,15 +121,18 @@ $(document).ready(function(){
   });
 
   //retrieve user's posts
+  var newsData = view_auth_data;
+  newsData.option = 0;
+  newsData.max_pid = 0;
   $.ajax({
      url:"/getuserposts",
-     data:JSON.stringify(view_auth_data),
+     data:JSON.stringify(newsData),
      type:"POST",
      contentType: 'application/json',
      success:function(data){
        console.log("News:");
        console.log(data);
-       viewpost(data.pidsets);
+       viewpost(data.pidsets,1,newsData);
      }
   });
 
@@ -267,12 +273,12 @@ $(document).ready(function(){
               $("#friendsHead").find("font").html("("+localStorage.user_friendsNumber+")");
               if(common_friends.length == 0){
                  $("#squaresWaveG-commonFriend").hide();
-                $("#commonFriendsList").append("<strong style = 'margin-left:15%;color:white;'>No mutual friend.</strong>");
+                $("#commonFriendsList").append("<strong style = 'text-align:center;margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Mutual Friend.</strong>");
               }else{
                 $("#commonFriendsHead").find('font').html("("+localStorage.common_friends.length+")");
               }
               if(localStorage.user_friendsNumber == 0){
-                $("#friendsList").append("<strong style = 'margin-left:15%;color:white;'>No friend.</strong>");
+                $("#friendsList").append("<strong style = 'text-align:center;margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Friend.</strong>");
                 $("#squaresWaveG-friend").hide();
               }else{
                   userlist(friendsData,'user');
@@ -559,7 +565,7 @@ $(document).ready(function(){
         $(chatArea).append(
           '<div class = "chat-message" uid = "'+localStorage.uid+'">'+
             '<div class = "chat-gravatar-wrapper">'+
-              '<img src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
+              '<img class = "chatAvarta'+localStorage.uid+'" src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
             '</div>'+
             '<div class = "chat-text-wrapper">'+
               '<p>'+content+'</p>'+            
@@ -599,13 +605,12 @@ $(document).ready(function(){
             $("#defriendCancel").removeAttr("disabled");
             $("#floatingBarsG-defriend").hide();
             $("#defriendModal").modal("hide");
-
           }
     });
   });
 
   $("#loadMoreButton").click(function(){
-    getMorePosts();
+    getMorePosts(1,newsData);
     return false;
   });
 
@@ -693,8 +698,9 @@ $(document).ready(function(){
   $('body').delegate('.eventResponse','click',function(){
     console.log("read event response");
     flag_displayevent = true;
-    if(notification.prev() && notification.prev().hasClass("divider")){
-        notification.prev().remove();
+    var notification = $(this).closest('.notificationItem');
+    if($(notification).prev() && $(notification).prev().hasClass("divider")){
+        $(notification).prev().remove();
     };
     notification.remove();
     removeNotification();
@@ -762,4 +768,5 @@ $(document).ready(function(){
   });
 
   $("#createPost").remove();
+  $("#createPicture").remove();
 });

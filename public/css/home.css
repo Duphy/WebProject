@@ -1,3 +1,7 @@
+.websiteFont{
+	font-family: 'Lato', sans-serif;font-weight:300;
+}
+
 #friendsHead{
 	color: #afdefa;
 	background: #0d77b6;
@@ -403,6 +407,14 @@ height:30px;
 display: none;
 }
 
+#floatingBarsG-picture{
+position:relative;
+width:24px;
+height:30px;
+display: none;
+}
+
+
 #floatingBarsG-update{
 position:relative;
 width:24px;
@@ -692,4 +704,13 @@ background-color:#FFFFFF}
 	outline:none;
 	text-decoration:none;
 	display:none;
+}
+
+#homeNav.active{
+	font-weight: bold;
+}
+
+.replyInput{
+	min-height: 70px;
+	border-radius: 0px;
 }

@@ -12,6 +12,9 @@ var flag_displayevent=true;
 localStorage.common_friends = "";
 
 $(document).ready(function(){ 
+
+  $(".imgLiquidFill").imgLiquid();
+
   //set authentication data
   var auth_data = {};
   auth_data.session_key = localStorage.session_key;
@@ -22,6 +25,7 @@ $(document).ready(function(){
 
   $("#right").find("a").html("<i class = 'icon-chevron-left' style = 'margin-top:2%;'></i>Chats");
 
+  $(".bootstrap-tagsinput").css("border-radius","0px");
   $(".bootstrap-tagsinput").find("input").attr("placeholder","Add").attr("size",8);
   $(".bootstrap-tagsinput").find("input").limit('14');
   $('body').delegate('#postArea','keyup',function(){
@@ -382,6 +386,110 @@ $(document).ready(function(){
     return false;
   });
 
+  $("#pictureFileupload").fileupload({
+    url:"/uploadpostpicture",
+    type:"POST",
+    dataType:"json",
+    maxFileSize:10000000,
+    acceptFileTypes: /\.(gif|jpe?g|png)$/i,
+    formData: {
+      uid: localStorage.uid
+    },
+    progress: function(e, data){
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#pictureProgress .bar').css(
+            'width',
+            progress + '%'
+        );
+    },
+    add: function(e, data){
+        data.files[0].name = localStorage.uid+".jpg";
+        console.log(data);
+        data.submit().success(function(result, textStatus, jqXHR){
+          console.log("upload feedback:");
+          console.log(result);
+          if(result.status == "successful"){
+            setTimeout(function(){
+              $('#pictureProgress').hide();
+              $('#pictureNotice').html("finished! Preview your picture below.").css("color",'green');
+              $('#pictureProgress .bar').css(
+                  'width',
+                  '0%'
+              );
+              $('#pictureCancel').removeAttr("disabled");
+              $('#pictureSubmit').removeAttr("disabled");
+              $('#pictureDescArea').show();
+              $('#pictureTags').parent().show();
+              $('#pictureSubmit').attr("picturename",data.files[0].name);
+              $('#previewImageArea').append('<img src="' + URL.createObjectURL(data.files[0]) + '"/>');
+            },1000);
+          }
+        }).error(function(jqXHR, textStatus, errorThrown){
+          $('#pictureSubmit').removeAttr("disabled");
+          $('#pictureCancel').removeAttr("disabled");
+          $('#pictureProgress').hide();
+          $('#pictureProgress .bar').css(
+              'width',
+              '0%'
+          );
+          $('#notice').show().html("failed!").css("color","#B94A48");
+        });
+    },
+    start:function(e, data){
+        $('#pictureProgress').show();
+        $('#pictureNotice').show().html("uploading...");
+        $('#pictureSubmit').attr("disabled","disabled");
+        $('#pictureCancel').attr("disabled","disabled");
+        $('#pictureFileupload').attr("disabled","disabled");
+    },
+    fail:function(e, data){
+        $('#pictureNotice').show().html("failed!").css("color","#B94A48");
+        $('#pictureSubmit').removeAttr("disabled");
+        $('#pictureCancel').removeAttr("disabled");
+        $('#pictureFileupload').removeAttr("disabled");
+        $('#pictureProgress .bar').css(
+            'width',
+            '0%'
+        );
+    },
+    done:function(e,data){  
+        console.log("upload done.");    
+    }
+  });
+
+  $("#pictureSubmit").click(function(){
+    var description = $("#pictureDescArea").val();
+    var tags = $('#pictureTags').tagsinput('items');
+    if(tags==""){
+      tags=[];
+    }
+    var eid = "0000000000000000";
+    var visibility = 0;
+    var tags = tags;
+    var data = {};
+    var d = new Date();
+    data.content = description;
+    data.eid = eid;
+    data.visibility = visibility;
+    data.tags = tags;
+    data.date = d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+    data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
+    data.session_key = localStorage.session_key;
+    data.uid = localStorage.uid;
+    data.pics = [$(this).attr("picturename")];
+    console.log("pciture name: "+data.pics);
+    $("#floatingBarsG-picture").show();
+    createPost(data);
+    return false;
+  });
+
+  $("#pictureCancel").click(function(){
+    //TO DO: remove the picture just uploaded.
+    $("#pictureDescArea").val("");
+    $("#pictureTags").tagsinput("removeAll");
+    $("#pictureSubmit").attr("picturename","");
+  });
+
   //retrieve self big avarta
 	$.ajax({
 	 	url:'/getselfavarta',
@@ -394,6 +502,7 @@ $(document).ready(function(){
     }
 	});
 
+  //retrieve self small avarta
   $.ajax({
     url:'/getselfsmallavarta',
     data:JSON.stringify(selfAvartaData),
@@ -410,6 +519,7 @@ $(document).ready(function(){
   newsData.session_key = localStorage.session_key;
   newsData.uid = localStorage.uid;
 	newsData.option = 1;
+  newsData.max_pid = 0;
   var date = new Date();
   var timeoffset = date.getTimezoneOffset();
 	$.ajax({
@@ -420,7 +530,7 @@ $(document).ready(function(){
 		success:function(data){
 			console.log("News:");
 			console.log(data);
-      viewpost(data.pidsets);
+      viewpost(data.pidsets,0,newsData);
 		}
 	});
 
@@ -533,6 +643,7 @@ $(document).ready(function(){
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
     newsData.option = 1;
+    newsData.max_pid = 0;
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
     $.ajax({
@@ -545,7 +656,7 @@ $(document).ready(function(){
         console.log(data);
         $("#left-column").html("");
         $("#right-column").html("");
-        viewpost(data.pidsets);
+        viewpost(data.pidsets,0,newsData);
         $("#userNameLink").html("User News");
       }
     });
@@ -557,6 +668,7 @@ $(document).ready(function(){
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
     newsData.option = 1;
+    newsData.max_pid = 0;
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
     $.ajax({
@@ -569,7 +681,8 @@ $(document).ready(function(){
         console.log(data);
         $("#left-column").html("");
         $("#right-column").html("");
-        viewpost(data.pidsets);
+        //TO DO: to be verified.
+        viewpost(data.pidsets,1,newsData);
         $("#userNameLink").html("Circa News");
       }
     });
@@ -602,6 +715,7 @@ $(document).ready(function(){
 			data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
 			data.session_key = localStorage.session_key;
 			data.uid = localStorage.uid;
+      data.pics = [];
       $("#floatingBarsG-post").show();
       createPost(data);
 		}
@@ -685,7 +799,7 @@ $(document).ready(function(){
             $(".friendItem").remove();
             $("#friendsHead").find("font").html("("+localStorage.friendsNumber+")");
             if(localStorage.friendsNumber == 0){
-              $("#friendsList").append("<strong style = 'margin-left:15%;color:white;'>No friend yet.</strong>");
+              $("#friendsList").append("<strong style = 'margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Friend Yet.</strong>");
               $("#squaresWaveG-friend").hide();
             }else{
               $("#friendsList").html("");
@@ -719,7 +833,7 @@ $(document).ready(function(){
               $(".eventItem").remove();
               $("#eventsHead").find("font").html("("+localStorage.eventsNumber+")");
               if(localStorage.eventsNumber == 0){
-                $("#eventsList").append("<strong style = 'margin-left:15%;color:white;'>No event yet.</strong>");
+                $("#eventsList").append("<strong style = 'margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Event Yet.</strong>");
                 $("#squaresWaveG-event").hide();
               }else{
                 $("#eventsList").html("");
@@ -923,7 +1037,6 @@ $(document).ready(function(){
 
   $("#notification").hover(function(){
     $(this).tooltip('show');
-    console.log("first");
     setTimeout(function(){$('#notification').tooltip('hide')},2000);
   });
 
@@ -1005,8 +1118,9 @@ $(document).ready(function(){
   $('body').delegate('.eventResponse','click',function(){
     console.log("read event response");
     flag_displayevent = true;
-    if(notification.prev() && notification.prev().hasClass("divider")){
-        notification.prev().remove();
+    var notification = $(this).closest('.notificationItem');
+    if($(notification).prev() && $(notification).prev().hasClass("divider")){
+        $(notification).prev().remove();
     };
     notification.remove();
     removeNotification();
@@ -1228,7 +1342,7 @@ $(document).ready(function(){
   });
 
   $("#loadMoreButton").click(function(){
-    getMorePosts();
+    getMorePosts(0);
     return false;
   });
 

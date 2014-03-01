@@ -1,3 +1,7 @@
+.websiteFont{
+	font-family: 'Lato', sans-serif;font-weight:300;
+}
+
 .length-limited {
 	border:none;
 	background-color: white;
@@ -216,4 +220,8 @@ transform:scale(.3)}
 	outline:none;
 	text-decoration:none;
 	display:none;
+}
+
+#searchNav.active{
+	font-weight: bold;
 }

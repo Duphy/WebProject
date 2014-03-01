@@ -14,6 +14,8 @@ var isMember = false;
 var isManager = false;
 $(document).ready(function(){
   $("#circularG").show();
+  $("#homeNav").removeClass("active");
+  $("#searchNav").removeClass("active");
   var auth_data = {};
   auth_data.session_key = localStorage.session_key;
   auth_data.uid = localStorage.uid;
@@ -83,7 +85,7 @@ $(document).ready(function(){
   //get event avarta
   $.ajax({
     url:"/geteventavarta",
-    data:JSON.stringify(newsData),
+    data:JSON.stringify(eventAvartaData),
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -95,97 +97,88 @@ $(document).ready(function(){
   });
 
   //get event posts
-  var newsData = view_auth_data;
-  newsData.option = 0;
-  $.ajax({
-   url:"/geteventpost",
-   data:JSON.stringify(newsData),
-   type:"POST",
-   contentType: 'application/json',
-   success:function(data){
-     console.log("News:");
-     console.log(data);
-     if(data.pidsets.length == 0){
-      $("#contentBody").find(".well").show();
-      $("#circularG").hide();
-     }else{
-      viewpost(data.pidsets);
+  if(!checkEvent(localStorage.eid)){
+    var newsData = view_auth_data;
+    newsData.option = 0;
+    newsData.max_pid = 0;
+    $.ajax({
+     url:"/geteventpost",
+     data:JSON.stringify(newsData),
+     type:"POST",
+     contentType: 'application/json',
+     success:function(data){
+       console.log("News:");
+       console.log(data);
+       if(data.pidsets.length == 0){
+        $("#contentBody").find(".well").show();
+        $("#circularG").hide();
+       }else{
+        viewpost(data.pidsets,2,newsData);
+       }
      }
-   }
-  });
+    });
 
-  $.ajax({
-    url:"/geteventmanagers",
-    data:JSON.stringify(view_auth_data),
-    type:"POST",
-    contentType: 'application/json',
-    success:function(data){
-      console.log("here");
-      console.log(data);
-      //$("#membersNumber").html(data.members.length);
-      for(var i = 0; i < data.members.length;i++){
-        if(data.members[i] == localStorage.uid){
-          isManager = true;
-          break;
+    $.ajax({
+      url:"/geteventmanagers",
+      data:JSON.stringify(view_auth_data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(data){
+        console.log("here");
+        console.log(data);
+        //$("#membersNumber").html(data.members.length);
+        for(var i = 0; i < data.members.length;i++){
+          if(data.members[i] == localStorage.uid){
+            isManager = true;
+            break;
+          }
+        }
+        if(!isManager){
+          $("#eventManage").hide();
+        }
+        else{
+          $("#eventManage").show();
         }
       }
-      if(!isManager){
-        $("#eventManage").hide();
-      }
-      else{
-        $("#eventManage").show();
-      }
-    }
-  });
-  //get event members
-  $.ajax({
-    url:"/geteventmembers",
-    data:JSON.stringify(view_auth_data),
-    type:"POST",
-    contentType: 'application/json',
-    success:function(data){
-      $("#membersNumber").html(data.members.length);
-      for(var i = 0; i < data.members.length;i++){
-        if(data.members[i] == localStorage.uid){
-          isMember = true;
-          break;
+    });
+    //get event members
+    $.ajax({
+      url:"/geteventmembers",
+      data:JSON.stringify(view_auth_data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(data){
+        $("#membersNumber").html(data.members.length);
+        for(var i = 0; i < data.members.length;i++){
+          if(data.members[i] == localStorage.uid){
+            isMember = true;
+            break;
+          }
+        }
+        if(!isMember){
+          $("#eventManage").hide();
+          $("#profileEdit").hide();
+          $("#createPost").hide();
+          $("#createPicture").hide();
+          $("#profileModal").find(".modal-footer").hide();
+          $("#eventManage").after('<a id = "settingJoinEvent"><i class="icon-plus"></i>&nbsp;&nbsp;Join Event</a>');
+        }else{
+          //$("#eventManage").hide();
+          $("#eventManage").after('<a href="#quitModal" data-toggle="modal" ><i class="icon-remove"></i>&nbsp;&nbsp;Quit Event</a>');
         }
       }
-      if(!isMember){
-        $("#eventManage").hide();
-        $("#profileEdit").hide();
-        $("#createPost").hide();
-        $("#profileModal").find(".modal-footer").hide();
-        $("#eventManage").after('<a id = "settingJoinEvent"><i class="icon-plus"></i>&nbsp;&nbsp;Join Event</a>');
-        $("#settingJoinEvent").click(function(){
-          var data = {};
-          data = auth_data;
-          data.eid = localStorage.eid;
-          data.content = "Could you add me into your event? :)";
-          $("#settingJoinEvent").css({"pointer-events":"none","cursor":"default","color":"#ccc"});
-          $("#settingJoinEvent").html("sending....");
-          $.ajax({
-            url:"/joinevent",
-            data:JSON.stringify(data),
-            type:"POST",
-            contentType: 'application/json',
-            success:function(result){
-              if(result.status == "successful"){
-                $("#settingJoinEvent").html("request pending");
-              }else{
-                $("#settingJoinEvent").html("request failed");
-              }
-            }
-          });
-          return false;
-        });
-      }else{
-        //$("#eventManage").hide();
-        $("#eventManage").after('<a href="#quitModal" data-toggle="modal" ><i class="icon-remove"></i>&nbsp;&nbsp;Quit Event</a>');
-      }
-    }
-  });
-  
+    });
+  }
+  else{
+    //TODO: add warning message
+    //flag_displaymember=false;
+    $("#right").hide();
+    $(".nonMemberWarning").show();
+    $("#circularG").hide();
+    $("#createPost").hide();
+    $("#eventManage").hide();
+    $("#eventManage").after('<a id = "settingJoinEvent"><i class="icon-plus"></i>&nbsp;&nbsp;Join Event</a>');
+  }
   //Adjust posting Area width
   $('#postArea').css({'width':$('#postModal').width()*0.9,'height':"80px"});
 
@@ -335,6 +328,29 @@ $(document).ready(function(){
     }
   });
 
+$("body").delegate("#settingJoinEvent",'click',function(){
+  var data = {};
+  data = auth_data;
+  data.eid = localStorage.eid;
+  data.content = "Could you add me into your event? :)";
+  $("#settingJoinEvent").css({"pointer-events":"none","cursor":"default","color":"#ccc"});
+  $("#settingJoinEvent").html("sending....");
+  $.ajax({
+    url:"/joinevent",
+    data:JSON.stringify(data),
+    type:"POST",
+    contentType: 'application/json',
+    success:function(result){
+      if(result.status == "successful"){
+        $("#settingJoinEvent").html("request pending");
+      }else{
+        $("#settingJoinEvent").html("request failed");
+      }
+    }
+  });
+  return false;
+});
+
 $("body").delegate(".userName", 'click', function() {
   if($(this).attr("uid") != localStorage.uid){
     $(this).css("cusor","pointer");
@@ -362,6 +378,7 @@ $("body").delegate(".memberItem", 'click', function() {
 });
 
   $("#left").click(function(){
+    console.log("shaobi");
    $('#contentBody').toggleClass('cbp-spmenu-push-toright').removeClass('cbp-spmenu-push-toleft');
    $('#cbp-spmenu-s1').toggleClass('cbp-spmenu-open');
    $('#cbp-spmenu-s2').removeClass('cbp-spmenu-open');
@@ -400,32 +417,31 @@ $("body").delegate(".memberItem", 'click', function() {
     }
     if(flag_displaymember){
     //get user's friends information
-    flag_displaymember=false;
-    $("#squaresWaveG-member").show();                    
-    $.ajax({
-           url:"/geteventmembers",
-           data:JSON.stringify(view_auth_data),
-           type:"POST",
-           contentType: 'application/json',
-           success:function(data){
-           console.log("members:");
-           console.log(data);
-           $("#membersHead").find("font").html("("+data.members.length+")");
-           var membersData = {};
-           membersData.uidList = data.members;
-           membersData.session_key = localStorage.session_key;
-           membersData.uid = localStorage.uid;
-           if(membersData.uidList.length == 0){
-              $("#membersList").append("<strong style = 'margin-left:15%;color:white;'>No member yet.</strong>");
-              $("#squaresWaveG-member").hide();
-            }else{
-              userlist(membersData,"event");
-            }
-           }
-      });//ajax
-    
-    }//if flag
-    });
+      flag_displaymember=false;
+      $("#squaresWaveG-member").show();                    
+      $.ajax({
+             url:"/geteventmembers",
+             data:JSON.stringify(view_auth_data),
+             type:"POST",
+             contentType: 'application/json',
+             success:function(data){
+             console.log("members:");
+             console.log(data);
+             $("#membersHead").find("font").html("("+data.members.length+")");
+             var membersData = {};
+             membersData.uidList = data.members;
+             membersData.session_key = localStorage.session_key;
+             membersData.uid = localStorage.uid;
+             if(membersData.uidList.length == 0){
+                $("#membersList").append("<strong style = 'margin-left:15%;color:white;font-family: \"Lato\", sans-serif;font-weight:300;'>No Member Yet.</strong>");
+                $("#squaresWaveG-member").hide();
+              }else{
+                userlist(membersData,"event");
+              }
+             }
+        });//ajax
+    }
+  });
 
   $('body').delegate('.tagHead','mouseover',function(){
     var tagsGroup = $(this).closest(".tagsGroup");
@@ -662,19 +678,18 @@ $("body").delegate(".memberItem", 'click', function() {
     data.eid = localStorage.eid;
     data.uid = localStorage.uid;
     data.session_key = localStorage.session_key;
-    // $.ajax({
-    //   url:"/quitevent",
-    //   data:JSON.stringify(data),
-    //   type:"POST",
-    //   contentType: 'application/json',
-    //   success:function(result){
-    //     if(result.status = "sccessful"){
-    //       $("#floatingBarsG-quit").show();
-    //       window.location = "/home";
-    //     }
-    //   }
-    // });
-    window.location = "/home";
+    $.ajax({
+      url:"/quitevent",
+      data:JSON.stringify(data),
+      type:"POST",
+      contentType: 'application/json',
+      success:function(result){
+        if(result.status = "sccessful"){
+          $("#floatingBarsG-quit").show();
+          window.location = "/home";
+        }
+      }
+    });
     return false;
   });
 
@@ -694,7 +709,7 @@ $("body").delegate(".memberItem", 'click', function() {
         $(chatArea).append(
           '<div class = "chat-message" uid = "'+localStorage.uid+'">'+
             '<div class = "chat-gravatar-wrapper">'+
-              '<img src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
+              '<img class = "chatAvarta'+localStorage.uid+'" src = "'+localStorage.self_small_avarta+'" style = "height:20px;width:20px;border-radius:10px;">'+
             '</div>'+
             '<div class = "chat-text-wrapper">'+
               '<p>'+content+'</p>'+            
@@ -718,7 +733,7 @@ $("body").delegate(".memberItem", 'click', function() {
   });
   
   $("#loadMoreButton").click(function(){
-    getMorePosts();
+    getMorePosts(2,newsData);
     return false;
   });
 
@@ -805,8 +820,9 @@ $("body").delegate(".memberItem", 'click', function() {
   $('body').delegate('.eventResponse','click',function(){
     console.log("read event response");
     flag_displayevent = true;
-    if(notification.prev() && notification.prev().hasClass("divider")){
-        notification.prev().remove();
+    var notification = $(this).closest('.notificationItem');
+    if($(notification).prev() && $(notification).prev().hasClass("divider")){
+        $(notification).prev().remove();
     };
     notification.remove();
     removeNotification();
@@ -864,6 +880,11 @@ $("body").delegate(".memberItem", 'click', function() {
       }
     });
     removeNotification();
+  });
+
+  $(".nonMemberWarning").click(function(){
+    $("#left").trigger("click");
+    return false;
   });
 
   $("#timeoutButton").click(function(){
