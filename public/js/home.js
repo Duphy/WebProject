@@ -86,7 +86,6 @@ $(document).ready(function(){
   $('.tagHead').show();
   adjustTags();
 
-
   $(window).resize(function(){
     $.each($(".tagHead"),function(index,element){
       var tagsGroup = $(element).closest(".tagsGroup");
@@ -902,21 +901,24 @@ $(document).ready(function(){
   });
 
   $('body').delegate('.removereply','click',function(){
-    $("#removeReplyConfirm").attr("postId",$(this).closest(".postRoot").attr("id"));
+    $("#removeReplyConfirm").attr("replyId",$(this).closest(".replyBody").attr("id")).attr("postId",$(this).closest(".postRoot").attr("id"));
   });
 
   $("#removeReplyConfirm").click(function(){
       $("#floatingBarsG-removeReply").show();
       $("#removeReplyConfirm").attr("disabled","disabled");
       var postId = $(this).attr("postId");
+      var replyId = $(this).attr("replyId");
       var context = $("#"+postId);
       var data = auth_data;
       data.id = context.attr('posterUid');
       data.eid = context.attr('postEid');
       data.pid = context.attr('postPid');
-      var reply = context.find('.replyBody');
+      var reply = $("#"+replyId);
       var repliesArea = context.find('.repliesArea');
-      data.rid = reply.attr("rid");
+      data.rid = $(reply).attr("rid");
+      console.log($(reply));
+      console.log("rid "+data.rid);
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
@@ -924,33 +926,60 @@ $(document).ready(function(){
             contentType: 'application/json',
             success:function(data){
               console.log(data);
-              if(data.status=="successful"){
-                if(context.attr("repliesNumber") == 1){
-                  repliesArea.remove();
+              if(context.attr("repliesNumber") == 1){
+                repliesArea.remove();
+              }else{
+                reply.remove();
+                var repliesNumber = parseInt(context.attr("repliesNumber"));
+                context.attr("repliesNumber",(repliesNumber - 1));
+                if(repliesNumber == 2){
+                  repliesArea.find(".accordion-toggle").html('1 reply');
                 }else{
-                  reply.remove();
-                  var repliesNumber = parseInt(context.attr("repliesNumber"));
-                  context.attr("repliesNumber",(repliesNumber - 1));
-                  if(repliesNumber == 2){
-                    repliesArea.find(".accordion-toggle").html('1 reply');
-                  }else{
-                    repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
-                  }
+                  repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
                 }
               }
-              $("#removeConfirm").removeAttr("disabled");
+              $("#removeReplyConfirm").removeAttr("disabled");
               $("#floatingBarsG-removeReply").hide();
-              $("#removeCancel").trigger("click");
+              $("#removeReplyCancel").trigger("click");
             }
       });
     return false;
   });
   
+  $("#imageModal").on("hide",function(){
+    $('body').css("overflow","scroll");
+  });
+
   $('body').delegate('.postImage','click',function(){
     var source = $(this).attr('src');
     var url = "url("+window.location.origin+"/"+source+")";
-    console.log(url);
     $('#imageModal').find('.imgLiquidFill').css('background-image',url);
+    $('body').css("overflow","hidden");
+    var context = $(this).closest(".postRoot");
+    var source = $("#post_user_avarta"+$(context).attr("postPid")).attr("src");
+    $(".interactionArea").find(".modalAvarta").first().attr("src",source);
+    var data = {};
+    data.session_key = localStorage.session_key;
+    data.uid = localStorage.uid;
+    data.uidList = [$(context).attr("posteruid")];
+    data.pidList = [$(context).attr("postpid")];
+    if([$(context).attr("posteid")] == ""){
+      data.eidList = ["0000000000000000"];
+    }else{
+      data.eidList = [$(context).attr("posteid")];
+    }
+    $.ajax({
+        url:"/getpostscontent",
+        data:JSON.stringify(data),
+        type:"POST",
+        contentType: 'application/json',
+        success:function(result){
+          if(result.status == "successful"){
+            renderLargePost(result.source[0]);
+            $(".interactionArea").show();
+          }
+        }
+    });
   });
 
   $('body').delegate('#postArea','keyup',function(){
@@ -980,13 +1009,14 @@ $(document).ready(function(){
         var data = auth_data;
         data.replier_name = localStorage.usernickname;
         var context = $(this).closest('.postRoot');
-        data.replyContent = $(this).closest('.span11').children('textarea').first().val();
-        data.posterUid = parseInt($(this).closest('.span11').children('textarea').first().attr('replyToUid'));
-        data.replyToUid = data.posterUid;
+        data.replyContent = context.find('textarea').first().val();
+        data.posterUid = localStorage.uid;
+        data.replyToUid = parseInt(context.find('textarea').first().attr('replyToUid'));
         data.postEid = context.attr('postEid');
         data.postPid = context.attr('postPid');
-        data.replyToName = $(this).closest('.span11').children('textarea').first().attr("replyToName");
+        data.replyToName = context.find('textarea').first().attr("replyToName");
         data.visibility = 0;
+        console.log(data);
         $.ajax({
               url:"/createreply",
               data:JSON.stringify(data),
@@ -1037,6 +1067,24 @@ $(document).ready(function(){
                   context.find('.accordion-toggle').first().html(replyNumber+" replies");
               }
               context.find('textarea').val("");
+
+              if(context.find("ul.repliesArea").length > 0){
+                var scroller = context.find(".repliesArea").first();
+                scroller.append(renderReplyInLargePost(reply));
+                context.attr("repliesNumber",parseInt(context.attr("repliesNumber")));
+                scroller.scrollTop(scroller.prop('scrollHeight'));
+                var orginalPost = $("#"+context.attr("id").replace("modal",""));
+                var scroller = orginalPost.find('ul.scroller').first();
+                scroller.append(renderReply(reply));
+                orginalPost.attr("repliesNumber",parseInt(context.attr("repliesNumber")));
+                scroller.scrollTop(scroller.prop('scrollHeight'));
+                var replyNumber = orginalPost.attr("repliesNumber");
+                if(replyNumber == 1){
+                    orginalPost.find('.accordion-toggle').first().html(replyNumber+" reply");
+                }else{
+                    orginalPost.find('.accordion-toggle').first().html(replyNumber+" replies");
+                }
+              }
               }
               }
               });                
