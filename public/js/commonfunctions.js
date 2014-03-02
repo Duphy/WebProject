@@ -333,7 +333,7 @@ function createPost(data){
                 console.log("picture url is:");
                 console.log(data.pics);
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
-                $("#"+postid).find(".pictureArea").append("<img class ='postImage' data-toggle='modal' href ='#imageModal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                $("#"+postid).find(".pictureArea").append("<img class ='postImage' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                 $('#pictureCancel').removeAttr("disabled");
                 $('#floatingBarsG-picture').hide();
                 $('#pictureDescArea').val("");
@@ -817,7 +817,7 @@ function viewpost(pids,char,newsData){
                             console.log("picture url is:");
                             console.log(data.pics);
                             var postid = element.uid+""+element.eid+""+element.pid;
-                            $("#"+postid).find(".pictureArea").append("<img class = 'postImage' data-toggle='modal' href ='#imageModal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                            $("#"+postid).find(".pictureArea").append("<img class = 'postImage' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                           }else{
                             console.log("failed to get the picture of this post");
                           }
