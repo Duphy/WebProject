@@ -145,15 +145,67 @@ function checkMutual(list, uid){
 
 /************* render functions **********/
 
+function renderLargePost(post){
+  post.id = "modal"+post.uid+""+post.eid+""+post.pid;
+  var time = convertUTCDateToLocalDate(post.date,post.time);
+  context = $(".interactionArea").find(".postRoot").first();
+  $(context).find(".repliesArea").html("");
+
+  $(context).attr("id",post.id);
+  $(context).attr("repliesNumber",post.replies_no).attr("postPid", post.pid).attr("posterUid", post.uid).attr("postEid", post.eid).attr("posterName", post.poster_name);
+  $(context).find(".userName").first().attr('name',post.poster_name).attr('uid',post.uid).html(post.poster_name);
+  $(context).find(".postTime").first().html(time[0]+' &nbsp;&nbsp;'+time[1]);
+  $(context).find(".length-limited").first().html(post.postContent); 
+  if(post.replies_no > 0){
+    for(var i = 0; i < post.replies_no;i++){
+      var rtime = convertUTCDateToLocalDate((post.replies)[i].date,(post.replies)[i].time);
+      var html = 
+      '<li rid="'+(post.replies)[i].rid+'" class = "row-fluid replyBody">'+
+          '<img class = "span1" id = "replyAvarta'+post.pid+''+(post.replies)[i].rid+'"  src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">'+
+          '<div class = "span8">'+
+            '<div class = "row-fluid websiteFont">'+
+              '<strong><a href = "#" class = "userName replier websiteFont" name = "'+(post.replies)[i].replier_name+'" uid = "'+(post.replies)[i].replier_uid+'">'+(post.replies)[i].replier_name+'</a></strong>'+
+              '&nbsp; to &nbsp;'+
+              '<strong><a href = "#" class = "userName replyto websiteFont" name = "'+(post.replies)[i].replyto_name+'" uid = "'+(post.replies)[i].replyto_uid+'">'+(post.replies)[i].replyto_name+'</a></strong>'+
+              '<br><font class = "websiteFont" style = "font-size: 12px;color: #999;">'+rtime[0]+'&nbsp;'+rtime[1]+'</font>'+
+          '</div>'+
+          '<div>'+
+          '<pre class = "length-limited" style = "padding:0px;font-family: \'Lato\', sans-serif;font-weight:300;">'+(post.replies)[i].replyContent+'</pre>'+
+          '</div>'+
+          '</div>'+
+          '<div class = "span1">';
+          if((post.replies)[i].replier_uid != localStorage.uid){
+            html=html+
+            '<button class = "btn btn-link pull-right replyLink" style ="padding:inherit;">reply</button>';
+          }
+          html=html+
+          '</div>'+
+          '<div class = "span1">';
+          if(post.uid==localStorage.uid||(post.replies)[i].replier_uid==localStorage.uid){
+            //html = html+'<a class="close removereply" data-toggle = "modal" href="#removeReplyModal">&times;</a>';
+          }
+          html=html+
+          '</div>'+
+        '</li>';
+        console.log($(".interactionArea ul.repliesArea"));
+        $(".interactionArea ul.repliesArea").append(html);
+        var source = $("#replyAvarta"+post.pid+""+(post.replies)[i].rid).attr("src");
+        $(".interactionArea ul.repliesArea").find("li").last().find("img").attr("src",source);
+    }
+  }
+  $(context).find("textarea").first().attr("replytouid",post.uid).attr("replytoname",post.poster_name);
+}
+
+
 function renderPost(post){
   post.id = post.uid+""+post.eid+""+post.pid;
-    var time = convertUTCDateToLocalDate(post.date,post.time);
+  var time = convertUTCDateToLocalDate(post.date,post.time);
   var html =
   '<div id = "'+post.id+'" class = "row-fluid postRoot" repliesNumber = '+post.replies_no+' postPid = "'+post.pid+'" posterUid = "'+post.uid+'" postEid = "'+post.eid+'" posterName = "'+post.poster_name+'" style = "background-color:#FFFFFF;margin-bottom:10px;">'+
     '<div class = "row-fluid" style = "margin-top:10px;height:50px;">'+
       '<div class = "span4 row-fluid" style = "text-align: center;">'+
         '<div class = "span4">'+
-          '<img id = "post_user_avarta'+post.pid+'" ';
+          '<img id = "post_user_avarta'+post.pid+'"';
           if(post.uid == localStorage.uid){
             html = html + 'class="selfProfileSmallAvarta"';
           }
@@ -161,7 +213,7 @@ function renderPost(post){
            'src = "'+localStorage.self_small_avarta+'" style = "width:40px;height:40px;border-radius:20px;">'+
         '</div>'+
         '<div class = "span8" style = "text-align:left;">'+
-          '<a href = # class = "userName" name = "'+post.poster_name+'" uid = "'+post.uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+post.poster_name+'</a><p style = "font-size:12px;color:#999;font-family: \'Lato\', sans-serif;font-weight:300;">'+time[0]+' &nbsp;&nbsp;'+time[1]+'</p>'+
+          '<a href = # class = "userName" name = "'+post.poster_name+'" uid = "'+post.uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+post.poster_name+'</a><p class = "postTime" style = "font-size:12px;color:#999;font-family: \'Lato\', sans-serif;font-weight:300;">'+time[0]+' &nbsp;&nbsp;'+time[1]+'</p>'+
         '</div>'+
       '</div>';
       if(post.uid == localStorage.uid){
@@ -224,13 +276,13 @@ function renderPost(post){
                 '<img class = "span1" id = "replyAvarta'+post.pid+''+(post.replies)[i].rid+'"  src = "#" style = "border-radius:20px;width:40px;height:40px;">'+
                 '<div class = "span8">'+
                 '<div class = "row-fluid">'+
-                '<strong><a href = "#" class = "userName replier" name = "'+(post.replies)[i].replier_name+'" uid = "'+(post.replies)[i].replier_uid+'">'+(post.replies)[i].replier_name+'</a></strong>'+
+                '<strong><a href = "#" class = "userName replier" name = "'+(post.replies)[i].replier_name+'" uid = "'+(post.replies)[i].replier_uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+(post.replies)[i].replier_name+'</a></strong>'+
                 '&nbsp; to &nbsp;'+
-                '<strong><a href = "#" class = "userName replyto" name = "'+(post.replies)[i].replyto_name+'" uid = "'+(post.replies)[i].replyto_uid+'">'+(post.replies)[i].replyto_name+'</a></strong>'+
+                '<strong><a href = "#" class = "userName replyto" name = "'+(post.replies)[i].replyto_name+'" uid = "'+(post.replies)[i].replyto_uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+(post.replies)[i].replyto_name+'</a></strong>'+
                 '&nbsp;&nbsp;<font>'+rtime[0]+'&nbsp;'+rtime[1]+'</font>'+
                 '</div>'+
                 '<div>'+
-                '<pre class = "length-limited">'+(post.replies)[i].replyContent+'</pre>'+
+                '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+(post.replies)[i].replyContent+'</pre>'+
                 '</div>'+
                 '</div>'+
                 '<div class = "span1">';
@@ -308,7 +360,6 @@ function createPost(data){
         }
         $('#postArea').val("");
         $('#postModal').modal("hide");
-        $(".tagsGroup").width("+=10");
         $(".tagsGroup a").hide();
         $('.tagHead').show();
         adjustTags(); 
@@ -333,7 +384,7 @@ function createPost(data){
                 console.log("picture url is:");
                 console.log(data.pics);
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
-                $("#"+postid).find(".pictureArea").append("<img class ='postImage' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                $("#"+postid).find(".pictureArea").append("<img class ='postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                 $('#pictureCancel').removeAttr("disabled");
                 $('#floatingBarsG-picture').hide();
                 $('#pictureDescArea').val("");
@@ -553,6 +604,35 @@ function renderReply(reply){
       '<div class = "span1">'+
       '</div>'+
     '</li>';
+  return html;
+}
+
+function renderReplyInLargePost(reply){
+    var html = 
+      '<li id = "" class = "row-fluid replyBody">'+
+          '<img class = "span1 selfProfileSmallAvarta" src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">'+
+          '<div class = "span8">'+
+            '<div class = "row-fluid websiteFont">'+
+              '<strong><a href = "#" class = "userName replier websiteFont" name = "'+reply.replier_name+'" uid = "'+reply.replier_uid+'">'+reply.replier_name+'</a></strong>'+
+              '&nbsp; to &nbsp;'+
+              '<strong><a href = "#" class = "userName replyto websiteFont" name = "'+reply.replyto_name+'" uid = "'+reply.replyto_uid+'">'+reply.replyto_name+'</a></strong>'+
+              '<br><font class = "websiteFont" style = "font-size: 12px;color: #999;">'+reply.date+'&nbsp;'+reply.time+'</font>'+
+          '</div>'+
+          '<div>'+
+          '<pre class = "length-limited" style = "padding:0px;font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replyContent+'</pre>'+
+          '</div>'+
+          '</div>'+
+          '<div class = "span1">';
+          if(reply.replier_uid != localStorage.uid){
+            html=html+
+            '<button class = "btn btn-link pull-right replyLink" style ="padding:inherit;">reply</button>';
+          }
+          html=html+
+          '</div>'+
+          '<div class = "span1">';
+          html=html+
+          '</div>'+
+        '</li>';
   return html;
 }
 
@@ -817,7 +897,7 @@ function viewpost(pids,char,newsData){
                             console.log("picture url is:");
                             console.log(data.pics);
                             var postid = element.uid+""+element.eid+""+element.pid;
-                            $("#"+postid).find(".pictureArea").append("<img class = 'postImage' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                            $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                           }else{
                             console.log("failed to get the picture of this post");
                           }
@@ -850,7 +930,6 @@ function viewpost(pids,char,newsData){
                       });
                     });
               });
-              $(".tagsGroup").width("+=10");
               $(".tagsGroup a").hide();
               $('.tagHead').show();
               adjustTags();
@@ -1310,7 +1389,6 @@ function getMorePosts(char,newsData){
               if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
                 $('#right-column').append(renderPost(element));
               }else{
-                console.log("right is large");
                 $('#left-column').append(renderPost(element));
               }
               $.ajax({
@@ -1337,11 +1415,9 @@ function getMorePosts(char,newsData){
                   });
               });
           });
-          $(".tagsGroup").width("+=10");
           $(".tagsGroup a").hide();
           $('.tagHead').show();
           adjustTags();
-          console.log("woca");
           $("#loadMoreButton").show();
           $("#circularG").hide();
           loadingFlag = true;
