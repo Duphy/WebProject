@@ -1391,6 +1391,33 @@ function getMorePosts(char,newsData){
               }else{
                 $('#left-column').append(renderPost(element));
               }
+              //retrieve the pics of the element if any.
+              if(element.picids && element.picids.length > 0){
+                console.log("element:");
+                console.log(element);
+                console.log(element.picids);
+                console.log(element.picids.length);
+                var pictureData  = {};
+                pictureData.session_key = localStorage.session_key;
+                pictureData.uid = localStorage.uid;
+                pictureData.picid = element.picids[0];
+                $.ajax({
+                  url:'/getpicture',
+                  data:JSON.stringify(pictureData),
+                  type:"POST",
+                  contentType:"application/json",
+                  success:function(data){
+                    if(data.pics){
+                      console.log("picture url is:");
+                      console.log(data.pics);
+                      var postid = element.uid+""+element.eid+""+element.pid;
+                      $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                    }else{
+                      console.log("failed to get the picture of this post");
+                    }
+                  }
+                });
+              }
               $.ajax({
                   url:'/getuseravarta',
                   data:JSON.stringify(postAvartaData),
