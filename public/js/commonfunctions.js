@@ -381,8 +381,6 @@ function createPost(data){
             contentType:"application/json",
             success:function(data){
               if(data.pics){
-                console.log("picture url is:");
-                console.log(data.pics);
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
                 $("#"+postid).find(".pictureArea").append("<img class ='postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                 $('#pictureCancel').removeAttr("disabled");
@@ -894,8 +892,6 @@ function viewpost(pids,char,newsData){
                         contentType:"application/json",
                         success:function(data){
                           if(data.pics){
-                            console.log("picture url is:");
-                            console.log(data.pics);
                             var postid = element.uid+""+element.eid+""+element.pid;
                             $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                           }else{
@@ -1337,8 +1333,6 @@ function getMorePosts(char,newsData){
       postData.pidList[i-postCounter] = pidsets[i][2];
     }
     if(postCounter+6>=pidsets.length){
-      console.log("postCounter");
-      console.log(postCounter);
       var posturl;
       switch (char){
         case 0://self
@@ -1363,9 +1357,17 @@ function getMorePosts(char,newsData){
         success:function(data){
           console.log("More post:");
           //console.log(data);
-          pidsets.concat(data.pidsets);
-          for(var j=0;j<data.pidsets.length;j++)
-            pidsets.push(data.pidsets[j]);
+          //pidsets.concat(data.pidsets);
+          if(data.pidsets.length==0){
+            if(postCounter>=pidsets.length){
+              $("#loadMoreButton").html("No More Posts");
+              $("#loadMoreButton").attr("disabled","disabled");
+            }
+          }
+          else{
+            for(var j=0;j<data.pidsets.length;j++)
+              pidsets.push(data.pidsets[j]);
+          }
           console.log(pidsets);
         }
       });
@@ -1393,10 +1395,6 @@ function getMorePosts(char,newsData){
               }
               //retrieve the pics of the element if any.
               if(element.picids && element.picids.length > 0){
-                console.log("element:");
-                console.log(element);
-                console.log(element.picids);
-                console.log(element.picids.length);
                 var pictureData  = {};
                 pictureData.session_key = localStorage.session_key;
                 pictureData.uid = localStorage.uid;
@@ -1408,8 +1406,7 @@ function getMorePosts(char,newsData){
                   contentType:"application/json",
                   success:function(data){
                     if(data.pics){
-                      console.log("picture url is:");
-                      console.log(data.pics);
+                      
                       var postid = element.uid+""+element.eid+""+element.pid;
                       $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                     }else{
@@ -1451,9 +1448,6 @@ function getMorePosts(char,newsData){
          }
          }
     });
-  }else{
-    $("#loadMoreButton").html("No More Posts");
-    $("#loadMoreButton").attr("disabled","disabled");
   }
 }
 
