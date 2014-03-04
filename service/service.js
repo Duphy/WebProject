@@ -540,7 +540,7 @@ exports.viewSelfPosts = function(req, res) {
 exports.viewUserPosts = function(req, res) {
     var output;
     var maxp=req.body.max_pid;
-    if(maxp==0)
+    if(maxp=="default")
     	maxp = max_pid;
     var pack = lib.createViewUserPack(2, req.body.session_key,
 	    parseInt(req.body.uid), parseInt(req.body.view_uid), maxp);
@@ -636,7 +636,7 @@ exports.viewSelfSchedule = function(req, res) {
 exports.viewUserNews = function(req, res) {
     var output;
     var maxp=req.body.max_pid;
-    if(maxp==0)
+    if(maxp=="default")
     	maxp = max_pid;
     console.log("max pid is ");
     console.log(maxp);
@@ -1059,7 +1059,7 @@ exports.viewEventManagers = function(req, res) {
 exports.viewEventPosts = function(req, res) {
     var output;
     var maxp=req.body.max_pid;
-    if(maxp==0)
+    if(maxp=="default")
     	maxp = max_pid;
     var pack = lib.createViewEventPack(2, req.body.session_key,
 	    parseInt(req.body.uid), helper.decToHex(req.body.eid), maxp);

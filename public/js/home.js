@@ -516,7 +516,7 @@ $(document).ready(function(){
   newsData.session_key = localStorage.session_key;
   newsData.uid = localStorage.uid;
 	newsData.option = 1;
-  newsData.max_pid = 0;
+  newsData.max_pid = "default";
   var date = new Date();
   var timeoffset = date.getTimezoneOffset();
 	$.ajax({

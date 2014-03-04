@@ -100,7 +100,7 @@ $(document).ready(function(){
   if(!checkEvent(localStorage.eid)){
     var newsData = view_auth_data;
     newsData.option = 0;
-    newsData.max_pid = 0;
+    newsData.max_pid = "default";
     $.ajax({
      url:"/geteventpost",
      data:JSON.stringify(newsData),
