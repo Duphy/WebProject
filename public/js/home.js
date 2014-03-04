@@ -664,12 +664,12 @@ $(document).ready(function(){
     var newsData = {};
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
-    newsData.option = 1;
+    newsData.option = 0;
     newsData.max_pid = 0;
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
     $.ajax({
-      url:"/geteventnews",
+      url:"/getusernews",
       data:JSON.stringify(newsData),
       type:"POST",
       contentType: 'application/json',
