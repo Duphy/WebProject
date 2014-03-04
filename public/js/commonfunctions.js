@@ -218,7 +218,7 @@ function renderPost(post){
       '</div>';
       if(post.uid == localStorage.uid){
         html = html + 
-          '<div class = "offset5 span1"><i class = "icon-trash pull-right removePost" data-toggle = "modal" href = "#removePostModal" style = "margin-right:25%;"></i></div>'+
+          '<div class = "offset1 span1"><i class = "icon-trash pull-right removePost" data-toggle = "modal" href = "#removePostModal" style = "margin-right:25%;"></i></div>'+
           '<div class = "span2 pull-right" style = "color:white;text-align: center;">'+
             '<div class = "tagsGroup">';
       }else{
