@@ -1,3 +1,18 @@
+.button{
+    -moz-border-radius: 5px;
+    webkit-border-radius: 0px;
+    border-radius: 0px;
+    background-image:none;
+    cursor:pointer;
+    font-family:'Lato', sans-serif;
+    font-weight: 300;
+    *padding:7px 2px 8px 2px; /* IE7 Fix */
+}
+
+.noRoundCorner{
+    border-radius:0px;
+}
+
 .navbar{
     font-weight: 200px;
     font-size: 25px;

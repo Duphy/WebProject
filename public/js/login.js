@@ -60,6 +60,7 @@ $(document).ready(function(){
 	$('.help-inline').hide();
 	$(".bootstrap-tagsinput").find("input").attr("placeholder","Add").attr("size",8);
   	$(".bootstrap-tagsinput").find("input").limit('14');
+  	$(".bootstrap-tagsinput").css("border-radius","0px");
 
 	$("#validationEmailLabel").find("a").click(function(){
 		var email = $("#validationEmail").val();
