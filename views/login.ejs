@@ -11,12 +11,12 @@
 				<!-- Signup Starts Here -->
 				<div id="signUpContainer" style="padding-right:20px;margin-right:10px;">
 					<button class="btn-large btn-warning" id="signUpButton"><span>Sign Up</span></button>
-					<div id="signUpBox" style="padding-right:20px;max-height:600px;overflow-y:scroll">
+					<div id="signUpBox" style="padding-right:20px;max-height:650px;overflow-y:scroll">
 						<form id="signUpForm">
-							<div id = "valicationbody" style="">
+							<div id = "valicationbody">
 								<fieldset>
 									<label for="validationEmail" id = "validationEmailLabel"><strong>Email</strong><font class = "btn-mini">(type in your email to verify)</font><a class = "btn-mini">verify</a></label>
-									<input type="email" name="email" id="validationEmail" />
+									<input type="email" name="email" id="validationEmail" style = "border-radius:0px;"/>
 								</fieldset>
 							</div>
 							<div id="squaresWaveG" style = "display:none;">
@@ -43,28 +43,28 @@
 								</fieldset>
 								<fieldset class = "validationCodeField">
 									<label for="validationCode" id = "validationCodeLabel"><strong>Validation Code: </strong></label>
-									<input type="text" name="validationCode" id="validationCode" style = "width:94%;"/>
+									<input type="text" name="validationCode" id="validationCode" style = "width:94%;border-radius:0px;"/>
 								</fieldset>
 								<div class = "row-fluid">
 									<div class = "span6">
 										<fieldset>
 											<label for="signUpName" id = "signUpRealNameLabel"><strong>Real Name<strong></label>
-											<input type="text" name="name" id="signUpRealName" />
+											<input type="text" name="name" id="signUpRealName" style = "border-radius:0px;"/>
 										</fieldset>
 										
 										<fieldset>
 											<label for="signUpPassword" id = "signUpPasswordLabel"><strong>Password</strong></label>
-											<input type="password" name="password" id="signUpPassword" />
+											<input type="password" name="password" id="signUpPassword" style = "border-radius:0px;"/>
 										</fieldset>
 									</div>
 									<div class = "span6">
 										<fieldset>
 											<label for="signUpName" id = "signUpNickNameLabel"><strong>Nick Name<strong></label>
-											<input type="text" name="name" id="signUpNickName" />
+											<input type="text" name="name" id="signUpNickName" style = "border-radius:0px;"/>
 										</fieldset>
 										<fieldset>
 											<label for="confirmsignUpPassword" id = "confirmsignUpPasswordLabel"><strong>Confirm Password<strong></label>
-											<input type="password" name="confirmPassword" id="confirmsignUpPassword" />
+											<input type="password" name="confirmPassword" id="confirmsignUpPassword" style = "border-radius:0px;"/>
 										</fieldset>
 									</div>
 								</div>
@@ -123,11 +123,11 @@
 							<div id="body">
 								<fieldset>
 									<label for="email" id = "loginEmailLabel"><strong>Email Address</strong></label>
-									<input type="text" name="email" id="loginEmail" />
+									<input type="text" name="email" id="loginEmail" style = "border-radius:0px;"/>
 								</fieldset>
 								<fieldset style = "margin-bottom:0px;">
 									<label for="password" id = "loginPasswordLabel"><strong>Password</strong></label>
-									<input type="password" name="password" id="loginPassword" />
+									<input type="password" name="password" id="loginPassword" style = "border-radius:0px;"/>
 									
 								</fieldset>
 								<div id="loginAlert" class="alert alert-error" style = "font-size:14px;width: 79%;margin-left: 2%;text-align:center;display:none;">
@@ -155,7 +155,7 @@
 												</div>
 											</div>
 										</div>
-									<button class="btn btn-success pull-right span2" id="login" style = "width:80px;height:34px;margin-right:10px;margin-top:0px;">GO<i class = " icon-circle-arrow-right" style = "margin-left:3px;margin-top:5px;"></i></button>
+									<button class="btn btn-success pull-right span2" id="login" style = "width:80px;height:34px;margin-right:5px;margin-top:0px;">GO<i class = " icon-circle-arrow-right" style = "margin-left:3px;margin-top:5px;"></i></button>
 									</div>
 								</fieldset>
 							</div>
@@ -228,7 +228,7 @@
 		Designed and built By Circa technical group. All rights reserved.
 	</footer>
 
-	<div id="agreementModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="agreementModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 		<legend style = "font-family:'Raleway', sans-serif; font-size:25px;margin:10px;width:95%;">Agreement</legend>
 	  <div class="modal-body" style = "font-weight:normal;">
 		To use or access Circa products (www.circatag.com, Circa PC client, or Circa Android, Circa iOS), you agree to all statements in this document.<br>
@@ -238,9 +238,11 @@
 		<strong>4.</strong>	We promise not to intentionally disclose your password. But you are responsible for your own account security. <br>
 		<strong>5.</strong>	Circa does not check copyrights, security, sensitivity, etc. of data provided by users. Thus you are responsible and liable for these issues raised from data you provided.<br>
 		<strong>6.</strong>	This statement is subject to change. Amendments will be available on www.circatag.com. By continuing using or accessing Circa products, you agree to all amendments.<br>
+		<br>
+		Last Revision on 8 Feb, 2014
 	  </div>
 	  <div class="modal-footer">
-	  	<button id = "agreementBack" class="btn btn-success" data-dismiss="modal" aria-hidden="true">Agree and Go back</button>
+	  	<button id = "agreementBack" class="btn btn-success button" data-dismiss="modal" aria-hidden="true">Agree and Go back</button>
 	  </div>
 	</div>
 </body>

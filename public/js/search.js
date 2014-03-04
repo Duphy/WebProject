@@ -23,11 +23,17 @@ $(document).ready(function(){
     $.ajax({
       url:'/getselfsmallavarta',
       data:JSON.stringify(auth_data),
+      timeout:10000,
       type:"POST",
       contentType:"application/json",
       success:function(data){
         localStorage.self_small_avarta = data.avarta;
         $(".selfProfileSmallAvarta").attr("src",data.avarta);
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
       }
     });
   }
@@ -161,6 +167,7 @@ $(document).on('click', ".posttag", function() {
                $.ajax({
                       url:"/searchpost",
                       data:JSON.stringify(searchData),
+                      timeout:10000,
                       type:"POST",
                       contentType: 'application/json',
                       success:function(data){
@@ -168,6 +175,11 @@ $(document).on('click', ".posttag", function() {
                       console.log(data);
                       $(window).unbind('scroll');
                       viewpost(data.pidsets);
+                      },
+                      error:function(jqXHR, textStatus, errorThrown){
+                        if(textStatus == "timeout"){
+                          $("#timeoutModal").modal("show");
+                        }
                       }
                       });
              return false;
@@ -215,6 +227,7 @@ $(document).on('click', ".addfriend", function() {
               $.ajax({
                 url:"/friendrequest",
                 data:JSON.stringify(requestData),
+                timeout:10000,
                 type:"POST",
                 contentType: 'application/json',
                 success:function(data){
@@ -222,6 +235,11 @@ $(document).on('click', ".addfriend", function() {
                   console.log(data);
                   if(data.status == "successful"){
                     $(addButton).html("request sended");
+                  }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
                   }
                 }
               });
@@ -241,6 +259,7 @@ $(document).on('click', ".joinevent", function() {
               $.ajax({
                 url:"/joinevent",
                 data:JSON.stringify(requestData),
+                timeout:10000,
                 type:"POST",
                 contentType: 'application/json',
                 success:function(data){
@@ -248,6 +267,11 @@ $(document).on('click', ".joinevent", function() {
                   console.log(data);
                   if(data.status == "successful"){
                     $(joinButton).html("request sended");
+                  }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
                   }
                 }
               });
@@ -270,6 +294,7 @@ $(document).on('click', ".joinevent", function() {
     $.ajax({
       url:"/logout",
       data:JSON.stringify(auth_data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -279,6 +304,11 @@ $(document).on('click', ".joinevent", function() {
           window.location = "/";
         }else{
           alert("fail to logout!");
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -375,6 +405,7 @@ $(document).on('click', ".joinevent", function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -383,6 +414,11 @@ $(document).on('click', ".joinevent", function() {
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -401,6 +437,7 @@ $(document).on('click', ".joinevent", function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -410,6 +447,11 @@ $(document).on('click', ".joinevent", function() {
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -441,6 +483,7 @@ $(document).on('click', ".joinevent", function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -449,6 +492,11 @@ $(document).on('click', ".joinevent", function() {
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -467,6 +515,7 @@ $(document).on('click', ".joinevent", function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -475,6 +524,11 @@ $(document).on('click', ".joinevent", function() {
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -515,6 +569,7 @@ function search(val,type){
         $.ajax({
           url:"/searchuserbyemail",
           data:JSON.stringify(searchData),
+          timeout:10000,
           type:"POST",
           contentType: 'application/json',
           success:function(data){
@@ -528,6 +583,7 @@ function search(val,type){
               $.ajax({
                 url:"/getuserinfo",
                 data:JSON.stringify(friendsData),
+                timeout:10000,
                 type:"POST",
                 contentType:'application/json',
                 success:function(result){
@@ -552,6 +608,11 @@ function search(val,type){
                   }else{
                     $("#circularG").hide();
                   }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
+                  }
                 }
               });
             }else{
@@ -559,6 +620,11 @@ function search(val,type){
               $("#search_result").html("");
               $("#search_result").css("text-align","center");
               $("#search_result").append("<strong>No Matched result found.</strong>");
+            }
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeoutModal").modal("show");
             }
           }
         });
@@ -569,6 +635,7 @@ function search(val,type){
         $.ajax({
           url:"/searchuserbyid",
           data:JSON.stringify(searchData),
+          timeout:10000,
           type:"POST",
           contentType: 'application/json',
           success:function(data){
@@ -581,6 +648,7 @@ function search(val,type){
               $.ajax({
                 url:"/getuserinfo",
                 data:JSON.stringify(friendsData),
+                timeout:10000,
                 type:"POST",
                 contentType:'application/json',
                 success:function(result){
@@ -603,6 +671,11 @@ function search(val,type){
                     adjustTags();
                     $("#circularG").hide();
                   }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
+                  }
                 }
               });
             }else{
@@ -611,6 +684,11 @@ function search(val,type){
               $("#search_result").css("text-align","center");
               $("#search_result").append("<strong>No Matched result found.</strong>");
             }               
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeoutModal").modal("show");
+            }
           }
         });
       }
@@ -637,6 +715,7 @@ function search(val,type){
       $.ajax({
         url:"/searcheventbyid",
         data:JSON.stringify(searchData),
+        timeout:10000,
         type:"POST",
         contentType: 'application/json',
         success:function(data){
@@ -649,6 +728,7 @@ function search(val,type){
             $.ajax({
               url:"/geteventinfo",
               data:JSON.stringify(eventData),
+              timeout:10000,
               type:"POST",
               contentType:'application/json',
               success:function(result){
@@ -671,6 +751,11 @@ function search(val,type){
                   adjustTags();
                   $("#circularG").hide();
                 }
+              },
+              error:function(jqXHR, textStatus, errorThrown){
+                if(textStatus == "timeout"){
+                  $("#timeoutModal").modal("show");
+                }
               }
             });
           }else{
@@ -678,6 +763,11 @@ function search(val,type){
             $("#search_result").html("");
             $("#search_result").css("text-align","center");
             $("#search_result").append("<strong>No Matched result found.</strong>");
+          }
+        },
+        error:function(jqXHR, textStatus, errorThrown){
+          if(textStatus == "timeout"){
+            $("#timeoutModal").modal("show");
           }
         }
       });
@@ -702,6 +792,7 @@ function search(val,type){
     $.ajax({
       url:"/searchpost",
       data:JSON.stringify(searchData),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -715,6 +806,11 @@ function search(val,type){
           $("#search_result").html("");
           $("#search_result").css("text-align","center");
           $("#search_result").append("<strong>No Matched result found.</strong>");
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });

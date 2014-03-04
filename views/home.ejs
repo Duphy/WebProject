@@ -10,7 +10,7 @@
 	<% include component/navigator %>
 
 	<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="cbp-spmenu-s1">
-		<div id = "settingsList">
+		<div id = "settingsList" style = "overflow:hidden;">
 			<a id = "settingUserNews"><i class = "icon-file"></i>&nbsp;&nbsp;User News</a>
 			<a id = "settingEventNews"><i class = "icon-list-alt"></i>&nbsp;&nbsp;Circa News</a>
 			<a href="#profileModal" id = "settingProfile" data-toggle="modal"><i class="icon-book"></i>&nbsp;&nbsp;Profile</a>
@@ -103,7 +103,7 @@
 
 	<div id = "chatArea"></div>
 	<!-- Modal -->
-	<div id="postModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="postModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 	  	<form class="">
 	  	<div class="control-group">
@@ -196,7 +196,7 @@
 	  </div>
 	</div>
 
-	<div id="profileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "width:60%;left:0px;margin-left:20%;">
+	<div id="profileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "width:60%;left:0px;margin-left:20%;border-radius:0px;">
 	  <div class="modal-body row-fluid" style = "font-size:15px;padding:0px;">
 		<div class = "span3 profileBody" style = "background-image:url(/img/semi_transparent.png);height:300px;">
 			<button id = "editAvarta" class = "btn btn-primary btn-mini button" href="#uploadModal" data-toggle="modal" data-backdrop="static" data-keyboard="false">Change Avatar</button>
@@ -344,7 +344,7 @@
 	  </div>
 	</div>
 
-	<div id="createEventModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="createEventModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 	  	<form>
 		  <legend style = "font-family: 'Raleway', sans-serif;font-size:30px;">New Group</legend>
@@ -396,7 +396,7 @@
 	  </div>
 	</div>
 
-	<div id="removePostModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="removePostModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 		Are you sure your want to remove this post?
 	  </div>
@@ -431,7 +431,7 @@
 	  </div>
 	</div>	
 
-	<div id="removeReplyModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="removeReplyModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 		Are you sure your want to remove this reply?
 	  </div>
@@ -466,7 +466,7 @@
 	  </div>
 	</div>
 
-	<div id="uploadModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="uploadModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 	  	<legend style = "font-family:'Raleway', sans-serif; font-size:25px;margin:10px;width:95%;">Upload Avatar</legend>
 		<div class = "well" style = "width:92%;">

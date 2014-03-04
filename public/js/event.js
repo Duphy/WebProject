@@ -44,33 +44,39 @@ $(document).ready(function(){
   $.ajax({
    url:'/geteventinfo',
    data:JSON.stringify(view_auth_data),
+   timeout:10000,
    type:"POST",
    contentType:"application/json",
    success:function(data){
-   localStorage.ename = data.name;
-   localStorage.ecreator = data.creator;
-   localStorage.edescription = data.description;
-   localStorage.erating = data.rating;
-   localStorage.etags = sortTags(data.tags);
-   var tagsList = sortTags(data.tags);
-   localStorage.ecity = data.city;
-   console.log(tagsList);
-   for(var index = 0; index <  Math.min(4,tagsList.length); index++){
-   $($("#subNavBar").find("li")[index+1]).html('<a class = "eventtag" href="#" tag = '+tagsList[index]+'>'+tagsList[index]+'</a>');
-   }
-   $("#name").html(localStorage.ename);
-   $("#creator").html(localStorage.ecreator);
-   $("#description").html(localStorage.edescription);
-   if(tagsList == ""){
-   $('#tags').append("<font>None</font>");
-   }else{
-      $.each(localStorage.etags.split(','),function(index,element){
-        $('#tags').append("<span class='label label-info' style = 'margin-left:5px;'>"+element+"</span>");
-      });
-   }
-   $("#rating").html(localStorage.erating);
-   $("#city").html(localStorage.ecity);
-   }
+     localStorage.ename = data.name;
+     localStorage.ecreator = data.creator;
+     localStorage.edescription = data.description;
+     localStorage.erating = data.rating;
+     localStorage.etags = sortTags(data.tags);
+     var tagsList = sortTags(data.tags);
+     localStorage.ecity = data.city;
+     console.log(tagsList);
+     for(var index = 0; index <  Math.min(4,tagsList.length); index++){
+     $($("#subNavBar").find("li")[index+1]).html('<a class = "eventtag" href="#" tag = '+tagsList[index]+'>'+tagsList[index]+'</a>');
+     }
+     $("#name").html(localStorage.ename);
+     $("#creator").html(localStorage.ecreator);
+     $("#description").html(localStorage.edescription);
+     if(tagsList == ""){
+     $('#tags').append("<font>None</font>");
+     }else{
+        $.each(localStorage.etags.split(','),function(index,element){
+          $('#tags').append("<span class='label label-info' style = 'margin-left:5px;'>"+element+"</span>");
+        });
+     }
+     $("#rating").html(localStorage.erating);
+     $("#city").html(localStorage.ecity);
+   },
+   error:function(jqXHR, textStatus, errorThrown){
+    if(textStatus == "timeout"){
+      $("#timeoutModal").modal("show");
+    }
+  }
   });
 
   $("#left").html('<a href="#">Settings<i class = "icon-chevron-right" style = "margin-top:2%;"></i></a>');
@@ -86,6 +92,7 @@ $(document).ready(function(){
   $.ajax({
     url:"/geteventavarta",
     data:JSON.stringify(eventAvartaData),
+    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -93,6 +100,11 @@ $(document).ready(function(){
       localStorage.event_small_avarta = data.avarta;
       $("#navi_avarta").attr("src",data.avarta);
       $("#profileAvarta").attr("src",data.avarta);
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
+      }
     }
   });
 
@@ -100,10 +112,11 @@ $(document).ready(function(){
   if(!checkEvent(localStorage.eid)){
     var newsData = view_auth_data;
     newsData.option = 0;
-    newsData.max_pid = 0;
+    newsData.max_pid = "default";
     $.ajax({
      url:"/geteventpost",
      data:JSON.stringify(newsData),
+     timeout:10000,
      type:"POST",
      contentType: 'application/json',
      success:function(data){
@@ -115,12 +128,18 @@ $(document).ready(function(){
        }else{
         viewpost(data.pidsets,2,newsData);
        }
-     }
+     },
+     error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
+      }
     });
 
     $.ajax({
       url:"/geteventmanagers",
       data:JSON.stringify(view_auth_data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -139,12 +158,18 @@ $(document).ready(function(){
         else{
           $("#eventManage").show();
         }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
       }
     });
     //get event members
     $.ajax({
       url:"/geteventmembers",
       data:JSON.stringify(view_auth_data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -165,6 +190,11 @@ $(document).ready(function(){
         }else{
           //$("#eventManage").hide();
           $("#eventManage").after('<a href="#quitModal" data-toggle="modal" ><i class="icon-remove"></i>&nbsp;&nbsp;Quit Event</a>');
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -275,21 +305,27 @@ $(document).ready(function(){
         $.ajax({
             url:'/updateevent',
             data:JSON.stringify(data),
+            timeout:10000,
             type:'POST',
             contentType: 'application/json',
             success:function(data){
-                if(data.status == "successful"){
-                    //TO DO: handle the returned data
-                    //update changes to localStorage
-               localStorage.ename=realname;
-               localStorage.city=city;
-               localStorage.etags="";
-               localStorage.etags=etags;
-               $(".profileBody").show();
-               $(".updateBody").hide();
-               renderEventProfile();
-               $("#floatingBarsG-update").hide();
-                }
+              if(data.status == "successful"){
+                  //TO DO: handle the returned data
+                  //update changes to localStorage
+                localStorage.ename=realname;
+                localStorage.city=city;
+                localStorage.etags="";
+                localStorage.etags=etags;
+                $(".profileBody").show();
+                $(".updateBody").hide();
+                renderEventProfile();
+                $("#floatingBarsG-update").hide();
+              }
+            },
+            error:function(jqXHR, textStatus, errorThrown){
+              if(textStatus == "timeout"){
+                $("#timeoutModal").modal("show");
+              }
             }
         });
     }
@@ -338,6 +374,7 @@ $("body").delegate("#settingJoinEvent",'click',function(){
   $.ajax({
     url:"/joinevent",
     data:JSON.stringify(data),
+    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(result){
@@ -345,6 +382,11 @@ $("body").delegate("#settingJoinEvent",'click',function(){
         $("#settingJoinEvent").html("request pending");
       }else{
         $("#settingJoinEvent").html("request failed");
+      }
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -422,6 +464,7 @@ $("body").delegate(".memberItem", 'click', function() {
       $.ajax({
              url:"/geteventmembers",
              data:JSON.stringify(view_auth_data),
+             timeout:10000,
              type:"POST",
              contentType: 'application/json',
              success:function(data){
@@ -438,7 +481,12 @@ $("body").delegate(".memberItem", 'click', function() {
               }else{
                 userlist(membersData,"event");
               }
-             }
+             },
+             error:function(jqXHR, textStatus, errorThrown){
+                if(textStatus == "timeout"){
+                  $("#timeoutModal").modal("show");
+                }
+              }
         });//ajax
     }
   });
@@ -482,6 +530,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/deletepost",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -495,6 +544,11 @@ $("body").delegate(".memberItem", 'click', function() {
         $("#removePostConfirm").removeAttr("disabled");
         $("#floatingBarsG-removePost").hide();
         $("#removePostCancel").trigger("click");
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
       }
     });
   });
@@ -521,6 +575,7 @@ $("body").delegate(".memberItem", 'click', function() {
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
+            timeout:10000,
             type:"POST",
             contentType: 'application/json',
             success:function(data){
@@ -540,6 +595,11 @@ $("body").delegate(".memberItem", 'click', function() {
               $("#removeReplyConfirm").removeAttr("disabled");
               $("#floatingBarsG-removeReply").hide();
               $("#removeReplyCancel").trigger("click");
+            },
+            error:function(jqXHR, textStatus, errorThrown){
+              if(textStatus == "timeout"){
+                $("#timeoutModal").modal("show");
+              }
             }
       });
     return false;
@@ -578,6 +638,7 @@ $("body").delegate(".memberItem", 'click', function() {
                      $.ajax({
                             url:"/createreply",
                             data:JSON.stringify(data),
+                            timeout:10000,
                             type:"POST",
                             contentType: 'application/json',
                             success:function(result){
@@ -623,6 +684,11 @@ $("body").delegate(".memberItem", 'click', function() {
                             context.find('.accordion-toggle').first().html((replyNumber+1)+" replies");
                             context.find('textarea').val("");
                             }
+                            },
+                            error:function(jqXHR, textStatus, errorThrown){
+                              if(textStatus == "timeout"){
+                                $("#timeoutModal").modal("show");
+                              }
                             }
                             });
                      
@@ -682,12 +748,18 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/quitevent",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
         if(result.status = "sccessful"){
           $("#floatingBarsG-quit").show();
           window.location = "/home";
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -777,6 +849,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -785,6 +858,11 @@ $("body").delegate(".memberItem", 'click', function() {
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -803,6 +881,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -812,6 +891,11 @@ $("body").delegate(".memberItem", 'click', function() {
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -843,6 +927,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -869,6 +954,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -877,6 +963,11 @@ $("body").delegate(".memberItem", 'click', function() {
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });

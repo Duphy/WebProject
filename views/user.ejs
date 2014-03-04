@@ -10,7 +10,7 @@
 	<% include component/navigator %> 
 
 	<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="cbp-spmenu-s1">
-		<div id = "settingsList">
+		<div id = "settingsList" style = "overflow:hidden;">
 			<a href="#profileModal" id = "settingProfile" data-toggle="modal"><i class="icon-book"></i>&nbsp;&nbsp;Profile</a>
 			<!-- <a href="#" id = "navilogout"><i class="icon-off"></i>&nbsp;&nbsp;Logout</a> -->
         </div>
@@ -121,7 +121,7 @@
 	<div id = "chatArea"></div>
 
 <!-- Modal -->
-	<div id="profileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "width:60%;left:0px;margin-left:20%;">
+	<div id="profileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "width:60%;left:0px;margin-left:20%;border-radius:0px;">
 	  <div class="modal-body row-fluid" style = "font-size:15px;padding:0px;">
 		<div class = "span3" style = "background-image:url(/img/semi_transparent.png);height:300px;">
 			<img id = "profileAvarta" class = "img-circle" src = "/img/circa.png" style = "height:100px;width:100px;margin-left:20%;margin-top:15%;padding:8px;border:solid;border-color: #dddddd #aaaaaa #aaaaaa #dddddd;border-width: 1px 2px 2px 1px;background-color:white;">
@@ -184,7 +184,7 @@
 	  </div>
 	</div>
 
-	<div id="defriendModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="defriendModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 		Are you sure your want to remove this friend?
 	  </div>
@@ -219,7 +219,7 @@
 	  </div>
 	</div>
 
-	<div id="removeReplyModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="removeReplyModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 		Are you sure your want to remove this reply?
 	  </div>
@@ -254,7 +254,7 @@
 	  </div>
 	</div>
 
-	<div id="timeoutModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="timeoutModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body" style = "text-align:center;">
 		Login Timeout. Please re-login.
 	  </div>

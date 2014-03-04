@@ -349,6 +349,7 @@ function createPost(data){
   $.ajax({
     url:"/createpost",
     data:JSON.stringify(data),
+    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(result){
@@ -377,6 +378,7 @@ function createPost(data){
           $.ajax({
             url:'/getpicture',
             data:JSON.stringify(pictureData),
+            timeout:10000,
             type:"POST",
             contentType:"application/json",
             success:function(data){
@@ -397,6 +399,11 @@ function createPost(data){
           });
         }
       }
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
+      }
     }
   });
 }
@@ -409,12 +416,18 @@ function member(member,type){
   $.ajax({
     url:'/getusersmallavarta',
     data:JSON.stringify(userAvartaData),
+    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
       console.log(data.avarta);
       $("#memberAvarta"+member.uid).attr("src",data.avarta);
       //$("div.chat-window[chatId='"+element.uid+"']").attr("url",data.avarta);
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
+      }
     }
   });
   var html = 
@@ -457,6 +470,7 @@ function userlist(usersData,type){
     $.ajax({
            url:"/getusersinfo",
            data:JSON.stringify(usersData),
+           timeout:10000,
            type:"POST",
            contentType:'application/json',
            success:function(result){
@@ -482,6 +496,7 @@ function userlist(usersData,type){
                     $.ajax({
                       url:'/getuseravarta',
                       data:JSON.stringify(userAvartaData),
+                      timeout:10000,
                       type:"POST",
                       contentType:"application/json",
                       success:function(data){
@@ -506,6 +521,7 @@ function userlist(usersData,type){
                         $.ajax({
                           url:'/getuseravarta',
                           data:JSON.stringify(userAvartaData),
+                          timeout:10000,
                           type:"POST",
                           contentType:"application/json",
                           success:function(data){
@@ -515,6 +531,11 @@ function userlist(usersData,type){
                   });
                 }
              }
+           },
+           error:function(jqXHR, textStatus, errorThrown){
+              if(textStatus == "timeout"){
+                $("#timeoutModal").modal("show");
+              }
            }
     });//get usersinfo
 }
@@ -536,6 +557,7 @@ function eventlist(eventData){
   $.ajax({
     url:"/geteventsinfo",
     data:JSON.stringify(eventData),
+    timeout:10000,
     type:"POST",
     contentType:'application/json',
     success:function(result){
@@ -555,17 +577,28 @@ function eventlist(eventData){
               $.ajax({
                 url:'/geteventavarta',
                 data:JSON.stringify(eventAvartaData),
+                timeout:10000,
                 type:"POST",
                 contentType:"application/json",
                 success:function(data){
                   console.log("event avarta data:");
                   console.log(data);
                   $("#eventAvarta"+element.eid).attr("src",data.avarta);
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
+                  }
                 }
               });
             });
         }
-     }
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
+      }
+    }
   });
 }
 
@@ -854,6 +887,7 @@ function viewpost(pids,char,newsData){
         $.ajax({
            url:"/getpostscontent",
            data:JSON.stringify(postData),
+           timeout:10000,
            type:"POST",
            contentType: 'application/json',
            success:function(result){
@@ -888,6 +922,7 @@ function viewpost(pids,char,newsData){
                       $.ajax({
                         url:'/getpicture',
                         data:JSON.stringify(pictureData),
+                        timeout:10000,
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
@@ -897,32 +932,49 @@ function viewpost(pids,char,newsData){
                           }else{
                             console.log("failed to get the picture of this post");
                           }
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeoutModal").modal("show");
+                          }
                         }
                       });
                     }
                     //retrieve the avatar of the poster
                     $.ajax({
-                           url:'/getuseravarta',
-                           data:JSON.stringify(postAvartaData),
-                           type:"POST",
-                           contentType:"application/json",
-                           success:function(data){
-                             //TO DO: render the user's avarta into home page
-                             $("#post_user_avarta"+element.pid).attr("src",data.avarta);
-                           }
+                        url:'/getuseravarta',
+                        data:JSON.stringify(postAvartaData),
+                        timeout:10000,
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                          //TO DO: render the user's avarta into home page
+                          $("#post_user_avarta"+element.pid).attr("src",data.avarta);
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeoutModal").modal("show");
+                          }
+                        }
                     });
                     $.each(element.replies,function(replyIndex,reply){
                       replyAvartaData.view_uid = reply.replier_uid;
                       replyAvartaData.time = 0000//getCurrentTime();
                       replyAvartaData.date = 00000000//getCurrentDate();
                       $.ajax({
-                             url:'/getuseravarta',
-                             data:JSON.stringify(replyAvartaData),
-                             type:"POST",
-                             contentType:"application/json",
-                             success:function(data){
-                               $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
-                             }
+                          url:'/getuseravarta',
+                          data:JSON.stringify(replyAvartaData),
+                          timeout:10000,
+                          type:"POST",
+                          contentType:"application/json",
+                          success:function(data){
+                            $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
+                          },
+                          error:function(jqXHR, textStatus, errorThrown){
+                            if(textStatus == "timeout"){
+                              $("#timeoutModal").modal("show");
+                            }
+                          }
                       });
                     });
               });
@@ -937,7 +989,12 @@ function viewpost(pids,char,newsData){
                 }
               });
             }
-           }
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeoutModal").modal("show");
+            }
+          }
         });
     }else{
       $("#contentBody").find(".well").show();
@@ -950,6 +1007,7 @@ function searchUser(searchData,loadOrder){
   $.ajax({
     url:"/searchuserbyfilter",
     data:JSON.stringify(searchData),
+    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -974,6 +1032,7 @@ function searchUser(searchData,loadOrder){
         $.ajax({
           url:"/getusersinfo",
           data:JSON.stringify(friendsData),
+          timeout:10000,
           type:"POST",
           contentType:'application/json',
           success:function(result){
@@ -999,10 +1058,16 @@ function searchUser(searchData,loadOrder){
                 $.ajax({
                   url:'/getuseravarta',
                   data:JSON.stringify(userAvartaData),
+                  timeout:10000,
                   type:"POST",
                   contentType:"application/json",
                   success:function(data){
                     $(".user_small_avarta"+element.uid).attr("src",data.avarta);
+                  },
+                  error:function(jqXHR, textStatus, errorThrown){
+                    if(textStatus == "timeout"){
+                      $("#timeoutModal").modal("show");
+                    }
                   }
                 });
                 $(".tagsGroup a").hide();
@@ -1021,6 +1086,11 @@ function searchUser(searchData,loadOrder){
               $("#loadMoreButton").show();
               $("#circularG").hide();
             }
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeoutModal").modal("show");
+            }
           }
         });//get usersinfo
       }else{
@@ -1030,7 +1100,12 @@ function searchUser(searchData,loadOrder){
         $("#search_result").css("text-align","center");
         $("#search_result").append("<strong>No Matched result found.</strong>");
       }   
-    }//success
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
+      }
+    }
   });//ajax
 }
 
@@ -1038,6 +1113,7 @@ function searchEvents(searchData,loadOrder){
   $.ajax({
     url:"/searcheventbyfilter",
     data:JSON.stringify(searchData),
+    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -1059,6 +1135,7 @@ function searchEvents(searchData,loadOrder){
         $.ajax({
           url:"/geteventsinfo",
           data:JSON.stringify(eventsData),
+          timeout:10000,
           type:"POST",
           contentType:'application/json',
           success:function(result){
@@ -1091,6 +1168,11 @@ function searchEvents(searchData,loadOrder){
               $("#loadMoreButton").show();
               $("#circularG").hide();
             }
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeoutModal").modal("show");
+            }
           }
         });//get eventsinfo  
       }else{
@@ -1099,6 +1181,11 @@ function searchEvents(searchData,loadOrder){
         $("#search_result").html("");
         $("#search_result").css("text-align","center");
         $("#search_result").append("<strong>No Matched result found.</strong>");
+      }
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -1272,17 +1359,24 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
   $.ajax({
     url:'/getuserinfo',
     data:JSON.stringify(userData),
+    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
       if(data.status == "successful"){
         $("#chat"+friendUid).find(".chatName").html(data.nickname);
       }
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
+      }
     }
   });
   $.ajax({
     url:'/getuseravarta', 
     data:JSON.stringify(userData),
+    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -1291,6 +1385,11 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
         console.log(data);
         $("#chat"+friendUid).attr("url",data.avarta);
         $(".chatAvarta"+friendUid).attr("src",data.avarta);
+      }
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -1306,11 +1405,17 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
   $.ajax({
     url:'/geteventinfo',
     data:JSON.stringify(eventData),
+    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
       if(data.status == "successful"){
         $("#chat"+eventEid).find(".chatName").html(data.name);
+      }
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -1352,6 +1457,7 @@ function getMorePosts(char,newsData){
       $.ajax({
         url:posturl,
         data:JSON.stringify(newsData),
+        timeout:10000,
         type:"POST",
         contentType: 'application/json',
         success:function(data){
@@ -1369,6 +1475,11 @@ function getMorePosts(char,newsData){
               pidsets.push(data.pidsets[j]);
           }
           console.log(pidsets);
+        },
+        error:function(jqXHR, textStatus, errorThrown){
+          if(textStatus == "timeout"){
+            $("#timeoutModal").modal("show");
+          }
         }
       });
     }
@@ -1376,10 +1487,11 @@ function getMorePosts(char,newsData){
     $.ajax({
          url:"/getpostscontent",
          data:JSON.stringify(postData),
+         timeout:10000,
          type:"POST",
          contentType: 'application/json',
-         success:function(result){
-         if(result.status == "successful"){
+          success:function(result){
+          if(result.status == "successful"){
           $.each(result.source,function(index,element){
               var postAvartaData = {};
               postAvartaData.session_key = localStorage.session_key;
@@ -1402,6 +1514,7 @@ function getMorePosts(char,newsData){
                 $.ajax({
                   url:'/getpicture',
                   data:JSON.stringify(pictureData),
+                  timeout:10000,
                   type:"POST",
                   contentType:"application/json",
                   success:function(data){
@@ -1412,16 +1525,27 @@ function getMorePosts(char,newsData){
                     }else{
                       console.log("failed to get the picture of this post");
                     }
+                  },
+                  error:function(jqXHR, textStatus, errorThrown){
+                    if(textStatus == "timeout"){
+                      $("#timeoutModal").modal("show");
+                    }
                   }
                 });
               }
               $.ajax({
                   url:'/getuseravarta',
                   data:JSON.stringify(postAvartaData),
+                  timeout:10000,
                   type:"POST",
                   contentType:"application/json",
                   success:function(data){
                       $("#post_user_avarta"+element.pid).attr("src",data.avarta);
+                  },
+                  error:function(jqXHR, textStatus, errorThrown){
+                    if(textStatus == "timeout"){
+                      $("#timeoutModal").modal("show");
+                    }
                   }
               });
               $.each(element.replies,function(replyIndex,reply){
@@ -1431,10 +1555,16 @@ function getMorePosts(char,newsData){
                   $.ajax({
                       url:'/getuseravarta',
                       data:JSON.stringify(replyAvartaData),
+                      timeout:10000,
                       type:"POST",
                       contentType:"application/json",
                       success:function(data){
                           $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
+                      },
+                      error:function(jqXHR, textStatus, errorThrown){
+                        if(textStatus == "timeout"){
+                          $("#timeoutModal").modal("show");
+                        }
                       }
                   });
               });
@@ -1445,8 +1575,13 @@ function getMorePosts(char,newsData){
           $("#loadMoreButton").show();
           $("#circularG").hide();
           loadingFlag = true;
-         }
-         }
+          }
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeoutModal").modal("show");
+            }
+          }
     });
   }
 }
@@ -1471,6 +1606,7 @@ function getMoreUsers(){
     $.ajax({
       url:"/getusersinfo",
       data:JSON.stringify(friendsData),
+      timeout:10000,
       type:"POST",
       contentType:'application/json',
       success:function(result){
@@ -1498,10 +1634,16 @@ function getMoreUsers(){
             $.ajax({
               url:'/getuseravarta',
               data:JSON.stringify(userAvartaData),
+              timeout:10000,
               type:"POST",
               contentType:"application/json",
               success:function(data){
                 $(".user_small_avarta"+element.uid).attr("src",data.avarta);
+              },
+              error:function(jqXHR, textStatus, errorThrown){
+                if(textStatus == "timeout"){
+                  $("#timeoutModal").modal("show");
+                }
               }
             });
             $(".tagsGroup a").hide();
@@ -1515,7 +1657,12 @@ function getMoreUsers(){
           $("#loadMoreButton").show();
           $("#circularG").hide();
         }
-      }//success
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
+      }
     });
   }else{
     $("#loadMoreButton").html("No More Users");
@@ -1539,6 +1686,7 @@ function getMoreEvents(){
     $.ajax({
       url:"/geteventsinfo",
       data:JSON.stringify(eventsData),
+      timeout:10000,
       type:"POST",
       contentType:'application/json',
       success:function(result){
@@ -1565,6 +1713,11 @@ function getMoreEvents(){
         }else{
           $("#loadMoreButton").show();
           $("#circularG").hide();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });

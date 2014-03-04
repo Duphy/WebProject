@@ -19,6 +19,7 @@ socket.on("friend request",function(name, uid, eid, pid, action, seq){
 	$.ajax({
 	    url:"/getuserinfo",
 	    data:JSON.stringify(userData),
+	    timeout:10000,
 	    type:"POST",
 	    contentType: 'application/json',
 	    success:function(data){
@@ -27,7 +28,12 @@ socket.on("friend request",function(name, uid, eid, pid, action, seq){
 	      		$(element).attr("name",data.nickname);
 	      		$(element).html(data.nickname);
 	      	});
-	    }  
+	    },
+	    error:function(jqXHR, textStatus, errorThrown){
+          if(textStatus == "timeout"){
+            $("#timeoutModal").modal("show");
+          }
+        }
 	});
 }); 
  
@@ -49,6 +55,7 @@ socket.on("event membership request",function(name,uid, pid, eventName,eid,actio
 	$.ajax({
 	    url:"/geteventinfo",
 	    data:JSON.stringify(eventData),
+	    timeout:10000,
 	    type:"POST",
 	    contentType: 'application/json',
 	    success:function(data){
@@ -58,7 +65,12 @@ socket.on("event membership request",function(name,uid, pid, eventName,eid,actio
 	      		$(element).attr("name",data.name);
 	      		$(element).html(data.name);
 	      	});
-	    }  
+	    },
+	    error:function(jqXHR, textStatus, errorThrown){
+          if(textStatus == "timeout"){
+            $("#timeoutModal").modal("show");
+          }
+        }
 	});
 	var userData = {};
 	userData.session_key = localStorage.session_key;
@@ -67,6 +79,7 @@ socket.on("event membership request",function(name,uid, pid, eventName,eid,actio
 	$.ajax({
 	    url:"/getuserinfo",
 	    data:JSON.stringify(userData),
+	    timeout:10000,
 	    type:"POST",
 	    contentType: 'application/json',
 	    success:function(data){
@@ -75,7 +88,12 @@ socket.on("event membership request",function(name,uid, pid, eventName,eid,actio
 	      		$(element).attr("name",data.nickname);
 	      		$(element).html(data.nickname);
 	      	});
-	    }  
+	    },
+	    error:function(jqXHR, textStatus, errorThrown){
+	      if(textStatus == "timeout"){
+	        $("#timeoutModal").modal("show");
+	      }
+	    } 
 	});
 });
 
@@ -167,12 +185,18 @@ socket.on("receive event chat",function(eid, s_uid, message, date, time){
 			        $.ajax({
 			          url:'/getusersmallavarta',
 			          data:JSON.stringify(data),
+			          timeout:10000,
 			          type:"POST",
 			          contentType:"application/json",
 			          success:function(result){
 			            localStorage.setItem("avarta"+s_uid,result.avarta);
 			            $(".chatAvarta"+s_uid).attr("src",result.avarta);
-			          }
+			          },
+			          error:function(jqXHR, textStatus, errorThrown){
+		                  if(textStatus == "timeout"){
+		                    $("#timeoutModal").modal("show");
+		                  }
+		                }
 			        });
 
 				}else{

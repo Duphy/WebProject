@@ -10,7 +10,7 @@
 	<% include component/navigator %>
 
 	<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="cbp-spmenu-s1">
-        <div id = "manageList">
+        <div id = "manageList" style = "overflow:hidden;">
 		<a href="#profileModal" id = "eventProfile" data-toggle="modal"><i class="icon-book"></i>&nbsp;&nbsp;Group Details</a>
         <a href = "#" id = "eventManage"><i class="icon-cog"></i>&nbsp;&nbsp;Manage</a>
 	</nav>   
@@ -82,7 +82,7 @@
 	<div id = "chatArea"></div>
 
 <!-- Modal -->
-	<div id="postModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="postModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 	  	<form class="">
 	  	<div class="control-group">
@@ -127,7 +127,7 @@
 	  </div>
 	</div>
 
-	<div id="profileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "width:50%;left:0px;margin-left:25%;">
+	<div id="profileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "width:50%;left:0px;margin-left:25%;border-radius:0px;">
 	  <div class="modal-body row-fluid" style = "font-size:15px;padding:0px;">
 		<div class = "span4 profileBody" style = "background-image:url(/img/semi_transparent.png);height:300px;">
 			<img id = "profileAvarta" class = "img-circle" src = "/img/circa.png" style = "height:100px;width:100px;margin-left:23%;margin-top:25%;padding:8px;border:solid;border-color: #dddddd #aaaaaa #aaaaaa #dddddd;border-width: 1px 2px 2px 1px;background-color:white;">
@@ -236,7 +236,7 @@
 	</div>
 	</div>
 
-	<div id="quitModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="quitModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 		Are you sure your want to quite this event?
 	  </div>
@@ -271,7 +271,7 @@
 	  </div>
 	</div>
 
-	<div id="removePostModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="removePostModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 		Are you sure your want to remove this post?
 	  </div>
@@ -306,7 +306,7 @@
 	  </div>
 	</div>
 
-	<div id="removeReplyModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="removeReplyModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 		Are you sure your want to remove this reply?
 	  </div>
@@ -341,7 +341,7 @@
 	  </div>
 	</div>
 
-	<div id="timeoutModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="timeoutModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body" style = "text-align:center;">
 		Login Timeout. Please re-login.
 	  </div>
