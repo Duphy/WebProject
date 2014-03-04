@@ -53,6 +53,11 @@ $(document).ready(function(){
         }else{
           $("#settingAddFriend").html("request failed");
         }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $('#timeoutModal').modal('show');
+        }
       }
     });
     return false;

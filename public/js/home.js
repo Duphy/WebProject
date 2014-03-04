@@ -194,7 +194,7 @@ $(document).ready(function(){
                 },
                 error:function(jqXHR, textStatus, errorThrown){
                   if(textStatus == "timeout"){
-                    $("#timeout").trigger("click");
+                    $('#timeoutModal').modal('show');
                   }
                 }
               });
@@ -237,7 +237,7 @@ $(document).ready(function(){
                 },
                 error:function(jqXHR, textStatus, errorThrown){
                   if(textStatus == "timeout"){
-                    $("#timeout").trigger("click");
+                    $("#timeoutModal").modal("show");
                   }
                 }
               });
@@ -386,7 +386,7 @@ $(document).ready(function(){
             },
             error:function(jqXHR, textStatus, errorThrown){
                   if(textStatus == "timeout"){
-                    $("#timeout").trigger("click");
+                    $("#timeoutModal").modal("show");
                   }
                 }
         });
@@ -521,7 +521,7 @@ $(document).ready(function(){
     },
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }
 	});
@@ -539,7 +539,7 @@ $(document).ready(function(){
     },
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -565,7 +565,7 @@ $(document).ready(function(){
 		},
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }
 	});
@@ -584,7 +584,7 @@ $(document).ready(function(){
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){
-          $("#timeout").trigger("click");
+          $("#timeoutModal").modal("show");
         }
       }
   });
@@ -603,7 +603,7 @@ $(document).ready(function(){
     },
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }  
   });
@@ -710,7 +710,7 @@ $(document).ready(function(){
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){
-          $("#timeout").trigger("click");
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -742,7 +742,7 @@ $(document).ready(function(){
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){
-          $("#timeout").trigger("click");
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -869,7 +869,7 @@ $(document).ready(function(){
           },
           error:function(jqXHR, textStatus, errorThrown){
             if(textStatus == "timeout"){
-              $("#timeout").trigger("click");
+              $("#timeoutModal").modal("show");
             }
           }
         });
@@ -909,7 +909,7 @@ $(document).ready(function(){
             },
             error:function(jqXHR, textStatus, errorThrown){
               if(textStatus == "timeout"){
-                $("#timeout").trigger("click");
+                $("#timeoutModal").modal("show");
               }
             }
         });
@@ -975,7 +975,7 @@ $(document).ready(function(){
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){
-          $("#timeout").trigger("click");
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -1026,7 +1026,7 @@ $(document).ready(function(){
             },
             error:function(jqXHR, textStatus, errorThrown){
               if(textStatus == "timeout"){
-                $("#timeout").trigger("click");
+                $("#timeoutModal").modal("show");
               }
             }
       });
@@ -1069,7 +1069,7 @@ $(document).ready(function(){
         },
         error:function(jqXHR, textStatus, errorThrown){
           if(textStatus == "timeout"){
-            $("#timeout").trigger("click");
+            $("#timeoutModal").modal("show");
           }
         }
     });
@@ -1183,7 +1183,7 @@ $(document).ready(function(){
               },
               error:function(jqXHR, textStatus, errorThrown){
                   if(textStatus == "timeout"){
-                    $("#timeout").trigger("click");
+                    $("#timeoutModal").modal("show");
                   }
                 }
               });                
@@ -1247,7 +1247,7 @@ $(document).ready(function(){
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){
-          $("#timeout").trigger("click");
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -1280,7 +1280,7 @@ $(document).ready(function(){
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){
-          $("#timeout").trigger("click");
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -1326,7 +1326,7 @@ $(document).ready(function(){
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){
-          $("#timeout").trigger("click");
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -1358,7 +1358,7 @@ $(document).ready(function(){
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){
-          $("#timeout").trigger("click");
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -1524,7 +1524,7 @@ $(document).ready(function(){
         },
         error:function(jqXHR, textStatus, errorThrown){
           if(textStatus == "timeout"){
-            $("#timeout").trigger("click");
+            $("#timeoutModal").modal("show");
           }
         }
     });

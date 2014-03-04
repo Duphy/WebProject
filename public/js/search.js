@@ -28,6 +28,11 @@ $(document).ready(function(){
       success:function(data){
         localStorage.self_small_avarta = data.avarta;
         $(".selfProfileSmallAvarta").attr("src",data.avarta);
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
       }
     });
   }
@@ -168,6 +173,11 @@ $(document).on('click', ".posttag", function() {
                       console.log(data);
                       $(window).unbind('scroll');
                       viewpost(data.pidsets);
+                      },
+                      error:function(jqXHR, textStatus, errorThrown){
+                        if(textStatus == "timeout"){
+                          $("#timeoutModal").modal("show");
+                        }
                       }
                       });
              return false;
@@ -223,6 +233,11 @@ $(document).on('click', ".addfriend", function() {
                   if(data.status == "successful"){
                     $(addButton).html("request sended");
                   }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
+                  }
                 }
               });
               return false;
@@ -248,6 +263,11 @@ $(document).on('click', ".joinevent", function() {
                   console.log(data);
                   if(data.status == "successful"){
                     $(joinButton).html("request sended");
+                  }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
                   }
                 }
               });
@@ -279,6 +299,11 @@ $(document).on('click', ".joinevent", function() {
           window.location = "/";
         }else{
           alert("fail to logout!");
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -384,6 +409,11 @@ $(document).on('click', ".joinevent", function() {
           };
           notification.remove();
         }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
       }
     });
     removeNotification();
@@ -410,6 +440,11 @@ $(document).on('click', ".joinevent", function() {
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -450,6 +485,11 @@ $(document).on('click', ".joinevent", function() {
           };
           notification.remove();
         }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
       }
     });
     removeNotification();
@@ -475,6 +515,11 @@ $(document).on('click', ".joinevent", function() {
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -552,6 +597,11 @@ function search(val,type){
                   }else{
                     $("#circularG").hide();
                   }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
+                  }
                 }
               });
             }else{
@@ -559,6 +609,11 @@ function search(val,type){
               $("#search_result").html("");
               $("#search_result").css("text-align","center");
               $("#search_result").append("<strong>No Matched result found.</strong>");
+            }
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeoutModal").modal("show");
             }
           }
         });
@@ -603,6 +658,11 @@ function search(val,type){
                     adjustTags();
                     $("#circularG").hide();
                   }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
+                  }
                 }
               });
             }else{
@@ -611,6 +671,11 @@ function search(val,type){
               $("#search_result").css("text-align","center");
               $("#search_result").append("<strong>No Matched result found.</strong>");
             }               
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeoutModal").modal("show");
+            }
           }
         });
       }
@@ -671,6 +736,11 @@ function search(val,type){
                   adjustTags();
                   $("#circularG").hide();
                 }
+              },
+              error:function(jqXHR, textStatus, errorThrown){
+                if(textStatus == "timeout"){
+                  $("#timeoutModal").modal("show");
+                }
               }
             });
           }else{
@@ -678,6 +748,11 @@ function search(val,type){
             $("#search_result").html("");
             $("#search_result").css("text-align","center");
             $("#search_result").append("<strong>No Matched result found.</strong>");
+          }
+        },
+        error:function(jqXHR, textStatus, errorThrown){
+          if(textStatus == "timeout"){
+            $("#timeoutModal").modal("show");
           }
         }
       });
@@ -715,6 +790,11 @@ function search(val,type){
           $("#search_result").html("");
           $("#search_result").css("text-align","center");
           $("#search_result").append("<strong>No Matched result found.</strong>");
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });

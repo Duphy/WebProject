@@ -402,7 +402,7 @@ function createPost(data){
     },
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -426,7 +426,7 @@ function member(member,type){
     },
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -534,7 +534,7 @@ function userlist(usersData,type){
            },
            error:function(jqXHR, textStatus, errorThrown){
               if(textStatus == "timeout"){
-                $("#timeout").trigger("click");
+                $("#timeoutModal").modal("show");
               }
            }
     });//get usersinfo
@@ -587,7 +587,7 @@ function eventlist(eventData){
                 },
                 error:function(jqXHR, textStatus, errorThrown){
                   if(textStatus == "timeout"){
-                    $("#timeout").trigger("click");
+                    $("#timeoutModal").modal("show");
                   }
                 }
               });
@@ -596,7 +596,7 @@ function eventlist(eventData){
     },
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -935,7 +935,7 @@ function viewpost(pids,char,newsData){
                         },
                         error:function(jqXHR, textStatus, errorThrown){
                           if(textStatus == "timeout"){
-                            $("#timeout").trigger("click");
+                            $("#timeoutModal").modal("show");
                           }
                         }
                       });
@@ -953,7 +953,7 @@ function viewpost(pids,char,newsData){
                         },
                         error:function(jqXHR, textStatus, errorThrown){
                           if(textStatus == "timeout"){
-                            $("#timeout").trigger("click");
+                            $("#timeoutModal").modal("show");
                           }
                         }
                     });
@@ -972,7 +972,7 @@ function viewpost(pids,char,newsData){
                           },
                           error:function(jqXHR, textStatus, errorThrown){
                             if(textStatus == "timeout"){
-                              $("#timeout").trigger("click");
+                              $("#timeoutModal").modal("show");
                             }
                           }
                       });
@@ -992,7 +992,7 @@ function viewpost(pids,char,newsData){
           },
           error:function(jqXHR, textStatus, errorThrown){
             if(textStatus == "timeout"){
-              $("#timeout").trigger("click");
+              $("#timeoutModal").modal("show");
             }
           }
         });
@@ -1066,7 +1066,7 @@ function searchUser(searchData,loadOrder){
                   },
                   error:function(jqXHR, textStatus, errorThrown){
                     if(textStatus == "timeout"){
-                      $("#timeout").trigger("click");
+                      $("#timeoutModal").modal("show");
                     }
                   }
                 });
@@ -1089,7 +1089,7 @@ function searchUser(searchData,loadOrder){
           },
           error:function(jqXHR, textStatus, errorThrown){
             if(textStatus == "timeout"){
-              $("#timeout").trigger("click");
+              $("#timeoutModal").modal("show");
             }
           }
         });//get usersinfo
@@ -1103,7 +1103,7 @@ function searchUser(searchData,loadOrder){
     },
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }
   });//ajax
@@ -1171,7 +1171,7 @@ function searchEvents(searchData,loadOrder){
           },
           error:function(jqXHR, textStatus, errorThrown){
             if(textStatus == "timeout"){
-              $("#timeout").trigger("click");
+              $("#timeoutModal").modal("show");
             }
           }
         });//get eventsinfo  
@@ -1185,7 +1185,7 @@ function searchEvents(searchData,loadOrder){
     },
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -1369,7 +1369,7 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
     },
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -1389,7 +1389,7 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
     },
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -1415,7 +1415,7 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
     },
     error:function(jqXHR, textStatus, errorThrown){
       if(textStatus == "timeout"){
-        $("#timeout").trigger("click");
+        $("#timeoutModal").modal("show");
       }
     }
   });
@@ -1478,7 +1478,7 @@ function getMorePosts(char,newsData){
         },
         error:function(jqXHR, textStatus, errorThrown){
           if(textStatus == "timeout"){
-            $("#timeout").trigger("click");
+            $("#timeoutModal").modal("show");
           }
         }
       });
@@ -1528,7 +1528,7 @@ function getMorePosts(char,newsData){
                   },
                   error:function(jqXHR, textStatus, errorThrown){
                     if(textStatus == "timeout"){
-                      $("#timeout").trigger("click");
+                      $("#timeoutModal").modal("show");
                     }
                   }
                 });
@@ -1544,7 +1544,7 @@ function getMorePosts(char,newsData){
                   },
                   error:function(jqXHR, textStatus, errorThrown){
                     if(textStatus == "timeout"){
-                      $("#timeout").trigger("click");
+                      $("#timeoutModal").modal("show");
                     }
                   }
               });
@@ -1563,7 +1563,7 @@ function getMorePosts(char,newsData){
                       },
                       error:function(jqXHR, textStatus, errorThrown){
                         if(textStatus == "timeout"){
-                          $("#timeout").trigger("click");
+                          $("#timeoutModal").modal("show");
                         }
                       }
                   });
@@ -1579,7 +1579,7 @@ function getMorePosts(char,newsData){
           },
           error:function(jqXHR, textStatus, errorThrown){
             if(textStatus == "timeout"){
-              $("#timeout").trigger("click");
+              $("#timeoutModal").modal("show");
             }
           }
     });
@@ -1642,7 +1642,7 @@ function getMoreUsers(){
               },
               error:function(jqXHR, textStatus, errorThrown){
                 if(textStatus == "timeout"){
-                  $("#timeout").trigger("click");
+                  $("#timeoutModal").modal("show");
                 }
               }
             });
@@ -1660,7 +1660,7 @@ function getMoreUsers(){
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){
-          $("#timeout").trigger("click");
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -1717,7 +1717,7 @@ function getMoreEvents(){
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){
-          $("#timeout").trigger("click");
+          $("#timeoutModal").modal("show");
         }
       }
     });
