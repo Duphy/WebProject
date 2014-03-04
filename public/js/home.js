@@ -33,7 +33,7 @@ $(document).ready(function(){
   renderSubNavBar();
 
   //update the user name in the navbar
-  $("#left a").prepend('<img class = "selfProfileSmallAvarta" src = "#" style = "width:22px;height:22px;border-radius:11px;">&nbsp;<strong id="userNameLink">user</strong>');
+  $("#left a").prepend('<div class = "span2"><img class = "selfProfileSmallAvarta" id = "navi_avarta" src = "#" style = "width:22px;height:22px;border-radius:11px;"></div><div class= "span4"><strong id="userNameLink" class = "pull-left" style = "text-overflow: ellipsis;overflow: hidden;white-space: nowrap;display: block;">user</strong></div>');
 	$("#userNameLink").text(localStorage.usernickname);
 
   //set self avarta data
@@ -718,21 +718,21 @@ $(document).ready(function(){
 		}
 	});
  
-	$("#left").click(function(){
-		$('#contentBody').toggleClass('cbp-spmenu-push-toright').removeClass('cbp-spmenu-push-toleft');
+  $("#left").click(function(){
+    $('#contentBody').toggleClass('cbp-spmenu-push-toright').removeClass('cbp-spmenu-push-toleft');
     $('#cbp-spmenu-s1').toggleClass('cbp-spmenu-open');
     $('#cbp-spmenu-s2').removeClass('cbp-spmenu-open');
     if($(this).attr("action") == "in"){
-      $(this).find(".icon-chevron-right").remove();
-      $(this).find("a").prepend("<i class = 'icon-chevron-left' style = 'margin-top:2%;'></i>");
+      $(this).find(".icon-chevron-right").parent().remove();
+      $(this).find("a").prepend("<div class = 'span1' style = 'margin-top:1.5%;'><i class = 'icon-chevron-left pull-right'></i></div>");
       $(this).attr("action","out");
     }else{
-      $(this).find(".icon-chevron-left").remove();
-      $(this).find("a").append("<i class = 'icon-chevron-right' style = 'margin-top:2%;'></i>");
+      $(this).find(".icon-chevron-left").parent().remove();
+      $(this).find("a").append("<div class = 'span1' style = 'margin-top:1.5%;'><i class = 'icon-chevron-right pull-left'></i></div>");
       $(this).attr("action","in");
     }
     return false;
-	});
+  });
 
   $("#friendsHead").click(function(){
     if($(this).find("i").hasClass("icon-chevron-right")){
