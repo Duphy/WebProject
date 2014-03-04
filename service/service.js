@@ -695,7 +695,7 @@ exports.viewSelfCircatags = function(req, res) {
     });
 }
 
-exports.viewPicture = function(req,res){
+exports.viewPicture = function(req, res){
 	var output;
 	var pack = lib.createViewPicturePack(req.body.session_key,
 		parseInt(req.body.uid),req.body.picid);
@@ -1260,7 +1260,7 @@ exports.viewPostsContent = function(req, res) {
 
     var counter = 0;
     pack = lib.createViewPostingPack(req.body.session_key,
-	    parseInt(req.body.uid), uidList[counter], eidList[counter], pidList[counter]);
+	    parseInt(req.body.uid), parseInt(uidList[counter]), eidList[counter], pidList[counter]);
     var f = function(data) {
 	var pkg = lib.resolvPack(data);
 	if (typeof pkg[1] == "undefined") {
@@ -1308,7 +1308,7 @@ exports.viewPostsContent = function(req, res) {
 	    });
 	else {
 	    pack = lib.createViewPostingPack(req.body.session_key,
-		    parseInt(req.body.uid), uidList[counter], eidList[counter], pidList[counter]);
+		    parseInt(req.body.uid), parseInt(uidList[counter]), eidList[counter], pidList[counter]);
 	   // console.log(pack);
 	    helper.connectAndSend(pack, f, function() {
 		res.send({

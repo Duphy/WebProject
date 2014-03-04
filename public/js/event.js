@@ -500,21 +500,24 @@ $("body").delegate(".memberItem", 'click', function() {
   });
 
   $('body').delegate('.removereply','click',function(){
-    $("#removeReplyConfirm").attr("postId",$(this).closest(".postRoot").attr("id"));
+    $("#removeReplyConfirm").attr("replyId",$(this).closest(".replyBody").attr("id")).attr("postId",$(this).closest(".postRoot").attr("id"));
   });
 
   $("#removeReplyConfirm").click(function(){
       $("#floatingBarsG-removeReply").show();
       $("#removeReplyConfirm").attr("disabled","disabled");
       var postId = $(this).attr("postId");
+      var replyId = $(this).attr("replyId");
       var context = $("#"+postId);
       var data = auth_data;
       data.id = context.attr('posterUid');
       data.eid = context.attr('postEid');
       data.pid = context.attr('postPid');
-      var reply = context.find('.replyBody');
+      var reply = $("#"+replyId);
       var repliesArea = context.find('.repliesArea');
-      data.rid = reply.attr("rid");
+      data.rid = $(reply).attr("rid");
+      console.log($(reply));
+      console.log("rid "+data.rid);
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
@@ -522,23 +525,21 @@ $("body").delegate(".memberItem", 'click', function() {
             contentType: 'application/json',
             success:function(data){
               console.log(data);
-              if(data.status=="successful"){
-                if(context.attr("repliesNumber") == 1){
-                  repliesArea.remove();
+              if(context.attr("repliesNumber") == 1){
+                repliesArea.remove();
+              }else{
+                reply.remove();
+                var repliesNumber = parseInt(context.attr("repliesNumber"));
+                context.attr("repliesNumber",(repliesNumber - 1));
+                if(repliesNumber == 2){
+                  repliesArea.find(".accordion-toggle").html('1 reply');
                 }else{
-                  reply.remove();
-                  var repliesNumber = parseInt(context.attr("repliesNumber"));
-                  context.attr("repliesNumber",(repliesNumber - 1));
-                  if(repliesNumber == 2){
-                    repliesArea.find(".accordion-toggle").html('1 reply');
-                  }else{
-                    repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
-                  }
+                  repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
                 }
               }
-              $("#removeConfirm").removeAttr("disabled");
+              $("#removeReplyConfirm").removeAttr("disabled");
               $("#floatingBarsG-removeReply").hide();
-              $("#removeCancel").trigger("click");
+              $("#removeReplyCancel").trigger("click");
             }
       });
     return false;

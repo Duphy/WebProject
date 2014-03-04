@@ -22,7 +22,7 @@
 	<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2">
 		<div id = "chatList">
 			<div><a id = "friendsHead"><i class = "icon-chevron-down icon-white"></i>friends <font>(0)</font></a></div>
-			<div id = "friendsList" style = "max-height:300px;overflow-x:hidden">
+			<div id = "friendsList" style = "overflow:hidden;">
 				<div id="squaresWaveG-friend">
 					<div class="squaresWaveG_1 squaresWaveG">
 					</div>
@@ -43,7 +43,7 @@
 				</div>
 			</div>
 			<div><a id = "eventsHead"><i class = "icon-chevron-down icon-white"></i>groups <font>(0)</font></a></a></div>
-			<div id = "eventsList" style = "max-height:300px;overflow-x:hidden">
+			<div id = "eventsList" style = "overflow:hidden;">
 				<div id="squaresWaveG-event">
 					<div class="squaresWaveG_1 squaresWaveG">
 					</div>
@@ -66,7 +66,7 @@
 		</div>
 	</nav>
 
-	<div id = "contentBody" class = "cbp-spmenu-push" style = "margin-top:100px;margin-left:100px;margin-right:100px;">
+	<div id = "contentBody" class = "cbp-spmenu-push" style = "margin-top:100px;margin-left:100px;margin-right:100px;overflow:hidden;">
 		<div class="container-fluid" style = "padding-left:0px;padding-right:0px;">
 			<div class = "well" style = "text-align:center;min-height:50px;display:none;">
 				No Post yet.
@@ -165,7 +165,7 @@
 		</div>
 		<textarea rows="3" id = "pictureDescArea" placeholder="Photo Description..." style = "width:97%;border-radius:0px;display:none;"></textarea>
 	    <div style = "border-radius:0px;margin-left:-5px;display:none;">
-  			<input type="text" id = "pictureTags" value="picture" data-role="tagsinput"/>
+  			<input type="text" id = "pictureTags" value="" data-role="tagsinput"/>
 	    </div>
 	  </div>
 	  <div class="modal-footer">
@@ -508,16 +508,15 @@
 				<img src = "/img/test.jpg" >
 			</div>-->
 		</div>
-		<div class = "span3 replyArea" style = "margin-left:1%;">
-
-			<div id="12345960000000000000104" class="row-fluid postRoot" repliesnumber="0" postpid="0000000000000104" posteruid="1234596" posteid="" postername="Sophie" style="background-color:#FFFFFF;margin-bottom:10px;">
+		<div class = "span3 interactionArea" style = "margin-left:1%;display:none;">
+			<div class="row-fluid postRoot" repliesnumber="0" postpid="" posteruid="" posteid="" postername="" style="background-color:#FFFFFF;margin-bottom:10px;">
 			  <div class="row-fluid" style="margin-top:10px;height:50px;">
 			    <div class="row-fluid" style="text-align: center;">
 			      <div class="span2">
-			        <img id="post_user_avarta0000000000000104" src="data/1234596/avarta/20140212_130029.jpg" style="width:40px;height:40px;border-radius:20px;">
+			        <img class = "modalAvarta" src="" style="width:40px;height:40px;border-radius:20px;">
 			      </div>
 			      <div class="span10" style="text-align:left;">
-			        <a href="#" class="userName" name="Sophie" uid="1234596" style="font-family: 'Lato', sans-serif;font-weight:300;">Sophie</a>
+			        <a href="#" class="userName" name="" uid="" style="font-family: 'Lato', sans-serif;font-weight:300;">Sophie</a>
 			        <p style="font-size:12px;color:#999;font-family: 'Lato', sans-serif;font-weight:300;">Feb  25, 2014 &nbsp;&nbsp;21:22</p>
 			      </div>
 			    </div>
@@ -529,15 +528,15 @@
 			  </div>
 			  <div class="row-fluid shareButtons" style="margin-top:10px;">
 			  </div>
-			  <hr>
+			  <hr style = "margin-bottom:0px;">
+			  <ul class = "row-fluid repliesArea" style = "width:100%;max-height:350px;margin-bottom:10px;overflow:scroll;margin-left:0px;">
+			  </ul>
 			  <div class="row-fluid" style="margin-bottom:10px;">
-			      <textarea class="input-block-level replyInput" replytouid="1234596" replytoname="Sophie" type="text" placeholder="Add Comments here..."></textarea>
+			      <textarea class="input-block-level replyInput" replytouid="" replytoname="" type="text" placeholder="Add Comments here..."></textarea>
 			      <button class="btn replyCancel pull-right  button" style="margin-left:10px;">Cancel</button>
 			      <button class="btn btn-success replySubmit pull-right button" disabled="">Post</button>
 			  </div>
 			</div>
-
-
 		</div>
 	  </div>
 	</div>

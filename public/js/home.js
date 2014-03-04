@@ -28,19 +28,12 @@ $(document).ready(function(){
   $(".bootstrap-tagsinput").css("border-radius","0px");
   $(".bootstrap-tagsinput").find("input").attr("placeholder","Add").attr("size",8);
   $(".bootstrap-tagsinput").find("input").limit('14');
-  $('body').delegate('#postArea','keyup',function(){
-    if($(this).val() == ""){
-      $("#postSubmit").attr('disabled','disabled');
-    }else{
-     $("#postSubmit").removeAttr('disabled');
-    }
-  });
-  
+
   //load tags
   renderSubNavBar();
 
   //update the user name in the navbar
-  $("#left a").prepend('<img class = "selfProfileSmallAvarta" src = "#" style = "width:22px;height:22px;border-radius:11px;">&nbsp;<strong id="userNameLink">user</strong>');
+  $("#left a").prepend('<div class = "span2"><img class = "selfProfileSmallAvarta" id = "navi_avarta" src = "#" style = "width:22px;height:22px;border-radius:11px;"></div><div class= "span4"><strong id="userNameLink" class = "pull-left" style = "text-overflow: ellipsis;overflow: hidden;white-space: nowrap;display: block;">user</strong></div>');
 	$("#userNameLink").text(localStorage.usernickname);
 
   //set self avarta data
@@ -92,7 +85,6 @@ $(document).ready(function(){
   $(".tagsGroup a").hide();
   $('.tagHead').show();
   adjustTags();
-
 
   $(window).resize(function(){
     $.each($(".tagHead"),function(index,element){
@@ -263,6 +255,7 @@ $(document).ready(function(){
     },
     done:function(e,data){  
         console.log("upload done.");    
+        $("#fileupload").removeAttr('disabled');
     }
   });
 
@@ -421,6 +414,7 @@ $(document).ready(function(){
               $('#pictureDescArea').show();
               $('#pictureTags').parent().show();
               $('#pictureSubmit').attr("picturename",data.files[0].name);
+              $('#previewImageArea').html("");
               $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '"/>');
             },1000);
           }
@@ -454,6 +448,7 @@ $(document).ready(function(){
     },
     done:function(e,data){  
         console.log("upload done.");    
+        $("#pictureFileupload").removeAttr("disabled");
     }
   });
 
@@ -669,12 +664,12 @@ $(document).ready(function(){
     var newsData = {};
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
-    newsData.option = 1;
+    newsData.option = 0;
     newsData.max_pid = 0;
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
     $.ajax({
-      url:"/geteventnews",
+      url:"/getusernews",
       data:JSON.stringify(newsData),
       type:"POST",
       contentType: 'application/json',
@@ -723,21 +718,21 @@ $(document).ready(function(){
 		}
 	});
  
-	$("#left").click(function(){
-		$('#contentBody').toggleClass('cbp-spmenu-push-toright').removeClass('cbp-spmenu-push-toleft');
+  $("#left").click(function(){
+    $('#contentBody').toggleClass('cbp-spmenu-push-toright').removeClass('cbp-spmenu-push-toleft');
     $('#cbp-spmenu-s1').toggleClass('cbp-spmenu-open');
     $('#cbp-spmenu-s2').removeClass('cbp-spmenu-open');
     if($(this).attr("action") == "in"){
-      $(this).find(".icon-chevron-right").remove();
-      $(this).find("a").prepend("<i class = 'icon-chevron-left' style = 'margin-top:2%;'></i>");
+      $(this).find(".icon-chevron-right").parent().remove();
+      $(this).find("a").prepend("<div class = 'span1' style = 'margin-top:1.5%;'><i class = 'icon-chevron-left pull-right'></i></div>");
       $(this).attr("action","out");
     }else{
-      $(this).find(".icon-chevron-left").remove();
-      $(this).find("a").append("<i class = 'icon-chevron-right' style = 'margin-top:2%;'></i>");
+      $(this).find(".icon-chevron-left").parent().remove();
+      $(this).find("a").append("<div class = 'span1' style = 'margin-top:1.5%;'><i class = 'icon-chevron-right pull-left'></i></div>");
       $(this).attr("action","in");
     }
     return false;
-	});
+  });
 
   $("#friendsHead").click(function(){
     if($(this).find("i").hasClass("icon-chevron-right")){
@@ -906,21 +901,24 @@ $(document).ready(function(){
   });
 
   $('body').delegate('.removereply','click',function(){
-    $("#removeReplyConfirm").attr("postId",$(this).closest(".postRoot").attr("id"));
+    $("#removeReplyConfirm").attr("replyId",$(this).closest(".replyBody").attr("id")).attr("postId",$(this).closest(".postRoot").attr("id"));
   });
 
   $("#removeReplyConfirm").click(function(){
       $("#floatingBarsG-removeReply").show();
       $("#removeReplyConfirm").attr("disabled","disabled");
       var postId = $(this).attr("postId");
+      var replyId = $(this).attr("replyId");
       var context = $("#"+postId);
       var data = auth_data;
       data.id = context.attr('posterUid');
       data.eid = context.attr('postEid');
       data.pid = context.attr('postPid');
-      var reply = context.find('.replyBody');
+      var reply = $("#"+replyId);
       var repliesArea = context.find('.repliesArea');
-      data.rid = reply.attr("rid");
+      data.rid = $(reply).attr("rid");
+      console.log($(reply));
+      console.log("rid "+data.rid);
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
@@ -928,28 +926,70 @@ $(document).ready(function(){
             contentType: 'application/json',
             success:function(data){
               console.log(data);
-              if(data.status=="successful"){
-                if(context.attr("repliesNumber") == 1){
-                  repliesArea.remove();
+              if(context.attr("repliesNumber") == 1){
+                repliesArea.remove();
+              }else{
+                reply.remove();
+                var repliesNumber = parseInt(context.attr("repliesNumber"));
+                context.attr("repliesNumber",(repliesNumber - 1));
+                if(repliesNumber == 2){
+                  repliesArea.find(".accordion-toggle").html('1 reply');
                 }else{
-                  reply.remove();
-                  var repliesNumber = parseInt(context.attr("repliesNumber"));
-                  context.attr("repliesNumber",(repliesNumber - 1));
-                  if(repliesNumber == 2){
-                    repliesArea.find(".accordion-toggle").html('1 reply');
-                  }else{
-                    repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
-                  }
+                  repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
                 }
               }
-              $("#removeConfirm").removeAttr("disabled");
+              $("#removeReplyConfirm").removeAttr("disabled");
               $("#floatingBarsG-removeReply").hide();
-              $("#removeCancel").trigger("click");
+              $("#removeReplyCancel").trigger("click");
             }
       });
     return false;
   });
   
+  $("#imageModal").on("hide",function(){
+    $('body').css("overflow","scroll");
+  });
+
+  $('body').delegate('.postImage','click',function(){
+    var source = $(this).attr('src');
+    var url = "url("+window.location.origin+"/"+source+")";
+    $('#imageModal').find('.imgLiquidFill').css('background-image',url);
+    $('body').css("overflow","hidden");
+    var context = $(this).closest(".postRoot");
+    var source = $("#post_user_avarta"+$(context).attr("postPid")).attr("src");
+    $(".interactionArea").find(".modalAvarta").first().attr("src",source);
+    var data = {};
+    data.session_key = localStorage.session_key;
+    data.uid = localStorage.uid;
+    data.uidList = [$(context).attr("posteruid")];
+    data.pidList = [$(context).attr("postpid")];
+    if([$(context).attr("posteid")] == ""){
+      data.eidList = ["0000000000000000"];
+    }else{
+      data.eidList = [$(context).attr("posteid")];
+    }
+    $.ajax({
+        url:"/getpostscontent",
+        data:JSON.stringify(data),
+        type:"POST",
+        contentType: 'application/json',
+        success:function(result){
+          if(result.status == "successful"){
+            renderLargePost(result.source[0]);
+            $(".interactionArea").show();
+          }
+        }
+    });
+  });
+
+  $('body').delegate('#postArea','keyup',function(){
+    if($(this).val() == ""){
+      $("#postSubmit").attr('disabled','disabled');
+    }else{
+     $("#postSubmit").removeAttr('disabled');
+    }
+  });
+
   $('body').delegate('.replyInput','focus',function(){
     var replyToName = $(this).attr("replyToName");
     $(this).attr('placeholder','Reply to '+replyToName+":");
@@ -969,13 +1009,14 @@ $(document).ready(function(){
         var data = auth_data;
         data.replier_name = localStorage.usernickname;
         var context = $(this).closest('.postRoot');
-        data.replyContent = $(this).closest('.span11').children('textarea').first().val();
-        data.posterUid = parseInt($(this).closest('.span11').children('textarea').first().attr('replyToUid'));
-        data.replyToUid = data.posterUid;
+        data.replyContent = context.find('textarea').first().val();
+        data.posterUid = localStorage.uid;
+        data.replyToUid = parseInt(context.find('textarea').first().attr('replyToUid'));
         data.postEid = context.attr('postEid');
         data.postPid = context.attr('postPid');
-        data.replyToName = $(this).closest('.span11').children('textarea').first().attr("replyToName");
+        data.replyToName = context.find('textarea').first().attr("replyToName");
         data.visibility = 0;
+        console.log(data);
         $.ajax({
               url:"/createreply",
               data:JSON.stringify(data),
@@ -1026,6 +1067,24 @@ $(document).ready(function(){
                   context.find('.accordion-toggle').first().html(replyNumber+" replies");
               }
               context.find('textarea').val("");
+
+              if(context.find("ul.repliesArea").length > 0){
+                var scroller = context.find(".repliesArea").first();
+                scroller.append(renderReplyInLargePost(reply));
+                context.attr("repliesNumber",parseInt(context.attr("repliesNumber")));
+                scroller.scrollTop(scroller.prop('scrollHeight'));
+                var orginalPost = $("#"+context.attr("id").replace("modal",""));
+                var scroller = orginalPost.find('ul.scroller').first();
+                scroller.append(renderReply(reply));
+                orginalPost.attr("repliesNumber",parseInt(context.attr("repliesNumber")));
+                scroller.scrollTop(scroller.prop('scrollHeight'));
+                var replyNumber = orginalPost.attr("repliesNumber");
+                if(replyNumber == 1){
+                    orginalPost.find('.accordion-toggle').first().html(replyNumber+" reply");
+                }else{
+                    orginalPost.find('.accordion-toggle').first().html(replyNumber+" replies");
+                }
+              }
               }
               }
               });                

@@ -82,7 +82,7 @@ $(document).ready(function(){
 
         $("#right").find("a").html("<i class = 'icon-chevron-left' style = 'margin-top:1%;'></i>Events & Friends");
          //update the user name in the navbar
-        $("#left a").prepend('<img id = "navi_avarta" src = "#" style = "width:22px;height:22px;border-radius:11px;">&nbsp;<strong id="userNameLink">user</strong>');
+        $("#left a").prepend('<div class = "span2"><img id = "navi_avarta" src = "#" style = "width:22px;height:22px;border-radius:11px;"></div><div class= "span7"><strong id="userNameLink" style = "text-overflow: ellipsis;overflow: hidden;white-space: nowrap;display: block;">user</strong></div>');
         $("#userNameLink").text(friendNickname);
 
         //update profile
@@ -182,12 +182,12 @@ $(document).ready(function(){
     $('#cbp-spmenu-s1').toggleClass('cbp-spmenu-open');
     $('#cbp-spmenu-s2').removeClass('cbp-spmenu-open');
     if($(this).attr("action") == "in"){
-      $(this).find(".icon-chevron-right").remove();
-      $(this).find("a").prepend("<i class = 'icon-chevron-left' style = 'margin-top:2%;'></i>");
+      $(this).find(".icon-chevron-right").parent().remove();
+      $(this).find("a").prepend("<div class = 'span1' style = 'margin-top:1.5%;'><i class = 'icon-chevron-left pull-right'></i></div>");
       $(this).attr("action","out");
     }else{
-      $(this).find(".icon-chevron-left").remove();
-      $(this).find("a").append("<i class = 'icon-chevron-right' style = 'margin-top:2%;'></i>");
+      $(this).find(".icon-chevron-left").parent().remove();
+      $(this).find("a").append("<div class = 'span1' style = 'margin-top:1.5%;'><i class = 'icon-chevron-right pull-left'></i></div>");
       $(this).attr("action","in");
     }
     return false;
@@ -345,21 +345,24 @@ $(document).ready(function(){
   });
   
   $('body').delegate('.removereply','click',function(){
-    $("#removeReplyConfirm").attr("postId",$(this).closest(".postRoot").attr("id"));
+    $("#removeReplyConfirm").attr("replyId",$(this).closest(".replyBody").attr("id")).attr("postId",$(this).closest(".postRoot").attr("id"));
   });
 
   $("#removeReplyConfirm").click(function(){
       $("#floatingBarsG-removeReply").show();
       $("#removeReplyConfirm").attr("disabled","disabled");
       var postId = $(this).attr("postId");
+      var replyId = $(this).attr("replyId");
       var context = $("#"+postId);
       var data = auth_data;
       data.id = context.attr('posterUid');
       data.eid = context.attr('postEid');
       data.pid = context.attr('postPid');
-      var reply = context.find('.replyBody');
+      var reply = $("#"+replyId);
       var repliesArea = context.find('.repliesArea');
-      data.rid = reply.attr("rid");
+      data.rid = $(reply).attr("rid");
+      console.log($(reply));
+      console.log("rid "+data.rid);
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
@@ -367,23 +370,21 @@ $(document).ready(function(){
             contentType: 'application/json',
             success:function(data){
               console.log(data);
-              if(data.status=="successful"){
-                if(context.attr("repliesNumber") == 1){
-                  repliesArea.remove();
+              if(context.attr("repliesNumber") == 1){
+                repliesArea.remove();
+              }else{
+                reply.remove();
+                var repliesNumber = parseInt(context.attr("repliesNumber"));
+                context.attr("repliesNumber",(repliesNumber - 1));
+                if(repliesNumber == 2){
+                  repliesArea.find(".accordion-toggle").html('1 reply');
                 }else{
-                  reply.remove();
-                  var repliesNumber = parseInt(context.attr("repliesNumber"));
-                  context.attr("repliesNumber",(repliesNumber - 1));
-                  if(repliesNumber == 2){
-                    repliesArea.find(".accordion-toggle").html('1 reply');
-                  }else{
-                    repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
-                  }
+                  repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
                 }
               }
-              $("#removeConfirm").removeAttr("disabled");
+              $("#removeReplyConfirm").removeAttr("disabled");
               $("#floatingBarsG-removeReply").hide();
-              $("#removeCancel").trigger("click");
+              $("#removeReplyCancel").trigger("click");
             }
       });
     return false;
