@@ -85,7 +85,7 @@ $(document).ready(function(){
 					console.log("email validation feedback:");
 					console.log(data);
 					if(data.status == "unsuccessful"){
-						$(checkButton).before('<font color ="#B94A48"> *'+data.reason+'</font>');
+						$(checkButton).before('<font color ="#B94A48"> * Invalid Email </font>');
 						$(input).css('border-color','#B94A48');
 						$(input).css('border-color','#CCC');
 					}else{
