@@ -45,6 +45,7 @@ $(document).ready(function(){
     $.ajax({
       url:'/friendrequest',
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType:"application/json",
       success:function(result){
@@ -67,6 +68,7 @@ $(document).ready(function(){
   $.ajax({
     url:'/getuserinfo',
     data:JSON.stringify(view_auth_data),
+    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -109,6 +111,11 @@ $(document).ready(function(){
         $("#birthday").html(birthday);
         $("#gender").html(gender);
         $("#profileEdit").hide();
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
+      }
     }
   });
 
@@ -116,12 +123,18 @@ $(document).ready(function(){
   $.ajax({
     url:'/getuseravarta',
     data:JSON.stringify(view_auth_data),
+    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
       localStorage.user_small_avarta = data.avarta;
       $("#navi_avarta").attr("src",data.avarta);
       $("#profileAvarta").attr("src",data.avarta);
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
+      }
     }
   });
 
@@ -132,25 +145,37 @@ $(document).ready(function(){
   $.ajax({
      url:"/getuserposts",
      data:JSON.stringify(newsData),
+     timeout:10000,
      type:"POST",
      contentType: 'application/json',
      success:function(data){
        console.log("News:");
        console.log(data);
        viewpost(data.pidsets,1,newsData);
-     }
+     },
+     error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
+      }
+    }
   });
 
   //retrieve user's events
   $.ajax({
       url:"/getuserevents",
       data:JSON.stringify(view_auth_data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
         $("#eventsNumber").html(data.events.length);
         localStorage.user_eventsNumber = data.events.length;
         localStorage.user_eventsList = data.events;
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
       }
   });
 
@@ -158,13 +183,19 @@ $(document).ready(function(){
   $.ajax({
     url:"/getuserfriendsinfo",
     data:JSON.stringify(view_auth_data),
+    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(data){
       $("#friendsNumber").html(data.friends.length);
       localStorage.user_friendsNumber = data.friends.length;
       localStorage.user_friendsList = data.friends;
-    }  
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeoutModal").modal("show");
+      }
+    }
   });
 
   //Just show the first tag for each post
@@ -259,6 +290,7 @@ $(document).ready(function(){
       $.ajax({
              url:"/getuserfriendsinfo",
              data:JSON.stringify(view_auth_data),
+             timeout:10000,
              type:"POST",
              contentType: 'application/json',
              success:function(data){
@@ -288,7 +320,12 @@ $(document).ready(function(){
               }else{
                   userlist(friendsData,'user');
               }
-             }
+             },
+             error:function(jqXHR, textStatus, errorThrown){
+                if(textStatus == "timeout"){
+                  $("#timeoutModal").modal("show");
+                }
+              }
       });
     }//if flag
     if(flag_displayevent){
@@ -298,6 +335,7 @@ $(document).ready(function(){
      $.ajax({
         url:"/getuserevents",
         data:JSON.stringify(view_auth_data),
+        timeout:10000,
         type:"POST",
         contentType: 'application/json',
         success:function(data){
@@ -320,6 +358,11 @@ $(document).ready(function(){
             $("#squaresWaveG-event").hide();
           }else{
             eventlist(eventsData);
+          }
+        },
+        error:function(jqXHR, textStatus, errorThrown){
+          if(textStatus == "timeout"){
+            $("#timeoutModal").modal("show");
           }
         } 
       });//ajax
@@ -371,6 +414,7 @@ $(document).ready(function(){
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
+            timeout:10000,
             type:"POST",
             contentType: 'application/json',
             success:function(data){
@@ -390,6 +434,11 @@ $(document).ready(function(){
               $("#removeReplyConfirm").removeAttr("disabled");
               $("#floatingBarsG-removeReply").hide();
               $("#removeReplyCancel").trigger("click");
+            },
+            error:function(jqXHR, textStatus, errorThrown){
+              if(textStatus == "timeout"){
+                $("#timeoutModal").modal("show");
+              }
             }
       });
     return false;
@@ -426,6 +475,7 @@ $(document).ready(function(){
     $.ajax({
           url:"/createreply",
           data:JSON.stringify(data),
+          timeout:10000,
           type:"POST",
           contentType: 'application/json',
           success:function(result){
@@ -474,6 +524,11 @@ $(document).ready(function(){
           }
           context.find('textarea').val("");
           }
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeoutModal").modal("show");
+            }
           }
     });            
   });
@@ -604,6 +659,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/deletefriend",
           data:JSON.stringify(data),
+          timeout:10000,
           type:"POST",
           contentType: 'application/json',
           success:function(result){
@@ -611,6 +667,11 @@ $(document).ready(function(){
             $("#defriendCancel").removeAttr("disabled");
             $("#floatingBarsG-defriend").hide();
             $("#defriendModal").modal("hide");
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeoutModal").modal("show");
+            }
           }
     });
   });
@@ -659,6 +720,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -668,6 +730,11 @@ $(document).ready(function(){
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -686,6 +753,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -695,6 +763,11 @@ $(document).ready(function(){
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -726,6 +799,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -735,6 +809,11 @@ $(document).ready(function(){
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });
@@ -753,6 +832,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -761,6 +841,11 @@ $(document).ready(function(){
               notification.prev().remove();
           };
           notification.remove();
+        }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
         }
       }
     });

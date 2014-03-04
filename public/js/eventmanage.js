@@ -14,19 +14,26 @@ $(document).ready(function(){
     $.ajax({
     	url:'/geteventsmallavarta',
     	data:JSON.stringify(eventAvartaData),
+      timeout:10000,
     	type:"POST",
     	contentType:"application/json",
     	success:function(data){
     		console.log("event avarta data:"); 
     		console.log(data);
         $("#eventAvarta").attr("src",data.avarta);
-    	}
+    	},
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
+      }
     });
 
     //get event's members information
     $.ajax({
          url:"/geteventmembers",
          data:JSON.stringify(auth_data),
+         timeout:10000,
          type:"POST",
          contentType: 'application/json',
          success:function(result){
@@ -39,13 +46,14 @@ $(document).ready(function(){
                 $.ajax({
                       url:"/getusersinfo",
                       data:JSON.stringify(membersData),
+                      timeout:10000,
                       type:"POST",
                       contentType:'application/json',
                       success:function(result){
                       //console.log("friends information:");
                       console.log(result);
                       if(result.status == "successful"){
-                      $.each(result.source,function(index,element){
+                        $.each(result.source,function(index,element){
                         switch(loadOrder){
                           case 1:
                             $("#membersList1").append(member(element,"member"));
@@ -72,9 +80,19 @@ $(document).ready(function(){
                       });
                       $("#circularG").hide();
                       }
+                    },
+                    error:function(jqXHR, textStatus, errorThrown){
+                      if(textStatus == "timeout"){
+                        $("#timeoutModal").modal("show");
+                      }
                     }
                 });//ajax
             }
+        },
+        error:function(jqXHR, textStatus, errorThrown){
+          if(textStatus == "timeout"){
+            $("#timeoutModal").modal("show");
+          }
         }
     });//ajax
 
@@ -88,6 +106,7 @@ $(document).ready(function(){
       $.ajax({
          url:"/geteventmembers",
          data:JSON.stringify(auth_data),
+         timeout:10000,
          type:"POST",
          contentType: 'application/json',
          success:function(result){
@@ -100,6 +119,7 @@ $(document).ready(function(){
           $.ajax({
                 url:"/getusersinfo",
                 data:JSON.stringify(membersData),
+                timeout:10000,
                 type:"POST",
                 contentType:'application/json',
                 success:function(result){
@@ -132,12 +152,22 @@ $(document).ready(function(){
                   });
                   $("#circularG").hide();
                   }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
+                  }
                 }
           }); 
       }else{
           $("#membersList").append("<font>No member yet.</font>");
           $("#circularG").hide();
       }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
       }
     });
 });
@@ -152,6 +182,7 @@ $(document).ready(function(){
       $.ajax({
          url:"/geteventmanagers",
          data:JSON.stringify(auth_data),
+         timeout:10000,
          type:"POST",
          contentType: 'application/json',
          success:function(result){
@@ -164,6 +195,7 @@ $(document).ready(function(){
           $.ajax({
                 url:"/getusersinfo",
                 data:JSON.stringify(membersData),
+                timeout:10000,
                 type:"POST",
                 contentType:'application/json',
                 success:function(result){
@@ -196,12 +228,22 @@ $(document).ready(function(){
                   });
                   $("#circularG").hide();
                   }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
+                  }
                 }
           }); 
       }else{
           $("#membersList").append("<font>No member yet.</font>");
           $("#circularG").hide();
       }
+      },
+      error:function(jqXHR, textStatus, errorThrown){
+        if(textStatus == "timeout"){
+          $("#timeoutModal").modal("show");
+        }
       }
     });
 });
