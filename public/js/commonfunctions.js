@@ -397,6 +397,11 @@ function createPost(data){
           });
         }
       }
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeout").trigger("click");
+      }
     }
   });
 }
@@ -415,6 +420,11 @@ function member(member,type){
       console.log(data.avarta);
       $("#memberAvarta"+member.uid).attr("src",data.avarta);
       //$("div.chat-window[chatId='"+element.uid+"']").attr("url",data.avarta);
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeout").trigger("click");
+      }
     }
   });
   var html = 
@@ -515,6 +525,11 @@ function userlist(usersData,type){
                   });
                 }
              }
+           },
+           error:function(jqXHR, textStatus, errorThrown){
+              if(textStatus == "timeout"){
+                $("#timeout").trigger("click");
+              }
            }
     });//get usersinfo
 }
@@ -561,11 +576,21 @@ function eventlist(eventData){
                   console.log("event avarta data:");
                   console.log(data);
                   $("#eventAvarta"+element.eid).attr("src",data.avarta);
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeout").trigger("click");
+                  }
                 }
               });
             });
         }
-     }
+    },
+    error:function(jqXHR, textStatus, errorThrown){
+      if(textStatus == "timeout"){
+        $("#timeout").trigger("click");
+      }
+    }
   });
 }
 
@@ -897,32 +922,47 @@ function viewpost(pids,char,newsData){
                           }else{
                             console.log("failed to get the picture of this post");
                           }
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeout").trigger("click");
+                          }
                         }
                       });
                     }
                     //retrieve the avatar of the poster
                     $.ajax({
-                           url:'/getuseravarta',
-                           data:JSON.stringify(postAvartaData),
-                           type:"POST",
-                           contentType:"application/json",
-                           success:function(data){
-                             //TO DO: render the user's avarta into home page
-                             $("#post_user_avarta"+element.pid).attr("src",data.avarta);
-                           }
+                        url:'/getuseravarta',
+                        data:JSON.stringify(postAvartaData),
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                          //TO DO: render the user's avarta into home page
+                          $("#post_user_avarta"+element.pid).attr("src",data.avarta);
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeout").trigger("click");
+                          }
+                        }
                     });
                     $.each(element.replies,function(replyIndex,reply){
                       replyAvartaData.view_uid = reply.replier_uid;
                       replyAvartaData.time = 0000//getCurrentTime();
                       replyAvartaData.date = 00000000//getCurrentDate();
                       $.ajax({
-                             url:'/getuseravarta',
-                             data:JSON.stringify(replyAvartaData),
-                             type:"POST",
-                             contentType:"application/json",
-                             success:function(data){
-                               $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
-                             }
+                          url:'/getuseravarta',
+                          data:JSON.stringify(replyAvartaData),
+                          type:"POST",
+                          contentType:"application/json",
+                          success:function(data){
+                            $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
+                          },
+                          error:function(jqXHR, textStatus, errorThrown){
+                            if(textStatus == "timeout"){
+                              $("#timeout").trigger("click");
+                            }
+                          }
                       });
                     });
               });
@@ -937,7 +977,12 @@ function viewpost(pids,char,newsData){
                 }
               });
             }
-           }
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeout").trigger("click");
+            }
+          }
         });
     }else{
       $("#contentBody").find(".well").show();
