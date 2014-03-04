@@ -349,7 +349,7 @@ function createPost(data){
   $.ajax({
     url:"/createpost",
     data:JSON.stringify(data),
-    timeout:5000,
+    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(result){
@@ -378,7 +378,7 @@ function createPost(data){
           $.ajax({
             url:'/getpicture',
             data:JSON.stringify(pictureData),
-            timeout:5000,
+            timeout:10000,
             type:"POST",
             contentType:"application/json",
             success:function(data){
@@ -416,7 +416,7 @@ function member(member,type){
   $.ajax({
     url:'/getusersmallavarta',
     data:JSON.stringify(userAvartaData),
-    timeout:5000,
+    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -470,7 +470,7 @@ function userlist(usersData,type){
     $.ajax({
            url:"/getusersinfo",
            data:JSON.stringify(usersData),
-           timeout:5000,
+           timeout:10000,
            type:"POST",
            contentType:'application/json',
            success:function(result){
@@ -496,7 +496,7 @@ function userlist(usersData,type){
                     $.ajax({
                       url:'/getuseravarta',
                       data:JSON.stringify(userAvartaData),
-                      timeout:5000,
+                      timeout:10000,
                       type:"POST",
                       contentType:"application/json",
                       success:function(data){
@@ -521,7 +521,7 @@ function userlist(usersData,type){
                         $.ajax({
                           url:'/getuseravarta',
                           data:JSON.stringify(userAvartaData),
-                          timeout:5000,
+                          timeout:10000,
                           type:"POST",
                           contentType:"application/json",
                           success:function(data){
@@ -557,7 +557,7 @@ function eventlist(eventData){
   $.ajax({
     url:"/geteventsinfo",
     data:JSON.stringify(eventData),
-    timeout:5000,
+    timeout:10000,
     type:"POST",
     contentType:'application/json',
     success:function(result){
@@ -577,7 +577,7 @@ function eventlist(eventData){
               $.ajax({
                 url:'/geteventavarta',
                 data:JSON.stringify(eventAvartaData),
-                timeout:5000,
+                timeout:10000,
                 type:"POST",
                 contentType:"application/json",
                 success:function(data){
@@ -887,7 +887,7 @@ function viewpost(pids,char,newsData){
         $.ajax({
            url:"/getpostscontent",
            data:JSON.stringify(postData),
-           timeout:5000,
+           timeout:10000,
            type:"POST",
            contentType: 'application/json',
            success:function(result){
@@ -922,7 +922,7 @@ function viewpost(pids,char,newsData){
                       $.ajax({
                         url:'/getpicture',
                         data:JSON.stringify(pictureData),
-                        timeout:5000,
+                        timeout:10000,
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
@@ -944,7 +944,7 @@ function viewpost(pids,char,newsData){
                     $.ajax({
                         url:'/getuseravarta',
                         data:JSON.stringify(postAvartaData),
-                        timeout:5000,
+                        timeout:10000,
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
@@ -964,7 +964,7 @@ function viewpost(pids,char,newsData){
                       $.ajax({
                           url:'/getuseravarta',
                           data:JSON.stringify(replyAvartaData),
-                          timeout:5000,
+                          timeout:10000,
                           type:"POST",
                           contentType:"application/json",
                           success:function(data){
@@ -1007,7 +1007,7 @@ function searchUser(searchData,loadOrder){
   $.ajax({
     url:"/searchuserbyfilter",
     data:JSON.stringify(searchData),
-    timeout:5000,
+    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -1032,7 +1032,7 @@ function searchUser(searchData,loadOrder){
         $.ajax({
           url:"/getusersinfo",
           data:JSON.stringify(friendsData),
-          timeout:5000,
+          timeout:10000,
           type:"POST",
           contentType:'application/json',
           success:function(result){
@@ -1058,7 +1058,7 @@ function searchUser(searchData,loadOrder){
                 $.ajax({
                   url:'/getuseravarta',
                   data:JSON.stringify(userAvartaData),
-                  timeout:5000,
+                  timeout:10000,
                   type:"POST",
                   contentType:"application/json",
                   success:function(data){
@@ -1113,7 +1113,7 @@ function searchEvents(searchData,loadOrder){
   $.ajax({
     url:"/searcheventbyfilter",
     data:JSON.stringify(searchData),
-    timeout:5000,
+    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -1135,7 +1135,7 @@ function searchEvents(searchData,loadOrder){
         $.ajax({
           url:"/geteventsinfo",
           data:JSON.stringify(eventsData),
-          timeout:5000,
+          timeout:10000,
           type:"POST",
           contentType:'application/json',
           success:function(result){
@@ -1359,7 +1359,7 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
   $.ajax({
     url:'/getuserinfo',
     data:JSON.stringify(userData),
-    timeout:5000,
+    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -1376,7 +1376,7 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
   $.ajax({
     url:'/getuseravarta', 
     data:JSON.stringify(userData),
-    timeout:5000,
+    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -1405,7 +1405,7 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
   $.ajax({
     url:'/geteventinfo',
     data:JSON.stringify(eventData),
-    timeout:5000,
+    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -1457,7 +1457,7 @@ function getMorePosts(char,newsData){
       $.ajax({
         url:posturl,
         data:JSON.stringify(newsData),
-        timeout:5000,
+        timeout:10000,
         type:"POST",
         contentType: 'application/json',
         success:function(data){
@@ -1487,7 +1487,7 @@ function getMorePosts(char,newsData){
     $.ajax({
          url:"/getpostscontent",
          data:JSON.stringify(postData),
-         timeout:5000,
+         timeout:10000,
          type:"POST",
          contentType: 'application/json',
           success:function(result){
@@ -1514,7 +1514,7 @@ function getMorePosts(char,newsData){
                 $.ajax({
                   url:'/getpicture',
                   data:JSON.stringify(pictureData),
-                  timeout:5000,
+                  timeout:10000,
                   type:"POST",
                   contentType:"application/json",
                   success:function(data){
@@ -1536,7 +1536,7 @@ function getMorePosts(char,newsData){
               $.ajax({
                   url:'/getuseravarta',
                   data:JSON.stringify(postAvartaData),
-                  timeout:5000,
+                  timeout:10000,
                   type:"POST",
                   contentType:"application/json",
                   success:function(data){
@@ -1555,7 +1555,7 @@ function getMorePosts(char,newsData){
                   $.ajax({
                       url:'/getuseravarta',
                       data:JSON.stringify(replyAvartaData),
-                      timeout:5000,
+                      timeout:10000,
                       type:"POST",
                       contentType:"application/json",
                       success:function(data){
@@ -1606,7 +1606,7 @@ function getMoreUsers(){
     $.ajax({
       url:"/getusersinfo",
       data:JSON.stringify(friendsData),
-      timeout:5000,
+      timeout:10000,
       type:"POST",
       contentType:'application/json',
       success:function(result){
@@ -1634,7 +1634,7 @@ function getMoreUsers(){
             $.ajax({
               url:'/getuseravarta',
               data:JSON.stringify(userAvartaData),
-              timeout:5000,
+              timeout:10000,
               type:"POST",
               contentType:"application/json",
               success:function(data){
@@ -1686,7 +1686,7 @@ function getMoreEvents(){
     $.ajax({
       url:"/geteventsinfo",
       data:JSON.stringify(eventsData),
-      timeout:5000,
+      timeout:10000,
       type:"POST",
       contentType:'application/json',
       success:function(result){

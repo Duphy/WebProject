@@ -122,7 +122,7 @@ $(document).ready(function(){
   $("#fileupload").fileupload({
     url:"/uploadavarta",
     type:"POST",
-    timeout: 5000,
+    timeout: 10000,
     dataType:"json",
     maxFileSize:10000000,
     acceptFileTypes: /\.(gif|jpe?g|png)$/i,
@@ -158,7 +158,7 @@ $(document).ready(function(){
               $.ajax({
                 url:'/updateselfsmallavarta',
                 data:JSON.stringify(avartaData),
-                timeout: 5000,
+                timeout: 10000,
                 type:'POST',
                 contentType: 'application/json',
                 success:function(result){
@@ -166,7 +166,7 @@ $(document).ready(function(){
                     $.ajax({
                       url:'/getselfsmallavarta',
                       data:JSON.stringify(auth_data),
-                      timeout: 5000,
+                      timeout: 10000,
                       type:'POST',
                       contentType: 'application/json',
                       success:function(avarta){
@@ -201,7 +201,7 @@ $(document).ready(function(){
               $.ajax({
                 url:'/updateselfavarta',
                 data:JSON.stringify(avartaData),
-                timeout: 5000,
+                timeout: 10000,
                 type:'POST',
                 contentType: 'application/json',
                 success:function(result){
@@ -209,7 +209,7 @@ $(document).ready(function(){
                     $.ajax({
                       url:'/getselfavarta',
                       data:JSON.stringify(auth_data),
-                      timeout: 5000,
+                      timeout: 10000,
                       type:'POST',
                       contentType: 'application/json',
                       success:function(avarta){
@@ -358,7 +358,7 @@ $(document).ready(function(){
         $.ajax({
             url:'/updatesuserinfo',
             data:JSON.stringify(data),
-            timeout: 5000,
+            timeout: 10000,
             type:'POST',
             contentType: 'application/json',
             success:function(data){
@@ -512,7 +512,7 @@ $(document).ready(function(){
 	$.ajax({
 	 	url:'/getselfavarta',
 	 	data:JSON.stringify(selfAvartaData),
-    timeout: 5000,
+    timeout: 10000,
 	 	type:"POST",
 	 	contentType:"application/json",
 	 	success:function(data){
@@ -530,7 +530,7 @@ $(document).ready(function(){
   $.ajax({
     url:'/getselfsmallavarta',
     data:JSON.stringify(selfAvartaData),
-    timeout: 5000,
+    timeout: 10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -555,7 +555,7 @@ $(document).ready(function(){
 	$.ajax({
 		url:"/getusernews",
 		data:JSON.stringify(newsData),
-    timeout: 5000,
+    timeout: 10000,
 		type:"POST",
 		contentType: 'application/json',
 		success:function(data){
@@ -574,7 +574,7 @@ $(document).ready(function(){
   $.ajax({
       url:"/getselfevents",
       data:JSON.stringify(auth_data),
-      timeout: 5000,
+      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -593,7 +593,7 @@ $(document).ready(function(){
   $.ajax({
     url:"/getselffriendsinfo",
     data:JSON.stringify(auth_data),
-    timeout: 5000,
+    timeout: 10000,
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -697,7 +697,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/getusernews",
       data:JSON.stringify(newsData),
-      timeout: 5000,
+      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -728,7 +728,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/getusernews",
       data:JSON.stringify(newsData),
-      timeout: 5000,
+      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -843,7 +843,7 @@ $(document).ready(function(){
         $.ajax({
           url:"/getselffriendsinfo",
           data:JSON.stringify(auth_data),
-          timeout: 5000,
+          timeout: 10000,
           type:"POST",
           contentType: 'application/json',
           success:function(data){
@@ -881,7 +881,7 @@ $(document).ready(function(){
         $.ajax({
             url:"/getselfevents",
             data:JSON.stringify(auth_data),
-            timeout: 5000,
+            timeout: 10000,
             type:"POST",
             contentType: 'application/json',
             success:function(data){
@@ -958,7 +958,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/deletepost",
       data:JSON.stringify(data),
-      timeout: 5000,
+      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -1003,7 +1003,7 @@ $(document).ready(function(){
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
-            timeout: 5000,
+            timeout: 10000,
             type:"POST",
             contentType: 'application/json',
             success:function(data){
@@ -1058,7 +1058,7 @@ $(document).ready(function(){
     $.ajax({
         url:"/getpostscontent",
         data:JSON.stringify(data),
-        timeout: 5000,
+        timeout: 10000,
         type:"POST",
         contentType: 'application/json',
         success:function(result){
@@ -1113,7 +1113,7 @@ $(document).ready(function(){
         $.ajax({
               url:"/createreply",
               data:JSON.stringify(data),
-              timeout: 5000,
+              timeout: 10000,
               type:"POST",
               contentType: 'application/json',
               success:function(result){
@@ -1233,7 +1233,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout: 5000,
+      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -1266,7 +1266,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout: 5000,
+      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -1312,7 +1312,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout: 5000,
+      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -1345,7 +1345,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout: 5000,
+      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -1505,7 +1505,7 @@ $(document).ready(function(){
     $.ajax({
         url:'/createevent',
         data:JSON.stringify(data),
-        timeout: 5000,
+        timeout: 10000,
         type:'POST',
         contentType: 'application/json',
         success:function(data){
