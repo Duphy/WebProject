@@ -203,8 +203,8 @@ function renderPost(post){
   var html =
   '<div id = "'+post.id+'" class = "row-fluid postRoot" repliesNumber = '+post.replies_no+' postPid = "'+post.pid+'" posterUid = "'+post.uid+'" postEid = "'+post.eid+'" posterName = "'+post.poster_name+'" style = "background-color:#FFFFFF;margin-bottom:10px;">'+
     '<div class = "row-fluid" style = "margin-top:10px;height:50px;">'+
-      '<div class = "span4 row-fluid" style = "text-align: center;">'+
-        '<div class = "span4">'+
+      '<div class = "span8 row-fluid" style = "text-align: center;">'+
+        '<div class = "span2">'+
           '<img id = "post_user_avarta'+post.pid+'"';
           if(post.uid == localStorage.uid){
             html = html + 'class="selfProfileSmallAvarta"';
@@ -212,18 +212,18 @@ function renderPost(post){
           html = html +
            'src = "'+localStorage.self_small_avarta+'" style = "width:40px;height:40px;border-radius:20px;">'+
         '</div>'+
-        '<div class = "span8" style = "text-align:left;">'+
+        '<div class = "span10" style = "text-align:left;">'+
           '<a href = # class = "userName" name = "'+post.poster_name+'" uid = "'+post.uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+post.poster_name+'</a><p class = "postTime" style = "font-size:12px;color:#999;font-family: \'Lato\', sans-serif;font-weight:300;">'+time[0]+' &nbsp;&nbsp;'+time[1]+'</p>'+
         '</div>'+
       '</div>';
       if(post.uid == localStorage.uid){
         html = html + 
-          '<div class = "offset5 span1"><i class = "icon-trash pull-right removePost" data-toggle = "modal" href = "#removePostModal" style = "margin-right:25%;"></i></div>'+
+          '<div class = "offset1 span1"><i class = "icon-trash pull-right removePost" data-toggle = "modal" href = "#removePostModal" style = "margin-right:25%;"></i></div>'+
           '<div class = "span2 pull-right" style = "color:white;text-align: center;">'+
             '<div class = "tagsGroup">';
       }else{
         html = html +
-          '<div class = "offset6 span2 pull-right" style = "color:white;text-align: center;">'+
+          '<div class = "offset2 span2 pull-right" style = "color:white;text-align: center;">'+
             '<div class = "tagsGroup">';
       }
     var posttags = sortTags(post.tags); 
