@@ -764,7 +764,7 @@ function renderSearchUser(user){
 }
 
 function renderProfile(){
-  $("#name").html(localStorage.username);
+  $("#profileName").html(localStorage.username);
   $("#nickname").html(localStorage.usernickname);
   $("#birthday").html(print_date(localStorage.raw_birthday));
   switch(localStorage.gender){
