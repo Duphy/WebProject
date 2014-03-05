@@ -26,6 +26,8 @@ $(document).ready(function(){
 
   $(".bootstrap-tagsinput").find("input").attr("placeholder","Add").attr("size",8);
   $(".bootstrap-tagsinput").find("input").limit('20');
+  $(".bootstrap-tagsinput").css("border-radius","0px");
+  $(".icon-question-sign").tooltip({title:"Add the tag you want by typing in it and press Enter; Remove the tag by pressing Delete.",placement:"right"});
   $('body').delegate('#postArea','keyup',function(){
     if($(this).val() == ""){
       $("#postSubmit").attr('disabled','disabled');

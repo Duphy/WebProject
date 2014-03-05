@@ -28,12 +28,12 @@ $(document).ready(function(){
   $(".bootstrap-tagsinput").css("border-radius","0px");
   $(".bootstrap-tagsinput").find("input").attr("placeholder","Add").attr("size",8);
   $(".bootstrap-tagsinput").find("input").limit('14');
-
+  $(".icon-question-sign").tooltip({title:"Add the tag you want by typing in it and press Enter; Remove the tag by pressing Delete.",placement:"right"});
   //load tags
   renderSubNavBar();
 
   //update the user name in the navbar
-  $("#left a").prepend('<div class = "span2"><img class = "selfProfileSmallAvarta" id = "navi_avarta" src = "#" style = "width:22px;height:22px;border-radius:11px;"></div><div class= "span4"><strong id="userNameLink" class = "pull-left" style = "text-overflow: ellipsis;overflow: hidden;white-space: nowrap;display: block;">user</strong></div>');
+  $("#left a").prepend('<div class = "span2"><img class = "selfProfileSmallAvarta" id = "navi_avarta" src = "#" style = "width:22px;height:22px;border-radius:11px;"></div><div class= "span6"><strong id="userNameLink" class = "pull-left" style = "text-overflow: ellipsis;overflow: hidden;white-space: nowrap;display: block;">user</strong></div>');
 	$("#userNameLink").text(localStorage.usernickname);
 
   //set self avarta data
@@ -286,14 +286,6 @@ $(document).ready(function(){
     var tags = localStorage.usertags.split(",");
     var modified_tags = [];
     var proceed = true;
-    if(realname == ""){
-      $('#inputName').closest('.control-group').children('label').html('<strong>Name </strong><font color ="#B94A48">*required</font>');
-      $('#inputName').css('border-color','#B94A48');
-      proceed = false;
-    }else{
-      $('#inputName').closest('.control-group').children('label').html('Name<font style = "color:red;">*</font>');
-      $('#inputName').css('border-color','#CCC');
-    }
     if(nickname == ""){
       $('#inputNickName').closest('.control-group').children('label').html('<strong>NickName </strong><font color ="#B94A48">*required</font>');
       $('#inputNickName').css('border-color','#B94A48');
@@ -548,10 +540,19 @@ $(document).ready(function(){
   var newsData = {};
   newsData.session_key = localStorage.session_key;
   newsData.uid = localStorage.uid;
-	newsData.option = 1;
   newsData.max_pid = "default";
   var date = new Date();
   var timeoffset = date.getTimezoneOffset();
+  console.log(localStorage.showAllNews);
+  if(localStorage.showAllNews == "true"){
+    console.log("showAllNews");
+    newsData.option = 0;
+    $("#userNameLink").html("All News");
+  }else if(localStorage.showAllNews == "false"){
+    console.log("showFriendsNews");
+    newsData.option = 1;
+    $("#userNameLink").html("Friends News");
+  }
 	$.ajax({
 		url:"/getusernews",
 		data:JSON.stringify(newsData),
@@ -686,14 +687,17 @@ $(document).ready(function(){
   //     return false;
   // });
 
-  $("#settingUserNews").click(function(){
+  $("#settingFriendsNews").click(function(){
     var newsData = {};
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
     newsData.option = 1;
-    newsData.max_pid = 0;
+    newsData.max_pid = "default";
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
+    $("#circularG").show();
+    $("#left-column").html("");
+    $("#right-column").html("");
     $.ajax({
       url:"/getusernews",
       data:JSON.stringify(newsData),
@@ -703,10 +707,8 @@ $(document).ready(function(){
       success:function(data){
         console.log("News:");
         console.log(data);
-        $("#left-column").html("");
-        $("#right-column").html("");
         viewpost(data.pidsets,0,newsData);
-        $("#userNameLink").html("User News");
+        $("#userNameLink").html("Friends News");
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){
@@ -717,14 +719,17 @@ $(document).ready(function(){
     return false;
   });
 
-  $("#settingEventNews").click(function(){
+  $("#settingAllNews").click(function(){
     var newsData = {};
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
     newsData.option = 0;
-    newsData.max_pid = 0;
+    newsData.max_pid = "default";
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
+    $("#circularG").show();
+    $("#left-column").html("");
+    $("#right-column").html("");
     $.ajax({
       url:"/getusernews",
       data:JSON.stringify(newsData),
@@ -732,13 +737,11 @@ $(document).ready(function(){
       type:"POST",
       contentType: 'application/json',
       success:function(data){
-        console.log("Event News:");
+        console.log("All News:");
         console.log(data);
-        $("#left-column").html("");
-        $("#right-column").html("");
         //TO DO: to be verified.
         viewpost(data.pidsets,1,newsData);
-        $("#userNameLink").html("Circa News");
+        $("#userNameLink").html("All News");
       },
       error:function(jqXHR, textStatus, errorThrown){
         if(textStatus == "timeout"){

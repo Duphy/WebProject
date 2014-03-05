@@ -133,14 +133,6 @@ $(document).ready(function(){
 			$("#validationCodeLabel").html('<strong>Validation Code </strong>');
 			$('#validationCode').css('border-color','#CCC');
 		}
-		if(realname == ""){
-			$('#signUpRealNameLabel').html('<strong>Nick Name </strong><font color ="#B94A48">*required</font>');
-			$('#signUpRealName').css('border-color','#B94A48');
-			proceed = false;
-		}else{
-			$('#signUpRealNameLabel').html('<strong>Nick Name<strong>');
-			$('#signUpRealName').css('border-color','#CCC');
-		}
 		if(nickname == ""){
 			$('#signUpNickNameLabel').html('<strong>Nick Name </strong><font color ="#B94A48">*required</font>');
 			$('#signUpNickName').css('border-color','#B94A48');
@@ -237,6 +229,7 @@ $(document).ready(function(){
 									    localStorage.country = data.country;
 									    localStorage.self_small_avarta = "";
 									    localStorage.self_big_avarta = "";
+									    localStorage.showAllNews = false;
 									    console.log("ready to go home");
 									    $("#floatingBarsG-signup").hide();
 									    $("#submitCreateAccount").removeAttr('disabled');
@@ -334,9 +327,16 @@ $(document).ready(function(){
 						        		$("#floatingBarsG-login").hide();
 						        		$("#login").removeAttr("disabled");
 						        		if(data.friend_uids.length>7){
+						        			if(data.friend_uids.length >= 12){
+						        				localStorage.showAllNews = "true";
+						        			}else{
+						        				localStorage.showAllNews = "false";
+						        			}
+						        			console.log(localStorage.showAllNews);
 						        			window.location = "/home";
 						        		}
 										else{
+											localStorage.showAllNews = false;
 											window.location = "/search";
 										}	
 									}

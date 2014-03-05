@@ -219,7 +219,6 @@ socket.on("receive event chat",function(eid, s_uid, message, date, time){
 });
 
 socket.on("log out",function(){
-	$("#timeout").trigger("click");
 	$("#timeoutModal").modal("show");
 });
 // socket.on("deleted from event",function(name,uid,eventName,eid){

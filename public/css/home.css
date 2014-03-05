@@ -1,3 +1,7 @@
+.disableRoundCorner{
+	border-radius: 0px !important;
+}
+
 .websiteFont {
 	font-family: 'Lato', sans-serif;
 	font-weight:300;
