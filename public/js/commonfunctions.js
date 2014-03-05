@@ -282,7 +282,9 @@ function renderPost(post){
                 '&nbsp;&nbsp;<font>'+rtime[0]+'&nbsp;'+rtime[1]+'</font>'+
                 '</div>'+
                 '<div>'+
-                '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+(post.replies)[i].replyContent+'</pre>'+
+                '<div class = "row-fluid">'+
+                  '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+(post.replies)[i].replyContent+'</pre>'+
+                '</div>'+
                 '</div>'+
                 '</div>'+
                 '<div class = "span1">';
@@ -622,7 +624,7 @@ function renderReply(reply){
             '&nbsp;&nbsp;<font>'+reply.date+'&nbsp;'+reply.time+'</font>'+
           '</div>'+
           '<div class = "row-fluid">'+
-            '<p style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replyContent+'</p>'+
+            '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replyContent+'</pre>'+
           '</div>'+
       '</div>'+
       '<div class = "span1">';
