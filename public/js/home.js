@@ -93,6 +93,8 @@ $(document).ready(function(){
       var selfWidth = $(element).closest(".tagsGroup").width();
       $(element).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
     });
+    var parentWidth = $("#userNameLink").parent().width();
+    $("#userNameLink").css("width",parentWidth);
   });
 
   $("#profileEdit").click(function(){
