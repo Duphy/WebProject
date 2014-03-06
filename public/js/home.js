@@ -499,6 +499,8 @@ $(document).ready(function(){
     $("#pictureDescArea").val("");
     $("#pictureTags").tagsinput("removeAll");
     $("#pictureSubmit").attr("picturename","");
+    $("#previewImageArea").hide();
+    $("#pictureNotice").hide();
   });
 
   //retrieve self big avarta

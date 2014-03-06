@@ -392,8 +392,8 @@ function createPost(data){
                 $('#floatingBarsG-picture').hide();
                 $('#pictureDescArea').val("");
                 $("#pictureTags").tagsinput('removeAll');
-                $("#pictureTags").tagsinput('add','picture');
                 $("#previewImageArea").hide();
+                $("#pictureNotice").hide();
                 $("#pictureCancel").trigger('click');
               }else{
                 console.log("failed to get the picture of this post");
