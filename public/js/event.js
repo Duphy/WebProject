@@ -407,7 +407,7 @@ $(document).ready(function(){
               $('#pictureTags').parent().show();
               $('#pictureSubmit').attr("picturename",data.files[0].name);
               $('#previewImageArea').html("");
-              $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '"/>');
+              $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '" style = "margin-left:auto;margin-right:auto;display:block;"/>');
             },1000);
           }
         }).error(function(jqXHR, textStatus, errorThrown){
