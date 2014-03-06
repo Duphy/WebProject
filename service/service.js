@@ -1262,6 +1262,10 @@ exports.viewPostsContent = function(req, res) {
     //console.log("Num of pids are: " + pidList.length);
 
     var counter = 0;
+    console.log(pidList);
+    console.log(uidList);
+    console.log("!!!!!!!!!!!!!!!eid list:");
+    console.log(eidList);
     pack = lib.createViewPostingPack(req.body.session_key,
 	    parseInt(req.body.uid), parseInt(uidList[counter]), eidList[counter], pidList[counter]);
     var f = function(data) {

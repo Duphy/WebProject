@@ -199,7 +199,6 @@ $(document).ready(function(){
   });
 
   //Just show the first tag for each post
-  $(".tagsGroup").width("+=10");
   $(".tagsGroup a").hide();
   $('.tagHead').show();
   adjustTags();
@@ -207,10 +206,12 @@ $(document).ready(function(){
   $(window).resize(function(){
     $.each($(".tagHead"),function(index,element){
       var tagsGroup = $(element).closest(".tagsGroup");
-      var parentWidth = $('.tagsGroup').closest('.span2').width();
-      var selfWidth = $(element).closest(".tagsGroup").width();
-      $(element).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
+      var parentWidth = $(tagsGroup).closest('.span2').width();
+      var selfWidth = $(tagsGroup).width();
+      $(tagsGroup).css('margin-left',parentWidth - selfWidth);
     });
+    var parentWidth = $("#userNameLink").parent().width();
+    $("#userNameLink").css("width",parentWidth);
   });
 
   $("#left").click(function(){
@@ -372,16 +373,16 @@ $(document).ready(function(){
   $('body').delegate('.tagHead','mouseover',function(){
     var tagsGroup = $(this).closest(".tagsGroup");
     $(tagsGroup).children().slideDown( "fast");
-    var parentWidth = $('.tagsGroup').closest('.span2').width();
-    var selfWidth = $(this).closest(".tagsGroup").width();
-    $(this).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
+    var parentWidth = $(tagsGroup).closest('.span2').width();
+    var selfWidth = $(tagsGroup).width();
+    $(tagsGroup).css('margin-left',parentWidth - selfWidth);
     setTimeout(function(){
       $(tagsGroup).children("a:not(:first-child)").slideUp( "fast",function(){
-        var parentWidth = $('.tagsGroup').closest('.span2').width();
-        var selfWidth = $(this).closest(".tagsGroup").width();
-        $(this).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
+        var parentWidth = $(tagsGroup).closest('.span2').width();
+        var selfWidth = $(tagsGroup).width();
+        $(tagsGroup).css('margin-left',parentWidth - selfWidth);
       });
-      },3000);
+    },3000);
     });
   
   $('body').delegate('.replyLink','click',function(){

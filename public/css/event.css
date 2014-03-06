@@ -1,3 +1,7 @@
+.disableRoundCorner{
+	border-radius: 0px !important;
+}
+
 .websiteFont{
 	font-family: 'Lato', sans-serif;font-weight:300;
 }
@@ -410,6 +414,14 @@ width:24px;
 height:30px;
 display: none;
 }
+
+#floatingBarsG-picture{
+position:relative;
+width:24px;
+height:30px;
+display: none;
+}
+
 .blockG{
 position:absolute;
 background-color:#FFFFFF;
@@ -620,4 +632,25 @@ background-color:#FFFFFF}
 	outline:none;
 	text-decoration:none;
 	display:none;
+}
+
+.file-wrapper {
+  cursor: pointer;
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+  margin-top:1%;
+  margin-left:33%;
+}
+
+.file-wrapper input {
+  cursor: pointer;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.0;
+  opacity: 0.0;
+  font-size: 100px;
 }
