@@ -1069,8 +1069,12 @@ exports.viewEventPosts = function(req, res) {
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	//console.log(pkg);
+	var pids = pkg[1][2];
+	for(var i =0 ; i<pids.length;i++){
+		pids[i][1] = helper.hexToDec(pids[i][1]);
+	}
 	output = {
-	    "pidsets" : pkg[1][2]
+	    "pidsets" : pids
 	};
 	res.send(output);
     }, function() {
@@ -1267,7 +1271,7 @@ exports.viewPostsContent = function(req, res) {
     console.log("!!!!!!!!!!!!!!!eid list:");
     console.log(eidList);
     pack = lib.createViewPostingPack(req.body.session_key,
-	    parseInt(req.body.uid), parseInt(uidList[counter]), eidList[counter], pidList[counter]);
+	    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
     var f = function(data) {
 	var pkg = lib.resolvPack(data);
 	if (typeof pkg[1] == "undefined") {
@@ -1315,7 +1319,7 @@ exports.viewPostsContent = function(req, res) {
 	    });
 	else {
 	    pack = lib.createViewPostingPack(req.body.session_key,
-		    parseInt(req.body.uid), parseInt(uidList[counter]), eidList[counter], pidList[counter]);
+		    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
 	   // console.log(pack);
 	    helper.connectAndSend(pack, f, function() {
 		res.send({
