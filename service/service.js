@@ -71,8 +71,7 @@ exports.setClearChatHandler = function(handler){
 	clearChatHandler = handler;
 }
 function loginAuth(req, res) {
-    const
-    LOG_IN_MODE = 1;
+    console.log(req.body.account);
     var account = req.body.account;
     if(req.body.login_mode==0){
     	account = parseInt(account);

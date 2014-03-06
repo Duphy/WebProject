@@ -255,16 +255,29 @@ $(document).ready(function(){
 
 	$('#login').click(function(){
 		$('#loginAlert').hide();
-		var Email = $('#loginEmail').val();
+		var loginMode = 0;
+		var account = $('#loginEmail').val();
 		var password = $('#loginPassword').val();
 		var proceed = true;
-		if(Email == ""){
-			$('#loginEmailLabel').html('<strong>Email </strong><font color ="#B94A48">*required</font>');
+		if(account == ""){
+			$('#loginEmailLabel').html('<strong>Email/Circa ID </strong><font color ="#B94A48">*required</font>');
+			$('#loginEmail').css('border-color','#B94A48');
+			proceed = false;
+		}else if(!isValidEmailAddress(account)&&isNaN(account)){
+			$('#loginEmailLabel').html('<strong>Email/Circa ID </strong><font color ="#B94A48">*invalid</font>');
 			$('#loginEmail').css('border-color','#B94A48');
 			proceed = false;
 		}else{
-			$('#loginEmailLabel').html('<strong>Email</strong>');
+			$('#loginEmailLabel').html('<strong>Email/Circa ID</strong>');
 			$('#loginEmail').css('border-color','#CCC');
+			if(isValidEmailAddress(account)){
+				loginMode = 1;
+			}else{
+				loginMode = 0;
+			}
+		}
+		if(!isValidEmailAddress(account)&&isNaN(account)){
+
 		}
 		if(password == ""){
 			$('#loginPasswordLabel').html('<strong>Password </strong><font color ="#B94A48">*required</font>');
@@ -278,8 +291,10 @@ $(document).ready(function(){
 			$("#floatingBarsG-login").show();
 			$("#login").attr("disabled","disabled");
 			var data = {};
-			data.email = Email;
+			data.login_mode = loginMode;
+			data.account = account;
 			data.password = password;
+			console.log(data);
 			$.ajax({
 				url:"/login",
 				data:JSON.stringify(data),
