@@ -73,7 +73,11 @@ exports.setClearChatHandler = function(handler){
 function loginAuth(req, res) {
     const
     LOG_IN_MODE = 1;
-    var pack = lib.createLoginPack(LOG_IN_MODE, req.body.email,
+    var account = req.body.account;
+    if(req.body.login_mode==0){
+    	account = parseInt(account);
+    }
+    var pack = lib.createLoginPack(req.body.login_mode, account,
 	    req.body.password);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
