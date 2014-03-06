@@ -14,6 +14,8 @@ localStorage.common_friends = "";
 $(document).ready(function(){ 
 
   $(".imgLiquidFill").imgLiquid();
+  $("#postArea").elastic();
+  $("#pictureDescArea").elastic();
 
   //set authentication data
   var auth_data = {};
