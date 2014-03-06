@@ -81,7 +81,6 @@ $(document).ready(function(){
   $('#postArea').css({'width':$('#postModal').width()*0.9,'height':"80px"});
 
   //Just show the first tag for each post
-  $(".tagsGroup").width("+=10");
   $(".tagsGroup a").hide();
   $('.tagHead').show();
   adjustTags();
@@ -89,9 +88,9 @@ $(document).ready(function(){
   $(window).resize(function(){
     $.each($(".tagHead"),function(index,element){
       var tagsGroup = $(element).closest(".tagsGroup");
-      var parentWidth = $('.tagsGroup').closest('.span2').width();
-      var selfWidth = $(element).closest(".tagsGroup").width();
-      $(element).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
+      var parentWidth = $(tagsGroup).closest('.span2').width();
+      var selfWidth = $(tagsGroup).width();
+      $(tagsGroup).css('margin-left',parentWidth - selfWidth);
     });
     var parentWidth = $("#userNameLink").parent().width();
     $("#userNameLink").css("width",parentWidth);
@@ -925,14 +924,14 @@ $(document).ready(function(){
 	$('body').delegate('.tagHead','mouseover',function(){
     var tagsGroup = $(this).closest(".tagsGroup");
 		$(tagsGroup).children().slideDown( "fast");
-		var parentWidth = $('.tagsGroup').closest('.span2').width();
-		var selfWidth = $(this).closest(".tagsGroup").width();
-		$(this).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
+		var parentWidth = $(tagsGroup).closest('.span2').width();
+		var selfWidth = $(tagsGroup).width();
+		$(tagsGroup).css('margin-left',parentWidth - selfWidth);
     setTimeout(function(){
       $(tagsGroup).children("a:not(:first-child)").slideUp( "fast",function(){
-        var parentWidth = $('.tagsGroup').closest('.span2').width();
-        var selfWidth = $(this).closest(".tagsGroup").width();
-        $(this).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
+        var parentWidth = $(tagsGroup).closest('.span2').width();
+        var selfWidth = $(tagsGroup).width();
+        $(tagsGroup).css('margin-left',parentWidth - selfWidth);
       });
     },3000);
 	});
@@ -1168,12 +1167,12 @@ $(document).ready(function(){
               context.find('textarea').val("");
 
               if(context.find("ul.repliesArea").length > 0){
-                var scroller = context.find(".repliesArea").first();
+                var scroller = context.find("ul.repliesArea").first();
                 scroller.append(renderReplyInLargePost(reply));
                 context.attr("repliesNumber",parseInt(context.attr("repliesNumber")));
                 scroller.scrollTop(scroller.prop('scrollHeight'));
                 var orginalPost = $("#"+context.attr("id").replace("modal",""));
-                var scroller = orginalPost.find('ul.scroller').first();
+                scroller = orginalPost.find('ul.scroller').first();
                 scroller.append(renderReply(reply));
                 orginalPost.attr("repliesNumber",parseInt(context.attr("repliesNumber")));
                 scroller.scrollTop(scroller.prop('scrollHeight'));
