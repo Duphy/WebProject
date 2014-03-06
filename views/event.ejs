@@ -95,6 +95,7 @@
 		    <label class="control-label" for="postTags" style = "text-align:left;width:50px;">Tags:</label>
 		    <div class="controls" style = "margin-left:0px;" >
 	  			<input type="text" id = "postTags" value="" data-role="tagsinput" placeholder="Add Tags"/>
+	  			<i class = "icon-question-sign" style = "margin-top:-5px;"></i>
 		    </div>
 	  	</div>
 	  	</form>
@@ -187,17 +188,17 @@
           		<div class="control-group" id = "nameGroup">
 	            	<label class="control-label" for="inputName">Name<font style = "color:red;">*</font></label>
 	            	<div class="controls">
-	            		<input type="text" id="inputName">
+	            		<input type="text" id="inputName" class = "disableRoundCorner">
 	            	</div>
 	          	</div>
                 <div class="control-group" id = "cityGroup">
             		<label class="control-label" for="inputCity">City<font style = "color:red;">*</font></label>
             		<div class="controls">
-              			<input type="text" id="inputCity">
+              			<input type="text" id="inputCity" class = "disableRoundCorner">
             		</div>
           		</div>
                 <div class="control-group" id = "tagsGroup">
-	            	<label class="control-label" for="inputTags"/>Tags</label>
+	            	<label class="control-label" for="inputTags"/>Tags: <i class = "icon-question-sign"></i></label>
 	            	<div class="controls">
 	           			<input type="text" id = "inputTags" data-role="tagsinput" />
 	            	</div>
@@ -351,7 +352,6 @@
 		  </div>
 	  </div>
 	</div>
-	<div data-toggle = "modal" id = "timeout" href="#timeoutModal" data-backdrop="static" data-keyboard="false" style = "opacity:0;"></div>
 	<script src = "/js/socket.js"></script>
 </body>
 </html>

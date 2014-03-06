@@ -11,8 +11,8 @@
 
 	<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="cbp-spmenu-s1">
 		<div id = "settingsList" style = "overflow:hidden;">
-			<a id = "settingUserNews"><i class = "icon-file"></i>&nbsp;&nbsp;User News</a>
-			<a id = "settingEventNews"><i class = "icon-list-alt"></i>&nbsp;&nbsp;Circa News</a>
+			<a id = "settingAllNews"><i class = "icon-file"></i>&nbsp;&nbsp;All News</a>
+			<a id = "settingFriendsNews"><i class = "icon-list-alt"></i>&nbsp;&nbsp;Friends News</a>
 			<a href="#profileModal" id = "settingProfile" data-toggle="modal"><i class="icon-book"></i>&nbsp;&nbsp;Profile</a>
 			<a href="#createEventModal" id = "settingCreateEvent" data-toggle="modal"><i class="icon-plus-sign"></i>&nbsp;&nbsp;Create Group</a>
 			<a href="#" id = "navilogout"><i class="icon-off"></i>&nbsp;&nbsp;Logout</a>
@@ -109,13 +109,13 @@
 	  	<div class="control-group">
 	  		<label class="control-label" for="postArea" style = "text-align:left;" data-toggle="tooltip" data-placement="right" title="first tooltip">Post Content <font style = "color:red;">*</font> :</label>
 		    <div class="controls">
-				<textarea rows="5" id = "postArea" placeholder="Share your new ideas..."></textarea>
+				<textarea rows="5" id = "postArea" class = "disableRoundCorner" placeholder="Share your new ideas..."></textarea>
 		    </div>
 		</div>
 	  	<div class="control-group">
-		    <label class="control-label" for="postTags" style = "text-align:left;width:50px;">Tags:</label>
+		    <label class="control-label" for="postTags" style = "text-align:left;width:80px;">Tags: <i class = "icon-question-sign"></i></label>
 		    <div class="controls" style = "margin-left:0px;" >
-	  			<input type="text" id = "postTags" value="" data-role="tagsinput"/>
+	  			<input type="text" id = "postTags" data-role="tagsinput"/>
 		    </div>
 	  	</div>
 	  	</form>
@@ -163,9 +163,10 @@
 			<div id = "previewImageArea" style = "max-width:100%;background-color:gray;"></div>
 			<!-- <img id = "preloading" src = "#" style = "height:50px;width:50px;display:none;"> -->
 		</div>
-		<textarea rows="3" id = "pictureDescArea" placeholder="Photo Description..." style = "width:97%;border-radius:0px;display:none;"></textarea>
+		<textarea rows="6" id = "pictureDescArea" placeholder="Photo Description..." style = "width:97%;display:none;" class = "disableRoundCorner"></textarea>
 	    <div style = "border-radius:0px;margin-left:-5px;display:none;">
   			<input type="text" id = "pictureTags" value="" data-role="tagsinput"/>
+  			<i class = "icon-question-sign" style = "margin-top:-5px;"></i>
 	    </div>
 	  </div>
 	  <div class="modal-footer">
@@ -276,19 +277,19 @@
       	<form class="row-fluid updateBody" style = "width:95%;padding-left:20px;display:none;">
       		<div class = "span6">
           		<div class="control-group" id = "nameGroup">
-	            	<label class="control-label" for="inputName">Name<font style = "color:red;">*</font></label>
+	            	<label class="control-label" for="inputName">Name</label>
 	            	<div class="controls">
-	            		<input type="text" id="inputName">
+	            		<input type="text" id="inputName" class = "disableRoundCorner">
 	            	</div>
 	          	</div>
           		<div class="control-group" id = "birthdayGroup"> 
            			<label class="control-label" for="inputBirthday">Birthday<font style = "color:red;">*</font></label>
 	            	<div class="controls">
-	              		<input type="date" id="inputBirthday">
+	              		<input type="date" id="inputBirthday" class = "disableRoundCorner">
 	            	</div>
           		</div>
 	            <div class="control-group" id = "tagsGroup">
-	            	<label class="control-label" for="inputTags"/>Tags</label>
+	            	<label class="control-label" for="inputTags"/>Tags: <i class = "icon-question-sign"></i></label>
 	            	<div class="controls">
 	           			<input type="text" id = "inputTags" data-role="tagsinput" />
 	            	</div>
@@ -299,7 +300,7 @@
 	            <div class="control-group" id = "nickNameGroup">
 	            	<label class="control-label" for="inputNickName">Nickname<font style = "color:red;">*</font></label>
 	            	<div class="controls">
-		            	<input type="text" id="inputNickName">
+		            	<input type="text" id="inputNickName" class = "disableRoundCorner">
 		            </div>
           		</div>
           		<div class="control-group" id = "genderGroup">
@@ -351,17 +352,17 @@
 		  <div class="control-group" id = "nameGroup">
 		    <label class="control-label" for="createEventInputName">Group Name<font style = "color:red;">*</font></label>
 		    <div class="controls">
-		      <input class = "span6 createEventInput" type="text" id="createEventInputName">
+		      <input class = "span6 createEventInput disableRoundCorner" type="text" id="createEventInputName">
 		    </div>
 		  </div>
 	      <div class="control-group" id = "nameGroup">
 		    <label class="control-label" for="createEventInputDescription">Description<font style = "color:red;">*</font></label>
 		    <div class="controls">
-		      <input class = "span6 createEventInput" type="text" id="createEventInputDescription">
+		      <input class = "span6 createEventInput disableRoundCorner" type="text" id="createEventInputDescription">
 		    </div>
 		  </div>
 		  <div class="control-group" id = "tagsGroup">
-		    <label class="control-label" for="createEventInputTags"/>Tags</label>
+		    <label class="control-label" for="createEventInputTags"/>Tags: <i class = "icon-question-sign"></i></label>
 		    <div class="controls">
 		      <input type="text" id="createEventInputTags" data-role="tagsinput">
 		    </div>
@@ -516,23 +517,22 @@
 			        <img class = "modalAvarta" src="" style="width:40px;height:40px;border-radius:20px;">
 			      </div>
 			      <div class="span10" style="text-align:left;">
-			        <a href="#" class="userName" name="" uid="" style="font-family: 'Lato', sans-serif;font-weight:300;">Sophie</a>
+			        <a href="#" class="userName" name="" uid="" style="font-family: 'Lato', sans-serif;font-weight:300;"></a>
 			        <p style="font-size:12px;color:#999;font-family: 'Lato', sans-serif;font-weight:300;">Feb  25, 2014 &nbsp;&nbsp;21:22</p>
 			      </div>
 			    </div>
 			  </div>
 			  <div class="row-fluid">
-			    <div class="span10 pull-left">
-			        <pre class="length-limited" style="font-family: 'Lato', sans-serif;font-weight:300;">Love the front page!</pre>
+			    <div class="span12 pull-left" style = "max-height:250px;overflow:scroll;">
+			        <pre class="length-limited" style="font-family: 'Lato', sans-serif;font-weight:300;"></pre>
 			    </div>
 			  </div>
-			  <div class="row-fluid shareButtons" style="margin-top:10px;">
 			  </div>
 			  <hr style = "margin-bottom:0px;">
 			  <ul class = "row-fluid repliesArea" style = "width:100%;max-height:350px;margin-bottom:10px;overflow:scroll;margin-left:0px;">
 			  </ul>
 			  <div class="row-fluid" style="margin-bottom:10px;">
-			      <textarea class="input-block-level replyInput" replytouid="" replytoname="" type="text" placeholder="Add Comments here..."></textarea>
+			      <textarea class="input-block-level replyInput disableRoundCorner" replytouid="" replytoname="" type="text" placeholder="Add Comments here..."></textarea>
 			      <button class="btn replyCancel pull-right  button" style="margin-left:10px;">Cancel</button>
 			      <button class="btn btn-success replySubmit pull-right button" disabled="">Post</button>
 			  </div>
@@ -541,7 +541,6 @@
 	  </div>
 	</div>
 
-	<div data-toggle = "modal" id = "timeout" href="#timeoutModal" data-backdrop="static" data-keyboard="false" style = "opacity:0;"></div>
 	<script src = "/js/socket.js"></script>
 
 </body>

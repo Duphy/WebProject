@@ -220,11 +220,11 @@ function renderPost(post){
         html = html + 
           '<div class = "offset1 span1"><i class = "icon-trash pull-right removePost" data-toggle = "modal" href = "#removePostModal" style = "margin-right:25%;"></i></div>'+
           '<div class = "span2 pull-right" style = "color:white;text-align: center;">'+
-            '<div class = "tagsGroup">';
+            '<div class = "tagsGroup" style = "min-width:80px;">';
       }else{
         html = html +
           '<div class = "offset2 span2 pull-right" style = "color:white;text-align: center;">'+
-            '<div class = "tagsGroup">';
+            '<div class = "tagsGroup" style = "min-width:80px;">';
       }
     var posttags = sortTags(post.tags); 
     var length = Math.min(4,posttags.length);       
@@ -282,7 +282,9 @@ function renderPost(post){
                 '&nbsp;&nbsp;<font>'+rtime[0]+'&nbsp;'+rtime[1]+'</font>'+
                 '</div>'+
                 '<div>'+
-                '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+(post.replies)[i].replyContent+'</pre>'+
+                '<div class = "row-fluid">'+
+                  '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+(post.replies)[i].replyContent+'</pre>'+
+                '</div>'+
                 '</div>'+
                 '</div>'+
                 '<div class = "span1">';
@@ -384,13 +386,14 @@ function createPost(data){
             success:function(data){
               if(data.pics){
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                $("#"+postid).find(".pictureArea").html("");
                 $("#"+postid).find(".pictureArea").append("<img class ='postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                 $('#pictureCancel').removeAttr("disabled");
                 $('#floatingBarsG-picture').hide();
                 $('#pictureDescArea').val("");
                 $("#pictureTags").tagsinput('removeAll');
-                $("#pictureTags").tagsinput('add','picture');
                 $("#previewImageArea").hide();
+                $("#pictureNotice").hide();
                 $("#pictureCancel").trigger('click');
               }else{
                 console.log("failed to get the picture of this post");
@@ -622,7 +625,7 @@ function renderReply(reply){
             '&nbsp;&nbsp;<font>'+reply.date+'&nbsp;'+reply.time+'</font>'+
           '</div>'+
           '<div class = "row-fluid">'+
-            '<p style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replyContent+'</p>'+
+            '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replyContent+'</pre>'+
           '</div>'+
       '</div>'+
       '<div class = "span1">';
@@ -762,7 +765,7 @@ function renderSearchUser(user){
 }
 
 function renderProfile(){
-  $("#name").html(localStorage.username);
+  $("#profileName").html(localStorage.username);
   $("#nickname").html(localStorage.usernickname);
   $("#birthday").html(print_date(localStorage.raw_birthday));
   switch(localStorage.gender){
@@ -928,6 +931,7 @@ function viewpost(pids,char,newsData){
                         success:function(data){
                           if(data.pics){
                             var postid = element.uid+""+element.eid+""+element.pid;
+                            $("#"+postid).find(".pictureArea").html("");
                             $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                           }else{
                             console.log("failed to get the picture of this post");
@@ -1269,11 +1273,16 @@ function removeNotification(){
 }
 
 function adjustTags(){
-  var parents = $('.tagsGroup').closest('.span2');
-  var selves = $('.tagsGroup');
-  for(var number = 0; number < parents.length;number++){
-  $(selves[number]).css('margin-left',$(parents[number]).width() - $(selves[number]).width());
-  }
+  $.each($(".tagsGroup"),function(index, element){
+    var parentsWidth = $(element).closest(".span2").width();
+    var childWidth = $(element).width();
+    $(element).css("margin-left",parentsWidth - childWidth + 1);
+  });
+  // var parents = $('.tagsGroup').closest('.span2');
+  // var selves = $('.tagsGroup');
+  // for(var number = 0; number < parents.length;number++){
+  // $(selves[number]).css('margin-left',$(parents[number]).width() - $(selves[number]).width() - 1);
+  // }
 }
 
 function checkEvent(eid){
@@ -1521,6 +1530,7 @@ function getMorePosts(char,newsData){
                     if(data.pics){
                       
                       var postid = element.uid+""+element.eid+""+element.pid;
+                      $("#"+postid).find(".pictureArea").html("");
                       $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                     }else{
                       console.log("failed to get the picture of this post");

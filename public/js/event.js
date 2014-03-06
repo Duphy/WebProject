@@ -26,6 +26,8 @@ $(document).ready(function(){
 
   $(".bootstrap-tagsinput").find("input").attr("placeholder","Add").attr("size",8);
   $(".bootstrap-tagsinput").find("input").limit('20');
+  $(".bootstrap-tagsinput").css("border-radius","0px");
+  $(".icon-question-sign").tooltip({title:"Add the tag you want by typing in it and press Enter; Remove the tag by pressing Delete.",placement:"right"});
   $('body').delegate('#postArea','keyup',function(){
     if($(this).val() == ""){
       $("#postSubmit").attr('disabled','disabled');
@@ -44,6 +46,7 @@ $(document).ready(function(){
   $.ajax({
    url:'/geteventinfo',
    data:JSON.stringify(view_auth_data),
+   timeout:10000,
    type:"POST",
    contentType:"application/json",
    success:function(data){
@@ -91,6 +94,7 @@ $(document).ready(function(){
   $.ajax({
     url:"/geteventavarta",
     data:JSON.stringify(eventAvartaData),
+    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -114,6 +118,7 @@ $(document).ready(function(){
     $.ajax({
      url:"/geteventpost",
      data:JSON.stringify(newsData),
+     timeout:10000,
      type:"POST",
      contentType: 'application/json',
      success:function(data){
@@ -136,6 +141,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/geteventmanagers",
       data:JSON.stringify(view_auth_data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -165,6 +171,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/geteventmembers",
       data:JSON.stringify(view_auth_data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -300,6 +307,7 @@ $(document).ready(function(){
         $.ajax({
             url:'/updateevent',
             data:JSON.stringify(data),
+            timeout:10000,
             type:'POST',
             contentType: 'application/json',
             success:function(data){
@@ -368,6 +376,7 @@ $("body").delegate("#settingJoinEvent",'click',function(){
   $.ajax({
     url:"/joinevent",
     data:JSON.stringify(data),
+    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(result){
@@ -457,6 +466,7 @@ $("body").delegate(".memberItem", 'click', function() {
       $.ajax({
              url:"/geteventmembers",
              data:JSON.stringify(view_auth_data),
+             timeout:10000,
              type:"POST",
              contentType: 'application/json',
              success:function(data){
@@ -522,6 +532,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/deletepost",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -566,6 +577,7 @@ $("body").delegate(".memberItem", 'click', function() {
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
+            timeout:10000,
             type:"POST",
             contentType: 'application/json',
             success:function(data){
@@ -628,6 +640,7 @@ $("body").delegate(".memberItem", 'click', function() {
                      $.ajax({
                             url:"/createreply",
                             data:JSON.stringify(data),
+                            timeout:10000,
                             type:"POST",
                             contentType: 'application/json',
                             success:function(result){
@@ -737,6 +750,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/quitevent",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -837,6 +851,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -868,6 +883,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -913,6 +929,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -939,6 +956,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
+      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
