@@ -745,7 +745,7 @@ $(document).ready(function(){
         console.log("All News:");
         console.log(data);
         //TO DO: to be verified.
-        viewpost(data.pidsets,1,newsData);
+        viewpost(data.pidsets,0,newsData);
         $("#userNameLink").html("All News");
       },
       error:function(jqXHR, textStatus, errorThrown){
@@ -1398,8 +1398,8 @@ $(document).ready(function(){
   });
 
   $(document).on('click', "#searchNav", function() {
+    localStorage.search_tag_option = "user";
     localStorage.search_tag_content = "";
-    localStorage.search_tag_option = "";
     window.location = "/search";
     return false;
   });

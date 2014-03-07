@@ -192,7 +192,8 @@ $(document).ready(function(){
 					if(data.status == "successful"){
 						console.log("sigup: successfully create new user.");
                     	var data = {};
-                    	data.email = email;
+                    	data.login_mode = 1;
+                    	data.account = email;
                     	data.password = password;
 						$.ajax({
 						url:"/login",

@@ -610,8 +610,8 @@ $(document).ready(function(){
   });
 
   $(document).on('click', "#searchNav", function() {
+    localStorage.search_tag_option = "user";
     localStorage.search_tag_content = "";
-    localStorage.search_tag_option = "";
     window.location = "/search";
     return false;
   });
