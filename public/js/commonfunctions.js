@@ -988,9 +988,11 @@ function viewpost(pids,char,newsData){
               $("#loadMoreButton").show();
               $("#circularG").hide();
               $(window).scroll(function(){
+                console.log("scroll to bottom");
                 if($(window).scrollTop() + $(window).height() == $(document).height() && loadingFlag){
                   getMorePosts(char,newsData);
                 }
+                return false;
               });
             }
           },
@@ -1448,6 +1450,8 @@ function getMorePosts(char,newsData){
     }
     if(postCounter+6>=pidsets.length){
       var posturl;
+
+      //TO DO: consider is it needed to set this case checking or not.
       switch (char){
         case 0://self
           posturl = "/getusernews"
