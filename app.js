@@ -397,7 +397,7 @@ function saveChat(chat){
                     //socket.emit("receive event chat",service.helper.hexToDec(chat[1][1]),chat[1][2],service.sanitizer.escape(chat[1][3]),chat[1][4],chat[1][5]);//eid,s_uid, message, date, time
                     var data = {};
                 	var uid = chat[0][2];
-                	data.eid = chat[1][1];
+                	data.eid = service.helper.hexToDec(chat[1][1]);
                 	data.sender_uid = chat[1][2];
                 	data.content = chat[1][3];
                 	data.date = chat[1][4];
