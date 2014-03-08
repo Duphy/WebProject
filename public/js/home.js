@@ -37,6 +37,8 @@ $(document).ready(function(){
   //update the user name in the navbar
   $("#left a").prepend('<div class = "span2"><img class = "selfProfileSmallAvarta" id = "navi_avarta" src = "#" style = "width:22px;height:22px;border-radius:11px;"></div><div class= "span6"><strong id="userNameLink" class = "pull-left" style = "text-overflow: ellipsis;overflow: hidden;white-space: nowrap;display: block;">user</strong></div>');
 	$("#userNameLink").text(localStorage.usernickname);
+  var parentWidth = $("#userNameLink").parent().width();
+  $("#userNameLink").css("width",parentWidth);
 
   //set self avarta data
 	var selfAvartaData = {};
