@@ -600,6 +600,25 @@ function search(val,type){
                       $('#right-column').append(renderSearchUser(element));
                       loadOrder = 0;
                     }
+                    var searchUserAvartaData = {};
+                    searchUserAvartaData.session_key = localStorage.session_key;
+                    searchUserAvartaData.uid = localStorage.uid;
+                    searchUserAvartaData.view_uid = element.uid;
+                    $.ajax({
+                        url:'/getuseravarta',
+                        data:JSON.stringify(searchUserAvartaData),
+                        timeout:10000,
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                          $(".user_small_avarta"+element.uid).attr("src",data.avarta);
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeoutModal").modal("show");
+                          }
+                        }
+                    });
                     $(".tagsGroup").width("+=10");
                     $(".tagsGroup a").hide();
                     $('.tagHead').show();
@@ -665,6 +684,25 @@ function search(val,type){
                       $('#right-column').append(renderSearchUser(element));
                       loadOrder = 0;
                     }
+                    var searchUserAvartaData = {};
+                    searchUserAvartaData.session_key = localStorage.session_key;
+                    searchUserAvartaData.uid = localStorage.uid;
+                    searchUserAvartaData.view_uid = element.uid;
+                    $.ajax({
+                        url:'/getuseravarta',
+                        data:JSON.stringify(searchUserAvartaData),
+                        timeout:10000,
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                          $(".user_small_avarta"+element.uid).attr("src",data.avarta);
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeoutModal").modal("show");
+                          }
+                        }
+                    });
                     $(".tagsGroup").width("+=10");
                     $(".tagsGroup a").hide();
                     $('.tagHead').show();

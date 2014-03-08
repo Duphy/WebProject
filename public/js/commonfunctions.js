@@ -1363,6 +1363,9 @@ function renderChatBox(type, id, chatBoxNumber){
 function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
   $("#chatArea").append(renderChatBox("user", friendUid, chatBoxNumber));
   $(".chat-window-text-box").elastic();
+  $(".chat-window-text-box").mouseDown(function(){
+
+  });
   var userData = {};
   userData.session_key = session_key;
   userData.uid = selfUid;
