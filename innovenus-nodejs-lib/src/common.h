@@ -57,6 +57,7 @@ void encode(std::string &buf, uint32_t length);
 #elif _LINUX || __APPLE__ || linux
 #include <stdarg.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #endif
 
 #ifdef _WIN32
@@ -135,14 +136,12 @@ static bool CreateDir(std::string path) {
 	int i = 0;
 	int iRet;
 	int iLen = path.length();
-	//在末尾加/
+
 	if (path[path.length() - 1] != '/')
 		path += '/';
 
-	// 创建目录
 	for (i = 0; i < iLen; i++) {
 		if (path[i] == '/') {
-			//如果不存在,创建
 			iRet = ACCESS(path.substr(0, i).c_str(), 0);
 			if (iRet != 0) {
 				iRet = MKDIR(path.substr(0, i).c_str());
