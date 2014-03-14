@@ -988,8 +988,6 @@ function viewpost(pids,char,newsData){
               $("#loadMoreButton").show();
               $("#circularG").hide();
               $(window).scroll(function(){
-                console.log("scroll to bottom");
-                console.log("loading flag:"+loadingFlag);
                 if($(window).scrollTop() + $(window).height() >= $(document).height() && loadingFlag){
                   getMorePosts(char,newsData);
                 }
@@ -1443,7 +1441,7 @@ function getMorePosts(char,newsData){
   console.log("getMorePost");
   console.log(postCounter);
   console.log(pidsets.length);
-  if(postCounter<=pidsets.length){
+  if(postCounter < pidsets.length){
     console.log("processing get more post");
     loadingFlag = false;
     $("#loadMoreButton").hide();
@@ -1493,12 +1491,114 @@ function getMorePosts(char,newsData){
               $("#loadMoreButton").html("No More Posts");
               $("#loadMoreButton").attr("disabled","disabled");
             }
-          }
-          else{
-            for(var j=0;j<data.pidsets.length;j++)
+          }else{
+            for(var j=0;j<data.pidsets.length;j++){
               pidsets.push(data.pidsets[j]);
+            }
+            console.log("new pidsets:");
+            console.log(pidsets);
           }
-          console.log(pidsets);
+          postCounter = Math.min(postCounter+6,pidsets.length);
+          $.ajax({
+               url:"/getpostscontent",
+               data:JSON.stringify(postData),
+               timeout:10000,
+               type:"POST",
+               contentType: 'application/json',
+                success:function(result){
+                if(result.status == "successful"){
+                $.each(result.source,function(index,element){
+                    var postAvartaData = {};
+                    postAvartaData.session_key = localStorage.session_key;
+                    postAvartaData.uid = localStorage.uid;
+                    postAvartaData.view_uid = element.uid;
+                    var replyAvartaData = {};
+                    replyAvartaData.session_key = localStorage.session_key;
+                    replyAvartaData.uid = localStorage.uid;
+                    if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
+                      $('#right-column').append(renderPost(element));
+                    }else{
+                      $('#left-column').append(renderPost(element));
+                    }
+                    //retrieve the pics of the element if any.
+                    if(element.picids && element.picids.length > 0){
+                      var pictureData  = {};
+                      pictureData.session_key = localStorage.session_key;
+                      pictureData.uid = localStorage.uid;
+                      pictureData.picid = element.picids[0];
+                      $.ajax({
+                        url:'/getpicture',
+                        data:JSON.stringify(pictureData),
+                        timeout:10000,
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                          if(data.pics){
+                            
+                            var postid = element.uid+""+element.eid+""+element.pid;
+                            $("#"+postid).find(".pictureArea").html("");
+                            $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                          }else{
+                            console.log("failed to get the picture of this post");
+                          }
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeoutModal").modal("show");
+                          }
+                        }
+                      });
+                    }
+                    $.ajax({
+                        url:'/getuseravarta',
+                        data:JSON.stringify(postAvartaData),
+                        timeout:10000,
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                            $("#post_user_avarta"+element.pid).attr("src",data.avarta);
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeoutModal").modal("show");
+                          }
+                        }
+                    });
+                    $.each(element.replies,function(replyIndex,reply){
+                        replyAvartaData.view_uid = reply.replier_uid;
+                        replyAvartaData.time = 0000//getCurrentTime();
+                        replyAvartaData.date = 00000000//getCurrentDate();
+                        $.ajax({
+                            url:'/getuseravarta',
+                            data:JSON.stringify(replyAvartaData),
+                            timeout:10000,
+                            type:"POST",
+                            contentType:"application/json",
+                            success:function(data){
+                                $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
+                            },
+                            error:function(jqXHR, textStatus, errorThrown){
+                              if(textStatus == "timeout"){
+                                $("#timeoutModal").modal("show");
+                              }
+                            }
+                        });
+                    });
+                });
+                $(".tagsGroup a").hide();
+                $('.tagHead').show();
+                adjustTags();
+                $("#loadMoreButton").show();
+                $("#circularG").hide();
+                loadingFlag = true;
+                }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
+                  }
+                }
+          });
         },
         error:function(jqXHR, textStatus, errorThrown){
           if(textStatus == "timeout"){
@@ -1506,108 +1606,109 @@ function getMorePosts(char,newsData){
           }
         }
       });
-    }
-    postCounter = Math.min(postCounter+6,pidsets.length);
-    $.ajax({
-         url:"/getpostscontent",
-         data:JSON.stringify(postData),
-         timeout:10000,
-         type:"POST",
-         contentType: 'application/json',
-          success:function(result){
-          if(result.status == "successful"){
-          $.each(result.source,function(index,element){
-              var postAvartaData = {};
-              postAvartaData.session_key = localStorage.session_key;
-              postAvartaData.uid = localStorage.uid;
-              postAvartaData.view_uid = element.uid;
-              var replyAvartaData = {};
-              replyAvartaData.session_key = localStorage.session_key;
-              replyAvartaData.uid = localStorage.uid;
-              if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
-                $('#right-column').append(renderPost(element));
-              }else{
-                $('#left-column').append(renderPost(element));
-              }
-              //retrieve the pics of the element if any.
-              if(element.picids && element.picids.length > 0){
-                var pictureData  = {};
-                pictureData.session_key = localStorage.session_key;
-                pictureData.uid = localStorage.uid;
-                pictureData.picid = element.picids[0];
-                $.ajax({
-                  url:'/getpicture',
-                  data:JSON.stringify(pictureData),
-                  timeout:10000,
-                  type:"POST",
-                  contentType:"application/json",
-                  success:function(data){
-                    if(data.pics){
-                      
-                      var postid = element.uid+""+element.eid+""+element.pid;
-                      $("#"+postid).find(".pictureArea").html("");
-                      $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
-                    }else{
-                      console.log("failed to get the picture of this post");
-                    }
-                  },
-                  error:function(jqXHR, textStatus, errorThrown){
-                    if(textStatus == "timeout"){
-                      $("#timeoutModal").modal("show");
-                    }
-                  }
-                });
-              }
-              $.ajax({
-                  url:'/getuseravarta',
-                  data:JSON.stringify(postAvartaData),
-                  timeout:10000,
-                  type:"POST",
-                  contentType:"application/json",
-                  success:function(data){
-                      $("#post_user_avarta"+element.pid).attr("src",data.avarta);
-                  },
-                  error:function(jqXHR, textStatus, errorThrown){
-                    if(textStatus == "timeout"){
-                      $("#timeoutModal").modal("show");
-                    }
-                  }
-              });
-              $.each(element.replies,function(replyIndex,reply){
-                  replyAvartaData.view_uid = reply.replier_uid;
-                  replyAvartaData.time = 0000//getCurrentTime();
-                  replyAvartaData.date = 00000000//getCurrentDate();
+    }else{
+      postCounter = Math.min(postCounter+6,pidsets.length);
+      $.ajax({
+           url:"/getpostscontent",
+           data:JSON.stringify(postData),
+           timeout:10000,
+           type:"POST",
+           contentType: 'application/json',
+            success:function(result){
+            if(result.status == "successful"){
+            $.each(result.source,function(index,element){
+                var postAvartaData = {};
+                postAvartaData.session_key = localStorage.session_key;
+                postAvartaData.uid = localStorage.uid;
+                postAvartaData.view_uid = element.uid;
+                var replyAvartaData = {};
+                replyAvartaData.session_key = localStorage.session_key;
+                replyAvartaData.uid = localStorage.uid;
+                if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
+                  $('#right-column').append(renderPost(element));
+                }else{
+                  $('#left-column').append(renderPost(element));
+                }
+                //retrieve the pics of the element if any.
+                if(element.picids && element.picids.length > 0){
+                  var pictureData  = {};
+                  pictureData.session_key = localStorage.session_key;
+                  pictureData.uid = localStorage.uid;
+                  pictureData.picid = element.picids[0];
                   $.ajax({
-                      url:'/getuseravarta',
-                      data:JSON.stringify(replyAvartaData),
-                      timeout:10000,
-                      type:"POST",
-                      contentType:"application/json",
-                      success:function(data){
-                          $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
-                      },
-                      error:function(jqXHR, textStatus, errorThrown){
-                        if(textStatus == "timeout"){
-                          $("#timeoutModal").modal("show");
-                        }
+                    url:'/getpicture',
+                    data:JSON.stringify(pictureData),
+                    timeout:10000,
+                    type:"POST",
+                    contentType:"application/json",
+                    success:function(data){
+                      if(data.pics){
+                        
+                        var postid = element.uid+""+element.eid+""+element.pid;
+                        $("#"+postid).find(".pictureArea").html("");
+                        $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                      }else{
+                        console.log("failed to get the picture of this post");
                       }
+                    },
+                    error:function(jqXHR, textStatus, errorThrown){
+                      if(textStatus == "timeout"){
+                        $("#timeoutModal").modal("show");
+                      }
+                    }
                   });
-              });
-          });
-          $(".tagsGroup a").hide();
-          $('.tagHead').show();
-          adjustTags();
-          $("#loadMoreButton").show();
-          $("#circularG").hide();
-          loadingFlag = true;
-          }
-          },
-          error:function(jqXHR, textStatus, errorThrown){
-            if(textStatus == "timeout"){
-              $("#timeoutModal").modal("show");
+                }
+                $.ajax({
+                    url:'/getuseravarta',
+                    data:JSON.stringify(postAvartaData),
+                    timeout:10000,
+                    type:"POST",
+                    contentType:"application/json",
+                    success:function(data){
+                        $("#post_user_avarta"+element.pid).attr("src",data.avarta);
+                    },
+                    error:function(jqXHR, textStatus, errorThrown){
+                      if(textStatus == "timeout"){
+                        $("#timeoutModal").modal("show");
+                      }
+                    }
+                });
+                $.each(element.replies,function(replyIndex,reply){
+                    replyAvartaData.view_uid = reply.replier_uid;
+                    replyAvartaData.time = 0000//getCurrentTime();
+                    replyAvartaData.date = 00000000//getCurrentDate();
+                    $.ajax({
+                        url:'/getuseravarta',
+                        data:JSON.stringify(replyAvartaData),
+                        timeout:10000,
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                            $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeoutModal").modal("show");
+                          }
+                        }
+                    });
+                });
+            });
+            $(".tagsGroup a").hide();
+            $('.tagHead').show();
+            adjustTags();
+            $("#loadMoreButton").show();
+            $("#circularG").hide();
+            loadingFlag = true;
             }
-          }
-    });
+            },
+            error:function(jqXHR, textStatus, errorThrown){
+              if(textStatus == "timeout"){
+                $("#timeoutModal").modal("show");
+              }
+            }
+      });
+    }
   }
 }
 
