@@ -553,11 +553,11 @@ $(document).ready(function(){
   console.log(localStorage.showAllNews);
   if(localStorage.showAllNews == "true"){
     console.log("showAllNews");
-    newsData.option = 1;
+    newsData.option = 0;
     $("#userNameLink").html("All News");
   }else if(localStorage.showAllNews == "false"){
     console.log("showFriendsNews");
-    newsData.option = 0;
+    newsData.option = 1;
     $("#userNameLink").html("Friends News");
   }
 	$.ajax({
