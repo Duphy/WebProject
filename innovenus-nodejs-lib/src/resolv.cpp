@@ -350,19 +350,48 @@ Local<Array> resolvUpdates(const char *pack, int &pointer) {
  * - 3: eventid (string)
  * - 4: pid (string)
  * - 5: action (int8)
- * - 6: msg (string)
+ * - friend-request:
+ * 		- 6: sender_name (string)
+ * 		- 7: message (string)
+ * - event-membership-request:
+ * 		- 6: sender_name (string)
+ * 		- 7: event_name (string)
+ * 		- 8: message (string)
+ * - reply-posting:
+ * 		- 6: sender_name (string)
+ * 		- 7: message (string)
+ * - other:
+ * 		- 6: message (string)
  */
 Local<Array> resolvNotification(const char *pack, int &pointer) {
 	Local<Array> ans = Array::New(7);
 	uint32_t msg_len;
-	ans->Set(0, JSreadInteger(pack, pointer, 1));
+	uint32_t subtype = readInteger(pack, pointer, 1);
+	ans->Set(0, Integer::New(subtype));
 	ans->Set(1, JSreadInteger(pack, pointer, 4));
 	ans->Set(2, JSreadInteger(pack, pointer, UID_LENGTH));
 	ans->Set(3, JSreadAsciiString(pack, pointer, EVENTID_LENGTH));
 	ans->Set(4, JSreadAsciiString(pack, pointer, POSTID_LENGTH));
 	ans->Set(5, JSreadInteger(pack, pointer, 1));
 	msg_len = readInteger(pack, pointer, 1);
-	ans->Set(6, JSreadString(pack, pointer, msg_len));
+	switch (subtype) {
+	case 0:
+		ans->Set(6, JSreadString(pack, pointer, 40));
+		ans->Set(7, JSreadString(pack, pointer, msg_len - 40));
+		break;
+	case 1:
+		ans->Set(6, JSreadString(pack, pointer, 30));
+		ans->Set(7, JSreadString(pack, pointer, 40));
+		ans->Set(8, JSreadString(pack, pointer, msg_len - 70));
+		break;
+	case 2:
+		ans->Set(6, JSreadString(pack, pointer, 48));
+		ans->Set(7, JSreadString(pack, pointer, msg_len - 48));
+		break;
+	default:
+		ans->Set(6, JSreadString(pack, pointer, msg_len));
+		break;
+	}
 	return ans;
 }
 
@@ -771,7 +800,8 @@ Handle<Value> resolvViewPack(const char *pack, const response_header &header) {
  * - \b "1 2 Search posting"
  * 		- Array: posting (::resolvPosting)
  */
-Handle<Value> resolvSearchPack(const char *pack, const response_header &header) {
+Handle<Value> resolvSearchPack(const char *pack,
+		const response_header &header) {
 	int pointer = HEADER_LENGTH;
 	switch (header.subtype) {
 	case 0:			//Search User
@@ -1200,7 +1230,8 @@ Local<Array> resolvDeletePack(const char *pack, const response_header &header) {
  * 		- \b "if not success"
  * 			- 1:reason (int8)
  */
-Local<Array> resolvValidationPack(const char *pack, const response_header &header) {
+Local<Array> resolvValidationPack(const char *pack,
+		const response_header &header) {
 	int pointer = HEADER_LENGTH;
 	Local<Array> ans = Array::New(1);
 	bool succ = readBool(pack, pointer);
@@ -1249,7 +1280,8 @@ Local<Array> resolvQuitPack(const char *pack, const response_header &header) {
  * - \todo \b "10 6 New feature suggestion"
  * - \todo \b "10 15 System polling"
  */
-Handle<Value> resolvSuggestionPack(const char *pack, const response_header &header) {
+Handle<Value> resolvSuggestionPack(const char *pack,
+		const response_header &header) {
 	int pointer = HEADER_LENGTH;
 	switch (header.subtype) {
 	case 0: //TODO friend suggestion
@@ -1295,7 +1327,8 @@ Handle<Value> resolvSuggestionPack(const char *pack, const response_header &head
  * 			- 4: send_date (int32)
  * 			- 5: send_time (int32)
  */
-Local<Object> resolvMessagePack(const char *pack, const response_header &header) {
+Local<Object> resolvMessagePack(const char *pack,
+		const response_header &header) {
 	int pointer = HEADER_LENGTH, content_len;
 	Local<Array> ans = Array::New(1);
 	uint32_t direction = readInteger(pack, pointer, 1);
