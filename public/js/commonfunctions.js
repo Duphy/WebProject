@@ -1438,9 +1438,6 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
 }
 
 function getMorePosts(char,newsData){
-  console.log("getMorePost");
-  console.log(postCounter);
-  console.log(pidsets.length);
   if(postCounter < pidsets.length){
     console.log("processing get more post");
     loadingFlag = false;
@@ -1483,9 +1480,6 @@ function getMorePosts(char,newsData){
         type:"POST",
         contentType: 'application/json',
         success:function(data){
-          console.log("More post:");
-          //console.log(data);
-          //pidsets.concat(data.pidsets);
           if(data.pidsets.length==0){
             if(postCounter>=pidsets.length){
               $("#loadMoreButton").html("No More Posts");
@@ -1495,8 +1489,6 @@ function getMorePosts(char,newsData){
             for(var j=0;j<data.pidsets.length;j++){
               pidsets.push(data.pidsets[j]);
             }
-            console.log("new pidsets:");
-            console.log(pidsets);
           }
           postCounter = Math.min(postCounter+6,pidsets.length);
           $.ajax({
