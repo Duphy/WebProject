@@ -990,9 +990,7 @@ function viewpost(pids,char,newsData){
               $(window).scroll(function(){
                 console.log("scroll to bottom");
                 console.log("loading flag:"+loadingFlag);
-                console.log($(window).scrollTop() + $(window).height());
-                console.log($(document).height());
-                if($(window).scrollTop() + $(window).height() == $(document).height() && loadingFlag){
+                if($(window).scrollTop() + $(window).height() >= $(document).height() && loadingFlag){
                   getMorePosts(char,newsData);
                 }
                 return false;
@@ -1442,7 +1440,11 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
 }
 
 function getMorePosts(char,newsData){
+  console.log("getMorePost");
+  console.log(postCounter);
+  console.log(pids.length);
   if(postCounter<pidsets.length){
+    console.log("processing get more post");
     loadingFlag = false;
     $("#loadMoreButton").hide();
     $("#circularG").show();
