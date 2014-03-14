@@ -294,7 +294,7 @@ function sendNotification(notification,socket){
 	switch(notification[0]){
 		case 0:
 			console.log("send friend notification!!!!!!!!!!!!!!!!!");
-			socket.emit("friend request",name, uid, eid, post,pid, action, n_seq);
+			socket.emit("friend request",name, uid, eid, pid, action, n_seq);
 			break;
 		case 1:
 			console.log("send event notification!!!!!!!!!!!!!!!!!");
