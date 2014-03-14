@@ -989,6 +989,7 @@ function viewpost(pids,char,newsData){
               $("#circularG").hide();
               $(window).scroll(function(){
                 console.log("scroll to bottom");
+                console.log("loading flag:"+loadingFlag);
                 if($(window).scrollTop() + $(window).height() == $(document).height() && loadingFlag){
                   getMorePosts(char,newsData);
                 }
