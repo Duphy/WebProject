@@ -1443,7 +1443,7 @@ function getMorePosts(char,newsData){
   console.log("getMorePost");
   console.log(postCounter);
   console.log(pidsets.length);
-  if(postCounter<pidsets.length){
+  if(postCounter<=pidsets.length){
     console.log("processing get more post");
     loadingFlag = false;
     $("#loadMoreButton").hide();
