@@ -285,17 +285,39 @@ function clearNotificationHandler(uid,seq){
 function sendNotification(notification,socket){
 	console.log("send notification!!!!!!!!!!!!!!!!!");
     console.log(notification);
+    var n_seq = notification[1];
+    var name = notification[1];
+    var uid = notification[2];
+    var eid = service.helper.hexToDec(notification[3]);
+    var pid = notification[4];
+    var action = notification[5];
 	switch(notification[0]){
 		case 0:
 			console.log("send friend notification!!!!!!!!!!!!!!!!!");
-			socket.emit("friend request",notification[2],notification[2],notification[3],notification[4],notification[5],notification[1]);
+			socket.emit("friend request",name, uid, eid, post,pid, action, n_seq);
 			break;
 		case 1:
 			console.log("send event notification!!!!!!!!!!!!!!!!!");
-			socket.emit("event membership request",notification[2],notification[2],notification[4],service.helper.hexToDec(notification[3]),service.helper.hexToDec(notification[3]),notification[5],notification[1]);
+			var eventName = eid; 
+			socket.emit("event membership request",name,uid, pid, eventName,eid,action, n_seq);
 			break;
 		case 2:
-			socket.emit("reply posting",notification[2],notification[2],service.helper.hexToDec(notification[3]),notification[4],notification[4],notification[1]);
+			socket.emit("reply posting",name, uid, eid, post,pid, n_seq);
+			break;
+		case 3:
+			socket.emit("event membership delete",name, uid, eid, post,pid, n_seq);
+			break;
+		case 4:
+			socket.emit("event membership invite",name, uid, eid, post,pid, n_seq);
+			break;
+		case 5:
+			socket.emit("event manager add",name, uid, eid, post,pid, n_seq);
+			break;
+		case 6:
+			socket.emit("event manager delete",name, uid, eid, post,pid, n_seq);
+			break;
+		case 8:
+			socket.emit("tagged",name, uid, eid, post,pid, n_seq);
 			break;
 		default:
 			console.log("no matched notification type!");

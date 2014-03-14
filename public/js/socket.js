@@ -98,6 +98,7 @@ socket.on("event membership request",function(name,uid, pid, eventName,eid,actio
 });
 
 socket.on("reply posting",function(name, uid, eid, post,pid, seq){
+	console.log("reply noti");
 	console.log("notfication name: "+name+" uid: "+uid+" post: "+eventName+" pid: "+eid);
 	var newNotificationNumber = parseInt($("#notificationNumber").html().trim()) + 1;
 	$("#notificationNumber").html(" "+newNotificationNumber+" ");
