@@ -1442,7 +1442,7 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
 function getMorePosts(char,newsData){
   console.log("getMorePost");
   console.log(postCounter);
-  console.log(pids.length);
+  console.log(pidsets.length);
   if(postCounter<pidsets.length){
     console.log("processing get more post");
     loadingFlag = false;
