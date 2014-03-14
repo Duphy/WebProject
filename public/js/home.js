@@ -700,6 +700,8 @@ $(document).ready(function(){
     newsData.uid = localStorage.uid;
     newsData.option = 0;
     newsData.max_pid = "default";
+    postCounter=0;
+    pidsets = []; 
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();
     $("#circularG").show();
@@ -730,7 +732,9 @@ $(document).ready(function(){
     var newsData = {};
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
+    postCounter=0;
     newsData.option = 1;
+    pidsets = []; 
     newsData.max_pid = "default";
     var date = new Date();
     var timeoffset = date.getTimezoneOffset();

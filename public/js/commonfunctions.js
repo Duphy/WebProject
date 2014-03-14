@@ -873,7 +873,7 @@ function viewpost(pids,char,newsData){
         $("#contentBody").find(".well").hide();
         $("#loadMoreButton").hide();
         $("#circularG").show();
-        var loadingFlag = true;
+        loadingFlag = true;
         pidsets = pids;
         var postData = {};
         postData.session_key = localStorage.session_key;
@@ -988,7 +988,9 @@ function viewpost(pids,char,newsData){
               $("#loadMoreButton").show();
               $("#circularG").hide();
               $(window).scroll(function(){
+                console.log(loadingFlag);
                 if($(window).scrollTop() + $(window).height() >= $(document).height() && loadingFlag){
+                  loadingFlag = false;
                   getMorePosts(char,newsData);
                 }
                 return false;
@@ -1439,8 +1441,6 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
 
 function getMorePosts(char,newsData){
   if(postCounter < pidsets.length){
-    console.log("processing get more post");
-    loadingFlag = false;
     $("#loadMoreButton").hide();
     $("#circularG").show();
     var postData = {};
@@ -1454,9 +1454,10 @@ function getMorePosts(char,newsData){
       postData.eidList[i-postCounter] = pidsets[i][1];
       postData.pidList[i-postCounter] = pidsets[i][2];
     }
+    console.log(postCounter);
+    console.log(pidsets.length);
     if(postCounter+6>=pidsets.length){
       var posturl;
-
       //TO DO: consider is it needed to set this case checking or not.
       switch (char){
         case 0://self
@@ -1490,6 +1491,8 @@ function getMorePosts(char,newsData){
               pidsets.push(data.pidsets[j]);
             }
           }
+          console.log(postCounter);
+          console.log(pidsets.length);
           postCounter = Math.min(postCounter+6,pidsets.length);
           $.ajax({
                url:"/getpostscontent",
@@ -1500,6 +1503,7 @@ function getMorePosts(char,newsData){
                 success:function(result){
                 if(result.status == "successful"){
                 $.each(result.source,function(index,element){
+                    console.log("here");
                     var postAvartaData = {};
                     postAvartaData.session_key = localStorage.session_key;
                     postAvartaData.uid = localStorage.uid;
@@ -1582,6 +1586,7 @@ function getMorePosts(char,newsData){
                 adjustTags();
                 $("#loadMoreButton").show();
                 $("#circularG").hide();
+                console.log("here");
                 loadingFlag = true;
                 }
                 },
@@ -1692,6 +1697,8 @@ function getMorePosts(char,newsData){
             $("#loadMoreButton").show();
             $("#circularG").hide();
             loadingFlag = true;
+                  console.log("here");
+                  console.log(loadingFlag);
             }
             },
             error:function(jqXHR, textStatus, errorThrown){
