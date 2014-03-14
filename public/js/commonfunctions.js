@@ -990,6 +990,8 @@ function viewpost(pids,char,newsData){
               $(window).scroll(function(){
                 console.log("scroll to bottom");
                 console.log("loading flag:"+loadingFlag);
+                console.log($(window).scrollTop() + $(window).height());
+                console.log($(document).height());
                 if($(window).scrollTop() + $(window).height() == $(document).height() && loadingFlag){
                   getMorePosts(char,newsData);
                 }
