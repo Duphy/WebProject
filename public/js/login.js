@@ -220,7 +220,8 @@ $(document).ready(function(){
 										localStorage.uid = auth_data.uid;
 									    localStorage.username = data.realname;
 										localStorage.usernickname = data.nickname;
-									    localStorage.raw_birthday = data.birthday;
+									    localStorage.birthday = data.birthday;
+                                		localStorage.raw_birthday = data.raw_birthday;
 									    localStorage.usertags = data.tags;
 									    localStorage.hiddentags= data.hidden_tags;
 									    localStorage.honors = data.honors;
