@@ -38,7 +38,7 @@ exports.signUp = function(req, res) {
     if (req.body.hidden_tags)
 	hidden_tags = req.body.hidden_tags;
 	console.log(tags);
-    var pack = lib.createCreateUserPack(req.body.email,req.body.code, req.body.password,req.body.nickname, req.body.realname, parseInt(req.body.birthday),
+    var pack = lib.createCreateUserPack(req.body.email,req.body.code, req.body.password,req.body.realname, req.body.nickname, parseInt(req.body.birthday),
 	    parseInt(req.body.gender), req.body.city, req.body.state,
 	    req.body.country, tags, hidden_tags);
     helper.connectAndSend(pack, function(data) {
