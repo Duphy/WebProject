@@ -1546,7 +1546,7 @@ $(document).ready(function(){
   });
 
   $("#loadMoreButton").click(function(){
-    getMorePosts(0);
+    getMorePosts(0, newsData);
     return false;
   });
 
