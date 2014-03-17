@@ -887,6 +887,11 @@ function viewpost(pids,char,newsData){
             postData.pidList[i] = pidsets[i][2];
         }
         postCounter = Math.min(postCounter+6,pidsets.length);
+        if(pidsets.length <= 6){
+          //no more post. disable the scroll down loading.
+          $("#loadMoreButton").html("No More Posts");
+          $("#loadMoreButton").attr("disabled","disabled");
+        }
         $.ajax({
            url:"/getpostscontent",
            data:JSON.stringify(postData),
