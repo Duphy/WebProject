@@ -97,7 +97,7 @@ socket.on("event membership request",function(name,uid, pid, eventName,eid,actio
 	});
 });
 
-socket.on("reply posting",function(name, uid, eid, post,pid, seq){
+socket.on("reply posting",function(name, uid, eid, pid, seq){
 	console.log("reply noti");
 	console.log("notfication name: "+name+" uid: "+uid+" post: "+eventName+" pid: "+eid);
 	var newNotificationNumber = parseInt($("#notificationNumber").html().trim()) + 1;
@@ -108,7 +108,7 @@ socket.on("reply posting",function(name, uid, eid, post,pid, seq){
 	}else{
 		$("#notificationList").append("<li class = 'divider'></li>");
 	}
-	$("#notificationList").append(postReplyNotification(name, uid, eid, post,pid, seq));
+	$("#notificationList").append(postReplyNotification(name, uid, eid, pid, seq));
 });
 
 socket.on("receive user chat",function(uid, message, date, time){

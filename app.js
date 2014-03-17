@@ -302,16 +302,16 @@ function sendNotification(notification,socket){
 			socket.emit("event membership request",name,uid, pid, eventName,eid,action, n_seq);
 			break;
 		case 2:
-			socket.emit("reply posting",name, uid, eid, post,pid, n_seq);
+			socket.emit("reply posting",name, uid, eid ,pid, n_seq);
 			break;
 		case 3:
-			socket.emit("event membership delete",name, uid, eid, post,pid, n_seq);
+			socket.emit("event membership delete",name, uid, eid, pid, n_seq);
 			break;
 		case 4:
-			socket.emit("event membership invite",name, uid, eid, post,pid, n_seq);
+			socket.emit("event membership invite",name, uid, eid, pid, n_seq);
 			break;
 		case 5:
-			socket.emit("event manager add",name, uid, eid, post,pid, n_seq);
+			socket.emit("event manager add",name, uid, eid, pid, n_seq);
 			break;
 		case 6:
 			socket.emit("event manager delete",name, uid, eid, post,pid, n_seq);
