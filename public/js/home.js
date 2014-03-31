@@ -733,7 +733,7 @@ $(document).ready(function(){
     newsData.session_key = localStorage.session_key;
     newsData.uid = localStorage.uid;
     postCounter=0;
-    newsData.option = 1;
+    newsData.option = 2;
     pidsets = []; 
     newsData.max_pid = "default";
     var date = new Date();
