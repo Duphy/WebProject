@@ -649,8 +649,13 @@ exports.viewUserNews = function(req, res) {
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	//console.log(pkg);
+	//console.log(pkg);
+	var pids = pkg[1];
+	for(var i =0 ; i<pids.length;i++){
+		pids[i][1] = helper.hexToDec(pids[i][1]);
+	}
 	output = {
-	    "pidsets" : pkg[1]
+	    "pidsets" : pids
 	};
 	res.send(output);
     }, function() {
@@ -1270,6 +1275,7 @@ exports.viewPostsContent = function(req, res) {
     console.log(uidList);
     console.log("!!!!!!!!!!!!!!!eid list:");
     console.log(eidList);
+    console.log("counter is "+counter);
     pack = lib.createViewPostingPack(req.body.session_key,
 	    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
     var f = function(data) {
