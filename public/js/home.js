@@ -553,7 +553,7 @@ $(document).ready(function(){
   console.log(localStorage.showAllNews);
   if(localStorage.showAllNews == "true"){
     console.log("showAllNews");
-    newsData.option = 1;
+    newsData.option = 2;
     $("#userNameLink").html("All News");
   }else if(localStorage.showAllNews == "false"){
     console.log("showFriendsNews");
