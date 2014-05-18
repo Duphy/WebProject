@@ -1,3 +1,7 @@
+.disableRoundCorner{
+	border-radius: 0px !important;
+}
+
 .websiteFont {
 	font-family: 'Lato', sans-serif;
 	font-weight:300;
@@ -59,6 +63,10 @@
 	font-weight: 300;
 	border-bottom: 1px solid #258ecd;
 	padding: 0.5em;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	text-align: -webkit-auto;
 }
 
 a:hover {

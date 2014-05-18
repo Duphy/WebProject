@@ -9,8 +9,8 @@
     *padding:7px 2px 8px 2px; /* IE7 Fix */
 }
 
-.noRoundCorner{
-    border-radius:0px;
+.disableRoundCorner{
+    border-radius:0px !important;
 }
 
 .navbar{

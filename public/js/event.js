@@ -16,6 +16,11 @@ $(document).ready(function(){
   $("#circularG").show();
   $("#homeNav").removeClass("active");
   $("#searchNav").removeClass("active");
+
+  $(".imgLiquidFill").imgLiquid();
+  $("#postArea").elastic();
+  $("#pictureDescArea").elastic();
+
   var auth_data = {};
   auth_data.session_key = localStorage.session_key;
   auth_data.uid = localStorage.uid;
@@ -26,6 +31,8 @@ $(document).ready(function(){
 
   $(".bootstrap-tagsinput").find("input").attr("placeholder","Add").attr("size",8);
   $(".bootstrap-tagsinput").find("input").limit('20');
+  $(".bootstrap-tagsinput").css("border-radius","0px");
+  $(".icon-question-sign").tooltip({title:"Add the tag you want by typing in it and press Enter; Remove the tag by pressing Delete.",placement:"right"});
   $('body').delegate('#postArea','keyup',function(){
     if($(this).val() == ""){
       $("#postSubmit").attr('disabled','disabled');
@@ -213,7 +220,6 @@ $(document).ready(function(){
   $('#postArea').css({'width':$('#postModal').width()*0.9,'height':"80px"});
 
   //Just show the first tag for each post
-  $(".tagsGroup").width("+=10");
   $(".tagsGroup a").hide();
   $('.tagHead').show();
   adjustTags();
@@ -221,9 +227,9 @@ $(document).ready(function(){
   $(window).resize(function(){
     $.each($(".tagHead"),function(index,element){
       var tagsGroup = $(element).closest(".tagsGroup");
-      var parentWidth = $('.tagsGroup').closest('.span2').width();
-      var selfWidth = $(element).closest(".tagsGroup").width();
-      $(element).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
+      var parentWidth = $(tagsGroup).closest('.span2').width();
+      var selfWidth = $(tagsGroup).width();
+      $(tagsGroup).css('margin-left',parentWidth - selfWidth);
     });
   });
 
@@ -359,10 +365,162 @@ $(document).ready(function(){
       data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
       data.session_key = localStorage.session_key;
       data.uid = localStorage.uid;
+      data.pics = [];
       $("#floatingBarsG-post").show();
       createPost(data);
     }
   });
+
+  $("#pictureFileupload").fileupload({
+    url:"/uploadpostpicture",
+    type:"POST",
+    dataType:"json",
+    maxFileSize:10000000,
+    acceptFileTypes: /\.(gif|jpe?g|png)$/i,
+    formData: {
+      uid: localStorage.uid
+    },
+    progress: function(e, data){
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#pictureProgress .bar').css(
+            'width',
+            progress + '%'
+        );
+    },
+    add: function(e, data){
+        data.files[0].name = localStorage.uid+".jpg";
+        console.log(data);
+        data.submit().success(function(result, textStatus, jqXHR){
+          console.log("upload feedback:");
+          console.log(result);
+          if(result.status == "successful"){
+            setTimeout(function(){
+              $('#pictureProgress').hide();
+              $('#pictureNotice').html("finished! Preview your picture below.").css("color",'green');
+              $('#pictureProgress .bar').css(
+                  'width',
+                  '0%'
+              );
+              $('#pictureCancel').removeAttr("disabled");
+              $('#pictureSubmit').removeAttr("disabled");
+              $('#pictureDescArea').show();
+              $('#pictureTags').parent().show();
+              $('#pictureSubmit').attr("picturename",data.files[0].name);
+              $('#previewImageArea').html("");
+              $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '" style = "margin-left:auto;margin-right:auto;display:block;"/>');
+            },1000);
+          }
+        }).error(function(jqXHR, textStatus, errorThrown){
+          $('#pictureSubmit').removeAttr("disabled");
+          $('#pictureCancel').removeAttr("disabled");
+          $('#pictureProgress').hide();
+          $('#pictureProgress .bar').css(
+              'width',
+              '0%'
+          );
+          $('#notice').show().html("failed!").css("color","#B94A48");
+        });
+    },
+    start:function(e, data){
+        $('#pictureProgress').show();
+        $('#pictureNotice').show().html("uploading...");
+        $('#pictureSubmit').attr("disabled","disabled");
+        $('#pictureCancel').attr("disabled","disabled");
+        $('#pictureFileupload').attr("disabled","disabled");
+    },
+    fail:function(e, data){
+        $('#pictureNotice').show().html("failed!").css("color","#B94A48");
+        $('#pictureSubmit').removeAttr("disabled");
+        $('#pictureCancel').removeAttr("disabled");
+        $('#pictureFileupload').removeAttr("disabled");
+        $('#pictureProgress .bar').css(
+            'width',
+            '0%'
+        );
+    },
+    done:function(e,data){  
+        console.log("upload done.");    
+        $("#pictureFileupload").removeAttr("disabled");
+    }
+  });
+
+  $("#pictureSubmit").click(function(){
+    $(this).attr("disabled","disabled");
+    $('#pictureCancel').attr("disabled","disabled");
+    var description = $("#pictureDescArea").val();
+    var tags = $('#pictureTags').tagsinput('items');
+    if(tags==""){
+      tags=[];
+    }
+    var eid = view_eid;
+    var visibility = 0;
+    var tags = tags;
+    var data = {};
+    var d = new Date();
+    data.content = description;
+    data.eid = eid;
+    data.visibility = visibility;
+    data.tags = tags;
+    data.date = d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+    data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
+    data.session_key = localStorage.session_key;
+    data.uid = localStorage.uid;
+    data.pics = [$(this).attr("picturename")];
+    console.log("pciture name: "+data.pics);
+    $("#floatingBarsG-picture").show();
+    createPost(data);
+    return false;
+  });
+
+  $("#pictureCancel").click(function(){
+    //TO DO: remove the picture just uploaded.
+    $("#pictureDescArea").val("");
+    $("#pictureTags").tagsinput("removeAll");
+    $("#pictureSubmit").attr("picturename","");
+    $("#previewImageArea").hide();
+    $("#pictureNotice").hide();
+  });
+
+  $('body').delegate('.postImage','click',function(){
+    var source = $(this).attr('src');
+    var url = "url("+window.location.origin+"/"+source+")";
+    $('#imageModal').find('.imgLiquidFill').css('background-image',url);
+    $('body').css("overflow","hidden");
+    var context = $(this).closest(".postRoot");
+    var source = $("#post_user_avarta"+$(context).attr("postPid")).attr("src");
+    $(".interactionArea").find(".modalAvarta").first().attr("src",source);
+    var data = {};
+    data.session_key = localStorage.session_key;
+    data.uid = localStorage.uid;
+    data.uidList = [$(context).attr("posteruid")];
+    data.pidList = [$(context).attr("postpid")];
+    if([$(context).attr("posteid")] == ""){
+      data.eidList = ["0000000000000000"];
+    }else{
+      data.eidList = [$(context).attr("posteid")];
+    }
+    console.log(data);
+    $.ajax({
+        url:"/getpostscontent",
+        data:JSON.stringify(data),
+        timeout: 10000,
+        type:"POST",
+        contentType: 'application/json',
+        success:function(result){
+          if(result.status == "successful"){
+            renderLargePost(result.source[0]);
+            $(".interactionArea").show();
+          }
+        },
+        error:function(jqXHR, textStatus, errorThrown){
+          if(textStatus == "timeout"){
+            $("#timeoutModal").modal("show");
+          }
+        }
+    });
+  });
+
+
 
 $("body").delegate("#settingJoinEvent",'click',function(){
   var data = {};
@@ -494,14 +652,14 @@ $("body").delegate(".memberItem", 'click', function() {
   $('body').delegate('.tagHead','mouseover',function(){
     var tagsGroup = $(this).closest(".tagsGroup");
     $(tagsGroup).children().slideDown( "fast");
-    var parentWidth = $('.tagsGroup').closest('.span2').width();
-    var selfWidth = $(this).closest(".tagsGroup").width();
-    $(this).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
+    var parentWidth = $(tagsGroup).closest('.span2').width();
+    var selfWidth = $(tagsGroup).width();
+    $(tagsGroup).css('margin-left',parentWidth - selfWidth);
     setTimeout(function(){
       $(tagsGroup).children("a:not(:first-child)").slideUp( "fast",function(){
-        var parentWidth = $('.tagsGroup').closest('.span2').width();
-        var selfWidth = $(this).closest(".tagsGroup").width();
-        $(this).closest(".tagsGroup").css('margin-left',parentWidth - selfWidth);
+        var parentWidth = $(tagsGroup).closest('.span2').width();
+        var selfWidth = $(tagsGroup).width();
+        $(tagsGroup).css('margin-left',parentWidth - selfWidth);
       });
     },3000);
   });
@@ -732,8 +890,8 @@ $("body").delegate(".memberItem", 'click', function() {
   });
 
   $(document).on('click', "#searchNav", function() {
+    localStorage.search_tag_option = "user";
     localStorage.search_tag_content = "";
-    localStorage.search_tag_option = "";
     window.location = "/search";
     return false;
   });

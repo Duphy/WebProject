@@ -97,7 +97,8 @@ socket.on("event membership request",function(name,uid, pid, eventName,eid,actio
 	});
 });
 
-socket.on("reply posting",function(name, uid, eid, post,pid, seq){
+socket.on("reply posting",function(name, uid, eid, pid, seq){
+	console.log("reply noti");
 	console.log("notfication name: "+name+" uid: "+uid+" post: "+eventName+" pid: "+eid);
 	var newNotificationNumber = parseInt($("#notificationNumber").html().trim()) + 1;
 	$("#notificationNumber").html(" "+newNotificationNumber+" ");
@@ -107,7 +108,7 @@ socket.on("reply posting",function(name, uid, eid, post,pid, seq){
 	}else{
 		$("#notificationList").append("<li class = 'divider'></li>");
 	}
-	$("#notificationList").append(postReplyNotification(name, uid, eid, post,pid, seq));
+	$("#notificationList").append(postReplyNotification(name, uid, eid, pid, seq));
 });
 
 socket.on("receive user chat",function(uid, message, date, time){
@@ -219,7 +220,6 @@ socket.on("receive event chat",function(eid, s_uid, message, date, time){
 });
 
 socket.on("log out",function(){
-	$("#timeout").trigger("click");
 	$("#timeoutModal").modal("show");
 });
 // socket.on("deleted from event",function(name,uid,eventName,eid){

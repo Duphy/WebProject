@@ -220,11 +220,11 @@ function renderPost(post){
         html = html + 
           '<div class = "offset1 span1"><i class = "icon-trash pull-right removePost" data-toggle = "modal" href = "#removePostModal" style = "margin-right:25%;"></i></div>'+
           '<div class = "span2 pull-right" style = "color:white;text-align: center;">'+
-            '<div class = "tagsGroup">';
+            '<div class = "tagsGroup" style = "min-width:80px;">';
       }else{
         html = html +
           '<div class = "offset2 span2 pull-right" style = "color:white;text-align: center;">'+
-            '<div class = "tagsGroup">';
+            '<div class = "tagsGroup" style = "min-width:80px;">';
       }
     var posttags = sortTags(post.tags); 
     var length = Math.min(4,posttags.length);       
@@ -282,7 +282,9 @@ function renderPost(post){
                 '&nbsp;&nbsp;<font>'+rtime[0]+'&nbsp;'+rtime[1]+'</font>'+
                 '</div>'+
                 '<div>'+
-                '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+(post.replies)[i].replyContent+'</pre>'+
+                '<div class = "row-fluid">'+
+                  '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+(post.replies)[i].replyContent+'</pre>'+
+                '</div>'+
                 '</div>'+
                 '</div>'+
                 '<div class = "span1">';
@@ -384,13 +386,14 @@ function createPost(data){
             success:function(data){
               if(data.pics){
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                $("#"+postid).find(".pictureArea").html("");
                 $("#"+postid).find(".pictureArea").append("<img class ='postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                 $('#pictureCancel').removeAttr("disabled");
                 $('#floatingBarsG-picture').hide();
                 $('#pictureDescArea').val("");
                 $("#pictureTags").tagsinput('removeAll');
-                $("#pictureTags").tagsinput('add','picture');
                 $("#previewImageArea").hide();
+                $("#pictureNotice").hide();
                 $("#pictureCancel").trigger('click');
               }else{
                 console.log("failed to get the picture of this post");
@@ -622,7 +625,7 @@ function renderReply(reply){
             '&nbsp;&nbsp;<font>'+reply.date+'&nbsp;'+reply.time+'</font>'+
           '</div>'+
           '<div class = "row-fluid">'+
-            '<p style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replyContent+'</p>'+
+            '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replyContent+'</pre>'+
           '</div>'+
       '</div>'+
       '<div class = "span1">';
@@ -762,7 +765,7 @@ function renderSearchUser(user){
 }
 
 function renderProfile(){
-  $("#name").html(localStorage.username);
+  $("#profileName").html(localStorage.username);
   $("#nickname").html(localStorage.usernickname);
   $("#birthday").html(print_date(localStorage.raw_birthday));
   switch(localStorage.gender){
@@ -870,7 +873,7 @@ function viewpost(pids,char,newsData){
         $("#contentBody").find(".well").hide();
         $("#loadMoreButton").hide();
         $("#circularG").show();
-        var loadingFlag = true;
+        loadingFlag = true;
         pidsets = pids;
         var postData = {};
         postData.session_key = localStorage.session_key;
@@ -884,6 +887,11 @@ function viewpost(pids,char,newsData){
             postData.pidList[i] = pidsets[i][2];
         }
         postCounter = Math.min(postCounter+6,pidsets.length);
+        if(pidsets.length <= 6){
+          //no more post. disable the scroll down loading.
+          $("#loadMoreButton").html("No More Posts");
+          $("#loadMoreButton").attr("disabled","disabled");
+        }
         $.ajax({
            url:"/getpostscontent",
            data:JSON.stringify(postData),
@@ -928,6 +936,7 @@ function viewpost(pids,char,newsData){
                         success:function(data){
                           if(data.pics){
                             var postid = element.uid+""+element.eid+""+element.pid;
+                            $("#"+postid).find(".pictureArea").html("");
                             $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
                           }else{
                             console.log("failed to get the picture of this post");
@@ -984,9 +993,12 @@ function viewpost(pids,char,newsData){
               $("#loadMoreButton").show();
               $("#circularG").hide();
               $(window).scroll(function(){
-                if($(window).scrollTop() + $(window).height() == $(document).height() && loadingFlag){
+                console.log(loadingFlag);
+                if($(window).scrollTop() + $(window).height() >= $(document).height() && loadingFlag){
+                  loadingFlag = false;
                   getMorePosts(char,newsData);
                 }
+                return false;
               });
             }
           },
@@ -1224,6 +1236,9 @@ function eventJoinRequestNotification(userName, userId, postId, eventName, event
   var html = "";
   switch(action){
     case 0:
+      if(typeof flag_displayevent != 'undefined'){
+        flag_displayevent == true;
+      }
       html = '<li seqNo = "'+seqNo+'" uid = "'+userId+'" eid = "'+eventId+'" pid = "'+postId+'" tabindex="-1" class = "notificationItem eventJoinRequestNotification unread row-fluid">'+
                 '<p class = "span10 websiteFont" style = "white-space:pre-wrap;margin-bottom:0px;"><i class="icon-calendar"></i>'+
                 '<a class = "userName user'+userId+'"  uid = "'+userId+'" style = "margin-left:6px;">'+userName+'</a> has approved your event request for <a class = "eventName '+eventId+'" eid = "'+eventId+'">'+eventName+'</a>.</p>'+
@@ -1269,11 +1284,16 @@ function removeNotification(){
 }
 
 function adjustTags(){
-  var parents = $('.tagsGroup').closest('.span2');
-  var selves = $('.tagsGroup');
-  for(var number = 0; number < parents.length;number++){
-  $(selves[number]).css('margin-left',$(parents[number]).width() - $(selves[number]).width());
-  }
+  $.each($(".tagsGroup"),function(index, element){
+    var parentsWidth = $(element).closest(".span2").width();
+    var childWidth = $(element).width();
+    $(element).css("margin-left",parentsWidth - childWidth + 1);
+  });
+  // var parents = $('.tagsGroup').closest('.span2');
+  // var selves = $('.tagsGroup');
+  // for(var number = 0; number < parents.length;number++){
+  // $(selves[number]).css('margin-left',$(parents[number]).width() - $(selves[number]).width() - 1);
+  // }
 }
 
 function checkEvent(eid){
@@ -1352,6 +1372,9 @@ function renderChatBox(type, id, chatBoxNumber){
 function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
   $("#chatArea").append(renderChatBox("user", friendUid, chatBoxNumber));
   $(".chat-window-text-box").elastic();
+  $(".chat-window-text-box").mouseDown(function(){
+
+  });
   var userData = {};
   userData.session_key = session_key;
   userData.uid = selfUid;
@@ -1422,8 +1445,7 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
 }
 
 function getMorePosts(char,newsData){
-  if(postCounter<pidsets.length){
-    loadingFlag = false;
+  if(postCounter < pidsets.length){
     $("#loadMoreButton").hide();
     $("#circularG").show();
     var postData = {};
@@ -1437,8 +1459,11 @@ function getMorePosts(char,newsData){
       postData.eidList[i-postCounter] = pidsets[i][1];
       postData.pidList[i-postCounter] = pidsets[i][2];
     }
+    console.log(postCounter);
+    console.log(pidsets.length);
     if(postCounter+6>=pidsets.length){
       var posturl;
+      //TO DO: consider is it needed to set this case checking or not.
       switch (char){
         case 0://self
           posturl = "/getusernews"
@@ -1461,20 +1486,121 @@ function getMorePosts(char,newsData){
         type:"POST",
         contentType: 'application/json',
         success:function(data){
-          console.log("More post:");
-          //console.log(data);
-          //pidsets.concat(data.pidsets);
           if(data.pidsets.length==0){
             if(postCounter>=pidsets.length){
               $("#loadMoreButton").html("No More Posts");
               $("#loadMoreButton").attr("disabled","disabled");
             }
-          }
-          else{
-            for(var j=0;j<data.pidsets.length;j++)
+          }else{
+            for(var j=0;j<data.pidsets.length;j++){
               pidsets.push(data.pidsets[j]);
+            }
           }
-          console.log(pidsets);
+          console.log(postCounter);
+          console.log(pidsets.length);
+          postCounter = Math.min(postCounter+6,pidsets.length);
+          $.ajax({
+               url:"/getpostscontent",
+               data:JSON.stringify(postData),
+               timeout:10000,
+               type:"POST",
+               contentType: 'application/json',
+                success:function(result){
+                if(result.status == "successful"){
+                $.each(result.source,function(index,element){
+                    console.log("here");
+                    var postAvartaData = {};
+                    postAvartaData.session_key = localStorage.session_key;
+                    postAvartaData.uid = localStorage.uid;
+                    postAvartaData.view_uid = element.uid;
+                    var replyAvartaData = {};
+                    replyAvartaData.session_key = localStorage.session_key;
+                    replyAvartaData.uid = localStorage.uid;
+                    if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
+                      $('#right-column').append(renderPost(element));
+                    }else{
+                      $('#left-column').append(renderPost(element));
+                    }
+                    //retrieve the pics of the element if any.
+                    if(element.picids && element.picids.length > 0){
+                      var pictureData  = {};
+                      pictureData.session_key = localStorage.session_key;
+                      pictureData.uid = localStorage.uid;
+                      pictureData.picid = element.picids[0];
+                      $.ajax({
+                        url:'/getpicture',
+                        data:JSON.stringify(pictureData),
+                        timeout:10000,
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                          if(data.pics){
+                            
+                            var postid = element.uid+""+element.eid+""+element.pid;
+                            $("#"+postid).find(".pictureArea").html("");
+                            $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                          }else{
+                            console.log("failed to get the picture of this post");
+                          }
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeoutModal").modal("show");
+                          }
+                        }
+                      });
+                    }
+                    $.ajax({
+                        url:'/getuseravarta',
+                        data:JSON.stringify(postAvartaData),
+                        timeout:10000,
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                            $("#post_user_avarta"+element.pid).attr("src",data.avarta);
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeoutModal").modal("show");
+                          }
+                        }
+                    });
+                    $.each(element.replies,function(replyIndex,reply){
+                        replyAvartaData.view_uid = reply.replier_uid;
+                        replyAvartaData.time = 0000//getCurrentTime();
+                        replyAvartaData.date = 00000000//getCurrentDate();
+                        $.ajax({
+                            url:'/getuseravarta',
+                            data:JSON.stringify(replyAvartaData),
+                            timeout:10000,
+                            type:"POST",
+                            contentType:"application/json",
+                            success:function(data){
+                                $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
+                            },
+                            error:function(jqXHR, textStatus, errorThrown){
+                              if(textStatus == "timeout"){
+                                $("#timeoutModal").modal("show");
+                              }
+                            }
+                        });
+                    });
+                });
+                $(".tagsGroup a").hide();
+                $('.tagHead').show();
+                adjustTags();
+                $("#loadMoreButton").show();
+                $("#circularG").hide();
+                console.log("here");
+                loadingFlag = true;
+                }
+                },
+                error:function(jqXHR, textStatus, errorThrown){
+                  if(textStatus == "timeout"){
+                    $("#timeoutModal").modal("show");
+                  }
+                }
+          });
         },
         error:function(jqXHR, textStatus, errorThrown){
           if(textStatus == "timeout"){
@@ -1482,107 +1608,111 @@ function getMorePosts(char,newsData){
           }
         }
       });
-    }
-    postCounter = Math.min(postCounter+6,pidsets.length);
-    $.ajax({
-         url:"/getpostscontent",
-         data:JSON.stringify(postData),
-         timeout:10000,
-         type:"POST",
-         contentType: 'application/json',
-          success:function(result){
-          if(result.status == "successful"){
-          $.each(result.source,function(index,element){
-              var postAvartaData = {};
-              postAvartaData.session_key = localStorage.session_key;
-              postAvartaData.uid = localStorage.uid;
-              postAvartaData.view_uid = element.uid;
-              var replyAvartaData = {};
-              replyAvartaData.session_key = localStorage.session_key;
-              replyAvartaData.uid = localStorage.uid;
-              if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
-                $('#right-column').append(renderPost(element));
-              }else{
-                $('#left-column').append(renderPost(element));
-              }
-              //retrieve the pics of the element if any.
-              if(element.picids && element.picids.length > 0){
-                var pictureData  = {};
-                pictureData.session_key = localStorage.session_key;
-                pictureData.uid = localStorage.uid;
-                pictureData.picid = element.picids[0];
-                $.ajax({
-                  url:'/getpicture',
-                  data:JSON.stringify(pictureData),
-                  timeout:10000,
-                  type:"POST",
-                  contentType:"application/json",
-                  success:function(data){
-                    if(data.pics){
-                      
-                      var postid = element.uid+""+element.eid+""+element.pid;
-                      $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
-                    }else{
-                      console.log("failed to get the picture of this post");
-                    }
-                  },
-                  error:function(jqXHR, textStatus, errorThrown){
-                    if(textStatus == "timeout"){
-                      $("#timeoutModal").modal("show");
-                    }
-                  }
-                });
-              }
-              $.ajax({
-                  url:'/getuseravarta',
-                  data:JSON.stringify(postAvartaData),
-                  timeout:10000,
-                  type:"POST",
-                  contentType:"application/json",
-                  success:function(data){
-                      $("#post_user_avarta"+element.pid).attr("src",data.avarta);
-                  },
-                  error:function(jqXHR, textStatus, errorThrown){
-                    if(textStatus == "timeout"){
-                      $("#timeoutModal").modal("show");
-                    }
-                  }
-              });
-              $.each(element.replies,function(replyIndex,reply){
-                  replyAvartaData.view_uid = reply.replier_uid;
-                  replyAvartaData.time = 0000//getCurrentTime();
-                  replyAvartaData.date = 00000000//getCurrentDate();
+    }else{
+      postCounter = Math.min(postCounter+6,pidsets.length);
+      $.ajax({
+           url:"/getpostscontent",
+           data:JSON.stringify(postData),
+           timeout:10000,
+           type:"POST",
+           contentType: 'application/json',
+            success:function(result){
+            if(result.status == "successful"){
+            $.each(result.source,function(index,element){
+                var postAvartaData = {};
+                postAvartaData.session_key = localStorage.session_key;
+                postAvartaData.uid = localStorage.uid;
+                postAvartaData.view_uid = element.uid;
+                var replyAvartaData = {};
+                replyAvartaData.session_key = localStorage.session_key;
+                replyAvartaData.uid = localStorage.uid;
+                if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
+                  $('#right-column').append(renderPost(element));
+                }else{
+                  $('#left-column').append(renderPost(element));
+                }
+                //retrieve the pics of the element if any.
+                if(element.picids && element.picids.length > 0){
+                  var pictureData  = {};
+                  pictureData.session_key = localStorage.session_key;
+                  pictureData.uid = localStorage.uid;
+                  pictureData.picid = element.picids[0];
                   $.ajax({
-                      url:'/getuseravarta',
-                      data:JSON.stringify(replyAvartaData),
-                      timeout:10000,
-                      type:"POST",
-                      contentType:"application/json",
-                      success:function(data){
-                          $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
-                      },
-                      error:function(jqXHR, textStatus, errorThrown){
-                        if(textStatus == "timeout"){
-                          $("#timeoutModal").modal("show");
-                        }
+                    url:'/getpicture',
+                    data:JSON.stringify(pictureData),
+                    timeout:10000,
+                    type:"POST",
+                    contentType:"application/json",
+                    success:function(data){
+                      if(data.pics){
+                        
+                        var postid = element.uid+""+element.eid+""+element.pid;
+                        $("#"+postid).find(".pictureArea").html("");
+                        $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                      }else{
+                        console.log("failed to get the picture of this post");
                       }
+                    },
+                    error:function(jqXHR, textStatus, errorThrown){
+                      if(textStatus == "timeout"){
+                        $("#timeoutModal").modal("show");
+                      }
+                    }
                   });
-              });
-          });
-          $(".tagsGroup a").hide();
-          $('.tagHead').show();
-          adjustTags();
-          $("#loadMoreButton").show();
-          $("#circularG").hide();
-          loadingFlag = true;
-          }
-          },
-          error:function(jqXHR, textStatus, errorThrown){
-            if(textStatus == "timeout"){
-              $("#timeoutModal").modal("show");
+                }
+                $.ajax({
+                    url:'/getuseravarta',
+                    data:JSON.stringify(postAvartaData),
+                    timeout:10000,
+                    type:"POST",
+                    contentType:"application/json",
+                    success:function(data){
+                        $("#post_user_avarta"+element.pid).attr("src",data.avarta);
+                    },
+                    error:function(jqXHR, textStatus, errorThrown){
+                      if(textStatus == "timeout"){
+                        $("#timeoutModal").modal("show");
+                      }
+                    }
+                });
+                $.each(element.replies,function(replyIndex,reply){
+                    replyAvartaData.view_uid = reply.replier_uid;
+                    replyAvartaData.time = 0000//getCurrentTime();
+                    replyAvartaData.date = 00000000//getCurrentDate();
+                    $.ajax({
+                        url:'/getuseravarta',
+                        data:JSON.stringify(replyAvartaData),
+                        timeout:10000,
+                        type:"POST",
+                        contentType:"application/json",
+                        success:function(data){
+                            $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
+                        },
+                        error:function(jqXHR, textStatus, errorThrown){
+                          if(textStatus == "timeout"){
+                            $("#timeoutModal").modal("show");
+                          }
+                        }
+                    });
+                });
+            });
+            $(".tagsGroup a").hide();
+            $('.tagHead').show();
+            adjustTags();
+            $("#loadMoreButton").show();
+            $("#circularG").hide();
+            loadingFlag = true;
+                  console.log("here");
+                  console.log(loadingFlag);
             }
-          }
-    });
+            },
+            error:function(jqXHR, textStatus, errorThrown){
+              if(textStatus == "timeout"){
+                $("#timeoutModal").modal("show");
+              }
+            }
+      });
+    }
   }
 }
 

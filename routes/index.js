@@ -1,5 +1,5 @@
 exports.login = function(req,res){
-	res.render('login', {title:"Circa"});
+	res.render('login', {title:"Circa — Meet the People You Like."});
 }
 
 exports.home = function(req,res){

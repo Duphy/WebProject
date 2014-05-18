@@ -38,7 +38,7 @@ exports.signUp = function(req, res) {
     if (req.body.hidden_tags)
 	hidden_tags = req.body.hidden_tags;
 	console.log(tags);
-    var pack = lib.createCreateUserPack(req.body.email,req.body.code, req.body.password,req.body.nickname, req.body.realname, parseInt(req.body.birthday),
+    var pack = lib.createCreateUserPack(req.body.email,req.body.code, req.body.password,req.body.realname, req.body.nickname, parseInt(req.body.birthday),
 	    parseInt(req.body.gender), req.body.city, req.body.state,
 	    req.body.country, tags, hidden_tags);
     helper.connectAndSend(pack, function(data) {
@@ -71,9 +71,12 @@ exports.setClearChatHandler = function(handler){
 	clearChatHandler = handler;
 }
 function loginAuth(req, res) {
-    const
-    LOG_IN_MODE = 1;
-    var pack = lib.createLoginPack(LOG_IN_MODE, req.body.email,
+    console.log(req.body.account);
+    var account = req.body.account;
+    if(req.body.login_mode==0){
+    	account = parseInt(account);
+    }
+    var pack = lib.createLoginPack(req.body.login_mode, account,
 	    req.body.password);
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
@@ -646,8 +649,13 @@ exports.viewUserNews = function(req, res) {
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	//console.log(pkg);
+	//console.log(pkg);
+	var pids = pkg[1];
+	for(var i =0 ; i<pids.length;i++){
+		pids[i][1] = helper.hexToDec(pids[i][1]);
+	}
 	output = {
-	    "pidsets" : pkg[1]
+	    "pidsets" : pids
 	};
 	res.send(output);
     }, function() {
@@ -1066,8 +1074,12 @@ exports.viewEventPosts = function(req, res) {
     helper.connectAndSend(pack, function(data) {
 	var pkg = lib.resolvPack(data);
 	//console.log(pkg);
+	var pids = pkg[1][2];
+	for(var i =0 ; i<pids.length;i++){
+		pids[i][1] = helper.hexToDec(pids[i][1]);
+	}
 	output = {
-	    "pidsets" : pkg[1][2]
+	    "pidsets" : pids
 	};
 	res.send(output);
     }, function() {
@@ -1259,8 +1271,13 @@ exports.viewPostsContent = function(req, res) {
     //console.log("Num of pids are: " + pidList.length);
 
     var counter = 0;
+    console.log(pidList);
+    console.log(uidList);
+    console.log("!!!!!!!!!!!!!!!eid list:");
+    console.log(eidList);
+    console.log("counter is "+counter);
     pack = lib.createViewPostingPack(req.body.session_key,
-	    parseInt(req.body.uid), parseInt(uidList[counter]), eidList[counter], pidList[counter]);
+	    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
     var f = function(data) {
 	var pkg = lib.resolvPack(data);
 	if (typeof pkg[1] == "undefined") {
@@ -1308,7 +1325,7 @@ exports.viewPostsContent = function(req, res) {
 	    });
 	else {
 	    pack = lib.createViewPostingPack(req.body.session_key,
-		    parseInt(req.body.uid), parseInt(uidList[counter]), eidList[counter], pidList[counter]);
+		    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
 	   // console.log(pack);
 	    helper.connectAndSend(pack, f, function() {
 		res.send({

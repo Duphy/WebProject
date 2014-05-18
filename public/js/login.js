@@ -133,14 +133,6 @@ $(document).ready(function(){
 			$("#validationCodeLabel").html('<strong>Validation Code </strong>');
 			$('#validationCode').css('border-color','#CCC');
 		}
-		if(realname == ""){
-			$('#signUpRealNameLabel').html('<strong>Nick Name </strong><font color ="#B94A48">*required</font>');
-			$('#signUpRealName').css('border-color','#B94A48');
-			proceed = false;
-		}else{
-			$('#signUpRealNameLabel').html('<strong>Nick Name<strong>');
-			$('#signUpRealName').css('border-color','#CCC');
-		}
 		if(nickname == ""){
 			$('#signUpNickNameLabel').html('<strong>Nick Name </strong><font color ="#B94A48">*required</font>');
 			$('#signUpNickName').css('border-color','#B94A48');
@@ -200,7 +192,8 @@ $(document).ready(function(){
 					if(data.status == "successful"){
 						console.log("sigup: successfully create new user.");
                     	var data = {};
-                    	data.email = email;
+                    	data.login_mode = 1;
+                    	data.account = email;
                     	data.password = password;
 						$.ajax({
 						url:"/login",
@@ -227,7 +220,8 @@ $(document).ready(function(){
 										localStorage.uid = auth_data.uid;
 									    localStorage.username = data.realname;
 										localStorage.usernickname = data.nickname;
-									    localStorage.raw_birthday = data.birthday;
+									    localStorage.birthday = data.birthday;
+                                		localStorage.raw_birthday = data.raw_birthday;
 									    localStorage.usertags = data.tags;
 									    localStorage.hiddentags= data.hidden_tags;
 									    localStorage.honors = data.honors;
@@ -237,6 +231,7 @@ $(document).ready(function(){
 									    localStorage.country = data.country;
 									    localStorage.self_small_avarta = "";
 									    localStorage.self_big_avarta = "";
+									    localStorage.showAllNews = false;
 									    console.log("ready to go home");
 									    $("#floatingBarsG-signup").hide();
 									    $("#submitCreateAccount").removeAttr('disabled');
@@ -262,16 +257,29 @@ $(document).ready(function(){
 
 	$('#login').click(function(){
 		$('#loginAlert').hide();
-		var Email = $('#loginEmail').val();
+		var loginMode = 0;
+		var account = $('#loginEmail').val();
 		var password = $('#loginPassword').val();
 		var proceed = true;
-		if(Email == ""){
-			$('#loginEmailLabel').html('<strong>Email </strong><font color ="#B94A48">*required</font>');
+		if(account == ""){
+			$('#loginEmailLabel').html('<strong>Email/Circa ID </strong><font color ="#B94A48">*required</font>');
+			$('#loginEmail').css('border-color','#B94A48');
+			proceed = false;
+		}else if(!isValidEmailAddress(account)&&isNaN(account)){
+			$('#loginEmailLabel').html('<strong>Email/Circa ID </strong><font color ="#B94A48">*invalid</font>');
 			$('#loginEmail').css('border-color','#B94A48');
 			proceed = false;
 		}else{
-			$('#loginEmailLabel').html('<strong>Email</strong>');
+			$('#loginEmailLabel').html('<strong>Email/Circa ID</strong>');
 			$('#loginEmail').css('border-color','#CCC');
+			if(isValidEmailAddress(account)){
+				loginMode = 1;
+			}else{
+				loginMode = 0;
+			}
+		}
+		if(!isValidEmailAddress(account)&&isNaN(account)){
+
 		}
 		if(password == ""){
 			$('#loginPasswordLabel').html('<strong>Password </strong><font color ="#B94A48">*required</font>');
@@ -285,8 +293,10 @@ $(document).ready(function(){
 			$("#floatingBarsG-login").show();
 			$("#login").attr("disabled","disabled");
 			var data = {};
-			data.email = Email;
+			data.login_mode = loginMode;
+			data.account = account;
 			data.password = password;
+			console.log(data);
 			$.ajax({
 				url:"/login",
 				data:JSON.stringify(data),
@@ -334,9 +344,16 @@ $(document).ready(function(){
 						        		$("#floatingBarsG-login").hide();
 						        		$("#login").removeAttr("disabled");
 						        		if(data.friend_uids.length>7){
+						        			if(data.friend_uids.length >= 12){
+						        				localStorage.showAllNews = "true";
+						        			}else{
+						        				localStorage.showAllNews = "false";
+						        			}
+						        			console.log(localStorage.showAllNews);
 						        			window.location = "/home";
 						        		}
 										else{
+											localStorage.showAllNews = false;
 											window.location = "/search";
 										}	
 									}
