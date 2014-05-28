@@ -578,7 +578,6 @@ Local<Array> resolvAdvertisements(const char *pack, int &pointer) {
  */
 Handle<Value> resolvViewPack(const char *pack, const response_header &header) {
 	int pointer = HEADER_LENGTH, mode;
-	int64_t length;
 	Local<Array> ans;
 	switch (header.subtype) {
 	case 0: // View user
@@ -770,18 +769,6 @@ Handle<Value> resolvViewPack(const char *pack, const response_header &header) {
 		ans->Set(8, resolvTags(pack, pointer));
 		ans->Set(9, resolvPictures(pack, pointer));
 		break;
-	case 40: // View picture
-	{
-		ans = Array::New(2);
-		char picid[PICID_LENGTH * 2 + 1];
-		readAsciiString(picid, pack, pointer, PICID_LENGTH);
-		picid[PICID_LENGTH * 2] = 0;
-		ans->Set(0, String::New(picid, PICID_LENGTH));
-		std::ostringstream os;
-		os << "public/data/post/" << picid << ".jpg";
-		ans->Set(1, JSreadFile(pack, pointer, os.str()));
-		break;
-	}
 	}
 	return ans;
 }
@@ -799,6 +786,16 @@ Handle<Value> resolvViewPack(const char *pack, const response_header &header) {
 /**
  * - \b "1 2 Search posting"
  * 		- Array: posting (::resolvPosting)
+ */
+
+/**
+ * - \b "1 30 Search pubpage"
+ * 		- Array: pub_eid (string)
+ */
+
+/**
+ * - \b "1 31 Search ads"
+ * 		- Array: advertisement (::resolvAdvertisement)
  */
 Handle<Value> resolvSearchPack(const char *pack,
 		const response_header &header) {
@@ -881,6 +878,17 @@ Handle<Value> resolvSearchPack(const char *pack,
  *			- 3: sid (int32)
  *		- \b "else"
  * 			- 1: reason (int8)
+ */
+
+/**
+ * - \b "2 31 Create advertisement"
+ * 		- 0: success (boolean)
+ * 		- \b "if success"
+ * 			- 1: uid (int32)
+ * 			- 2: eventid (string)
+ * 			- 3: pid (string)
+ * 		- \b "else"
+ * 			- 1: reason(int8)
  */
 Local<Array> resolvCreatePack(const char *pack, const response_header &header) {
 	int pointer = HEADER_LENGTH;
@@ -1370,6 +1378,70 @@ Local<Object> resolvMessagePack(const char *pack,
 }
 
 /**
+ * - \b "15 0 Upload picture"
+ * 		- 0: picid (string)
+ */
+
+/**
+ * - \b "15 1 View picture"
+ * 		- 0: picid (string)
+ * 		- 1: picture_path (string)
+ */
+Local<Object> resolvPicturePack(const char *pack,
+		const response_header &header) {
+	int pointer = HEADER_LENGTH;
+	Local<Array> ans = Array::New(1);
+	char picid[PICID_LENGTH * 2 + 1];
+	readAsciiString(picid, pack, pointer, PICID_LENGTH);
+	picid[PICID_LENGTH * 2] = 0;
+	ans->Set(0, String::New(picid, PICID_LENGTH * 2));
+	switch (header.subtype) {
+	case 0: // for upload
+		break;
+	case 1: // for view
+	{
+		std::ostringstream os;
+		os << "public/data/pictures/" << picid << ".jpg";
+		ans->Set(1, JSreadFile(pack, pointer, os.str()));
+		break;
+	}
+	}
+	return ans;
+}
+
+/**
+ * - \b "15 0 Upload file"
+ * 		- 0: fileid (string)
+ */
+
+/**
+ * - \b "15 1 Download file"
+ * 		- 0: fileid (string)
+ * 		- 1: file_path (string)
+ */
+Local<Object> resolvFilePack(const char *pack,
+		const response_header &header) {
+	int pointer = HEADER_LENGTH;
+	Local<Array> ans = Array::New(1);
+	char fileid[FILEID_LENGTH * 2 + 1];
+	readAsciiString(fileid, pack, pointer, FILEID_LENGTH);
+	fileid[FILEID_LENGTH * 2] = 0;
+	ans->Set(0, String::New(fileid, FILEID_LENGTH * 2));
+	switch (header.subtype) {
+	case 0: // for upload
+		break;
+	case 1: // for download
+	{
+		std::ostringstream os;
+		os << "public/data/files/" << fileid << ".jpg";
+		ans->Set(1, JSreadFile(pack, pointer, os.str()));
+		break;
+	}
+	}
+	return ans;
+}
+
+/**
  * - 0: header
  * 		- 0: length
  * 		- 1: session_key
@@ -1387,6 +1459,8 @@ Local<Object> resolvMessagePack(const char *pack,
  * 		- \b "7 Quit" (::resolvQuitPack)
  * 		- \b "10 Suggestion" (::resolvSuggestionPack)
  * 		- \b "12 Message" (::resolvMessagePack)
+ * 		- \b "15 Picture" (::resolvPicturePack)
+ * 		- \b "16 File" (::resolvFilePack)
  */
 Handle<Value> resolvPack(const Arguments& args) {
 	const char *pack = node::Buffer::Data(args[0]);
@@ -1424,6 +1498,12 @@ Handle<Value> resolvPack(const Arguments& args) {
 		break;
 	case 12:
 		package->Set(1, resolvMessagePack(pack, header));
+		break;
+	case 15:
+		package->Set(1, resolvPicturePack(pack, header));
+		break;
+	case 16:
+		package->Set(1, resolvFilePack(pack, header));
 		break;
 	default:
 		package->Delete(1);

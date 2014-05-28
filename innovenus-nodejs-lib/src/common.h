@@ -27,6 +27,7 @@ using namespace v8;
 #define PICID_LENGTH			8
 #define PUBID_LENGTH			8
 #define ADID_LENGTH				8
+#define FILEID_LENGTH			8
 #define NUM_OF_BYTES_IN_LENGTH	4
 #define NUM_OF_BITS_IN_BYTE		8
 #define SESSION_KEY_LENGTH		8
@@ -36,7 +37,7 @@ using namespace v8;
 
 #define reverse(x) ((unsigned int)((((x)&0xFF)<<24)|((((x)>>8)&0xFF)<<16)|((((x)>>16)&0xFF)<<8)|(((x)>>24)&0xFF)))
 
-inline static Local<String> sym(char *x) {
+inline static Local<String> sym(const char *x) {
 	return String::NewSymbol(x);
 }
 
@@ -156,7 +157,7 @@ static bool CreateDir(std::string path) {
 }
 static Local<String> JSreadFile(const char *buf, int &pointer,
 		std::string path) {
-	int64_t length = readInteger(buf, pointer, 4);
+	size_t length = readInteger(buf, pointer, 4);
 	int i;
 	for (i = path.length() - 1; i >= 0; i--)
 		if (path[i] == '/')

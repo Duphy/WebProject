@@ -31,7 +31,8 @@
 #define TYPE_UIDS  				(ARRAY_MASK | 0x1)
 #define TYPE_UPDATES  			(ARRAY_MASK | 0x2)
 #define TYPE_TAGS				(ARRAY_MASK | 0x3)
-#define TYPE_PICTURES			(ARRAY_MASK | 0x4)
+#define TYPE_PICIDS				(ARRAY_MASK | 0x4)
+#define TYPE_EMAILS				(ARRAY_MASK | 0x5)
 
 #define TYPE_FILE				(FILE_MASK)
 
@@ -121,7 +122,8 @@ static std::string convert_ascii_string_to_hex_string(Handle<String> src) {
 			tmp[i] = tmp[i] - 'A' + 'a';
 	}
 	for (unsigned int i = 0; i < (length >> 1); i++)
-		tmp[i] = resolvHexBit(tmp[i << 1]) << 4 | resolvHexBit(tmp[(i << 1) | 1]);
+		tmp[i] = resolvHexBit(tmp[i << 1]) << 4
+				| resolvHexBit(tmp[(i << 1) | 1]);
 	std::string ans(tmp, length >> 1);
 	delete[] tmp;
 	return ans;
@@ -253,10 +255,19 @@ static inline void Add(std::string& code, const int type,
 			Add(code, TYPE_FOUR_BYTE_INT, Integer::New(i), "");
 			code += tmpstr;
 			break;
-		case TYPE_PICTURES:
+		case TYPE_PICIDS:
 			cur = tmp->Get(i = 0);
 			while (!cur->IsUndefined()) {
-				Add(tmpstr, TYPE_FILE, cur, "picture");
+				Add(tmpstr, TYPE_ASCII_STRING | PICID_LENGTH, cur, "picid");
+				cur = tmp->Get(++i);
+			}
+			Add(code, TYPE_ONE_BYTE_INT, Integer::New(i), "");
+			code += tmpstr;
+			break;
+		case TYPE_EMAILS:
+			cur = tmp->Get(i = 0);
+			while (!cur->IsUndefined()) {
+				Add(tmpstr, TYPE_STRING | ONE_BYTE_FOR_LENGTH, cur, "email");
 				cur = tmp->Get(++i);
 			}
 			Add(code, TYPE_ONE_BYTE_INT, Integer::New(i), "");
@@ -775,36 +786,6 @@ Handle<Value> createMassViewAdvertisementsPack(const Arguments& args) {
 }
 
 /**
- * - \b "0 40 View picture"
- * 		- createViewPicturePack(session_key, viewer_uid, pic_id)
- */
-// args[0]: session_key
-// args[1]: viewer_uid
-// args[2]: pic_id
-Handle<Value> createViewPicturePack(const Arguments& args) {
-	std::string code;
-	BEGIN
-		Add(code, TYPE_FOUR_BYTE_INT, args[1], "viewer_uid");
-		Add(code, TYPE_ASCII_STRING | PICID_LENGTH, args[2], "pic_id");
-		SetHeadAndReturn(0, 0, 40);END
-}
-
-/**
- * - \b "0 41 View pubpicture"
- * 		- createViewPicturePack(session_key, viewer_uid, pic_id)
- */
-// args[0]: session_key
-// args[1]: viewer_uid
-// args[2]: pic_id
-Handle<Value> createViewPubpicturePack(const Arguments& args) {
-	std::string code;
-	BEGIN
-		Add(code, TYPE_FOUR_BYTE_INT, args[1], "viewer_uid");
-		Add(code, TYPE_ASCII_STRING | PICID_LENGTH, args[2], "pic_id");
-		SetHeadAndReturn(0, 0, 40);END
-}
-
-/**
  * - \b "1 0 Search user"
  * - for search by filter
  * 		- createSearchUserPack(0, session_key, searcher_uid, match_option, \n
@@ -1091,7 +1072,7 @@ Handle<Value> createCreatePostingPack(const Arguments &args) {
 		Add(code, TYPE_STRING | TWO_BYTE_FOR_LENGTH, args[3], "content");
 		Add(code, TYPE_ONE_BYTE_INT, args[4], "visibility");
 		Add(code, TYPE_TAGS, args[5], "tags");
-		Add(code, TYPE_PICTURES, args[6], "pictures");
+		Add(code, TYPE_PICIDS, args[6], "picids");
 		SetHeadAndReturn(0, 2, 2);END
 }
 
@@ -1200,7 +1181,7 @@ Handle<Value> createCreateAdvertisementPack(const Arguments &args) {
 		Add(code, TYPE_STRING | TWO_BYTE_FOR_LENGTH, args[3], "content");
 		Add(code, TYPE_ONE_BYTE_INT, args[4], "visibility");
 		Add(code, TYPE_TAGS, args[5], "tags");
-		Add(code, TYPE_PICTURES, args[6], "pictures");
+		Add(code, TYPE_PICIDS, args[6], "pictures");
 		SetHeadAndReturn(0, 2, 31);END
 }
 
@@ -1747,8 +1728,68 @@ Handle<Value> createInvitationPack(const Arguments &args) {
 	std::string code("");
 	BEGIN
 		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
-		Add(code, TYPE_TAGS, args[2], "emails");
+		Add(code, TYPE_EMAILS, args[2], "emails");
 		SetHeadAndReturn(0, 13, 0);END
+}
+
+/**
+ * - \b "15 0 Upload picture"
+ * 		- createUploadPicturePack(session_key, your_uid, picture)
+ */
+// args[0]: session_key
+// args[1]: your_uid
+// args[2]: picture
+Handle<Value> createUploadPicturePack(const Arguments &args) {
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_FILE, args[2], "picture");
+		SetHeadAndReturn(0, 15, 0);END
+}
+
+/**
+ * - \b "15 1 View picture"
+ * 		- createViewPicturePack(session_key, your_uid, picid)
+ */
+// args[0]: session_key
+// args[1]: your_uid
+// args[2]: picid
+Handle<Value> createViewPicturePack(const Arguments &args) {
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_ASCII_STRING | PICID_LENGTH, args[2], "picid");
+		SetHeadAndReturn(0, 15, 1);END
+}
+
+/**
+ * - \b "16 0 Upload file"
+ * 		- createUploadFilePack(session_key, your_uid, file)
+ */
+// args[0]: session_key
+// args[1]: your_uid
+// args[2]: file
+Handle<Value> createUploadFilePack(const Arguments &args) {
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_FILE, args[2], "file");
+		SetHeadAndReturn(0, 16, 0);END
+}
+
+/**
+ * - \b "16 1 View picture"
+ * 		- createDownloadFilePack(session_key, your_uid, fileid)
+ */
+// args[0]: session_key
+// args[1]: your_uid
+// args[2]: fileid
+Handle<Value> createDownloadFilePack(const Arguments &args) {
+	std::string code("");
+	BEGIN
+		Add(code, TYPE_FOUR_BYTE_INT, args[1], "your_uid");
+		Add(code, TYPE_ASCII_STRING | FILEID_LENGTH, args[2], "fileid");
+		SetHeadAndReturn(0, 16, 1);END
 }
 
 typedef struct s_header {
