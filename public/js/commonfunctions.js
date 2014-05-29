@@ -1372,7 +1372,7 @@ function renderChatBox(type, id, chatBoxNumber){
 function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
   $("#chatArea").append(renderChatBox("user", friendUid, chatBoxNumber));
   $(".chat-window-text-box").elastic();
-  $(".chat-window-text-box").mouseDown(function(){
+  $(".chat-window-text-box").mousedown(function(){
 
   });
   var userData = {};
