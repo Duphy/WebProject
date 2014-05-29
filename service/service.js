@@ -834,7 +834,7 @@ exports.viewSelfCircatags = function(req, res) {
 exports.viewPicture = function(req, res){
 	var output;
 	var pack = lib.createViewPicturePack(req.body.session_key,
-		parseInt(req.body.uid),helper.decToHex(req.body.picid));
+		parseInt(req.body.uid),req.body.picid);
 	helper.connectAndSend(pack, function(data){
 		var pkg = lib.resolvPack(data);
 		output = {
