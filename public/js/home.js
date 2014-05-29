@@ -492,6 +492,8 @@ $(document).ready(function(){
     data.session_key = localStorage.session_key;
     data.uid = localStorage.uid;
     data.pics = [$(this).attr("picturename")];
+    //TO DO: fake file ids
+    data.fileids = [$(this).attr("picturename")];
     console.log("pciture name: "+data.pics);
     $("#floatingBarsG-picture").show();
     createPost(data);

@@ -147,7 +147,8 @@ exports.createEvent = function(req, res) {
 	});
     });
 }
-exports.createPost = function(req, res) {
+/*
+exports.createPost_old = function(req, res) {
     console.log("creater uid: " + req.body.uid);
     var pic_paths=[];
     for(var i =0;i<req.body.pics.length;i++){
@@ -223,17 +224,20 @@ exports.createPost = function(req, res) {
 	});
     });
 }
-exports.createPostNew = function(req, res) {
+*/
+exports.createPost = function(req, res) {
     console.log("creater uid: " + req.body.uid);
     var picids = [];
     var fileids = [];
-
-    for(var i =0;i<req.body.picids.length;i++){
-    	picids.push(helper.decToHex(req.body.picids[i]));
+    /*
+    for(var i =0;i<req.body.pics.length;i++){
+    	picids.push(helper.decToHex(req.body.pics[i]));
     }
+    /*
     for(var i =0;i<req.body.fileids.length;i++){
     	fileids.push(helper.decToHex(req.body.fileids[i]));
     }
+    */
     var pack = lib.createCreatePostingPack(req.body.session_key,
 	    parseInt(req.body.uid), helper.decToHex(req.body.eid), req.body.content,
 	    parseInt(req.body.visibility), req.body.tags, picids, fileids);
@@ -281,7 +285,8 @@ exports.createPostNew = function(req, res) {
 		    "tags" : parseTags(pkg[1][9]),
 		    "replies_no" : reply_set.length,
 		    "replies" : replies,
-		    "picids": pkg[1][11]
+		    "picids": pkg[1][11],
+		    "fileids": pkg[1][12]
 		};
 		res.send({
 		    status : "successful",
