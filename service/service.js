@@ -223,7 +223,86 @@ exports.createPost = function(req, res) {
 	});
     });
 }
+exports.createPostNew = function(req, res) {
+    console.log("creater uid: " + req.body.uid);
+    var picids = [];
+    var fileids = [];
 
+    for(var i =0;i<req.body.picids.length;i++){
+    	picids.push(helper.decToHex(req.body.picids[i]));
+    }
+    for(var i =0;i<req.body.fileids.length;i++){
+    	fileids.push(helper.decToHex(req.body.fileids[i]));
+    }
+    var pack = lib.createCreatePostingPack(req.body.session_key,
+	    parseInt(req.body.uid), helper.decToHex(req.body.eid), req.body.content,
+	    parseInt(req.body.visibility), req.body.tags, picids, fileids);
+    helper.connectAndSend(pack, function(data) {
+	var pkg = lib.resolvPack(data);
+	if (pkg[1][0]) {
+	    var pidset = pkg[1][1];
+	    console.log("try to remove directory");
+	    rimraf(dataPath+req.body.uid+'/tmp/', function(err){
+				console.log("remove directory successfully");
+		});
+	    var pack = lib.createViewPostingPack(req.body.session_key,
+		    parseInt(req.body.uid), pidset[0], pidset[1], pidset[2]);
+	    var output;
+	    helper.connectAndSend(pack, function(data) {
+		var pkg = lib.resolvPack(data);
+		// resolve replies
+		var replies = [];
+		var reply_set = pkg[1][10];
+		for (var i = 0; i < reply_set.length; i++) {
+		    var time = helper.UTCtimeTransform(reply_set[i][6],
+			    reply_set[i][7]);
+		    replies[i] = {
+			"rid" : reply_set[i][0],
+			"replier_uid" : reply_set[i][1],
+			"replyto_uid" : reply_set[i][2],
+			"replier_name" : sanitizer.escape(reply_set[i][3]),
+			"replyto_name" : sanitizer.escape(reply_set[i][4]),
+			"replyContent" : sanitizer.escape(reply_set[i][5]),
+			"date" : time[0],
+			"time" : time[1],
+			"visibility" : reply_set[i][8]
+		    };
+		}
+		output = {
+		    "pid" : pkg[1][0],
+		    "uid" : pkg[1][1],
+		    "eid" : helper.hexToDec(pkg[1][2]),
+		    "date" : pkg[1][3],
+		    "time" : pkg[1][4],
+		    "poster_name" : sanitizer.escape(pkg[1][5]),
+		    "event_name" : sanitizer.escape(pkg[1][6]),
+		    "postContent" : sanitizer.escape(pkg[1][7]),
+		    "visibility" : pkg[1][8],
+		    "tags" : parseTags(pkg[1][9]),
+		    "replies_no" : reply_set.length,
+		    "replies" : replies,
+		    "picids": pkg[1][11]
+		};
+		res.send({
+		    status : "successful",
+		    post : output
+		});
+	    }, function() {
+		res.send({
+		    status : "timeout"
+		});
+	    });
+	} else {
+	    res.send({
+		status : "unsuccessful"
+	    });
+	}
+    }, function() {
+	res.send({
+	    status : "timeout"
+	});
+    });
+}
 exports.createReply = function(req, res) {
     var status = "unsuccessful";
     var pack = lib.createReplyPostingPack(req.body.session_key,
