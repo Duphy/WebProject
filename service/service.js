@@ -147,6 +147,50 @@ exports.createEvent = function(req, res) {
 	});
     });
 }
+exports.uploadPicture = function(req,res){
+    var path = dataPath+req.body.uid+'/tmp/'+req.body.pics;
+    var pack = lib.createUploadPicturePack(req.body.session_key,
+	    parseInt(req.body.uid), req.body.tags,path);
+    helper.connectAndSend(pack, function(data) {
+		var pkg = lib.resolvPack(data);
+		// console.log("self friends:");
+		// console.log(pkg);
+	    if(pkg[1][0]>0){
+	        picid = pkg[1][1];
+	    }
+		output = {
+		    "status" : "successful",
+		    "picid" : pkg[1][1]
+	    };
+		res.send(output);
+	    }, function() {
+			res.send({
+		    	status : "timeout"
+			});
+    	});
+}
+exports.uploadFile = function(req,res){
+    var path = dataPath+req.body.uid+'/tmp/'+req.body.file;
+    var pack = lib.createUploadFilePack(req.body.session_key,
+	    parseInt(req.body.uid), req.body.tags,path);
+    helper.connectAndSend(pack, function(data) {
+		var pkg = lib.resolvPack(data);
+		// console.log("self friends:");
+		// console.log(pkg);
+	    if(pkg[1][0]>0){
+	        picid = pkg[1][1];
+	    }
+		output = {
+		    "status" : "successful",
+		    "fileid" : pkg[1][1]
+	    };
+		res.send(output);
+	    }, function() {
+			res.send({
+		    	status : "timeout"
+			});
+    	});
+}
 /*
 exports.createPost_old = function(req, res) {
     console.log("creater uid: " + req.body.uid);
@@ -790,7 +834,7 @@ exports.viewSelfCircatags = function(req, res) {
 exports.viewPicture = function(req, res){
 	var output;
 	var pack = lib.createViewPicturePack(req.body.session_key,
-		parseInt(req.body.uid),req.body.picid);
+		parseInt(req.body.uid),helper.decToHex(req.body.picid));
 	helper.connectAndSend(pack, function(data){
 		var pkg = lib.resolvPack(data);
 		output = {
@@ -826,6 +870,24 @@ exports.viewPictures = function(req,res){
 	// 	   }
 	// 	);
 	// }
+}
+exports.downloadFile = function(req, res){
+	var output;
+	var pack = lib.createDownloadFilePack(req.body.session_key,
+		parseInt(req.body.uid),helper.decToHex(req.body.fileid));
+	helper.connectAndSend(pack, function(data){
+		var pkg = lib.resolvPack(data);
+		output = {
+			"status" : "successful",
+		    "files" : pkg[1][1]
+		};
+		res.send(output);
+	    }, function() {
+			res.send({
+			    "status" : "timeout"
+			});
+	   }
+	);
 }
 exports.viewCommonFriends = function(req,res){
 	var pack = createViewUserPack(9, req.body.session_key,
