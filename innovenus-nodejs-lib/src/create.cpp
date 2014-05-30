@@ -33,6 +33,7 @@
 #define TYPE_TAGS				(ARRAY_MASK | 0x3)
 #define TYPE_PICIDS				(ARRAY_MASK | 0x4)
 #define TYPE_EMAILS				(ARRAY_MASK | 0x5)
+#define TYPE_FILEIDS			(ARRAY_MASK | 0x6)
 
 #define TYPE_FILE				(FILE_MASK)
 
@@ -268,6 +269,15 @@ static inline void Add(std::string& code, const int type,
 			cur = tmp->Get(i = 0);
 			while (!cur->IsUndefined()) {
 				Add(tmpstr, TYPE_STRING | ONE_BYTE_FOR_LENGTH, cur, "email");
+				cur = tmp->Get(++i);
+			}
+			Add(code, TYPE_ONE_BYTE_INT, Integer::New(i), "");
+			code += tmpstr;
+			break;
+		case TYPE_FILEIDS:
+			cur = tmp->Get(i = 0);
+			while (!cur->IsUndefined()) {
+				Add(tmpstr, TYPE_ASCII_STRING | FILEID_LENGTH, cur, "fileid");
 				cur = tmp->Get(++i);
 			}
 			Add(code, TYPE_ONE_BYTE_INT, Integer::New(i), "");
@@ -1053,7 +1063,7 @@ Handle<Value> createCreateEventPack(const Arguments &args) {
 
 /**
  * - \b "2 2 Create posting
- * 		- createCreatePosting(session_key, creater_uid, eventid, content, visibility, tags, pictures)
+ * 		- createCreatePosting(session_key, creater_uid, eventid, content, visibility, tags, picids, fileids)
  * 		- tags: Array of string
  * - \see ::resolvCreatePack
  */
@@ -1063,7 +1073,8 @@ Handle<Value> createCreateEventPack(const Arguments &args) {
 // args[3]: content
 // args[4]: visibility
 // args[5]: tags
-// args[6]: pictures
+// args[6]: picids
+// args[7]: fileids
 Handle<Value> createCreatePostingPack(const Arguments &args) {
 	std::string code("");
 	BEGIN
@@ -1073,6 +1084,7 @@ Handle<Value> createCreatePostingPack(const Arguments &args) {
 		Add(code, TYPE_ONE_BYTE_INT, args[4], "visibility");
 		Add(code, TYPE_TAGS, args[5], "tags");
 		Add(code, TYPE_PICIDS, args[6], "picids");
+		Add(code, TYPE_FILEIDS, args[7], "fileids");
 		SetHeadAndReturn(0, 2, 2);END
 }
 
