@@ -148,27 +148,83 @@ exports.createEvent = function(req, res) {
     });
 }
 exports.uploadPicture = function(req,res){
-    var path = dataPath+req.body.uid+'/tmp/'+req.body.pics;
-    var pack = lib.createUploadPicturePack(req.body.session_key,
-	    parseInt(req.body.uid), req.body.tags,path);
-    helper.connectAndSend(pack, function(data) {
-		var pkg = lib.resolvPack(data);
-		// console.log("self friends:");
-		// console.log(pkg);
-	    if(pkg[1][0]>0){
-	        picid = pkg[1][1];
-	    }
-		output = {
-		    "status" : "successful",
-		    "picid" : pkg[1][1]
-	    };
-		res.send(output);
-	    }, function() {
-			res.send({
-		    	status : "timeout"
+	fs.readFile(req.files.image.path, function(err, data){
+		var imageName = req.files.image.name;
+		var imgsize =1;
+		/// If there's an error
+		if(!imageName){
+			console.log("There was an error.")
+			res.send({status:"unsuccessful"});
+		}else{
+			var path = dataPath +req.body.uid+"/tmp/";
+			console.log("path: "+path);
+			fs.readdir(path, function(err){
+				if(err){
+					console.log("not exists");
+					fs.mkdir(path,function(err){
+						if(!err){
+							console.log("created dir");
+							var imagePath = path + imageName;
+							fs.writeFile(imagePath, data, function(){
+								//upload the picture(s)
+								var pack = lib.createUploadPicturePack(req.body.session_key,
+								    parseInt(req.body.uid), imagePath);
+							    helper.connectAndSend(pack, 
+							    	function(data){
+										var pkg = lib.resolvPack(data);
+										var output = {};
+									    if(pkg[1].length > 0){
+									        output = {
+									        	"status": "successful",
+											    "picid" : pkg[1][0]
+										    };
+									    }
+										res.send(output);
+									}, 
+								    function(){
+										res.send({
+									    	status : "timeout"
+										});
+							    	}
+							    );
+							});	
+						}else{
+							//res.send({status:"unsuccessful"});
+						}
+					});
+				}else{
+					console.log("exists");
+					var imagePath = path + imageName;
+					console.log(imagePath);
+					fs.writeFile(imagePath, data, function(){
+						//upload the picture(s)
+						var pack = lib.createUploadPicturePack(req.body.session_key,
+								    parseInt(req.body.uid), imagePath);
+					    helper.connectAndSend(pack, 
+					    	function(data){
+								var pkg = lib.resolvPack(data);
+								var output = {};
+							    if(pkg[1].length > 0){
+							        output = {
+							        	"status": "successful",
+									    "picid" : pkg[1][0]
+								    };
+							    }
+								res.send(output);
+							}, 
+						    function(){
+								res.send({
+							    	status : "timeout"
+								});
+					    	}
+					    );
+					});
+				}
 			});
-    	});
+		}
+	});
 }
+
 exports.uploadFile = function(req,res){
     var path = dataPath+req.body.uid+'/tmp/'+req.body.file;
     var pack = lib.createUploadFilePack(req.body.session_key,
@@ -271,17 +327,9 @@ exports.createPost_old = function(req, res) {
 */
 exports.createPost = function(req, res) {
     console.log("creater uid: " + req.body.uid);
-    var picids = [];
+    var picids = req.body.pics;
     var fileids = [];
-    /*
-    for(var i =0;i<req.body.pics.length;i++){
-    	picids.push(helper.decToHex(req.body.pics[i]));
-    }
-    /*
-    for(var i =0;i<req.body.fileids.length;i++){
-    	fileids.push(helper.decToHex(req.body.fileids[i]));
-    }
-    */
+
     var pack = lib.createCreatePostingPack(req.body.session_key,
 	    parseInt(req.body.uid), helper.decToHex(req.body.eid), req.body.content,
 	    parseInt(req.body.visibility), req.body.tags, picids, fileids);
@@ -298,6 +346,7 @@ exports.createPost = function(req, res) {
 	    var output;
 	    helper.connectAndSend(pack, function(data) {
 		var pkg = lib.resolvPack(data);
+
 		// resolve replies
 		var replies = [];
 		var reply_set = pkg[1][10];
@@ -2081,7 +2130,7 @@ exports.uploadAvarta = function(req, res){
 	});
 }
 
-exports.uploadPicture = function(req, res){
+/*exports.uploadPicture = function(req, res){
 	fs.readFile(req.files.image.path, function(err, data){
 		var imageName = req.files.image.name;
 		var imgsize =1;
@@ -2114,7 +2163,7 @@ exports.uploadPicture = function(req, res){
 			});
 		}
 	});
-}
+}*/
 
 /*sanitizer tags*/
 function parseTags(tags){

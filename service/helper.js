@@ -408,6 +408,7 @@ function convertBase(str, fromBase, toBase) {
  */
 function decToHex(decStr) {
 	var hex = convertBase(decStr, 10, 16);
+	console.log(hex);
 	if (hex.length < 16) {
 		for (var i = hex.length; i < 16; i++)
 			hex = '0' + hex;

@@ -347,6 +347,19 @@ function renderSchedule(schedule,isManager){
   return html;
 }
 
+function uploadPicture(data){
+    $.ajax({
+        url:"/uploadpostpicture",
+        data:JSON.stringify(data),
+        timeout:20000,
+        type:"POST",
+        contentType: 'application/json',
+        success:function(result){
+            
+        }
+    });
+}
+
 function createPost(data){
   $.ajax({
     url:"/createpost",
@@ -380,7 +393,7 @@ function createPost(data){
           $.ajax({
             url:'/getpicture',
             data:JSON.stringify(pictureData),
-            timeout:10000,
+            timeout:20000,
             type:"POST",
             contentType:"application/json",
             success:function(data){
@@ -922,7 +935,7 @@ function viewpost(pids,char,newsData){
                       console.log("element:");
                       console.log(element);
                       console.log(element.picids);
-                      console.log(element.picids.length);
+                      console.log("pictures amount: " + element.picids.length);
                       var pictureData  = {};
                       pictureData.session_key = localStorage.session_key;
                       pictureData.uid = localStorage.uid;
@@ -930,7 +943,7 @@ function viewpost(pids,char,newsData){
                       $.ajax({
                         url:'/getpicture',
                         data:JSON.stringify(pictureData),
-                        timeout:10000,
+                        timeout:20000,
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
@@ -1530,7 +1543,7 @@ function getMorePosts(char,newsData){
                       $.ajax({
                         url:'/getpicture',
                         data:JSON.stringify(pictureData),
-                        timeout:10000,
+                        timeout:20000,
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
@@ -1640,7 +1653,7 @@ function getMorePosts(char,newsData){
                   $.ajax({
                     url:'/getpicture',
                     data:JSON.stringify(pictureData),
-                    timeout:10000,
+                    timeout:20000,
                     type:"POST",
                     contentType:"application/json",
                     success:function(data){
