@@ -723,3 +723,9 @@ background-color:#FFFFFF}
 	min-height: 70px;
 	border-radius: 0px;
 }
+
+.notificationContent{
+	background-color: white;
+	border: none;
+	padding: 0;
+}

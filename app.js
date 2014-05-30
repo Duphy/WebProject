@@ -286,7 +286,7 @@ function sendNotification(notification,socket){
 	console.log("send notification!!!!!!!!!!!!!!!!!");
     console.log(notification);
     var n_seq = notification[1];
-    var name = notification[1];
+    var name = notification[6];
     var uid = notification[2];
     var eid = service.helper.hexToDec(notification[3]);
     var pid = notification[4];

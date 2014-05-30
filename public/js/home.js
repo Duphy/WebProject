@@ -1384,6 +1384,14 @@ $(document).ready(function(){
     removeNotification();
   });
 
+  $('body').delegate('.postReplyNotification','hover',function(event){
+    if (event.type == 'mouseenter') {
+      $(this).css("background-color","#e9edf0");
+    } else {
+      $(this).css("background-color","white");
+    }
+  });
+
   $(document).on('click', ".posttag", function() {
     localStorage.search_tag_content = $(this).attr("tag");
     localStorage.search_tag_option = "post";

@@ -368,7 +368,6 @@ $(document).on('click', ".joinevent", function() {
   
   $("#notification").hover(function(){
     $(this).tooltip('show');
-    console.log("first");
     setTimeout(function(){$('#notification').tooltip('hide')},2000);
   });
 

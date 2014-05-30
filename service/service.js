@@ -1473,61 +1473,61 @@ exports.viewPostsContent = function(req, res) {
     console.log("counter is "+counter);
     pack = lib.createViewPostingPack(req.body.session_key,
 	    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
-    var f = function(data) {
-	var pkg = lib.resolvPack(data);
-	if (typeof pkg[1] == "undefined") {
-	    res.send({
-		status : "unsuccessful"
-	    });
-	    return;
-	}
-	// resolve replies
-	var replies = [];
-	var reply_set = pkg[1][10];
-	for (var i = 0; i < reply_set.length; i++) {
-	    replies[i] = {
-		"rid" : reply_set[i][0],
-		"replier_uid" : reply_set[i][1],
-		"replyto_uid" : reply_set[i][2],
-		"replier_name" : sanitizer.escape(reply_set[i][3]),
-		"replyto_name" : sanitizer.escape(reply_set[i][4]),
-		"replyContent" : sanitizer.escape(reply_set[i][5]),
-		"date" : reply_set[i][6],
-		"time" : reply_set[i][7],
-		"visibility" : reply_set[i][8]
-	    };
-	}
-	results[counter] = {
-	    "pid" : pkg[1][0],
-	    "uid" : pkg[1][1],
-	    "eid" : helper.hexToDec(pkg[1][2]),
-	    "date" : pkg[1][3],
-	    "time" : pkg[1][4],
-	    "poster_name" : sanitizer.escape(pkg[1][5]),
-	    "event_name" : sanitizer.escape(pkg[1][6]),
-	    "postContent" : sanitizer.escape(pkg[1][7]),
-	    "visibility" : pkg[1][8],
-	    "tags" : parseTags(pkg[1][9]),
-	    "replies_no" : reply_set.length,
-	    "replies" : replies, 
-	    "picids": pkg[1][11]
-	};
-	counter++;
-	if (counter == pidList.length)
-	    res.send({
-		status : "successful",
-		source : results
-	    });
-	else {
-	    pack = lib.createViewPostingPack(req.body.session_key,
-		    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
-	   // console.log(pack);
-	    helper.connectAndSend(pack, f, function() {
-		res.send({
-		    status : "timeout"
-		});
-	    });
-	}
+    var f = function(data){
+		var pkg = lib.resolvPack(data);
+		if (typeof pkg[1] == "undefined") {
+		    res.send({
+			status : "unsuccessful"
+		    });
+		    return;
+		}
+		// resolve replies
+		var replies = [];
+		var reply_set = pkg[1][10];
+		for (var i = 0; i < reply_set.length; i++) {
+		    replies[i] = {
+			"rid" : reply_set[i][0],
+			"replier_uid" : reply_set[i][1],
+			"replyto_uid" : reply_set[i][2],
+			"replier_name" : sanitizer.escape(reply_set[i][3]),
+			"replyto_name" : sanitizer.escape(reply_set[i][4]),
+			"replyContent" : sanitizer.escape(reply_set[i][5]),
+			"date" : reply_set[i][6],
+			"time" : reply_set[i][7],
+			"visibility" : reply_set[i][8]
+		    };
+		}
+		results[counter] = {
+		    "pid" : pkg[1][0],
+		    "uid" : pkg[1][1],
+		    "eid" : helper.hexToDec(pkg[1][2]),
+		    "date" : pkg[1][3],
+		    "time" : pkg[1][4],
+		    "poster_name" : sanitizer.escape(pkg[1][5]),
+		    "event_name" : sanitizer.escape(pkg[1][6]),
+		    "postContent" : sanitizer.escape(pkg[1][7]),
+		    "visibility" : pkg[1][8],
+		    "tags" : parseTags(pkg[1][9]),
+		    "replies_no" : reply_set.length,
+		    "replies" : replies, 
+		    "picids": pkg[1][11]
+		};
+		counter++;
+		if (counter == pidList.length)
+		    res.send({
+			status : "successful",
+			source : results
+		    });
+		else {
+		    pack = lib.createViewPostingPack(req.body.session_key,
+			    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
+		   // console.log(pack);
+		    helper.connectAndSend(pack, f, function() {
+			res.send({
+			    status : "timeout"
+			});
+		    });
+		}
     };
     //console.log(pack);
     helper.connectAndSend(pack, f, function() {

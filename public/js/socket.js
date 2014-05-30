@@ -16,25 +16,25 @@ socket.on("friend request",function(name, uid, eid, pid, action, seq){
 	userData.session_key = localStorage.session_key;
 	userData.uid = localStorage.uid;
 	userData.view_uid = uid;
-	$.ajax({
-	    url:"/getuserinfo",
-	    data:JSON.stringify(userData),
-	    timeout:10000,
-	    type:"POST",
-	    contentType: 'application/json',
-	    success:function(data){
-	    	console.log(data);
-	      	$.each($(".user"+uid),function(index, element){
-	      		$(element).attr("name",data.nickname);
-	      		$(element).html(data.nickname);
-	      	});
-	    },
-	    error:function(jqXHR, textStatus, errorThrown){
-          if(textStatus == "timeout"){
-            $("#timeoutModal").modal("show");
-          }
-        }
-	});
+	// $.ajax({
+	//     url:"/getuserinfo",
+	//     data:JSON.stringify(userData),
+	//     timeout:10000,
+	//     type:"POST",
+	//     contentType: 'application/json',
+	//     success:function(data){
+	//     	console.log(data);
+	//       	$.each($(".user"+uid),function(index, element){
+	//       		$(element).attr("name",data.nickname);
+	//       		$(element).html(data.nickname);
+	//       	});
+	//     },
+	//     error:function(jqXHR, textStatus, errorThrown){
+ //          if(textStatus == "timeout"){
+ //            $("#timeoutModal").modal("show");
+ //          }
+ //        }
+	// });
 }); 
  
 socket.on("event membership request",function(name,uid, pid, eventName,eid,action, seq){
@@ -99,7 +99,7 @@ socket.on("event membership request",function(name,uid, pid, eventName,eid,actio
 
 socket.on("reply posting",function(name, uid, eid, pid, seq){
 	console.log("reply noti");
-	console.log("notfication name: "+name+" uid: "+uid+" post: "+eventName+" pid: "+eid);
+	console.log("notfication name: "+name+" uid: "+uid+" post: "+eid+" pid: "+pid);
 	var newNotificationNumber = parseInt($("#notificationNumber").html().trim()) + 1;
 	$("#notificationNumber").html(" "+newNotificationNumber+" ");
 	if(newNotificationNumber == 1){
@@ -109,6 +109,50 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 		$("#notificationList").append("<li class = 'divider'></li>");
 	}
 	$("#notificationList").append(postReplyNotification(name, uid, eid, pid, seq));
+	var userData = {};
+	userData.session_key = localStorage.session_key;
+	userData.uid = localStorage.uid;
+	userData.view_uid = uid;
+	// $.ajax({
+	//     url:"/getuserinfo",
+	//     data:JSON.stringify(userData),
+	//     timeout:10000,
+	//     type:"POST",
+	//     contentType: 'application/json',
+	//     success:function(data){
+	//     	console.log(data);
+	//       	$.each($(".user"+uid),function(index, element){
+	//       		$(element).attr("name",data.nickname);
+	//       		$(element).html(data.nickname);
+	//       	});
+	//     },
+	//     error:function(jqXHR, textStatus, errorThrown){
+ //          if(textStatus == "timeout"){
+ //            $("#timeoutModal").modal("show");
+ //          }
+ //        }
+	// });
+	var postsData = {};
+	postsData.pidList = [pid];
+	postsData.uidList = [localStorage.uid];
+	postsData.eidList = [eid];
+	postsData.session_key = localStorage.session_key;
+	postsData.uid = localStorage.uid;
+	$.ajax({
+		url:"/getpostscontent",
+	    data:JSON.stringify(postsData),
+	    timeout:10000,
+	    type:"POST",
+	    contentType: 'application/json',
+	    success:function(data){
+	    	console.log("post details: ");
+	    	console.log(data);
+	    	if(data.status == "successful"){
+	    		$("li.notificationItem[pid="+pid+"]").find(".postContent").html(data.source[0].postContent);
+
+	    	}
+	    }
+	});
 });
 
 socket.on("receive user chat",function(uid, message, date, time){
