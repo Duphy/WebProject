@@ -109,6 +109,13 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 		$("#notificationList").append("<li class = 'divider'></li>");
 	}
 	$("#notificationList").append(postReplyNotification(name, uid, eid, pid, seq));
+	$(".postReplyNotification").last().hover(function(){
+		$(this).css("background-color","#e9edf0");
+		$(this).find(".notificationContent").css("background-color","#e9edf0");
+	},function(){
+    	$(this).css("background-color","white");
+    	$(this).find(".notificationContent").css("background-color","white");
+	});
 	var userData = {};
 	userData.session_key = localStorage.session_key;
 	userData.uid = localStorage.uid;
