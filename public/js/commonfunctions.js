@@ -244,7 +244,7 @@ function renderPopPost(post){
               '<strong><a href = "#" class = "userName replier websiteFont" name = "'+(post.replies)[i].replier_name+'" uid = "'+(post.replies)[i].replier_uid+'">'+(post.replies)[i].replier_name+'</a></strong>'+
               '&nbsp; to &nbsp;'+
               '<strong><a href = "#" class = "userName replyto websiteFont" name = "'+(post.replies)[i].replyto_name+'" uid = "'+(post.replies)[i].replyto_uid+'">'+(post.replies)[i].replyto_name+'</a></strong>'+
-              '<br><font class = "websiteFont" style = "font-size: 12px;color: #999;">'+rtime[0]+'&nbsp;'+rtime[1]+'</font>'+
+              '<font>'+rtime[0]+'&nbsp;'+rtime[1]+'</font>'+
           '</div>'+
           '<div>'+
           '<pre class = "length-limited" style = "padding:0px;font-family: \'Lato\', sans-serif;font-weight:300;">'+(post.replies)[i].replyContent+'</pre>'+
@@ -709,7 +709,7 @@ function renderReply(reply){
       }
       html = html + 
       '<div class = "span8">'+
-          '<div class = "row-fluid">'+
+          '<div class = "row-fluid websiteFont">'+
             '<strong><a href = "#" class = "userName" name = "'+reply.replier_name+'" uid = "'+reply.replier_uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replier_name+'</a></strong>'+
             '&nbsp; to &nbsp;'+
             '<strong><a href = "#" class = "userName" name = "'+reply.replyto_name+'" uid = "'+reply.replyto_uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replyto_name+'</a></strong>'+
@@ -1380,7 +1380,7 @@ function postReplyNotification(userName, userId, eventId, postId ,seqNo){
                 '</div>'+
                 '<pre class = "websiteFont span11 notificationContent">'+
                   '<a class = "userName user'+userId+'"  uid = "'+userId+'">'+userName+'</a>'+ 
-                  ' has replied to your post:" '+
+                  ' has replied to you in post:" '+
                   '<strong class = "postContent"></strong>'+
                   '".</pre>'+
              '</li>';
