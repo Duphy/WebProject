@@ -247,7 +247,7 @@ function notificationHandler(notifications,uid){
 	console.log("get notifications!");
 	var uid = notifications[0][2];
 	for(var i = 0;i< notifications[1].length;i++){
-		notifications[1][6]=notiCounter[uid];
+		notifications[1][i][6]=notiCounter[uid];
 		notiCounter[uid]++;
 	}
 	if(socketsList[uid] && !socketsList[uid].disconnected){
