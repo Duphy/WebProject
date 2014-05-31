@@ -1,7 +1,7 @@
 var socket = io.connect('localhost');
 console.log("client socket connected!");
 socket.emit("uid",localStorage.uid);
-socket.on("friend request",function(name, uid, eid, pid, action, seq){
+socket.on("friend request",function(name, uid, eid, pid, action, seq, nid){
 	console.log("notfication name: "+name+" uid: "+uid+" action: "+action);
 	var newNotificationNumber = parseInt($("#notificationNumber").html().trim()) + 1;
 	$("#notificationNumber").html(" "+newNotificationNumber+" ");
@@ -18,7 +18,7 @@ socket.on("friend request",function(name, uid, eid, pid, action, seq){
 	userData.view_uid = uid;
 }); 
  
-socket.on("event membership request",function(name,uid, pid, eventName,eid,action, seq){
+socket.on("event membership request",function(name,uid, pid, eventName,eid,action, seq, nid){
 	console.log("notfication name: "+name+" uid: "+uid+" eventName: "+eventName+" eid: "+eid+"action: "+action);
 	var newNotificationNumber = parseInt($("#notificationNumber").html().trim()) + 1;
 	$("#notificationNumber").html(" "+newNotificationNumber+" ");
@@ -78,7 +78,7 @@ socket.on("event membership request",function(name,uid, pid, eventName,eid,actio
 	});
 });
 
-socket.on("reply posting",function(name, uid, eid, pid, seq){
+socket.on("reply posting",function(name, uid, eid, pid, seq, nid){
 	console.log("reply noti");
 	console.log("notfication name: "+name+" uid: "+uid+" post: "+eid+" pid: "+pid);
 	var newNotificationNumber = parseInt($("#notificationNumber").html().trim()) + 1;
@@ -120,6 +120,7 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 	    		var notificationItem = $("li.notificationItem[pid="+pid+"]");
 	    		$(notificationItem).find(".postContent").html(data.source[0].postContent);
 	    		$(notificationItem).unbind('click').click(function(event){
+	    			var notification = $(this);
 	    			$.ajax({
 						url:"/getpostscontent",
 					    data:JSON.stringify(postsData),
@@ -149,6 +150,12 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 							    		renderLargePost(data.source[0]);
 							    		$(".interactionArea").show();
 										$("#imageModal").modal("show");
+										socket.emit("processNoti", uid, nid);
+										if($(notification).prev() && $(notification).prev().hasClass("divider")){
+											$(notification).prev().remove();
+										};
+										$(notification).remove();
+										removeNotification();
 				                      }else{
 				                        console.log("failed to get the picture of this post");
 				                      }
@@ -159,7 +166,6 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 				                      }
 				                    }
 				                });
-
 								var userData = {};
 						        userData.uid = localStorage.uid;
 						        userData.session_key = localStorage.session_key;
@@ -202,8 +208,13 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 							    	}
 				    			});
 				    			$("#popPostModal").modal("show");
+				    			socket.emit("processNoti", uid, nid);
+								if($(notification).prev() && $(notification).prev().hasClass("divider")){
+									$(notification).prev().remove();
+								};
+								$(notification).remove();
+								removeNotification();
 			    			}
-			    			
 		    			}
 		    		});
 	    		});
