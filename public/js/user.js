@@ -675,6 +675,7 @@ $(document).ready(function(){
           type:"POST",
           contentType: 'application/json',
           success:function(result){
+            console.log("defriend success");
             $(this).removeAttr("disabled");
             $("#defriendCancel").removeAttr("disabled");
             $("#floatingBarsG-defriend").hide();
