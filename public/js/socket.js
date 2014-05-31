@@ -120,6 +120,8 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 	    		var notificationItem = $("li.notificationItem[pid="+pid+"]");
 	    		$(notificationItem).find(".postContent").html(data.source[0].postContent);
 	    		$(notificationItem).unbind('click').click(function(event){
+	    			console.log("post details: ");
+	    			console.log(data);
 	    			renderPopPost(data.source[0]);
 	    			$.each(data.source[0].replies,function(index, element){
 	    				if(element.replier_uid != localStorage.uid){

@@ -160,7 +160,7 @@ function renderLargePost(post){
     for(var i = 0; i < post.replies_no;i++){
       var rtime = convertUTCDateToLocalDate((post.replies)[i].date,(post.replies)[i].time);
       var html = 
-      '<li rid="'+(post.replies)[i].rid+'" class = "row-fluid replyBody">'+
+      '<li id ="'+post.pid+''+(post.replies)[i].rid+'" rid="'+(post.replies)[i].rid+'" class = "row-fluid replyBody">'+
           '<img class = "span1" src = "#" style = "border-radius:20px;width:40px;height:40px;">'+
           '<div class = "span8">'+
             '<div class = "row-fluid websiteFont">'+
@@ -208,6 +208,7 @@ function renderPopPost(post){
     $(context).find(".userName").first().attr('name',post.poster_name).attr('uid',post.uid).html(post.poster_name);
     $(context).find(".postTime").first().html(time[0]+' &nbsp;&nbsp;'+time[1]);
     $(context).find(".length-limited").first().html(post.postContent);
+    $(context).find("textarea").attr("replytouid",post.uid).attr("replytoname",post.poster_name);
     $(context).find(".tagsGroup").first().html("");
     var posttags = sortTags(post.tags); 
     var length = Math.min(4,posttags.length);
@@ -226,7 +227,7 @@ function renderPopPost(post){
     for(var i = 0; i < post.replies_no;i++){
       var rtime = convertUTCDateToLocalDate((post.replies)[i].date,(post.replies)[i].time);
       var html = 
-      '<li rid="'+(post.replies)[i].rid+'" class = "row-fluid replyBody" style = "text-align:left;">';
+      '<li id ="'+post.pid+''+(post.replies)[i].rid+'" rid="'+(post.replies)[i].rid+'" class = "row-fluid replyBody" style = "text-align:left;">';
       if((post.replies)[i].replier_uid == localStorage.uid){
         html = html + '<img class = "span1" id = "popPostReply'+post.pid+''+(post.replies)[i].rid+'" src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">';
       }else{
@@ -271,7 +272,7 @@ function renderPopPost(post){
     userAvartaData.time = 0000//getCurrentTime();
     userAvartaData.date = 00000000//getCurrentDate();
     $.ajax({
-      url:'/getuseravarta',
+      url:'/getusersmallavarta',
       data:JSON.stringify(userAvartaData),
       timeout:10000,
       type:"POST",
@@ -596,7 +597,7 @@ function userlist(usersData,type){
                       $("#friendsList").append(renderFriend(element));
                     }
                     $.ajax({
-                      url:'/getuseravarta',
+                      url:'/getusersmallavarta',
                       data:JSON.stringify(userAvartaData),
                       timeout:10000,
                       type:"POST",
@@ -621,7 +622,7 @@ function userlist(usersData,type){
                         userAvartaData.date = getCurrentDate();
                         $("#membersList").append(renderMember(element));
                         $.ajax({
-                          url:'/getuseravarta',
+                          url:'/getusersmallavarta',
                           data:JSON.stringify(userAvartaData),
                           timeout:10000,
                           type:"POST",
@@ -707,15 +708,13 @@ function eventlist(eventData){
 function renderReply(reply){
   var html =
     //TO DO: make up the id content
-    '<li id = "" class = "row-fluid replyBody">'+
-      '<img ';
-      if(reply.replier_uid != localStorage.uid){
-        html = html + 'class="span1 selfProfileSmallAvarta"';
+    '<li id = "'+reply.id+'" rid = "'+reply.rid+'" class = "row-fluid replyBody" style = "text-align:left;">';
+      if(reply.replier_uid == localStorage.uid){
+        html = html + '<img class="span1 selfProfileSmallAvarta" src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">';
       }else{
-        html = html + 'class="span1"';
+        html = html + '<img class="span1" src = "#" style = "border-radius:20px;width:40px;height:40px;">';
       }
       html = html + 
-      'src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">'+
       '<div class = "span8">'+
           '<div class = "row-fluid">'+
             '<strong><a href = "#" class = "userName" name = "'+reply.replier_name+'" uid = "'+reply.replier_uid+'" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+reply.replier_name+'</a></strong>'+
@@ -742,8 +741,13 @@ function renderReply(reply){
 
 function renderReplyInLargePost(reply){
     var html = 
-      '<li id = "" class = "row-fluid replyBody">'+
-          '<img class = "span1 selfProfileSmallAvarta" src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">'+
+      '<li id = "" class = "row-fluid replyBody" style = "text-align:left;">';
+          if(reply.replier_uid == localStorage.uid){
+        html = html + '<img class="span1 selfProfileSmallAvarta" src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">';
+      }else{
+        html = html + '<img class="span1" src = "#" style = "border-radius:20px;width:40px;height:40px;">';
+      }
+      html = html +
           '<div class = "span8">'+
             '<div class = "row-fluid websiteFont">'+
               '<strong><a href = "#" class = "userName replier websiteFont" name = "'+reply.replier_name+'" uid = "'+reply.replier_uid+'">'+reply.replier_name+'</a></strong>'+
@@ -762,8 +766,7 @@ function renderReplyInLargePost(reply){
           }
           html=html+
           '</div>'+
-          '<div class = "span1">';
-          html=html+
+          '<div class = "span1">'+
           '</div>'+
         '</li>';
   return html;
@@ -1050,7 +1053,7 @@ function viewpost(pids,char,newsData){
                     }
                     //retrieve the avatar of the poster
                     $.ajax({
-                        url:'/getuseravarta',
+                        url:'/getusersmallavarta',
                         data:JSON.stringify(postAvartaData),
                         timeout:10000,
                         type:"POST",
@@ -1070,7 +1073,7 @@ function viewpost(pids,char,newsData){
                       replyAvartaData.time = 0000//getCurrentTime();
                       replyAvartaData.date = 00000000//getCurrentDate();
                       $.ajax({
-                          url:'/getuseravarta',
+                          url:'/getusersmallavarta',
                           data:JSON.stringify(replyAvartaData),
                           timeout:10000,
                           type:"POST",
@@ -1167,7 +1170,7 @@ function searchUser(searchData,loadOrder){
                 userAvartaData.time = 0000//getCurrentTime();
                 userAvartaData.date = 00000000//getCurrentDate();
                 $.ajax({
-                  url:'/getuseravarta',
+                  url:'/getusersmallavarta',
                   data:JSON.stringify(userAvartaData),
                   timeout:10000,
                   type:"POST",
@@ -1513,7 +1516,7 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
     }
   });
   $.ajax({
-    url:'/getuseravarta', 
+    url:'/getusersmallavarta', 
     data:JSON.stringify(userData),
     timeout:10000,
     type:"POST",
@@ -1667,7 +1670,7 @@ function getMorePosts(char,newsData){
                       });
                     }
                     $.ajax({
-                        url:'/getuseravarta',
+                        url:'/getusersmallavarta',
                         data:JSON.stringify(postAvartaData),
                         timeout:10000,
                         type:"POST",
@@ -1686,7 +1689,7 @@ function getMorePosts(char,newsData){
                         replyAvartaData.time = 0000//getCurrentTime();
                         replyAvartaData.date = 00000000//getCurrentDate();
                         $.ajax({
-                            url:'/getuseravarta',
+                            url:'/getusersmallavarta',
                             data:JSON.stringify(replyAvartaData),
                             timeout:10000,
                             type:"POST",
@@ -1777,7 +1780,7 @@ function getMorePosts(char,newsData){
                   });
                 }
                 $.ajax({
-                    url:'/getuseravarta',
+                    url:'/getusersmallavarta',
                     data:JSON.stringify(postAvartaData),
                     timeout:10000,
                     type:"POST",
@@ -1796,7 +1799,7 @@ function getMorePosts(char,newsData){
                     replyAvartaData.time = 0000//getCurrentTime();
                     replyAvartaData.date = 00000000//getCurrentDate();
                     $.ajax({
-                        url:'/getuseravarta',
+                        url:'/getusersmallavarta',
                         data:JSON.stringify(replyAvartaData),
                         timeout:10000,
                         type:"POST",
@@ -1878,7 +1881,7 @@ function getMoreUsers(){
             userAvartaData.time = 0000//getCurrentTime();
             userAvartaData.date = 00000000//getCurrentDate();
             $.ajax({
-              url:'/getuseravarta',
+              url:'/getusersmallavarta',
               data:JSON.stringify(userAvartaData),
               timeout:10000,
               type:"POST",
