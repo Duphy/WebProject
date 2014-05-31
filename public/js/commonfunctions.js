@@ -146,12 +146,13 @@ function checkMutual(list, uid){
 /************* render functions **********/
 
 function renderLargePost(post){
-  post.id = "modal"+post.uid+""+post.eid+""+post.pid;
+  post.id = post.uid+""+post.eid+""+post.pid;
   var time = convertUTCDateToLocalDate(post.date,post.time);
   context = $(".interactionArea").find(".postRoot").first();
-  $(context).find(".repliesArea").first().html("");
+  replyArea = $(context).find(".scroller").first();
+  $(replyArea).html("");
 
-  $(context).attr("id",post.id);
+  $(context).addClass(post.id);
   $(context).attr("repliesNumber",post.replies_no).attr("postPid", post.pid).attr("posterUid", post.uid).attr("postEid", post.eid).attr("posterName", post.poster_name);
   $(context).find(".userName").first().attr('name',post.poster_name).attr('uid',post.uid).html(post.poster_name);
   $(context).find(".postTime").first().html(time[0]+' &nbsp;&nbsp;'+time[1]);
@@ -160,8 +161,13 @@ function renderLargePost(post){
     for(var i = 0; i < post.replies_no;i++){
       var rtime = convertUTCDateToLocalDate((post.replies)[i].date,(post.replies)[i].time);
       var html = 
-      '<li id ="'+post.pid+''+(post.replies)[i].rid+'" rid="'+(post.replies)[i].rid+'" class = "row-fluid replyBody">'+
-          '<img class = "span1" src = "#" style = "border-radius:20px;width:40px;height:40px;">'+
+      '<li replyId ="'+post.id+''+(post.replies)[i].rid+'" rid="'+(post.replies)[i].rid+'" class = "row-fluid replyBody">';
+      if((post.replies)[i].replier_uid == localStorage.uid){
+        html = html + '<img class = "span1" id = "popPostReply'+post.pid+''+(post.replies)[i].rid+'" src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">';
+      }else{
+        html = html + '<img class = "span1" id = "popPostReply'+post.pid+''+(post.replies)[i].rid+'" src = "#" style = "border-radius:20px;width:40px;height:40px;">';
+      }
+      html = html +
           '<div class = "span8">'+
             '<div class = "row-fluid websiteFont">'+
               '<strong><a href = "#" class = "userName replier websiteFont" name = "'+(post.replies)[i].replier_name+'" uid = "'+(post.replies)[i].replier_uid+'">'+(post.replies)[i].replier_name+'</a></strong>'+
@@ -187,10 +193,9 @@ function renderLargePost(post){
           html=html+
           '</div>'+
         '</li>';
-        console.log($(".interactionArea ul.repliesArea"));
-        $(".interactionArea ul.repliesArea").append(html);
+        $(replyArea).append(html);
         var source = $("#replyAvarta"+post.pid+""+(post.replies)[i].rid).attr("src");
-        $(".interactionArea ul.repliesArea").find("li").last().find("img").attr("src",source);
+        $(replyArea).find("li").last().find("img").attr("src",source);
     }
   }
   $(context).find("textarea").first().attr("replytouid",post.uid).attr("replytoname",post.poster_name);
@@ -203,7 +208,7 @@ function renderPopPost(post){
     replyArea = $(context).find(".scroller").first();
     $(replyArea).html("");
 
-    $(context).attr("id",post.id);
+    $(context).addClass(post.id);
     $(context).attr("repliesNumber",post.replies_no).attr("postPid", post.pid).attr("posterUid", post.uid).attr("postEid", post.eid).attr("posterName", post.poster_name);
     $(context).find(".userName").first().attr('name',post.poster_name).attr('uid',post.uid).html(post.poster_name);
     $(context).find(".postTime").first().html(time[0]+' &nbsp;&nbsp;'+time[1]);
@@ -227,7 +232,7 @@ function renderPopPost(post){
     for(var i = 0; i < post.replies_no;i++){
       var rtime = convertUTCDateToLocalDate((post.replies)[i].date,(post.replies)[i].time);
       var html = 
-      '<li id ="'+post.pid+''+(post.replies)[i].rid+'" rid="'+(post.replies)[i].rid+'" class = "row-fluid replyBody" style = "text-align:left;">';
+      '<li replyId ="'+post.id+''+(post.replies)[i].rid+'" rid="'+(post.replies)[i].rid+'" class = "row-fluid replyBody" style = "text-align:left;">';
       if((post.replies)[i].replier_uid == localStorage.uid){
         html = html + '<img class = "span1" id = "popPostReply'+post.pid+''+(post.replies)[i].rid+'" src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">';
       }else{
@@ -288,7 +293,7 @@ function renderPost(post){
   post.id = post.uid+""+post.eid+""+post.pid;
   var time = convertUTCDateToLocalDate(post.date,post.time);
   var html =
-  '<div id = "'+post.id+'" class = "row-fluid postRoot" repliesNumber = '+post.replies_no+' postPid = "'+post.pid+'" posterUid = "'+post.uid+'" postEid = "'+post.eid+'" posterName = "'+post.poster_name+'" style = "background-color:#FFFFFF;margin-bottom:10px;">'+
+  '<div class = "row-fluid postRoot '+post.id+'" repliesNumber = '+post.replies_no+' postPid = "'+post.pid+'" posterUid = "'+post.uid+'" postEid = "'+post.eid+'" posterName = "'+post.poster_name+'" style = "background-color:#FFFFFF;margin-bottom:10px;">'+
     '<div class = "row-fluid" style = "margin-top:10px;height:50px;">'+
       '<div class = "span8 row-fluid" style = "text-align: center;">'+
         '<div class = "span2">'+
@@ -359,7 +364,7 @@ function renderPost(post){
         for(var i = 0; i < post.replies_no;i++){
             var rtime = convertUTCDateToLocalDate((post.replies)[i].date,(post.replies)[i].time);
             html = html +
-            '<li id ="'+post.pid+''+(post.replies)[i].rid+'" rid="'+(post.replies)[i].rid+'" class = "row-fluid replyBody">'+
+            '<li replyId ="'+post.id+''+(post.replies)[i].rid+'" rid="'+(post.replies)[i].rid+'" class = "row-fluid replyBody">'+
                 '<img class = "span1" id = "replyAvarta'+post.pid+''+(post.replies)[i].rid+'"  src = "#" style = "border-radius:20px;width:40px;height:40px;">'+
                 '<div class = "span8">'+
                 '<div class = "row-fluid">'+
@@ -473,8 +478,9 @@ function createPost(data){
             success:function(data){
               if(data.pics){
                 var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
-                $("#"+postid).find(".pictureArea").html("");
-                $("#"+postid).find(".pictureArea").append("<img class ='postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                $.each($("div."+postid),function(index, element){
+                  $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                });
                 $('#pictureCancel').removeAttr("disabled");
                 $('#floatingBarsG-picture').hide();
                 $('#pictureDescArea').val("");
@@ -695,7 +701,7 @@ function eventlist(eventData){
 function renderReply(reply){
   var html =
     //TO DO: make up the id content
-    '<li id = "'+reply.id+'" rid = "'+reply.rid+'" class = "row-fluid replyBody" style = "text-align:left;">';
+    '<li replyId = "'+reply.postId+'" rid = "'+reply.rid+'" class = "row-fluid replyBody" style = "text-align:left;">';
       if(reply.replier_uid == localStorage.uid){
         html = html + '<img class="span1 selfProfileSmallAvarta" src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">';
       }else{
@@ -728,7 +734,7 @@ function renderReply(reply){
 
 function renderReplyInLargePost(reply){
     var html = 
-      '<li id = "" class = "row-fluid replyBody" style = "text-align:left;">';
+      '<li replyId = "'+reply.id+'" class = "row-fluid replyBody" style = "text-align:left;">';
           if(reply.replier_uid == localStorage.uid){
         html = html + '<img class="span1 selfProfileSmallAvarta" src = "'+localStorage.self_small_avarta+'" style = "border-radius:20px;width:40px;height:40px;">';
       }else{
@@ -1025,8 +1031,9 @@ function viewpost(pids,char,newsData){
                         success:function(data){
                           if(data.pics){
                             var postid = element.uid+""+element.eid+""+element.pid;
-                            $("#"+postid).find(".pictureArea").html("");
-                            $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                            $.each($("div."+postid),function(index, element){
+                              $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                            });
                           }else{
                             console.log("failed to get the picture of this post");
                           }
@@ -1625,10 +1632,10 @@ function getMorePosts(char,newsData){
                         contentType:"application/json",
                         success:function(data){
                           if(data.pics){
-                            
                             var postid = element.uid+""+element.eid+""+element.pid;
-                            $("#"+postid).find(".pictureArea").html("");
-                            $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                            $.each($("div."+postid),function(index, element){
+                              $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                            });
                           }else{
                             console.log("failed to get the picture of this post");
                           }
@@ -1735,10 +1742,10 @@ function getMorePosts(char,newsData){
                     contentType:"application/json",
                     success:function(data){
                       if(data.pics){
-                        
                         var postid = element.uid+""+element.eid+""+element.pid;
-                        $("#"+postid).find(".pictureArea").html("");
-                        $("#"+postid).find(".pictureArea").append("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                        $.each($("div."+postid),function(index, element){
+                          $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                        });
                       }else{
                         console.log("failed to get the picture of this post");
                       }
@@ -1792,8 +1799,7 @@ function getMorePosts(char,newsData){
             $("#loadMoreButton").show();
             $("#circularG").hide();
             loadingFlag = true;
-                  console.log("here");
-                  console.log(loadingFlag);
+            console.log(loadingFlag);
             }
             },
             error:function(jqXHR, textStatus, errorThrown){

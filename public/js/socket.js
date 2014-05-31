@@ -120,30 +120,39 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 	    		var notificationItem = $("li.notificationItem[pid="+pid+"]");
 	    		$(notificationItem).find(".postContent").html(data.source[0].postContent);
 	    		$(notificationItem).unbind('click').click(function(event){
-	    			console.log("post details: ");
-	    			console.log(data);
-	    			renderPopPost(data.source[0]);
-	    			$.each(data.source[0].replies,function(index, element){
-	    				if(element.replier_uid != localStorage.uid){
-					        var userAvartaData = {};
-					        userAvartaData.session_key = localStorage.session_key;
-					        userAvartaData.uid = localStorage.uid;
-					        userAvartaData.view_uid = element.replier_uid;
-					        userAvartaData.time = 0000//getCurrentTime();
-					        userAvartaData.date = 00000000//getCurrentDate();
-					        $.ajax({
-					          url:'/getuseravarta',
-					          data:JSON.stringify(userAvartaData),
-					          timeout:10000,
-					          type:"POST",
-					          contentType:"application/json",
-					          success:function(avatarData){
-					              $("#popPostReply"+data.source[0].pid+""+element.rid).attr("src",avatarData.avarta);
-					          }
-					        });
-				    	}
-	    			});
-	    			$("#popPostModal").modal("show");
+	    			$.ajax({
+						url:"/getpostscontent",
+					    data:JSON.stringify(postsData),
+					    timeout:10000,
+					    type:"POST",
+					    contentType: 'application/json',
+		    			success:function(data){
+		    				console.log("post details: ");
+			    			console.log(data);
+			    			renderPopPost(data.source[0]);
+			    			$.each(data.source[0].replies,function(index, element){
+			    				if(element.replier_uid != localStorage.uid){
+							        var userAvartaData = {};
+							        userAvartaData.session_key = localStorage.session_key;
+							        userAvartaData.uid = localStorage.uid;
+							        userAvartaData.view_uid = element.replier_uid;
+							        userAvartaData.time = 0000//getCurrentTime();
+							        userAvartaData.date = 00000000//getCurrentDate();
+							        $.ajax({
+							          url:'/getuseravarta',
+							          data:JSON.stringify(userAvartaData),
+							          timeout:10000,
+							          type:"POST",
+							          contentType:"application/json",
+							          success:function(avatarData){
+							              $("#popPostReply"+data.source[0].pid+""+element.rid).attr("src",avatarData.avarta);
+							          }
+							        });
+						    	}
+			    			});
+			    			$("#popPostModal").modal("show");
+		    			}
+		    		});
 	    		});
 	    	}
 	    }
