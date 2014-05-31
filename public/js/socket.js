@@ -150,7 +150,7 @@ socket.on("reply posting",function(name, uid, eid, pid, seq, nid){
 							    		renderLargePost(data.source[0]);
 							    		$(".interactionArea").show();
 										$("#imageModal").modal("show");
-										socket.emit("processNoti", uid, nid);
+										socket.emit("processNoti", localStorage.uid, nid);
 										if($(notification).prev() && $(notification).prev().hasClass("divider")){
 											$(notification).prev().remove();
 										};
@@ -208,7 +208,7 @@ socket.on("reply posting",function(name, uid, eid, pid, seq, nid){
 							    	}
 				    			});
 				    			$("#popPostModal").modal("show");
-				    			socket.emit("processNoti", uid, nid);
+				    			socket.emit("processNoti", localStorage.uid, nid);
 								if($(notification).prev() && $(notification).prev().hasClass("divider")){
 									$(notification).prev().remove();
 								};
