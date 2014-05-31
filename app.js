@@ -210,7 +210,7 @@ io.on('connection',function(socket){
 			console.log("logout");
 			console.log(uid);
 			console.log(session_key);
-			notificationsPool[uid] = {};
+			notificationsPool[uid] = [];
             service.helper.disconnect(session_key);
 		});
 	});
