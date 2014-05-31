@@ -149,7 +149,7 @@ function renderLargePost(post){
   post.id = "modal"+post.uid+""+post.eid+""+post.pid;
   var time = convertUTCDateToLocalDate(post.date,post.time);
   context = $(".interactionArea").find(".postRoot").first();
-  $(context).find(".repliesArea").html("");
+  $(context).find(".repliesArea").first().html("");
 
   $(context).attr("id",post.id);
   $(context).attr("repliesNumber",post.replies_no).attr("postPid", post.pid).attr("posterUid", post.uid).attr("postEid", post.eid).attr("posterName", post.poster_name);
@@ -196,6 +196,10 @@ function renderLargePost(post){
   $(context).find("textarea").first().attr("replytouid",post.uid).attr("replytoname",post.poster_name);
 }
 
+function renderPopPost(Post){
+    post.id = post.uid+""+post.eid+""+post.pid;
+    var time = convertUTCDateToLocalDate(post.date,post.time);
+}
 
 function renderPost(post){
   post.id = post.uid+""+post.eid+""+post.pid;
