@@ -680,7 +680,7 @@ $(document).ready(function(){
             $("#defriendCancel").removeAttr("disabled");
             $("#floatingBarsG-defriend").hide();
             $("#defriendModal").modal("hide");
-            window.location == "/home";
+            window.location = "/home";
           },
           error:function(jqXHR, textStatus, errorThrown){
             if(textStatus == "timeout"){
