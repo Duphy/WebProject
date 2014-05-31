@@ -257,7 +257,7 @@ function notificationHandler(notifications,uid){
 		}
 		notificationsPool[uid] = newNotificationsList;
 	}else{
-		notificationsPool[uid] = {};
+		notificationsPool[uid] = [];
 		for(var j = 0;j < notifications[1].length;j++){
 			if(notifications[1][j][0]!=0 && notifications[1][j][0]!=1
 					&&notifications[1][j][0]!=4){
