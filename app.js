@@ -215,7 +215,7 @@ io.on('connection',function(socket){
 		});
 	});
 	socket.on('processNoti', function(uid, nid){
-		if(notificationsPool[uid]){}
+		if(notificationsPool[uid]){
 			for(var i = 0;i< notificationsPool[uid].length;i++){
 				if(notificationsPool[uid][i][6]==nid){
 					notificationsPool[uid].splice(i,1);
