@@ -250,11 +250,21 @@ function notificationHandler(notifications,uid){
 		console.log("pool is not empty!!!!");
 		var newNotificationsList = notificationsPool[uid];
 		for(var j = 0;j < notifications[1].length;j++){
-			newNotificationsList.push(notifications[1][j]);
+			if(notifications[1][j][0]!=0 && notifications[1][j][0]!=1
+					&&notifications[1][j][0]!=4){
+				newNotificationsList.push(notifications[1][j]);
+			}
 		}
 		notificationsPool[uid] = newNotificationsList;
 	}else{
-		notificationsPool[uid] = notifications[1];
+		notificationsPool[uid] = {};
+		for(var j = 0;j < notifications[1].length;j++){
+			if(notifications[1][j][0]!=0 && notifications[1][j][0]!=1
+					&&notifications[1][j][0]!=4){
+				notificationsPool[uid].push(notifications[1][j]);
+			}
+		}
+		//notificationsPool[uid] = notifications[1];
 	}
 	console.log("finished handling");
 }
