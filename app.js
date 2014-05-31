@@ -215,11 +215,13 @@ io.on('connection',function(socket){
 		});
 	});
 	socket.on('processNoti', function(uid, nid){
-		for(var i = 0;i< notificationsPool[uid].length;i++){
-			if(notificationsPool[uid][i][6]==nid){
-				notificationsPool[uid].splice(i,1);
+		if(notificationsPool[uid]){}
+			for(var i = 0;i< notificationsPool[uid].length;i++){
+				if(notificationsPool[uid][i][6]==nid){
+					notificationsPool[uid].splice(i,1);
+				}
 			}
-		}
+		}	
 	});
 	socket.on('disconnect',function(){
 		// socket.on('chat history',function(chats){
