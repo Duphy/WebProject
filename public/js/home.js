@@ -957,8 +957,7 @@ $(document).ready(function(){
     var tagsGroup = $(this).closest(".tagsGroup");
     $(tagsGroup).children().slideDown( "fast");
     setTimeout(function(){
-      $(tagsGroup).children("a:not(:first-child)").slideUp( "fast",function(){
-      });
+      $(tagsGroup).children("a:not(:first-child)").slideUp( "fast");
     },3000);
     return false;
   });
