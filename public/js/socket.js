@@ -129,28 +129,81 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 		    			success:function(data){
 		    				console.log("post details: ");
 			    			console.log(data);
-			    			renderPopPost(data.source[0]);
-			    			$.each(data.source[0].replies,function(index, element){
-			    				if(element.replier_uid != localStorage.uid){
-							        var userAvartaData = {};
-							        userAvartaData.session_key = localStorage.session_key;
-							        userAvartaData.uid = localStorage.uid;
-							        userAvartaData.view_uid = element.replier_uid;
-							        userAvartaData.time = 0000//getCurrentTime();
-							        userAvartaData.date = 00000000//getCurrentDate();
-							        $.ajax({
-							          url:'/getuseravarta',
-							          data:JSON.stringify(userAvartaData),
-							          timeout:10000,
-							          type:"POST",
-							          contentType:"application/json",
-							          success:function(avatarData){
-							              $("#popPostReply"+data.source[0].pid+""+element.rid).attr("src",avatarData.avarta);
-							          }
-							        });
-						    	}
-			    			});
-			    			$("#popPostModal").modal("show");
+			    			if(data.source[0].picids.length > 0){
+							    var pictureData  = {};
+								pictureData.session_key = localStorage.session_key;
+								pictureData.uid = localStorage.uid;
+								pictureData.picid = data.source[0].picids[0];
+							    $.ajax({
+				                    url:'/getpicture',
+				                    data:JSON.stringify(pictureData),
+				                    timeout:10000,
+				                    type:"POST",
+				                    contentType:"application/json",
+				                    success:function(avatarData){
+				                    	console.log(avatarData);
+				                      if(avatarData.pics){
+				                      	var url = "url("+window.location.origin+"/"+avatarData.pics+")";
+							    		$('#imageModal').find('.imgLiquidFill').css('background-image',url);
+							    		$('body').css("overflow","hidden");
+							    		renderLargePost(data.source[0]);
+							    		$(".interactionArea").show();
+										$("#imageModal").modal("show");
+				                      }else{
+				                        console.log("failed to get the picture of this post");
+				                      }
+				                    },
+				                    error:function(jqXHR, textStatus, errorThrown){
+				                      if(textStatus == "timeout"){
+				                        $("#timeoutModal").modal("show");
+				                      }
+				                    }
+				                });
+
+								var userData = {};
+						        userData.uid = localStorage.uid;
+						        userData.session_key = localStorage.session_key;
+						        userData.view_uid = data.source[0].uid;
+						        $.ajax({
+						          url:'/getusersmallavarta',
+						          data:JSON.stringify(userData),
+						          timeout:10000,
+						          type:"POST",
+						          contentType:"application/json",
+						          success:function(result){
+						            $("#imageModal").find(".modalAvarta").first().attr("src",result.avarta);
+						          },
+						          error:function(jqXHR, textStatus, errorThrown){
+					                  if(textStatus == "timeout"){
+					                    $("#timeoutModal").modal("show");
+					                  }
+					                }
+						        });
+			    			}else{
+			    				renderPopPost(data.source[0]);
+				    			$.each(data.source[0].replies,function(index, element){
+				    				if(element.replier_uid != localStorage.uid){
+								        var userAvartaData = {};
+								        userAvartaData.session_key = localStorage.session_key;
+								        userAvartaData.uid = localStorage.uid;
+								        userAvartaData.view_uid = element.replier_uid;
+								        userAvartaData.time = 0000//getCurrentTime();
+								        userAvartaData.date = 00000000//getCurrentDate();
+								        $.ajax({
+								          url:'/getuseravarta',
+								          data:JSON.stringify(userAvartaData),
+								          timeout:10000,
+								          type:"POST",
+								          contentType:"application/json",
+								          success:function(avatarData){
+								              $("#popPostReply"+data.source[0].pid+""+element.rid).attr("src",avatarData.avarta);
+								          }
+								        });
+							    	}
+				    			});
+				    			$("#popPostModal").modal("show");
+			    			}
+			    			
 		    			}
 		    		});
 	    		});

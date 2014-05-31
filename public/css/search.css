@@ -231,3 +231,7 @@ transform:scale(.3)}
 	border: none;
 	padding: 0;
 }
+
+hr{
+	margin:0 0 10px 0 !important;
+}

@@ -1380,7 +1380,7 @@ function postReplyNotification(userName, userId, eventId, postId ,seqNo){
                 '</div>'+
                 '<pre class = "websiteFont span11 notificationContent">'+
                   '<a class = "userName user'+userId+'"  uid = "'+userId+'">'+userName+'</a>'+ 
-                  ' has replied to your post:" '+
+                  ' has replied to you in post:" '+
                   '<strong class = "postContent"></strong>'+
                   '".</pre>'+
              '</li>';
