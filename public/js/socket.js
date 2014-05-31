@@ -16,6 +16,25 @@ socket.on("friend request",function(name, uid, eid, pid, action, seq){
 	userData.session_key = localStorage.session_key;
 	userData.uid = localStorage.uid;
 	userData.view_uid = uid;
+	// $.ajax({
+	//     url:"/getuserinfo",
+	//     data:JSON.stringify(userData),
+	//     timeout:10000,
+	//     type:"POST",
+	//     contentType: 'application/json',
+	//     success:function(data){
+	//     	console.log(data);
+	//       	$.each($(".user"+uid),function(index, element){
+	//       		$(element).attr("name",data.nickname);
+	//       		$(element).html(data.nickname);
+	//       	});
+	//     },
+	//     error:function(jqXHR, textStatus, errorThrown){
+ //          if(textStatus == "timeout"){
+ //            $("#timeoutModal").modal("show");
+ //          }
+ //        }
+	// });
 }); 
  
 socket.on("event membership request",function(name,uid, pid, eventName,eid,action, seq){
@@ -90,7 +109,7 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 		$("#notificationList").append("<li class = 'divider'></li>");
 	}
 	$("#notificationList").append(postReplyNotification(name, uid, eid, pid, seq));
-	$(".postReplyNotification").css("cursor","pointer").hover(function(){
+	$(".postReplyNotification").last().hover(function(){
 		$(this).css("background-color","#e9edf0");
 		$(this).find(".notificationContent").css("background-color","#e9edf0");
 	},function(){
@@ -101,6 +120,25 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 	userData.session_key = localStorage.session_key;
 	userData.uid = localStorage.uid;
 	userData.view_uid = uid;
+	// $.ajax({
+	//     url:"/getuserinfo",
+	//     data:JSON.stringify(userData),
+	//     timeout:10000,
+	//     type:"POST",
+	//     contentType: 'application/json',
+	//     success:function(data){
+	//     	console.log(data);
+	//       	$.each($(".user"+uid),function(index, element){
+	//       		$(element).attr("name",data.nickname);
+	//       		$(element).html(data.nickname);
+	//       	});
+	//     },
+	//     error:function(jqXHR, textStatus, errorThrown){
+ //          if(textStatus == "timeout"){
+ //            $("#timeoutModal").modal("show");
+ //          }
+ //        }
+	// });
 	var postsData = {};
 	postsData.pidList = [pid];
 	postsData.uidList = [localStorage.uid];
@@ -117,43 +155,8 @@ socket.on("reply posting",function(name, uid, eid, pid, seq){
 	    	console.log("post details: ");
 	    	console.log(data);
 	    	if(data.status == "successful"){
-	    		var notificationItem = $("li.notificationItem[pid="+pid+"]");
-	    		$(notificationItem).find(".postContent").html(data.source[0].postContent);
-	    		$(notificationItem).unbind('click').click(function(event){
-	    			$.ajax({
-						url:"/getpostscontent",
-					    data:JSON.stringify(postsData),
-					    timeout:10000,
-					    type:"POST",
-					    contentType: 'application/json',
-		    			success:function(data){
-		    				console.log("post details: ");
-			    			console.log(data);
-			    			renderPopPost(data.source[0]);
-			    			$.each(data.source[0].replies,function(index, element){
-			    				if(element.replier_uid != localStorage.uid){
-							        var userAvartaData = {};
-							        userAvartaData.session_key = localStorage.session_key;
-							        userAvartaData.uid = localStorage.uid;
-							        userAvartaData.view_uid = element.replier_uid;
-							        userAvartaData.time = 0000//getCurrentTime();
-							        userAvartaData.date = 00000000//getCurrentDate();
-							        $.ajax({
-							          url:'/getuseravarta',
-							          data:JSON.stringify(userAvartaData),
-							          timeout:10000,
-							          type:"POST",
-							          contentType:"application/json",
-							          success:function(avatarData){
-							              $("#popPostReply"+data.source[0].pid+""+element.rid).attr("src",avatarData.avarta);
-							          }
-							        });
-						    	}
-			    			});
-			    			$("#popPostModal").modal("show");
-		    			}
-		    		});
-	    		});
+	    		$("li.notificationItem[pid="+pid+"]").find(".postContent").html(data.source[0].postContent);
+
 	    	}
 	    }
 	});
