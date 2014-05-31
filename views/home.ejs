@@ -432,7 +432,7 @@
 	  </div>
 	</div>	
 
-	<div id="removeReplyModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
+	<div id="removeReplyModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;z-index:2000;">
 	  <div class="modal-body">
 		Are you sure your want to remove this reply?
 	  </div>
@@ -527,7 +527,10 @@
 			        <pre class="length-limited" style="font-family: 'Lato', sans-serif;font-weight:300;"></pre>
 			    </div>
 			  </div>
+
+			  <div class = "row-fluid shareButtons" style = "margin-top:10px;">
 			  </div>
+
 			  <hr style = "margin-bottom:0px;">
 			  <ul class = "row-fluid repliesArea" style = "width:100%;max-height:350px;margin-bottom:10px;overflow:scroll;margin-left:0px;">
 			  </ul>
@@ -540,6 +543,57 @@
 		</div>
 	  </div>
 	</div>
+
+	<div id="popPostModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;top:5%;">
+	  	<div class="modal-body" style = "text-align:center;overflow:hidden;min-height:570px;">
+
+	  		<div id="" class="row-fluid postRoot" repliesnumber="" postpid="" posteruid="" posteid="" postername="" style="background-color:#FFFFFF;margin-bottom:10px;">
+	  			<div class="row-fluid" style="margin-top:10px;height:50px;">
+	  				<div class="span8 row-fluid" style="text-align: center;">
+	  					<div class="span2">
+	  						<img src="#" style="width:40px;height:40px;border-radius:20px;">
+	  					</div>
+	  					<div class="span10" style="text-align:left;">
+	  						<a href="#" class="userName" name="" uid="" style="font-family: 'Lato', sans-serif;font-weight:300;">rododo</a>
+	  						<p class="postTime" style="font-size:12px;color:#999;font-family: 'Lato', sans-serif;font-weight:300;"></p>
+	  					</div>
+	  				</div>
+	  				<div class="offset2 span2 pull-right" style="color:white;text-align: center;">
+	  					<div class="tagsGroup popPostTags" style="min-width: 80px; margin-left: 11px;">
+	  					</div>
+	  				</div>
+	  			</div>
+				<div class="row-fluid">
+					<div class="offset1 span10 offset2">
+						<pre class="length-limited" style="font-family: 'Lato', sans-serif;font-weight:300;text-align:left;">Just for test. Hope you a good weekend.</pre>
+					</div>
+				</div>
+
+				<div class = "row-fluid shareButtons" style = "margin-top:10px;">
+				</div>
+
+				<div class="row-fluid repliesArea" style="margin-top:10px;">
+					<hr>
+					<ul class="scroller" style="max-height:300px;overflow: scroll;">
+					</ul>
+					<hr>
+				</div>
+
+				<div class="row-fluid" style="margin-bottom:10px;">
+					<div class="span1">
+						<img class="selfProfileSmallAvarta" src="#" style="width:36px;height:36px;border-radius:18px;margin-left:10px;">
+					</div>
+					<div class="span11" style="padding-left:10px;padding-right:20px;">
+						<textarea class="input-block-level replyInput" replytouid="" replytoname="" type="text" placeholder="Add Comments here..." style="min-height:70px;border-radius:0px;"></textarea>
+						<button class="btn replyCancel pull-right button" style="margin-left:10px;">Cancel</button>
+						<button class="btn btn-success replySubmit pull-right button" disabled="">Post</button>
+					</div>
+				</div>
+	  		</div>
+
+	  	</div>
+	</div>
+
 
 	<script src = "/js/socket.js"></script>
 

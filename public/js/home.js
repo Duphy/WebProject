@@ -92,9 +92,11 @@ $(document).ready(function(){
   $(window).resize(function(){
     $.each($(".tagHead"),function(index,element){
       var tagsGroup = $(element).closest(".tagsGroup");
-      var parentWidth = $(tagsGroup).closest('.span2').width();
-      var selfWidth = $(tagsGroup).width();
-      $(tagsGroup).css('margin-left',parentWidth - selfWidth);
+      if(!$(tagsGroup).hasClass('popPostTags')){
+          var parentWidth = $(tagsGroup).closest('.span2').width();
+          var selfWidth = $(tagsGroup).width();
+          $(tagsGroup).css('margin-left',parentWidth - selfWidth);
+      }
     });
     var parentWidth = $("#userNameLink").parent().width();
     $("#userNameLink").css("width",parentWidth);
@@ -951,6 +953,15 @@ $(document).ready(function(){
     },3000);
 	});
 
+  $('#popPostModal').delegate('.tagHead','mouseover',function(){
+    var tagsGroup = $(this).closest(".tagsGroup");
+    $(tagsGroup).children().slideDown( "fast");
+    setTimeout(function(){
+      $(tagsGroup).children("a:not(:first-child)").slideUp( "fast");
+    },3000);
+    return false;
+  });
+
   $('body').delegate('.replyLink','click',function(){
     var replier = $(this).closest(".replyBody").find('.userName').first();
     console.log(replier.attr('name'));
@@ -1001,6 +1012,7 @@ $(document).ready(function(){
   });
 
   $('body').delegate('.removereply','click',function(){
+    console.log("removereply click");
     $("#removeReplyConfirm").attr("replyId",$(this).closest(".replyBody").attr("id")).attr("postId",$(this).closest(".postRoot").attr("id"));
   });
 
@@ -1149,6 +1161,7 @@ $(document).ready(function(){
               reply.time = getCurrentTime();
               if(context.attr("repliesNumber") == 0){
               var id = context.attr("posterUid")+context.attr("postEid")+context.attr("postPid");
+              reply.id = id;
               context.find(".shareButtons").after(
                     '<div class = "row-fluid repliesArea" style = "margin-top:10px;" repliesNumber = '+0+'>'+
                     '<div class="accordion" id="reply'+id+'" style = "background-color:white;margin-bottom: 0px;">'+
@@ -1171,6 +1184,9 @@ $(document).ready(function(){
               }
               var scroller = context.find('ul.scroller').first();
               scroller.append(renderReply(reply));
+              // if(context.attr('posterUid') == localStorage.uid || reply.replier_uid==localStorage.uid){
+              //   scroller.find("li").last().find(".span1").last().html('<a class="close removereply" data-toggle = "modal" href="#removeReplyModal">&times;</a>');
+              // }
               context.attr("repliesNumber",parseInt(context.attr("repliesNumber"))+1);
               scroller.scrollTop(scroller.prop('scrollHeight'));
               var replyNumber = context.attr("repliesNumber");
@@ -1184,6 +1200,9 @@ $(document).ready(function(){
               if(context.find("ul.repliesArea").length > 0){
                 var scroller = context.find("ul.repliesArea").first();
                 scroller.append(renderReplyInLargePost(reply));
+                // if(context.attr('posterUid') == localStorage.uid || reply.replier_uid==localStorage.uid){
+                //   scroller.find("li").last().find(".span1").last().html('<a class="close removereply" data-toggle = "modal" href="#removeReplyModal">&times;</a>');
+                // }
                 context.attr("repliesNumber",parseInt(context.attr("repliesNumber")));
                 scroller.scrollTop(scroller.prop('scrollHeight'));
                 var orginalPost = $("#"+context.attr("id").replace("modal",""));
