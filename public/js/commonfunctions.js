@@ -898,12 +898,13 @@ function renderEventProfile(){
     $("#name").html(localStorage.ename);
     $("#creator").html(localStorage.ecreator);
     $("#description").html(localStorage.description);
+    $("#tags").html("");
     if(localStorage.etags == ""){
         $('#tags').append("<font>None</font>");
     }else{
         $.each(localStorage.etags.split(','),function(index,element){
-               $('#tags').append("<span class='label label-info' style = 'margin-left:5px;'>"+element+"</span>");
-               });
+          $('#tags').append("<span class='label label-info' style = 'margin-left:5px;'>"+element+"</span>");
+        });
     }
     $("#rating").html(localStorage.erating);
     $("#city").html(localStorage.ecity);
