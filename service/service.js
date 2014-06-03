@@ -226,26 +226,81 @@ exports.uploadPicture = function(req,res){
 }
 
 exports.uploadFile = function(req,res){
-    var path = dataPath+req.body.uid+'/tmp/'+req.body.file;
-    var pack = lib.createUploadFilePack(req.body.session_key,
-	    parseInt(req.body.uid), req.body.tags,path);
-    helper.connectAndSend(pack, function(data) {
-		var pkg = lib.resolvPack(data);
-		// console.log("self friends:");
-		// console.log(pkg);
-	    if(pkg[1][0]>0){
-	        picid = pkg[1][1];
-	    }
-		output = {
-		    "status" : "successful",
-		    "fileid" : pkg[1][1]
-	    };
-		res.send(output);
-	    }, function() {
-			res.send({
-		    	status : "timeout"
+	fs.readFile(req.files.file.path, function(err, data){
+		var fileName = req.files.file.name;
+		var filesize =1;
+		/// If there's an error
+		if(!fileName){
+			console.log("There was an error.")
+			res.send({status:"unsuccessful"});
+		}else{
+			var path = dataPath +req.body.uid+"/tmp/";
+			console.log("path: "+path);
+			fs.readdir(path, function(err){
+				if(err){
+					console.log("not exists");
+					fs.mkdir(path,function(err){
+						if(!err){
+							console.log("created dir");
+							var filePath = path + fileName;
+							fs.writeFile(filePath, data, function(){
+								//upload the picture(s)
+								var pack = lib.createUploadFilePack(req.body.session_key,
+								    parseInt(req.body.uid), filePath);
+							    helper.connectAndSend(pack, 
+							    	function(data){
+										var pkg = lib.resolvPack(data);
+										var output = {};
+									    if(pkg[1].length > 0){
+									        output = {
+									        	"status": "successful",
+											    "picid" : pkg[1][0]
+										    };
+									    }
+										res.send(output);
+									}, 
+								    function(){
+										res.send({
+									    	status : "timeout"
+										});
+							    	}
+							    );
+							});	
+						}else{
+							//res.send({status:"unsuccessful"});
+						}
+					});
+				}else{
+					console.log("exists");
+					var filePath = path + fileName;
+					console.log(filePath);
+					fs.writeFile(filePath, data, function(){
+						//upload the picture(s)
+						var pack = lib.createUploadFilePack(req.body.session_key,
+								    parseInt(req.body.uid), filePath);
+					    helper.connectAndSend(pack, 
+					    	function(data){
+								var pkg = lib.resolvPack(data);
+								var output = {};
+							    if(pkg[1].length > 0){
+							        output = {
+							        	"status": "successful",
+									    "picid" : pkg[1][0]
+								    };
+							    }
+								res.send(output);
+							}, 
+						    function(){
+								res.send({
+							    	status : "timeout"
+								});
+					    	}
+					    );
+					});
+				}
 			});
-    	});
+		}
+	});
 }
 /*
 exports.createPost_old = function(req, res) {

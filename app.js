@@ -221,7 +221,7 @@ io.on('connection',function(socket){
 					notificationsPool[uid].splice(i,1);
 				}
 			}
-		}	
+		}
 	});
 	socket.on('disconnect',function(){
 		// socket.on('chat history',function(chats){
