@@ -169,6 +169,7 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 //configure socket.io connection
 var socketsList = {};
 var notificationsPool = {};
+var notiCounter = {};
 var personalChatPool = {};
 var eventChatPool = {};
 
@@ -177,6 +178,7 @@ io.on('connection',function(socket){
 	console.log("server socket connected!");
 	socket.on('uid',function(uid){
 		socketsList[uid] = socket;
+		notiCounter[uid] = 0;
 		if(notificationsPool[uid]){
 			console.log("pool is not empty");
 			for(var i = 0;i < notificationsPool[uid].length;i++){
@@ -212,7 +214,15 @@ io.on('connection',function(socket){
             service.helper.disconnect(session_key);
 		});
 	});
-
+	socket.on('processNoti', function(uid, nid){
+		if(notificationsPool[uid]){
+			for(var i = 0;i< notificationsPool[uid].length;i++){
+				if(notificationsPool[uid][i][6]==nid){
+					notificationsPool[uid].splice(i,1);
+				}
+			}
+		}
+	});
 	socket.on('disconnect',function(){
 		// socket.on('chat history',function(chats){
 		// 	chats.friendsChats.forEach(function(friends){
@@ -238,6 +248,10 @@ io.on('connection',function(socket){
 function notificationHandler(notifications,uid){
 	console.log("get notifications!");
 	var uid = notifications[0][2];
+	for(var i = 0;i< notifications[1].length;i++){
+		notifications[1][i][6]=notiCounter[uid];
+		notiCounter[uid]++;
+	}
 	if(socketsList[uid] && !socketsList[uid].disconnected){
 		console.log("find socket!!!!");
 		for(var i = 0;i < notifications[1].length;i++){
@@ -250,11 +264,21 @@ function notificationHandler(notifications,uid){
 		console.log("pool is not empty!!!!");
 		var newNotificationsList = notificationsPool[uid];
 		for(var j = 0;j < notifications[1].length;j++){
-			newNotificationsList.push(notifications[1][j]);
+			if(notifications[1][j][0]!=0 && notifications[1][j][0]!=1
+					&&notifications[1][j][0]!=4){
+				newNotificationsList.push(notifications[1][j]);
+			}
 		}
 		notificationsPool[uid] = newNotificationsList;
 	}else{
-		notificationsPool[uid] = notifications[1];
+		notificationsPool[uid] = [];
+		for(var j = 0;j < notifications[1].length;j++){
+			if(notifications[1][j][0]!=0 && notifications[1][j][0]!=1
+					&&notifications[1][j][0]!=4){
+				notificationsPool[uid].push(notifications[1][j]);
+			}
+		}
+		//notificationsPool[uid] = notifications[1];
 	}
 	console.log("finished handling");
 }
@@ -286,38 +310,39 @@ function sendNotification(notification,socket){
 	console.log("send notification!!!!!!!!!!!!!!!!!");
     console.log(notification);
     var n_seq = notification[1];
-    var name = notification[1];
+    var name = notification[6];
     var uid = notification[2];
     var eid = service.helper.hexToDec(notification[3]);
     var pid = notification[4];
     var action = notification[5];
+    var nid = notification[6];
 	switch(notification[0]){
 		case 0:
 			console.log("send friend notification!!!!!!!!!!!!!!!!!");
-			socket.emit("friend request",name, uid, eid, pid, action, n_seq);
+			socket.emit("friend request",name, uid, eid, pid, action, n_seq, nid);
 			break;
 		case 1:
 			console.log("send event notification!!!!!!!!!!!!!!!!!");
 			var eventName = eid; 
-			socket.emit("event membership request",name,uid, pid, eventName,eid,action, n_seq);
+			socket.emit("event membership request",name,uid, pid, eventName,eid,action, n_seq, nid);
 			break;
 		case 2:
-			socket.emit("reply posting",name, uid, eid ,pid, n_seq);
+			socket.emit("reply posting",name, uid, eid ,pid, n_seq, nid);
 			break;
 		case 3:
-			socket.emit("event membership delete",name, uid, eid, pid, n_seq);
+			socket.emit("event membership delete",name, uid, eid, pid, n_seq, nid);
 			break;
 		case 4:
-			socket.emit("event membership invite",name, uid, eid, pid, n_seq);
+			socket.emit("event membership invite",name, uid, eid, pid, n_seq, nid);
 			break;
 		case 5:
-			socket.emit("event manager add",name, uid, eid, pid, n_seq);
+			socket.emit("event manager add",name, uid, eid, pid, n_seq, nid);
 			break;
 		case 6:
-			socket.emit("event manager delete",name, uid, eid, post,pid, n_seq);
+			socket.emit("event manager delete",name, uid, eid, post,pid, n_seq, nid);
 			break;
 		case 8:
-			socket.emit("tagged",name, uid, eid, post,pid, n_seq);
+			socket.emit("tagged",name, uid, eid, post,pid, n_seq, nid);
 			break;
 		default:
 			console.log("no matched notification type!");

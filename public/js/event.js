@@ -227,9 +227,11 @@ $(document).ready(function(){
   $(window).resize(function(){
     $.each($(".tagHead"),function(index,element){
       var tagsGroup = $(element).closest(".tagsGroup");
-      var parentWidth = $(tagsGroup).closest('.span2').width();
-      var selfWidth = $(tagsGroup).width();
-      $(tagsGroup).css('margin-left',parentWidth - selfWidth);
+      if(!$(tagsGroup).hasClass('popPostTags')){
+          var parentWidth = $(tagsGroup).closest('.span2').width();
+          var selfWidth = $(tagsGroup).width();
+          $(tagsGroup).css('margin-left',parentWidth - selfWidth);
+      }
     });
   });
 
@@ -378,7 +380,8 @@ $(document).ready(function(){
     maxFileSize:10000000,
     acceptFileTypes: /\.(gif|jpe?g|png)$/i,
     formData: {
-      uid: localStorage.uid
+      uid: localStorage.uid,
+      session_key: localStorage.session_key
     },
     progress: function(e, data){
         var progress = parseInt(data.loaded / data.total * 100, 10);
@@ -388,8 +391,6 @@ $(document).ready(function(){
         );
     },
     add: function(e, data){
-        data.files[0].name = localStorage.uid+".jpg";
-        console.log(data);
         data.submit().success(function(result, textStatus, jqXHR){
           console.log("upload feedback:");
           console.log(result);
@@ -405,7 +406,7 @@ $(document).ready(function(){
               $('#pictureSubmit').removeAttr("disabled");
               $('#pictureDescArea').show();
               $('#pictureTags').parent().show();
-              $('#pictureSubmit').attr("picturename",data.files[0].name);
+              $('#pictureSubmit').attr("pictureid",result.picid);
               $('#previewImageArea').html("");
               $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '" style = "margin-left:auto;margin-right:auto;display:block;"/>');
             },1000);
@@ -465,8 +466,13 @@ $(document).ready(function(){
     data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
     data.session_key = localStorage.session_key;
     data.uid = localStorage.uid;
-    data.pics = [$(this).attr("picturename")];
-    console.log("pciture name: "+data.pics);
+    data.pics = [$(this).attr("pictureid")];
+    console.log("picture ids: ");
+    console.log(data.pics);
+
+    //TO DO: fake file ids
+    //data.fields = [];
+    
     $("#floatingBarsG-picture").show();
     createPost(data);
     return false;
@@ -662,6 +668,15 @@ $("body").delegate(".memberItem", 'click', function() {
         $(tagsGroup).css('margin-left',parentWidth - selfWidth);
       });
     },3000);
+  });
+  $('#popPostModal').delegate('.tagHead','mouseover',function(){
+    var tagsGroup = $(this).closest(".tagsGroup");
+    $(tagsGroup).children().slideDown( "fast");
+    setTimeout(function(){
+      $(tagsGroup).children("a:not(:first-child)").slideUp( "fast",function(){
+      });
+    },3000);
+    return false;
   });
 
   $('body').delegate('.replyLink','click',function(){

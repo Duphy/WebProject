@@ -225,3 +225,13 @@ transform:scale(.3)}
 #searchNav.active{
 	font-weight: bold;
 }
+
+.notificationContent{
+	background-color: white;
+	border: none;
+	padding: 0;
+}
+
+hr{
+	margin:0 0 10px 0 !important;
+}

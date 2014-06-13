@@ -147,7 +147,163 @@ exports.createEvent = function(req, res) {
 	});
     });
 }
-exports.createPost = function(req, res) {
+exports.uploadPicture = function(req,res){
+	fs.readFile(req.files.image.path, function(err, data){
+		var imageName = req.files.image.name;
+		var imgsize =1;
+		/// If there's an error
+		if(!imageName){
+			console.log("There was an error.")
+			res.send({status:"unsuccessful"});
+		}else{
+			var path = dataPath +req.body.uid+"/tmp/";
+			console.log("path: "+path);
+			fs.readdir(path, function(err){
+				if(err){
+					console.log("not exists");
+					fs.mkdir(path,function(err){
+						if(!err){
+							console.log("created dir");
+							var imagePath = path + imageName;
+							fs.writeFile(imagePath, data, function(){
+								//upload the picture(s)
+								var pack = lib.createUploadPicturePack(req.body.session_key,
+								    parseInt(req.body.uid), imagePath);
+							    helper.connectAndSend(pack, 
+							    	function(data){
+										var pkg = lib.resolvPack(data);
+										var output = {};
+									    if(pkg[1].length > 0){
+									        output = {
+									        	"status": "successful",
+											    "picid" : pkg[1][0]
+										    };
+									    }
+										res.send(output);
+									}, 
+								    function(){
+										res.send({
+									    	status : "timeout"
+										});
+							    	}
+							    );
+							});	
+						}else{
+							//res.send({status:"unsuccessful"});
+						}
+					});
+				}else{
+					console.log("exists");
+					var imagePath = path + imageName;
+					console.log(imagePath);
+					fs.writeFile(imagePath, data, function(){
+						//upload the picture(s)
+						var pack = lib.createUploadPicturePack(req.body.session_key,
+								    parseInt(req.body.uid), imagePath);
+					    helper.connectAndSend(pack, 
+					    	function(data){
+								var pkg = lib.resolvPack(data);
+								var output = {};
+							    if(pkg[1].length > 0){
+							        output = {
+							        	"status": "successful",
+									    "picid" : pkg[1][0]
+								    };
+							    }
+								res.send(output);
+							}, 
+						    function(){
+								res.send({
+							    	status : "timeout"
+								});
+					    	}
+					    );
+					});
+				}
+			});
+		}
+	});
+}
+
+exports.uploadFile = function(req,res){
+	fs.readFile(req.files.file.path, function(err, data){
+		var fileName = req.files.file.name;
+		var filesize =1;
+		/// If there's an error
+		if(!fileName){
+			console.log("There was an error.")
+			res.send({status:"unsuccessful"});
+		}else{
+			var path = dataPath +req.body.uid+"/tmp/";
+			console.log("path: "+path);
+			fs.readdir(path, function(err){
+				if(err){
+					console.log("not exists");
+					fs.mkdir(path,function(err){
+						if(!err){
+							console.log("created dir");
+							var filePath = path + fileName;
+							fs.writeFile(filePath, data, function(){
+								//upload the picture(s)
+								var pack = lib.createUploadFilePack(req.body.session_key,
+								    parseInt(req.body.uid), filePath);
+							    helper.connectAndSend(pack, 
+							    	function(data){
+										var pkg = lib.resolvPack(data);
+										var output = {};
+									    if(pkg[1].length > 0){
+									        output = {
+									        	"status": "successful",
+											    "picid" : pkg[1][0]
+										    };
+									    }
+										res.send(output);
+									}, 
+								    function(){
+										res.send({
+									    	status : "timeout"
+										});
+							    	}
+							    );
+							});	
+						}else{
+							//res.send({status:"unsuccessful"});
+						}
+					});
+				}else{
+					console.log("exists");
+					var filePath = path + fileName;
+					console.log(filePath);
+					fs.writeFile(filePath, data, function(){
+						//upload the picture(s)
+						var pack = lib.createUploadFilePack(req.body.session_key,
+								    parseInt(req.body.uid), filePath);
+					    helper.connectAndSend(pack, 
+					    	function(data){
+								var pkg = lib.resolvPack(data);
+								var output = {};
+							    if(pkg[1].length > 0){
+							        output = {
+							        	"status": "successful",
+									    "picid" : pkg[1][0]
+								    };
+							    }
+								res.send(output);
+							}, 
+						    function(){
+								res.send({
+							    	status : "timeout"
+								});
+					    	}
+					    );
+					});
+				}
+			});
+		}
+	});
+}
+/*
+exports.createPost_old = function(req, res) {
     console.log("creater uid: " + req.body.uid);
     var pic_paths=[];
     for(var i =0;i<req.body.pics.length;i++){
@@ -223,7 +379,83 @@ exports.createPost = function(req, res) {
 	});
     });
 }
+*/
+exports.createPost = function(req, res) {
+    console.log("creater uid: " + req.body.uid);
+    var picids = req.body.pics;
+    var fileids = [];
 
+    var pack = lib.createCreatePostingPack(req.body.session_key,
+	    parseInt(req.body.uid), helper.decToHex(req.body.eid), req.body.content,
+	    parseInt(req.body.visibility), req.body.tags, picids, fileids);
+    helper.connectAndSend(pack, function(data) {
+	var pkg = lib.resolvPack(data);
+	if (pkg[1][0]) {
+	    var pidset = pkg[1][1];
+	    console.log("try to remove directory");
+	    rimraf(dataPath+req.body.uid+'/tmp/', function(err){
+				console.log("remove directory successfully");
+		});
+	    var pack = lib.createViewPostingPack(req.body.session_key,
+		    parseInt(req.body.uid), pidset[0], pidset[1], pidset[2]);
+	    var output;
+	    helper.connectAndSend(pack, function(data) {
+		var pkg = lib.resolvPack(data);
+
+		// resolve replies
+		var replies = [];
+		var reply_set = pkg[1][10];
+		for (var i = 0; i < reply_set.length; i++) {
+		    var time = helper.UTCtimeTransform(reply_set[i][6],
+			    reply_set[i][7]);
+		    replies[i] = {
+			"rid" : reply_set[i][0],
+			"replier_uid" : reply_set[i][1],
+			"replyto_uid" : reply_set[i][2],
+			"replier_name" : sanitizer.escape(reply_set[i][3]),
+			"replyto_name" : sanitizer.escape(reply_set[i][4]),
+			"replyContent" : sanitizer.escape(reply_set[i][5]),
+			"date" : time[0],
+			"time" : time[1],
+			"visibility" : reply_set[i][8]
+		    };
+		}
+		output = {
+		    "pid" : pkg[1][0],
+		    "uid" : pkg[1][1],
+		    "eid" : helper.hexToDec(pkg[1][2]),
+		    "date" : pkg[1][3],
+		    "time" : pkg[1][4],
+		    "poster_name" : sanitizer.escape(pkg[1][5]),
+		    "event_name" : sanitizer.escape(pkg[1][6]),
+		    "postContent" : sanitizer.escape(pkg[1][7]),
+		    "visibility" : pkg[1][8],
+		    "tags" : parseTags(pkg[1][9]),
+		    "replies_no" : reply_set.length,
+		    "replies" : replies,
+		    "picids": pkg[1][11],
+		    "fileids": pkg[1][12]
+		};
+		res.send({
+		    status : "successful",
+		    post : output
+		});
+	    }, function() {
+		res.send({
+		    status : "timeout"
+		});
+	    });
+	} else {
+	    res.send({
+		status : "unsuccessful"
+	    });
+	}
+    }, function() {
+	res.send({
+	    status : "timeout"
+	});
+    });
+}
 exports.createReply = function(req, res) {
     var status = "unsuccessful";
     var pack = lib.createReplyPostingPack(req.body.session_key,
@@ -742,6 +974,24 @@ exports.viewPictures = function(req,res){
 	// 	   }
 	// 	);
 	// }
+}
+exports.downloadFile = function(req, res){
+	var output;
+	var pack = lib.createDownloadFilePack(req.body.session_key,
+		parseInt(req.body.uid),helper.decToHex(req.body.fileid));
+	helper.connectAndSend(pack, function(data){
+		var pkg = lib.resolvPack(data);
+		output = {
+			"status" : "successful",
+		    "files" : pkg[1][1]
+		};
+		res.send(output);
+	    }, function() {
+			res.send({
+			    "status" : "timeout"
+			});
+	   }
+	);
 }
 exports.viewCommonFriends = function(req,res){
 	var pack = createViewUserPack(9, req.body.session_key,
@@ -1278,61 +1528,61 @@ exports.viewPostsContent = function(req, res) {
     console.log("counter is "+counter);
     pack = lib.createViewPostingPack(req.body.session_key,
 	    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
-    var f = function(data) {
-	var pkg = lib.resolvPack(data);
-	if (typeof pkg[1] == "undefined") {
-	    res.send({
-		status : "unsuccessful"
-	    });
-	    return;
-	}
-	// resolve replies
-	var replies = [];
-	var reply_set = pkg[1][10];
-	for (var i = 0; i < reply_set.length; i++) {
-	    replies[i] = {
-		"rid" : reply_set[i][0],
-		"replier_uid" : reply_set[i][1],
-		"replyto_uid" : reply_set[i][2],
-		"replier_name" : sanitizer.escape(reply_set[i][3]),
-		"replyto_name" : sanitizer.escape(reply_set[i][4]),
-		"replyContent" : sanitizer.escape(reply_set[i][5]),
-		"date" : reply_set[i][6],
-		"time" : reply_set[i][7],
-		"visibility" : reply_set[i][8]
-	    };
-	}
-	results[counter] = {
-	    "pid" : pkg[1][0],
-	    "uid" : pkg[1][1],
-	    "eid" : helper.hexToDec(pkg[1][2]),
-	    "date" : pkg[1][3],
-	    "time" : pkg[1][4],
-	    "poster_name" : sanitizer.escape(pkg[1][5]),
-	    "event_name" : sanitizer.escape(pkg[1][6]),
-	    "postContent" : sanitizer.escape(pkg[1][7]),
-	    "visibility" : pkg[1][8],
-	    "tags" : parseTags(pkg[1][9]),
-	    "replies_no" : reply_set.length,
-	    "replies" : replies, 
-	    "picids": pkg[1][11]
-	};
-	counter++;
-	if (counter == pidList.length)
-	    res.send({
-		status : "successful",
-		source : results
-	    });
-	else {
-	    pack = lib.createViewPostingPack(req.body.session_key,
-		    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
-	   // console.log(pack);
-	    helper.connectAndSend(pack, f, function() {
-		res.send({
-		    status : "timeout"
-		});
-	    });
-	}
+    var f = function(data){
+		var pkg = lib.resolvPack(data);
+		if (typeof pkg[1] == "undefined") {
+		    res.send({
+			status : "unsuccessful"
+		    });
+		    return;
+		}
+		// resolve replies
+		var replies = [];
+		var reply_set = pkg[1][10];
+		for (var i = 0; i < reply_set.length; i++) {
+		    replies[i] = {
+			"rid" : reply_set[i][0],
+			"replier_uid" : reply_set[i][1],
+			"replyto_uid" : reply_set[i][2],
+			"replier_name" : sanitizer.escape(reply_set[i][3]),
+			"replyto_name" : sanitizer.escape(reply_set[i][4]),
+			"replyContent" : sanitizer.escape(reply_set[i][5]),
+			"date" : reply_set[i][6],
+			"time" : reply_set[i][7],
+			"visibility" : reply_set[i][8]
+		    };
+		}
+		results[counter] = {
+		    "pid" : pkg[1][0],
+		    "uid" : pkg[1][1],
+		    "eid" : helper.hexToDec(pkg[1][2]),
+		    "date" : pkg[1][3],
+		    "time" : pkg[1][4],
+		    "poster_name" : sanitizer.escape(pkg[1][5]),
+		    "event_name" : sanitizer.escape(pkg[1][6]),
+		    "postContent" : sanitizer.escape(pkg[1][7]),
+		    "visibility" : pkg[1][8],
+		    "tags" : parseTags(pkg[1][9]),
+		    "replies_no" : reply_set.length,
+		    "replies" : replies, 
+		    "picids": pkg[1][11]
+		};
+		counter++;
+		if (counter == pidList.length)
+		    res.send({
+			status : "successful",
+			source : results
+		    });
+		else {
+		    pack = lib.createViewPostingPack(req.body.session_key,
+			    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
+		   // console.log(pack);
+		    helper.connectAndSend(pack, f, function() {
+			res.send({
+			    status : "timeout"
+			});
+		    });
+		}
     };
     //console.log(pack);
     helper.connectAndSend(pack, f, function() {
@@ -1935,7 +2185,7 @@ exports.uploadAvarta = function(req, res){
 	});
 }
 
-exports.uploadPicture = function(req, res){
+/*exports.uploadPicture = function(req, res){
 	fs.readFile(req.files.image.path, function(err, data){
 		var imageName = req.files.image.name;
 		var imgsize =1;
@@ -1968,7 +2218,7 @@ exports.uploadPicture = function(req, res){
 			});
 		}
 	});
-}
+}*/
 
 /*sanitizer tags*/
 function parseTags(tags){

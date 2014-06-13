@@ -870,3 +870,9 @@ background-color:#FFFFFF}
 	text-decoration:none;
 	display:none;
 }
+
+.notificationContent{
+	background-color: white;
+	border: none;
+	padding: 0;
+}

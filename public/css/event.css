@@ -654,3 +654,9 @@ background-color:#FFFFFF}
   opacity: 0.0;
   font-size: 100px;
 }
+
+.notificationContent{
+	background-color: white;
+	border: none;
+	padding: 0;
+}

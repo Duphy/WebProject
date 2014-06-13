@@ -92,9 +92,11 @@ $(document).ready(function(){
   $(window).resize(function(){
     $.each($(".tagHead"),function(index,element){
       var tagsGroup = $(element).closest(".tagsGroup");
-      var parentWidth = $(tagsGroup).closest('.span2').width();
-      var selfWidth = $(tagsGroup).width();
-      $(tagsGroup).css('margin-left',parentWidth - selfWidth);
+      if(!$(tagsGroup).hasClass('popPostTags')){
+          var parentWidth = $(tagsGroup).closest('.span2').width();
+          var selfWidth = $(tagsGroup).width();
+          $(tagsGroup).css('margin-left',parentWidth - selfWidth);
+      }
     });
     var parentWidth = $("#userNameLink").parent().width();
     $("#userNameLink").css("width",parentWidth);
@@ -404,7 +406,8 @@ $(document).ready(function(){
     maxFileSize:10000000,
     acceptFileTypes: /\.(gif|jpe?g|png)$/i,
     formData: {
-      uid: localStorage.uid
+      uid: localStorage.uid,
+      session_key: localStorage.session_key
     },
     progress: function(e, data){
         var progress = parseInt(data.loaded / data.total * 100, 10);
@@ -414,8 +417,6 @@ $(document).ready(function(){
         );
     },
     add: function(e, data){
-        data.files[0].name = localStorage.uid+".jpg";
-        console.log(data);
         data.submit().success(function(result, textStatus, jqXHR){
           console.log("upload feedback:");
           console.log(result);
@@ -431,7 +432,7 @@ $(document).ready(function(){
               $('#pictureSubmit').removeAttr("disabled");
               $('#pictureDescArea').show();
               $('#pictureTags').parent().show();
-              $('#pictureSubmit').attr("picturename",data.files[0].name);
+              $('#pictureSubmit').attr("pictureid",result.picid);
               $('#previewImageArea').html("");
               $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '" style = "margin-left:auto;margin-right:auto;display:block;"/>');
             },1000);
@@ -464,8 +465,8 @@ $(document).ready(function(){
             '0%'
         );
     },
-    done:function(e,data){  
-        console.log("upload done.");    
+    done:function(e, data){  
+        console.log("upload done.");
         $("#pictureFileupload").removeAttr("disabled");
     }
   });
@@ -491,8 +492,14 @@ $(document).ready(function(){
     data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
     data.session_key = localStorage.session_key;
     data.uid = localStorage.uid;
-    data.pics = [$(this).attr("picturename")];
-    console.log("pciture name: "+data.pics);
+
+    data.pics = [$(this).attr("pictureid")];
+    console.log("picture ids: ");
+    console.log(data.pics);
+
+    //TO DO: fake file ids
+    //data.fields = [];
+    
     $("#floatingBarsG-picture").show();
     createPost(data);
     return false;
@@ -550,7 +557,6 @@ $(document).ready(function(){
   newsData.max_pid = "default";
   var date = new Date();
   var timeoffset = date.getTimezoneOffset();
-  console.log(localStorage.showAllNews);
   if(localStorage.showAllNews == "true"){
     console.log("showAllNews");
     newsData.option = 2;
@@ -946,6 +952,15 @@ $(document).ready(function(){
     },3000);
 	});
 
+  $('#popPostModal').delegate('.tagHead','mouseover',function(){
+    var tagsGroup = $(this).closest(".tagsGroup");
+    $(tagsGroup).children().slideDown( "fast");
+    setTimeout(function(){
+      $(tagsGroup).children("a:not(:first-child)").slideUp( "fast");
+    },3000);
+    return false;
+  });
+
   $('body').delegate('.replyLink','click',function(){
     var replier = $(this).closest(".replyBody").find('.userName').first();
     console.log(replier.attr('name'));
@@ -958,7 +973,8 @@ $(document).ready(function(){
 
   $('body').delegate('.removePost','click',function(){
     var context = $(this).closest('.postRoot');
-    $("#removePostConfirm").attr("postId",$(this).closest(".postRoot").attr("id")).attr('postUid',$(context).attr('posterUid')).attr('postEid',$(context).attr('postEid')).attr('postPid',$(context).attr('postPid'));
+    var postId = $(context).attr("posterUid")+""+$(context).attr("postEid")+""+$(context).attr("postPid");
+    $("#removePostConfirm").attr("postId",postId).attr('postUid',$(context).attr('posterUid')).attr('postEid',$(context).attr('postEid')).attr('postPid',$(context).attr('postPid'));
   });
 
   $('#removePostConfirm').click(function(){
@@ -996,7 +1012,9 @@ $(document).ready(function(){
   });
 
   $('body').delegate('.removereply','click',function(){
-    $("#removeReplyConfirm").attr("replyId",$(this).closest(".replyBody").attr("id")).attr("postId",$(this).closest(".postRoot").attr("id"));
+    console.log("removereply click");
+    var postId = $(this).closest(".postRoot").attr("posterUid")+""+$(this).closest(".postRoot").attr("postEid")+""+$(this).closest(".postRoot").attr("postPid");
+    $("#removeReplyConfirm").attr("replyId",$(this).closest(".replyBody").attr("replyId")).attr("postId",postId);
   });
 
   $("#removeReplyConfirm").click(function(){
@@ -1004,16 +1022,14 @@ $(document).ready(function(){
       $("#removeReplyConfirm").attr("disabled","disabled");
       var postId = $(this).attr("postId");
       var replyId = $(this).attr("replyId");
-      var context = $("#"+postId);
+      var context = $("div."+postId).first();
       var data = auth_data;
-      data.id = context.attr('posterUid');
-      data.eid = context.attr('postEid');
-      data.pid = context.attr('postPid');
-      var reply = $("#"+replyId);
-      var repliesArea = context.find('.repliesArea');
+      data.id = $(context).attr('posterUid');
+      data.eid = $(context).attr('postEid');
+      data.pid = $(context).attr('postPid');
+      var reply = $("li[replyId='"+replyId+"']").first();
       data.rid = $(reply).attr("rid");
-      console.log($(reply));
-      console.log("rid "+data.rid);
+      console.log(data);
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
@@ -1022,18 +1038,25 @@ $(document).ready(function(){
             contentType: 'application/json',
             success:function(data){
               console.log(data);
-              if(context.attr("repliesNumber") == 1){
-                repliesArea.remove();
-              }else{
-                reply.remove();
-                var repliesNumber = parseInt(context.attr("repliesNumber"));
-                context.attr("repliesNumber",(repliesNumber - 1));
-                if(repliesNumber == 2){
-                  repliesArea.find(".accordion-toggle").html('1 reply');
+              $.each($("li[replyId='"+replyId+"']"),function(index,element){
+                if(!$(element).closest("#imageModal").length && !$(element).closest("#popPostModal").length){
+                  var repliesArea = $(element).closest(".repliesArea");
+                  if($(element).attr("repliesNumber") == 1){
+                    $(repliesArea).remove();
+                  }else{
+                    var repliesNumber = parseInt($(element).closest(".postRoot").attr("repliesNumber"));
+                    $(element).closest(".postRoot").attr("repliesNumber",(repliesNumber - 1));
+                    $(element).remove();
+                    if(repliesNumber == 2){
+                      $(repliesArea).find(".accordion-toggle").html('1 reply');
+                    }else{
+                      $(repliesArea).find(".accordion-toggle").html((repliesNumber - 1)+' replies');
+                    }
+                  }
                 }else{
-                  repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
+                  $(element).remove();
                 }
-              }
+              });
               $("#removeReplyConfirm").removeAttr("disabled");
               $("#floatingBarsG-removeReply").hide();
               $("#removeReplyCancel").trigger("click");
@@ -1077,6 +1100,7 @@ $(document).ready(function(){
         contentType: 'application/json',
         success:function(result){
           if(result.status == "successful"){
+            console.log(result.source[0]);
             renderLargePost(result.source[0]);
             $(".interactionArea").show();
           }
@@ -1131,69 +1155,77 @@ $(document).ready(function(){
               type:"POST",
               contentType: 'application/json',
               success:function(result){
-              if(result.status = "sccessful"){
-              console.log(result);
-              var reply = {};
-              reply.posterUid = data.posterUid;
-              reply.replyto_name = data.replyToName;
-              reply.replyto_uid = data.replyToUid;
-              reply.replier_name = data.replier_name;
-              reply.replier_uid = data.uid;
-              reply.replyContent = data.replyContent;
-              reply.date = getCurrentDate();
-              reply.time = getCurrentTime();
-              if(context.attr("repliesNumber") == 0){
-              var id = context.attr("posterUid")+context.attr("postEid")+context.attr("postPid");
-              context.find(".shareButtons").after(
-                    '<div class = "row-fluid repliesArea" style = "margin-top:10px;" repliesNumber = '+0+'>'+
-                    '<div class="accordion" id="reply'+id+'" style = "background-color:white;margin-bottom: 0px;">'+
-                    '<div class="accordion-group" style = "border:none;">'+
-                    '<div class="accordion-heading" style = "text-align: center;">'+
-                    '<a class="accordion-toggle" data-toggle="collapse" data-parent="#reply'+id+'" href="#collapse'+id+'">'+
-                    '0 reply'+
-                    '</a>'+
-                    '</div>'+
-                    '<div id = "collapse'+id+'" class="accordion-body collapse">'+
-                    '<div class="accordion-inner">'+
-                    '<ul class ="scroller" style = "max-height:250px;overflow: scroll;">'+
-                    '</ul>'+
-                    '</div>'+
-                    '</div>'+
-                    '</div>'+
-                    '</div>'+
-                    '</div>'
-                );
-              }
-              var scroller = context.find('ul.scroller').first();
-              scroller.append(renderReply(reply));
-              context.attr("repliesNumber",parseInt(context.attr("repliesNumber"))+1);
-              scroller.scrollTop(scroller.prop('scrollHeight'));
-              var replyNumber = context.attr("repliesNumber");
-              if(replyNumber == 1){
-                  context.find('.accordion-toggle').first().html(replyNumber+" reply");
-              }else{
-                  context.find('.accordion-toggle').first().html(replyNumber+" replies");
-              }
-              context.find('textarea').val("");
-
-              if(context.find("ul.repliesArea").length > 0){
-                var scroller = context.find("ul.repliesArea").first();
-                scroller.append(renderReplyInLargePost(reply));
-                context.attr("repliesNumber",parseInt(context.attr("repliesNumber")));
-                scroller.scrollTop(scroller.prop('scrollHeight'));
-                var orginalPost = $("#"+context.attr("id").replace("modal",""));
-                scroller = orginalPost.find('ul.scroller').first();
-                scroller.append(renderReply(reply));
-                orginalPost.attr("repliesNumber",parseInt(context.attr("repliesNumber")));
-                scroller.scrollTop(scroller.prop('scrollHeight'));
-                var replyNumber = orginalPost.attr("repliesNumber");
-                if(replyNumber == 1){
-                    orginalPost.find('.accordion-toggle').first().html(replyNumber+" reply");
-                }else{
-                    orginalPost.find('.accordion-toggle').first().html(replyNumber+" replies");
+                if(result.status = "sccessful"){
+                  console.log(result);
+                  var reply = {};
+                  reply.posterUid = data.posterUid;
+                  reply.replyto_name = data.replyToName;
+                  reply.replyto_uid = data.replyToUid;
+                  reply.replier_name = data.replier_name;
+                  reply.replier_uid = data.uid;
+                  reply.replyContent = data.replyContent;
+                  reply.date = getCurrentDate();
+                  reply.time = getCurrentTime();
+                  var id = context.attr("posterUid")+context.attr("postEid")+context.attr("postPid");
+                  reply.postId = id;
+                  console.log($("div."+id));
+                  $.each($("div."+id),function(index,element){
+                    //the post in pop up page
+                    if(!$(element).closest("#imageModal").length && !$(element).closest("#popPostModal").length){
+                      if($(element).attr("repliesNumber") == 0){
+                        $(element).find(".shareButtons").after(
+                          '<div class = "row-fluid repliesArea" style = "margin-top:10px;" repliesNumber = '+0+'>'+
+                          '<div class="accordion" id="reply'+id+'" style = "background-color:white;margin-bottom: 0px;">'+
+                          '<div class="accordion-group" style = "border:none;">'+
+                          '<div class="accordion-heading" style = "text-align: center;">'+
+                          '<a class="accordion-toggle" data-toggle="collapse" data-parent="#reply'+id+'" href="#collapse'+id+'">'+
+                          '0 reply'+
+                          '</a>'+
+                          '</div>'+
+                          '<div id = "collapse'+id+'" class="accordion-body collapse">'+
+                          '<div class="accordion-inner">'+
+                          '<ul class ="scroller" style = "max-height:250px;overflow: scroll;">'+
+                          '</ul>'+
+                          '</div>'+
+                          '</div>'+
+                          '</div>'+
+                          '</div>'+
+                          '</div>'
+                        );
+                      }
+                      var scroller = $(element).find('ul.scroller').first();
+                      scroller.append(renderReply(reply));
+                      // if(context.attr('posterUid') == localStorage.uid || reply.replier_uid==localStorage.uid){
+                      //   scroller.find("li").last().find(".span1").last().html('<a class="close removereply" data-toggle = "modal" href="#removeReplyModal">&times;</a>');
+                      // }
+                      $(element).attr("repliesNumber",parseInt($(element).attr("repliesNumber"))+1);
+                      scroller.scrollTop(scroller.prop('scrollHeight'));
+                      var replyNumber = $(element).attr("repliesNumber");
+                      if(replyNumber == 1){
+                          $(element).find('.accordion-toggle').first().html(replyNumber+" reply");
+                      }else{
+                          $(element).find('.accordion-toggle').first().html(replyNumber+" replies");
+                      }
+                    }else{
+                    //the post in normal page
+                      console.log("render in large post");
+                      var scroller = $(element).find("ul.scroller").first();
+                      scroller.append(renderReply(reply));
+                      // if(context.attr('posterUid') == localStorage.uid || reply.replier_uid==localStorage.uid){
+                      //   scroller.find("li").last().find(".span1").last().html('<a class="close removereply" data-toggle = "modal" href="#removeReplyModal">&times;</a>');
+                      // }
+                      // $(element).attr("repliesNumber",parseInt($(element).attr("repliesNumber")));
+                      // scroller.scrollTop(scroller.prop('scrollHeight'));
+                      // var replyNumber = $(element).attr("repliesNumber");
+                      // if(replyNumber == 1){
+                      //     $(element).find('.accordion-toggle').first().html(replyNumber+" reply");
+                      // }else{
+                      //     $(element).find('.accordion-toggle').first().html(replyNumber+" replies");
+                      // }
+                    }
+                    context.find('textarea').val("");
+                  });
                 }
-              }
-              }
               },
               error:function(jqXHR, textStatus, errorThrown){
                   if(textStatus == "timeout"){
