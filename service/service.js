@@ -149,7 +149,14 @@ exports.createEvent = function(req, res) {
 }
 
 exports.uploadPicture = function(req,res){
-	var images = req.files.image;
+	var images = [];
+	if(!Array.isArray(req.files.image)) {
+	    images = [req.files.image];
+	}else{
+		images = req.files.image;
+	}
+	console.log("images: ");
+	console.log(images);
 	var pictureNumber = req.files.image.length;
 	var pictureCounter = 0;
 	var picIds = [];

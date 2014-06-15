@@ -427,7 +427,12 @@ $(document).ready(function(){
               $('#pictureSubmit').removeAttr("disabled");
               $('#pictureDescArea').show();
               $('#pictureTags').parent().show();
-              localStorage.pictureids = result.picids;
+              if(!localStorage.pictureids){
+                localStorage.pictureids = result.picids;
+              }else{
+                var originalPictureIds = localStorage.pictureids.split(",");
+                localStorage.pictureids = originalPictureIds.concat(result.picids);
+              } 
               $('#previewImageArea').html("");
               $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '" style = "margin-left:auto;margin-right:auto;display:block;"/>');
             },1000);
@@ -507,6 +512,7 @@ $(document).ready(function(){
     $("#pictureSubmit").attr("picturename","");
     $("#previewImageArea").hide();
     $("#pictureNotice").hide();
+    localStorage.removeItem("pictureids");
   });
 
   //retrieve self big avarta
