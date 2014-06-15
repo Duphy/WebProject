@@ -423,6 +423,13 @@ height:30px;
 display: none;
 }
 
+#floatingBarsG-file{
+position:relative;
+width:24px;
+height:30px;
+display: none;
+}
+
 
 #floatingBarsG-update{
 position:relative;

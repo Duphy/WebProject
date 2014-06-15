@@ -160,7 +160,7 @@ exports.uploadPicture = function(req,res){
 	var pictureNumber = images.length;
 	var pictureCounter = 0;
 	var picIds = [];
-	for(var i = 0;i < images.length;i++){
+	for(var i = 0;i < pictureNumber;i++){
 		var pack = lib.createUploadPicturePack(req.body.session_key,
 		    parseInt(req.body.uid), (images[i]).path);
 	    helper.connectAndSend(pack, 
@@ -174,6 +174,45 @@ exports.uploadPicture = function(req,res){
 				   	res.send({
 			        	"status": "successful",
 					    "picids" : picIds
+				    });
+		    	}
+			}, 
+		    function(){
+				res.send({
+			    	status : "timeout"
+				});
+	    	}
+	    );
+	}
+}
+
+exports.uploadFile = function(req,res){
+	var files = [];
+	if(!Array.isArray(req.files.file)) {
+	    files = [req.files.file];
+	}else{
+		files = req.files.file;
+	}
+	console.log("files: ");
+	console.log(files);
+	var fileNumber = files.length;
+	var fileCounter = 0;
+	var fileIds = [];
+	for(var i = 0;i < fileNumber;i++){
+		var pack = lib.createUploadFilePack(req.body.session_key,
+		    parseInt(req.body.uid), (files[i]).path);
+	    helper.connectAndSend(pack, 
+	    	function(data){
+	    		console.log("upload successfully!");
+				var pkg = lib.resolvPack(data);
+				fileCounter++;
+				if(pkg[1].length > 0){
+					fileIds.push(pkg[1][0]);
+				}
+				if(fileCounter == fileNumber){
+				   	res.send({
+			        	"status": "successful",
+					    "fileids" : fileIds
 				    });
 		    	}
 			}, 
@@ -278,7 +317,7 @@ exports.uploadPicture = function(req,res){
 	
 }*/
 
-exports.uploadFile = function(req,res){
+/*exports.uploadFile = function(req,res){
 	fs.readFile(req.files.file.path, function(err, data){
 		var fileName = req.files.file.name;
 		var filesize =1;
@@ -354,7 +393,8 @@ exports.uploadFile = function(req,res){
 			});
 		}
 	});
-}
+}*/
+
 /*
 exports.createPost_old = function(req, res) {
     console.log("creater uid: " + req.body.uid);

@@ -153,6 +153,7 @@ app.post('/responsetonotification', express.bodyParser(), service.responseNoti);
 
 //upload Avarta
 app.post('/uploadpostpicture',service.uploadPicture);
+app.post('/uploadpostfile',service.uploadFile);
 app.post('/uploadavarta',service.uploadAvarta);
 /*************** End *****************/
 
