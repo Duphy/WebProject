@@ -1790,7 +1790,7 @@ Handle<Value> createUploadFilePack(const Arguments &args) {
 }
 
 /**
- * - \b "16 1 View picture"
+ * - \b "16 1 Download file"
  * 		- createDownloadFilePack(session_key, your_uid, fileid)
  */
 // args[0]: session_key

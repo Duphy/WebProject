@@ -418,6 +418,17 @@ Local<Array> resolvPictures(const char *pack, int &pointer) {
 }
 
 /**
+ * Array: fileid (string)
+ */
+Local<Array> resolvFiles(const char *pack, int &pointer) {
+	uint32_t num = readInteger(pack, pointer, 4);
+	Local<Array> ans = Array::New(num);
+	for (uint32_t i = 0; i < num; i++)
+		ans->Set(i, JSreadAsciiString(pack, pointer, FILEID_LENGTH));
+	return ans;
+}
+
+/**
  * Array: pubid (string)
  */
 Local<Array> resolvPubpages(const char *pack, int &pointer) {
@@ -504,6 +515,7 @@ Local<Array> resolvAdvertisements(const char *pack, int &pointer) {
  * 		- 9: tags (::resolvTags)
  * 		- 10: replies (::resolvReplies)
  * 		- 11: pictures (::resolvPictures)
+ * 		- 12: files (::resolvFiles)
  */
 
 /**
@@ -677,6 +689,7 @@ Handle<Value> resolvViewPack(const char *pack, const response_header &header) {
 		ans->Set(9, resolvTags(pack, pointer)); // tags
 		ans->Set(10, resolvReplies(pack, pointer)); // replies
 		ans->Set(11, resolvPictures(pack, pointer)); // pictures
+		ans->Set(12, resolvFiles(pack, pointer)); // files
 		break;
 	case 10: // View user's posting
 		return resolvPostings(pack, pointer);
