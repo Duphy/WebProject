@@ -1446,7 +1446,7 @@ Local<Object> resolvFilePack(const char *pack,
 	case 1: // for download
 	{
 		std::ostringstream os;
-		os << "public/data/files/" << fileid << ".jpg";
+		os << "public/data/files/" << fileid;
 		ans->Set(1, JSreadFile(pack, pointer, os.str()));
 		break;
 	}
