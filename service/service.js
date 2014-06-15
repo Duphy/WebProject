@@ -157,7 +157,7 @@ exports.uploadPicture = function(req,res){
 	}
 	console.log("images: ");
 	console.log(images);
-	var pictureNumber = req.files.image.length;
+	var pictureNumber = images.length;
 	var pictureCounter = 0;
 	var picIds = [];
 	for(var i = 0;i < images.length;i++){

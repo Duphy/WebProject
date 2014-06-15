@@ -433,8 +433,15 @@ $(document).ready(function(){
                 var originalPictureIds = localStorage.pictureids.split(",");
                 localStorage.pictureids = originalPictureIds.concat(result.picids);
               } 
-              $('#previewImageArea').html("");
-              $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '" style = "margin-left:auto;margin-right:auto;display:block;"/>');
+              $('#previewImageArea').html("").append(
+                '<ul class="thumbnails">'+
+                  '<li class="span4">'+
+                    '<a href="#" class="thumbnail">'+
+                      '<img src="' + URL.createObjectURL(data.files[0]) + '" style = "margin-left:auto;margin-right:auto;display:block;"/>'+
+                    '</a>'+
+                  '</li>'+
+                '</ul>'
+              ).show();
             },1000);
           }
         }).error(function(jqXHR, textStatus, errorThrown){
