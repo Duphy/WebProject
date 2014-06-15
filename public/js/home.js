@@ -515,11 +515,13 @@ $(document).ready(function(){
   });
 
   $("#pictureCancel").click(function(){
-    $("#pictureDescArea").val("");
+    $("#pictureDescArea").val("").hide();
     $("#pictureTags").tagsinput("removeAll");
+    $('#pictureTags').parent().hide();
     $("#pictureSubmit").attr("picturename","");
     $("#previewImageArea").html("");
     $("#pictureNotice").hide();
+    $('#pictureSubmit').attr("disabled", "disabled");
     localStorage.removeItem("pictureids");
   });
 
