@@ -468,10 +468,11 @@ function createPost(data){
 
           //TO DO: to be changed to support multiple pictures in one post.
           pictureData.picid = result.post.picids[0];
+          console.log("created picture pids:");
+          console.log(esult.post.picids);
           $.ajax({
             url:'/getpicture',
-            data:JSON.stringify(pictureData),
-            
+            data:JSON.stringify(pictureData),      
             type:"POST",
             contentType:"application/json",
             success:function(data){
