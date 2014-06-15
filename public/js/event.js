@@ -406,9 +406,23 @@ $(document).ready(function(){
               $('#pictureSubmit').removeAttr("disabled");
               $('#pictureDescArea').show();
               $('#pictureTags').parent().show();
-              $('#pictureSubmit').attr("pictureid",result.picid);
-              $('#previewImageArea').html("");
-              $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '" style = "margin-left:auto;margin-right:auto;display:block;"/>');
+              if(!localStorage.pictureids){
+                localStorage.pictureids = result.picids;
+              }else{
+                var originalPictureIds = localStorage.pictureids.split(",");
+                localStorage.pictureids = originalPictureIds.concat(result.picids);
+              } 
+              console.log("upload picture urls:");
+              console.log(data.files);
+              $.each(data.files,function(index,element){
+                $('#previewImageArea').append(
+                  '<li class="span3">'+
+                    '<a href="#" class="thumbnail">'+
+                      '<img src="' + URL.createObjectURL(element) + '" style = "margin-left:auto;margin-right:auto;display:block;height:300px;"/>'+
+                    '</a>'+
+                  '</li>');
+              });
+              $('#previewImageArea').show();
             },1000);
           }
         }).error(function(jqXHR, textStatus, errorThrown){
@@ -466,7 +480,8 @@ $(document).ready(function(){
     data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
     data.session_key = localStorage.session_key;
     data.uid = localStorage.uid;
-    data.pics = [$(this).attr("pictureid")];
+
+    data.pics = localStorage.pictureids.split(",");
     console.log("picture ids: ");
     console.log(data.pics);
 
@@ -479,12 +494,12 @@ $(document).ready(function(){
   });
 
   $("#pictureCancel").click(function(){
-    //TO DO: remove the picture just uploaded.
     $("#pictureDescArea").val("");
     $("#pictureTags").tagsinput("removeAll");
     $("#pictureSubmit").attr("picturename","");
-    $("#previewImageArea").hide();
+    $("#previewImageArea").html("");
     $("#pictureNotice").hide();
+    localStorage.removeItem("pictureids");
   });
 
   $('body').delegate('.postImage','click',function(){

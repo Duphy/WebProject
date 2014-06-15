@@ -515,7 +515,6 @@ $(document).ready(function(){
   });
 
   $("#pictureCancel").click(function(){
-    //TO DO: remove the picture just uploaded.
     $("#pictureDescArea").val("");
     $("#pictureTags").tagsinput("removeAll");
     $("#pictureSubmit").attr("picturename","");
