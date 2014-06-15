@@ -147,83 +147,129 @@ exports.createEvent = function(req, res) {
 	});
     });
 }
+
 exports.uploadPicture = function(req,res){
-	fs.readFile(req.files.image.path, function(err, data){
-		var imageName = req.files.image.name;
-		var imgsize =1;
-		/// If there's an error
-		if(!imageName){
-			console.log("There was an error.")
-			res.send({status:"unsuccessful"});
-		}else{
-			var path = dataPath +req.body.uid+"/tmp/";
-			console.log("path: "+path);
-			fs.readdir(path, function(err){
-				if(err){
-					console.log("not exists");
-					fs.mkdir(path,function(err){
-						if(!err){
-							console.log("created dir");
-							var imagePath = path + imageName;
-							fs.writeFile(imagePath, data, function(){
-								//upload the picture(s)
-								var pack = lib.createUploadPicturePack(req.body.session_key,
-								    parseInt(req.body.uid), imagePath);
-							    helper.connectAndSend(pack, 
-							    	function(data){
-										var pkg = lib.resolvPack(data);
-										var output = {};
-									    if(pkg[1].length > 0){
-									        output = {
-									        	"status": "successful",
-											    "picid" : pkg[1][0]
-										    };
-									    }
-										res.send(output);
-									}, 
-								    function(){
-										res.send({
-									    	status : "timeout"
-										});
-							    	}
-							    );
-							});	
-						}else{
-							//res.send({status:"unsuccessful"});
-						}
-					});
-				}else{
-					console.log("exists");
-					var imagePath = path + imageName;
-					console.log(imagePath);
-					fs.writeFile(imagePath, data, function(){
-						//upload the picture(s)
-						var pack = lib.createUploadPicturePack(req.body.session_key,
-								    parseInt(req.body.uid), imagePath);
-					    helper.connectAndSend(pack, 
-					    	function(data){
-								var pkg = lib.resolvPack(data);
-								var output = {};
-							    if(pkg[1].length > 0){
-							        output = {
-							        	"status": "successful",
-									    "picid" : pkg[1][0]
-								    };
-							    }
-								res.send(output);
-							}, 
-						    function(){
-								res.send({
-							    	status : "timeout"
-								});
-					    	}
-					    );
-					});
+	var images = req.files.image;
+	var pictureNumber = req.files.image.length;
+	var pictureCounter = 0;
+	var picIds = [];
+	for(var i = 0;i < images.length;i++){
+		var pack = lib.createUploadPicturePack(req.body.session_key,
+		    parseInt(req.body.uid), (images[i]).path);
+	    helper.connectAndSend(pack, 
+	    	function(data){
+				var pkg = lib.resolvPack(data);
+				pictureCounter++;
+				if(pkg[1].length > 0){
+					picIds.push(pkg[1][0]);
 				}
-			});
-		}
-	});
+				if(pictureCounter == pictureNumber){
+				   	res.send({
+			        	"status": "successful",
+					    "picids" : picIds
+				    });
+		    	}
+			}, 
+		    function(){
+				res.send({
+			    	status : "timeout"
+				});
+	    	}
+	    );
+	}
 }
+
+/*exports.uploadPicture = function(req,res){
+	var images = req.files.image;
+	var pictureNumber = req.files.image.length;
+	var pictureCounter = 0;
+	var picIds = [];
+	for(var i = 0;i < images.length;i++){
+		var imageData = images[i];
+		console.log("imageData is:");
+		console.log(imageData);
+		fs.readFile(imageData.path, function(err, data){
+			var imageName = imageData.name;
+			console.log("imageName is:"+ imageName);
+			/// If there's an error
+			if(!imageName){
+				console.log("There was an error.")
+				res.send({status:"unsuccessful"});
+			}else{
+				var path = dataPath +req.body.uid+"/tmp/";
+				console.log("path: "+path);
+				fs.readdir(path, function(err){
+					if(err){
+						console.log("not exists");
+						fs.mkdir(path,function(err){
+							if(!err){
+								console.log("created dir");
+								var imagePath = path + imageName;
+								fs.writeFile(imagePath, data, function(){
+									//upload the picture(s)
+									var pack = lib.createUploadPicturePack(req.body.session_key,
+									    parseInt(req.body.uid), imagePath);
+								    helper.connectAndSend(pack, 
+								    	function(data){
+											var pkg = lib.resolvPack(data);
+											pictureCounter++;
+											if(pkg[1].length > 0){
+												picIds.push(pkg[1][0]);
+											}
+											if(pictureCounter == pictureNumber){
+											   	res.send({
+										        	"status": "successful",
+												    "picids" : picIds
+											    });
+									    	}
+										}, 
+									    function(){
+											res.send({
+										    	status : "timeout"
+											});
+								    	}
+								    );
+								});	
+							}else{
+								//res.send({status:"unsuccessful"});
+							}
+						});
+					}else{
+						console.log("exists");
+						var imagePath = path + imageName;
+						console.log(imagePath);
+						fs.writeFile(imagePath, data, function(){
+							//upload the picture(s)
+							var pack = lib.createUploadPicturePack(req.body.session_key,
+									    parseInt(req.body.uid), imagePath);
+						    helper.connectAndSend(pack, 
+						    	function(data){
+									var pkg = lib.resolvPack(data);
+									pictureCounter++;
+									if(pkg[1].length > 0){
+										picIds.push(pkg[1][0]);
+									}
+									if(pictureCounter == pictureNumber){
+									   	res.send({
+								        	"status": "successful",
+										    "picids" : picIds
+									    });
+							    	}
+								}, 
+							    function(){
+									res.send({
+								    	status : "timeout"
+									});
+						    	}
+						    );
+						});
+					}
+				});
+			}
+		});
+	}
+	
+}*/
 
 exports.uploadFile = function(req,res){
 	fs.readFile(req.files.file.path, function(err, data){
@@ -937,6 +983,8 @@ exports.viewSelfCircatags = function(req, res) {
 
 exports.viewPicture = function(req, res){
 	var output;
+	console.log("picture id is:");
+	console.log(req.body.picid);
 	var pack = lib.createViewPicturePack(req.body.session_key,
 		parseInt(req.body.uid),req.body.picid);
 	helper.connectAndSend(pack, function(data){
@@ -950,7 +998,7 @@ exports.viewPicture = function(req, res){
 			res.send({
 			    "status" : "timeout"
 			});
-	   }
+	    }
 	);
 }
 
@@ -1521,11 +1569,6 @@ exports.viewPostsContent = function(req, res) {
     //console.log("Num of pids are: " + pidList.length);
 
     var counter = 0;
-    console.log(pidList);
-    console.log(uidList);
-    console.log("!!!!!!!!!!!!!!!eid list:");
-    console.log(eidList);
-    console.log("counter is "+counter);
     pack = lib.createViewPostingPack(req.body.session_key,
 	    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
     var f = function(data){

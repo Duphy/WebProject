@@ -14,7 +14,7 @@ $(document).ready(function(){
     $.ajax({
     	url:'/geteventsmallavarta',
     	data:JSON.stringify(eventAvartaData),
-      timeout:10000,
+      
     	type:"POST",
     	contentType:"application/json",
     	success:function(data){
@@ -33,7 +33,7 @@ $(document).ready(function(){
     $.ajax({
          url:"/geteventmembers",
          data:JSON.stringify(auth_data),
-         timeout:10000,
+         
          type:"POST",
          contentType: 'application/json',
          success:function(result){
@@ -46,7 +46,7 @@ $(document).ready(function(){
                 $.ajax({
                       url:"/getusersinfo",
                       data:JSON.stringify(membersData),
-                      timeout:10000,
+                      
                       type:"POST",
                       contentType:'application/json',
                       success:function(result){
@@ -106,7 +106,7 @@ $(document).ready(function(){
       $.ajax({
          url:"/geteventmembers",
          data:JSON.stringify(auth_data),
-         timeout:10000,
+         
          type:"POST",
          contentType: 'application/json',
          success:function(result){
@@ -119,7 +119,7 @@ $(document).ready(function(){
           $.ajax({
                 url:"/getusersinfo",
                 data:JSON.stringify(membersData),
-                timeout:10000,
+                
                 type:"POST",
                 contentType:'application/json',
                 success:function(result){
@@ -182,7 +182,7 @@ $(document).ready(function(){
       $.ajax({
          url:"/geteventmanagers",
          data:JSON.stringify(auth_data),
-         timeout:10000,
+         
          type:"POST",
          contentType: 'application/json',
          success:function(result){
@@ -195,7 +195,7 @@ $(document).ready(function(){
           $.ajax({
                 url:"/getusersinfo",
                 data:JSON.stringify(membersData),
-                timeout:10000,
+                
                 type:"POST",
                 contentType:'application/json',
                 success:function(result){

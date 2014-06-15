@@ -45,7 +45,6 @@ $(document).ready(function(){
     $.ajax({
       url:'/friendrequest',
       data:JSON.stringify(data),
-      timeout:10000,
       type:"POST",
       contentType:"application/json",
       success:function(result){
@@ -68,7 +67,6 @@ $(document).ready(function(){
   $.ajax({
     url:'/getuserinfo',
     data:JSON.stringify(view_auth_data),
-    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -123,7 +121,6 @@ $(document).ready(function(){
   $.ajax({
     url:'/getuseravarta',
     data:JSON.stringify(view_auth_data),
-    timeout:10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -145,7 +142,6 @@ $(document).ready(function(){
   $.ajax({
      url:"/getuserposts",
      data:JSON.stringify(newsData),
-     timeout:10000,
      type:"POST",
      contentType: 'application/json',
      success:function(data){
@@ -164,7 +160,6 @@ $(document).ready(function(){
   $.ajax({
       url:"/getuserevents",
       data:JSON.stringify(view_auth_data),
-      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -183,7 +178,6 @@ $(document).ready(function(){
   $.ajax({
     url:"/getuserfriendsinfo",
     data:JSON.stringify(view_auth_data),
-    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -293,7 +287,6 @@ $(document).ready(function(){
       $.ajax({
              url:"/getuserfriendsinfo",
              data:JSON.stringify(view_auth_data),
-             timeout:10000,
              type:"POST",
              contentType: 'application/json',
              success:function(data){
@@ -338,7 +331,6 @@ $(document).ready(function(){
      $.ajax({
         url:"/getuserevents",
         data:JSON.stringify(view_auth_data),
-        timeout:10000,
         type:"POST",
         contentType: 'application/json',
         success:function(data){
@@ -402,10 +394,13 @@ $(document).ready(function(){
     textarea.attr({replyToName:replier.attr('name'),replyToUid:replier.attr('uid')});
     textarea.focus();
     return false;
+    
   });
   
   $('body').delegate('.removereply','click',function(){
-    $("#removeReplyConfirm").attr("replyId",$(this).closest(".replyBody").attr("id")).attr("postId",$(this).closest(".postRoot").attr("id"));
+    console.log("removereply click");
+    var postId = $(this).closest(".postRoot").attr("posterUid")+""+$(this).closest(".postRoot").attr("postEid")+""+$(this).closest(".postRoot").attr("postPid");
+    $("#removeReplyConfirm").attr("replyId",$(this).closest(".replyBody").attr("replyId")).attr("postId",postId);
   });
 
   $("#removeReplyConfirm").click(function(){
@@ -413,36 +408,40 @@ $(document).ready(function(){
       $("#removeReplyConfirm").attr("disabled","disabled");
       var postId = $(this).attr("postId");
       var replyId = $(this).attr("replyId");
-      var context = $("#"+postId);
+      var context = $("div."+postId).first();
       var data = auth_data;
-      data.id = context.attr('posterUid');
-      data.eid = context.attr('postEid');
-      data.pid = context.attr('postPid');
-      var reply = $("#"+replyId);
-      var repliesArea = context.find('.repliesArea');
+      data.id = $(context).attr('posterUid');
+      data.eid = $(context).attr('postEid');
+      data.pid = $(context).attr('postPid');
+      var reply = $("li[replyId='"+replyId+"']").first();
       data.rid = $(reply).attr("rid");
-      console.log($(reply));
-      console.log("rid "+data.rid);
+      console.log(data);
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
-            timeout:10000,
             type:"POST",
             contentType: 'application/json',
             success:function(data){
               console.log(data);
-              if(context.attr("repliesNumber") == 1){
-                repliesArea.remove();
-              }else{
-                reply.remove();
-                var repliesNumber = parseInt(context.attr("repliesNumber"));
-                context.attr("repliesNumber",(repliesNumber - 1));
-                if(repliesNumber == 2){
-                  repliesArea.find(".accordion-toggle").html('1 reply');
+              $.each($("li[replyId='"+replyId+"']"),function(index,element){
+                if(!$(element).closest("#imageModal").length && !$(element).closest("#popPostModal").length){
+                  var repliesArea = $(element).closest(".repliesArea");
+                  if($(element).attr("repliesNumber") == 1){
+                    $(repliesArea).remove();
+                  }else{
+                    var repliesNumber = parseInt($(element).closest(".postRoot").attr("repliesNumber"));
+                    $(element).closest(".postRoot").attr("repliesNumber",(repliesNumber - 1));
+                    $(element).remove();
+                    if(repliesNumber == 2){
+                      $(repliesArea).find(".accordion-toggle").html('1 reply');
+                    }else{
+                      $(repliesArea).find(".accordion-toggle").html((repliesNumber - 1)+' replies');
+                    }
+                  }
                 }else{
-                  repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
+                  $(element).remove();
                 }
-              }
+              });
               $("#removeReplyConfirm").removeAttr("disabled");
               $("#floatingBarsG-removeReply").hide();
               $("#removeReplyCancel").trigger("click");
@@ -487,7 +486,6 @@ $(document).ready(function(){
     $.ajax({
           url:"/createreply",
           data:JSON.stringify(data),
-          timeout:10000,
           type:"POST",
           contentType: 'application/json',
           success:function(result){
@@ -671,7 +669,6 @@ $(document).ready(function(){
     $.ajax({
       url:"/deletefriend",
           data:JSON.stringify(data),
-          timeout:10000,
           type:"POST",
           contentType: 'application/json',
           success:function(result){
@@ -734,7 +731,6 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -767,7 +763,6 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -813,7 +808,6 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -846,7 +840,6 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){

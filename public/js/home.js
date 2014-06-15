@@ -129,7 +129,6 @@ $(document).ready(function(){
   $("#fileupload").fileupload({
     url:"/uploadavarta",
     type:"POST",
-    timeout: 10000,
     dataType:"json",
     maxFileSize:10000000,
     acceptFileTypes: /\.(gif|jpe?g|png)$/i,
@@ -165,7 +164,6 @@ $(document).ready(function(){
               $.ajax({
                 url:'/updateselfsmallavarta',
                 data:JSON.stringify(avartaData),
-                timeout: 10000,
                 type:'POST',
                 contentType: 'application/json',
                 success:function(result){
@@ -173,7 +171,6 @@ $(document).ready(function(){
                     $.ajax({
                       url:'/getselfsmallavarta',
                       data:JSON.stringify(auth_data),
-                      timeout: 10000,
                       type:'POST',
                       contentType: 'application/json',
                       success:function(avarta){
@@ -208,7 +205,6 @@ $(document).ready(function(){
               $.ajax({
                 url:'/updateselfavarta',
                 data:JSON.stringify(avartaData),
-                timeout: 10000,
                 type:'POST',
                 contentType: 'application/json',
                 success:function(result){
@@ -216,7 +212,6 @@ $(document).ready(function(){
                     $.ajax({
                       url:'/getselfavarta',
                       data:JSON.stringify(auth_data),
-                      timeout: 10000,
                       type:'POST',
                       contentType: 'application/json',
                       success:function(avarta){
@@ -357,7 +352,6 @@ $(document).ready(function(){
         $.ajax({
             url:'/updatesuserinfo',
             data:JSON.stringify(data),
-            timeout: 10000,
             type:'POST',
             contentType: 'application/json',
             success:function(data){
@@ -405,6 +399,7 @@ $(document).ready(function(){
     dataType:"json",
     maxFileSize:10000000,
     acceptFileTypes: /\.(gif|jpe?g|png)$/i,
+    singleFileUploads:false,
     formData: {
       uid: localStorage.uid,
       session_key: localStorage.session_key
@@ -432,7 +427,7 @@ $(document).ready(function(){
               $('#pictureSubmit').removeAttr("disabled");
               $('#pictureDescArea').show();
               $('#pictureTags').parent().show();
-              $('#pictureSubmit').attr("pictureid",result.picid);
+              localStorage.pictureids = result.picids;
               $('#previewImageArea').html("");
               $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '" style = "margin-left:auto;margin-right:auto;display:block;"/>');
             },1000);
@@ -493,7 +488,7 @@ $(document).ready(function(){
     data.session_key = localStorage.session_key;
     data.uid = localStorage.uid;
 
-    data.pics = [$(this).attr("pictureid")];
+    data.pics = localStorage.pictureids.split(",");
     console.log("picture ids: ");
     console.log(data.pics);
 
@@ -518,7 +513,6 @@ $(document).ready(function(){
 	$.ajax({
 	 	url:'/getselfavarta',
 	 	data:JSON.stringify(selfAvartaData),
-    timeout: 10000,
 	 	type:"POST",
 	 	contentType:"application/json",
 	 	success:function(data){
@@ -536,7 +530,6 @@ $(document).ready(function(){
   $.ajax({
     url:'/getselfsmallavarta',
     data:JSON.stringify(selfAvartaData),
-    timeout: 10000,
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -569,7 +562,6 @@ $(document).ready(function(){
 	$.ajax({
 		url:"/getusernews",
 		data:JSON.stringify(newsData),
-    timeout: 10000,
 		type:"POST",
 		contentType: 'application/json',
 		success:function(data){
@@ -588,7 +580,6 @@ $(document).ready(function(){
   $.ajax({
       url:"/getselfevents",
       data:JSON.stringify(auth_data),
-      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -607,7 +598,6 @@ $(document).ready(function(){
   $.ajax({
     url:"/getselffriendsinfo",
     data:JSON.stringify(auth_data),
-    timeout: 10000,
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -716,7 +706,6 @@ $(document).ready(function(){
     $.ajax({
       url:"/getusernews",
       data:JSON.stringify(newsData),
-      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -750,7 +739,6 @@ $(document).ready(function(){
     $.ajax({
       url:"/getusernews",
       data:JSON.stringify(newsData),
-      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -863,7 +851,6 @@ $(document).ready(function(){
         $.ajax({
           url:"/getselffriendsinfo",
           data:JSON.stringify(auth_data),
-          timeout: 10000,
           type:"POST",
           contentType: 'application/json',
           success:function(data){
@@ -901,7 +888,6 @@ $(document).ready(function(){
         $.ajax({
             url:"/getselfevents",
             data:JSON.stringify(auth_data),
-            timeout: 10000,
             type:"POST",
             contentType: 'application/json',
             success:function(data){
@@ -973,33 +959,36 @@ $(document).ready(function(){
 
   $('body').delegate('.removePost','click',function(){
     var context = $(this).closest('.postRoot');
-    var postId = $(context).attr("posterUid")+""+$(context).attr("postEid")+""+$(context).attr("postPid");
-    $("#removePostConfirm").attr("postId",postId).attr('postUid',$(context).attr('posterUid')).attr('postEid',$(context).attr('postEid')).attr('postPid',$(context).attr('postPid'));
+    $(context).addClass("PostToBeRemoved");
+    $("#removePostConfirm").attr('postUid',$(context).attr('posterUid')).attr('postEid',$(context).attr('postEid')).attr('postPid',$(context).attr('postPid'));
   });
 
   $('#removePostConfirm').click(function(){
     $("#floatingBarsG-removePost").show();
     $("#removePostConfirm").attr("disabled","disabled");
     var data = auth_data;
-    var id = $(this).attr('postId');
     data.id = $(this).attr('postUid');
     data.eid = $(this).attr('postEid');
     data.pid = $(this).attr('postPid');
     $.ajax({
       url:"/deletepost",
       data:JSON.stringify(data),
-      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
         console.log(data);
         if(data.status=="successful"){
-          $('#'+id).remove();
+          // BUG!! did not remove the post!
+          $('.PostToBeRemoved')[0].remove();
           if($("#left-column").html() == "" && $("#right-column").html() == ""){
             $("#contentBody").find(".well").show();
           }
+        }else{
+          $('.PostToBeRemoved')[0].removeClass("PostToBeRemoved");
+          console.log("post was not removed successfully!");
         }
         $("#removePostConfirm").removeAttr("disabled");
+        $("#removePostConfirm").removeAttr("postUid").removeAttr("postEid").removeAttr("postPid");
         $("#floatingBarsG-removePost").hide();
         $("#removePostCancel").trigger("click");
       },
@@ -1033,7 +1022,6 @@ $(document).ready(function(){
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
-            timeout: 10000,
             type:"POST",
             contentType: 'application/json',
             success:function(data){
@@ -1095,7 +1083,6 @@ $(document).ready(function(){
     $.ajax({
         url:"/getpostscontent",
         data:JSON.stringify(data),
-        timeout: 10000,
         type:"POST",
         contentType: 'application/json',
         success:function(result){
@@ -1151,7 +1138,6 @@ $(document).ready(function(){
         $.ajax({
               url:"/createreply",
               data:JSON.stringify(data),
-              timeout: 10000,
               type:"POST",
               contentType: 'application/json',
               success:function(result){
@@ -1279,7 +1265,6 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -1312,7 +1297,6 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -1358,7 +1342,6 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -1391,7 +1374,6 @@ $(document).ready(function(){
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout: 10000,
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -1551,7 +1533,6 @@ $(document).ready(function(){
     $.ajax({
         url:'/createevent',
         data:JSON.stringify(data),
-        timeout: 10000,
         type:'POST',
         contentType: 'application/json',
         success:function(data){
