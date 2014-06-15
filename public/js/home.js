@@ -433,15 +433,17 @@ $(document).ready(function(){
                 var originalPictureIds = localStorage.pictureids.split(",");
                 localStorage.pictureids = originalPictureIds.concat(result.picids);
               } 
-              $('#previewImageArea').html("").append(
-                '<ul class="thumbnails">'+
-                  '<li class="span4">'+
+              console.log("upload picture urls:");
+              console.log(data.files);
+              $.each(data.files,function(index,element){
+                $('#previewImageArea').append(
+                  '<li class="span3">'+
                     '<a href="#" class="thumbnail">'+
-                      '<img src="' + URL.createObjectURL(data.files[0]) + '" style = "margin-left:auto;margin-right:auto;display:block;"/>'+
+                      '<img src="' + URL.createObjectURL(element) + '" style = "margin-left:auto;margin-right:auto;display:block;height:300px;"/>'+
                     '</a>'+
-                  '</li>'+
-                '</ul>'
-              ).show();
+                  '</li>');
+              });
+              $('#previewImageArea').show();
             },1000);
           }
         }).error(function(jqXHR, textStatus, errorThrown){
@@ -517,7 +519,7 @@ $(document).ready(function(){
     $("#pictureDescArea").val("");
     $("#pictureTags").tagsinput("removeAll");
     $("#pictureSubmit").attr("picturename","");
-    $("#previewImageArea").hide();
+    $("#previewImageArea").html("");
     $("#pictureNotice").hide();
     localStorage.removeItem("pictureids");
   });
