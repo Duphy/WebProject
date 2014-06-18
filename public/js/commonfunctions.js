@@ -339,7 +339,7 @@ function renderPost(post){
     if(post.picids){
       html = html + '<div class="row-fluid pictureArea" style = "margin-left:2%;">';
       if(post.picids.length > 1){
-        html = html + '<div id="'+post.id+'PictureCarousel" class="carousel slide" style = "min-height:200px;">'+
+        html = html + '<div id="'+post.id+'PictureCarousel" class="carousel slide" style = "min-height:200px;width:96%;">'+
           '<ol class="carousel-indicators">'+
           '</ol>'+
           '<div class="carousel-inner">'+
@@ -1094,10 +1094,10 @@ function viewpost(pids,char,newsData){
                                 var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
                                 if(data.index == 0){
                                   $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
-                                  $(inner).append('<div class="active item"><img src="'+data.pics+'" alt="" style = "width:96%;"></div>');
+                                  $(inner).append('<div class="active item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
                                 }else{
                                   $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
-                                  $(inner).append('<div class="item"><img src="'+data.pics+'" alt="" style = "width:96%;"></div>');
+                                  $(inner).append('<div class="item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
                                 }
                               }else{
                                 console.log("failed to get the picture of this post");
