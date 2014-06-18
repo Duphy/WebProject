@@ -495,6 +495,7 @@ function createPost(data){
 
           //TO DO: to be changed to support multiple pictures in one post.
           pictureData.picid = result.post.picids[0];
+          pictureData.index = 0;
           console.log("created picture pids:");
           console.log(result.post.picids);
           $.ajax({
@@ -1049,6 +1050,7 @@ function viewpost(pids,char,newsData){
                         pictureData.session_key = localStorage.session_key;
                         pictureData.uid = localStorage.uid;
                         pictureData.picid = element.picids[0];
+                        pictureData.index = 0;
                         $.ajax({
                           url:'/getpicture',
                           data:JSON.stringify(pictureData),
@@ -1078,7 +1080,7 @@ function viewpost(pids,char,newsData){
                           pictureData.session_key = localStorage.session_key;
                           pictureData.uid = localStorage.uid;
                           pictureData.picid = pictureId;
-                          console.log(pictureId);
+                          pictureData.index = index;
                           $.ajax({
                             url:'/getpicture',
                             data:JSON.stringify(pictureData),
@@ -1088,15 +1090,14 @@ function viewpost(pids,char,newsData){
                               console.log(data);
                               if(data.pics){
                                 var postid = element.uid+""+element.eid+""+element.pid;
-                                console.log(index);
                                 var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
                                 var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
-                                if(index == 0){
+                                if(data.index == 0){
                                   $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
-                                  $(inner).append('<div class="active item"><img src="'+data.pics+'" alt=""></div>');
+                                  $(inner).append('<div class="active item"><img src="'+data.pics+'" alt="" style = "width:96%;"></div>');
                                 }else{
-                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+index+'"></li>');
-                                  $(inner).append('<div class="item"><img src="'+data.pics+'" alt=""></div>');
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                                  $(inner).append('<div class="item"><img src="'+data.index+'" alt="" style = "width:96%;"></div>');
                                 }
                               }else{
                                 console.log("failed to get the picture of this post");
@@ -1704,6 +1705,7 @@ function getMorePosts(char,newsData){
                       pictureData.session_key = localStorage.session_key;
                       pictureData.uid = localStorage.uid;
                       pictureData.picid = element.picids[0];
+                      pictureData.index = 0;
                       $.ajax({
                         url:'/getpicture',
                         data:JSON.stringify(pictureData),
@@ -1814,6 +1816,7 @@ function getMorePosts(char,newsData){
                   pictureData.session_key = localStorage.session_key;
                   pictureData.uid = localStorage.uid;
                   pictureData.picid = element.picids[0];
+                  pictureData.index = 0;
                   $.ajax({
                     url:'/getpicture',
                     data:JSON.stringify(pictureData),

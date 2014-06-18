@@ -131,6 +131,7 @@ socket.on("reply posting",function(name, uid, eid, pid, seq, nid){
 								pictureData.session_key = localStorage.session_key;
 								pictureData.uid = localStorage.uid;
 								pictureData.picid = data.source[0].picids[0];
+								pictureData.index = 0;
 							    $.ajax({
 				                    url:'/getpicture',
 				                    data:JSON.stringify(pictureData),
