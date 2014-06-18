@@ -1097,7 +1097,7 @@ function viewpost(pids,char,newsData){
                                   $(inner).append('<div class="active item"><img src="'+data.pics+'" alt="" style = "width:96%;"></div>');
                                 }else{
                                   $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
-                                  $(inner).append('<div class="item"><img src="'+data.index+'" alt="" style = "width:96%;"></div>');
+                                  $(inner).append('<div class="item"><img src="'+data.pics+'" alt="" style = "width:96%;"></div>');
                                 }
                               }else{
                                 console.log("failed to get the picture of this post");
