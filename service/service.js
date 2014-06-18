@@ -1030,15 +1030,14 @@ exports.viewSelfCircatags = function(req, res) {
 
 exports.viewPicture = function(req, res){
 	var output;
-	console.log("picture id is:");
-	console.log(req.body.picid);
 	var pack = lib.createViewPicturePack(req.body.session_key,
 		parseInt(req.body.uid),req.body.picid);
 	helper.connectAndSend(pack, function(data){
 		var pkg = lib.resolvPack(data);
 		output = {
 			"status" : "successful",
-		    "pics" : pkg[1][1]
+		    "pics" : pkg[1][1],
+		    "index": req.body.index
 		};
 		res.send(output);
 	    }, function() {
