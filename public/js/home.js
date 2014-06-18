@@ -405,7 +405,7 @@ $(document).ready(function(){
     },
     progress: function(e, data){
         var progress = parseInt(data.loaded / data.total * 100, 10);
-        $('#pictureProgress .bar').css(
+        $('#fileProgress .bar').css(
             'width',
             progress + '%'
         );
@@ -502,7 +502,7 @@ $(document).ready(function(){
     data.session_key = localStorage.session_key;
     data.uid = localStorage.uid;
 
-    data.fields = localStorage.fileeids.split(",");
+    data.fields = localStorage.fileids.split(",");
     console.log("file ids: ");
     console.log(data.fields);
     
