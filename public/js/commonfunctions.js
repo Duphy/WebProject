@@ -335,9 +335,36 @@ function renderPost(post){
     '<div class = "offset1 span10 offset2">'+
     '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+post.postContent+'</pre>'+
     '</div>'+
-    '</div>'+
-    '<div class="row-fluid pictureArea" style = "margin-left:2%;">'+
-    '</div>'+
+    '</div>';
+    if(post.picids){
+      html = html + '<div class="row-fluid pictureArea" style = "margin-left:2%;">';
+      if(post.picids.length > 1){
+        html = html + '<div id="'+post.id+'PictureCarousel" class="carousel slide" style = "min-height:200px;">'+
+          '<ol class="carousel-indicators">'+
+          '</ol>'+
+          '<div class="carousel-inner">'+
+          '</div>'+
+          '<a class="carousel-control left" href="#'+post.id+'Carousel" data-slide="prev">&lsaquo;</a>'+
+          '<a class="carousel-control right" href="#'+post.id+'Carousel" data-slide="next">&rsaquo;</a>'+
+        '</div>';
+      }
+      html = html + '</div>';
+    }
+    if(post.fileids){
+      html = html + '<div class="row-fluid fileArea" style = "margin-left:2%;">';
+      if(post.fileids.length > 1){
+        html = html + '<div id="'+post.id+'FileCarousel" class="carousel slide" style = "height:300px;">'+
+          '<ol class="carousel-indicators">'+
+          '</ol>'+
+          '<div class="carousel-inner">'+
+          '</div>'+
+          '<a class="carousel-control left" href="#'+post.id+'Carousel" data-slide="prev">&lsaquo;</a>'+
+          '<a class="carousel-control right" href="#'+post.id+'Carousel" data-slide="next">&rsaquo;</a>'+
+        '</div>';
+      }
+      html = html + '</div>';
+    }
+    html = html +
     '<div class = "row-fluid shareButtons" style = "margin-top:10px;">'+
       /*'<div class = "offset1 span1"><button class = "btn button" style = "width:50px;"><i class = "icon-thumbs-up"></i>0</button></div>'+
       '<div class = "span1"><button class = "btn button" style = "width:50px;margin-left:10px;"><i class = "icon-share"></i></button></div>';
@@ -1014,37 +1041,70 @@ function viewpost(pids,char,newsData){
                       $('#left-column').append(renderPost(element));
                     }
                     //retrieve the pics of the element if any.
-                    if(element.picids && element.picids.length > 0){
+                    if(element.picids){
                       console.log("view post picture picids:");
                       console.log(element.picids);
-                      var pictureData  = {};
-                      pictureData.session_key = localStorage.session_key;
-                      pictureData.uid = localStorage.uid;
-                      pictureData.picid = element.picids[0];
-                      $.ajax({
-                        url:'/getpicture',
-                        data:JSON.stringify(pictureData),
-                        
-                        type:"POST",
-                        contentType:"application/json",
-                        success:function(data){
-                          console.log("picture data:");
-                          console.log(data);
-                          if(data.pics){
-                            var postid = element.uid+""+element.eid+""+element.pid;
-                            $.each($("div."+postid),function(index, element){
-                              $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
-                            });
-                          }else{
-                            console.log("failed to get the picture of this post");
+                      if(element.picids.length == 1){
+                        var pictureData  = {};
+                        pictureData.session_key = localStorage.session_key;
+                        pictureData.uid = localStorage.uid;
+                        pictureData.picid = element.picids[0];
+                        $.ajax({
+                          url:'/getpicture',
+                          data:JSON.stringify(pictureData),
+                          type:"POST",
+                          contentType:"application/json",
+                          success:function(data){
+                            console.log("picture data:");
+                            console.log(data);
+                            if(data.pics){
+                              var postid = element.uid+""+element.eid+""+element.pid;
+                              $.each($("div."+postid),function(index, element){
+                                $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                              });
+                            }else{
+                              console.log("failed to get the picture of this post");
+                            }
+                          },
+                          error:function(jqXHR, textStatus, errorThrown){
+                            if(textStatus == "timeout"){
+                              $("#timeoutModal").modal("show");
+                            }
                           }
-                        },
-                        error:function(jqXHR, textStatus, errorThrown){
-                          if(textStatus == "timeout"){
-                            $("#timeoutModal").modal("show");
-                          }
-                        }
-                      });
+                        });
+                      }else{
+                        $.each(element.picids, function(index, pictureId){
+                          var pictureData  = {};
+                          pictureData.session_key = localStorage.session_key;
+                          pictureData.uid = localStorage.uid;
+                          pictureData.picid = pictureId;
+                          console.log(pictureId);
+                          $.ajax({
+                            url:'/getpicture',
+                            data:JSON.stringify(pictureData),
+                            type:"POST",
+                            contentType:"application/json",
+                            success:function(data){
+                              console.log(data);
+                              if(data.pics){
+                                var postid = element.uid+""+element.eid+""+element.pid;
+                                console.log(index);
+                                var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                                var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                                if(index == 0){
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                                  $(inner).append('<div class="active item"><img src="'+data.pics+'" alt=""></div>');
+                                }else{
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+index+'"></li>');
+                                  $(inner).append('<div class="item"><img src="'+data.pics+'" alt=""></div>');
+                                }
+                              }else{
+                                console.log("failed to get the picture of this post");
+                              }
+                            }
+                          });
+                        });
+                      }
                     }
                     //retrieve the avatar of the poster
                     $.ajax({
@@ -1090,7 +1150,7 @@ function viewpost(pids,char,newsData){
               $("#loadMoreButton").show();
               $("#circularG").hide();
               $(window).scroll(function(){
-                console.log(loadingFlag);
+                //console.log(loadingFlag);
                 if($(window).scrollTop() + $(window).height() >= $(document).height() && loadingFlag){
                   loadingFlag = false;
                   getMorePosts(char,newsData);
