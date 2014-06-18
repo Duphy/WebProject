@@ -344,8 +344,8 @@ function renderPost(post){
           '</ol>'+
           '<div class="carousel-inner">'+
           '</div>'+
-          '<a class="carousel-control left" href="#'+post.id+'Carousel" data-slide="prev">&lsaquo;</a>'+
-          '<a class="carousel-control right" href="#'+post.id+'Carousel" data-slide="next">&rsaquo;</a>'+
+          '<a class="carousel-control left" href="#'+post.id+'PictureCarousel" data-slide="prev">&lsaquo;</a>'+
+          '<a class="carousel-control right" href="#'+post.id+'PictureCarousel" data-slide="next">&rsaquo;</a>'+
         '</div>';
       }
       html = html + '</div>';
