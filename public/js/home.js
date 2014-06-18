@@ -502,9 +502,11 @@ $(document).ready(function(){
     data.session_key = localStorage.session_key;
     data.uid = localStorage.uid;
 
-    data.fields = localStorage.fileids.split(",");
+    data.pics = [];
+
+    data.files = localStorage.fileids.split(",");
     console.log("file ids: ");
-    console.log(data.fields);
+    console.log(data.files);
     
     $("#floatingBarsG-file").show();
     createPost(data);
@@ -633,6 +635,8 @@ $(document).ready(function(){
     data.pics = localStorage.pictureids.split(",");
     console.log("picture ids: ");
     console.log(data.pics);
+
+    data.files = [];
     
     $("#floatingBarsG-picture").show();
     createPost(data);
