@@ -1219,7 +1219,7 @@ function viewpost(pids,char,newsData){
                         fileData.fileid = element.fileids[0];
                         fileData.index = 0;
                         console.log("download file data:");
-                        consol.log(fileData);
+                        console.log(fileData);
                         $.ajax({
                           url:'/downloadfile',
                           data:JSON.stringify(fileData),
