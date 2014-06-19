@@ -475,7 +475,9 @@ exports.createPost_old = function(req, res) {
 */
 exports.createPost = function(req, res) {
     console.log("creater uid: " + req.body.uid);
+    console.log(req.body.pics);
     var picids = req.body.pics;
+    console.log(picids);
     var fileids = req.body.files;
 
     var pack = lib.createCreatePostingPack(req.body.session_key,
