@@ -1209,11 +1209,70 @@ function viewpost(pids,char,newsData){
                       }
                     }
                     //retrieve the files of the element if any.
-                    if(element.fileids){
-                      if(element.fileids.elngth == 1){
-
+                    if(result.post.fileids){
+                      console.log("create post file ids:");
+                      console.log(result.post.fileids);
+                      if(result.post.fileids.length == 1){
+                        var fileData  = {};
+                        fileData.session_key = localStorage.session_key;
+                        fileData.uid = localStorage.uid;
+                        fileData.fileid = result.post.fileids[0];
+                        fileData.index = 0;
+                        $.ajax({
+                          url:'/download',
+                          data:JSON.stringify(fileData),
+                          type:"POST",
+                          contentType:"application/json",
+                          success:function(data){
+                            console.log("file data:");
+                            console.log(data);
+                            if(data.file){
+                              var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                              $.each($("div."+postid),function(index, element){
+                                $(element).find(".fileArea").html("<a href='"+data.file+"' download='file.zip'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;width:96%;'/></a>");
+                              });
+                            }else{
+                              console.log("failed to get the picture of this post");
+                            }
+                          },
+                          error:function(jqXHR, textStatus, errorThrown){
+                            if(textStatus == "timeout"){
+                              $("#timeoutModal").modal("show");
+                            }
+                          }
+                        });
                       }else{
-
+                        $.each(result.post.fileids, function(index, fileId){
+                          var fileData  = {};
+                          fileData.session_key = localStorage.session_key;
+                          fileData.uid = localStorage.uid;
+                          fileData.fileid = fileId;
+                          fileData.index = index;
+                          $.ajax({
+                            url:'/downloadfile',
+                            data:JSON.stringify(fileData),
+                            type:"POST",
+                            contentType:"application/json",
+                            success:function(data){
+                              console.log("file data:");
+                              console.log(data);
+                              if(data.file){
+                                var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                                var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                                var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                                if(data.index == 0){
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                                  $(inner).append('<div class="active item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/></a></div>');
+                                }else{
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                                  $(inner).append('<div class="item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/></a></div>');
+                                }
+                              }else{
+                                console.log("failed to get the picture of this post");
+                              }
+                            }
+                          });
+                        });
                       }
                     }
                     //retrieve the avatar of the poster
