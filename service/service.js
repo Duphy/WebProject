@@ -1075,7 +1075,7 @@ exports.viewPictures = function(req,res){
 exports.downloadFile = function(req, res){
 	var output;
 	var pack = lib.createDownloadFilePack(req.body.session_key,
-		parseInt(req.body.uid),helper.decToHex(req.body.fileid));
+		parseInt(req.body.uid),req.body.fileid);
 	helper.connectAndSend(pack, function(data){
 		var pkg = lib.resolvPack(data);
 		console.log("file pkg:");
