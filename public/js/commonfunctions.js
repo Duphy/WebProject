@@ -1209,14 +1209,14 @@ function viewpost(pids,char,newsData){
                       }
                     }
                     //retrieve the files of the element if any.
-                    if(result.post.fileids){
+                    if(element.fileids){
                       console.log("create post file ids:");
-                      console.log(result.post.fileids);
-                      if(result.post.fileids.length == 1){
+                      console.log(element.fileids);
+                      if(element.fileids.length == 1){
                         var fileData  = {};
                         fileData.session_key = localStorage.session_key;
                         fileData.uid = localStorage.uid;
-                        fileData.fileid = result.post.fileids[0];
+                        fileData.fileid = element.fileids[0];
                         fileData.index = 0;
                         $.ajax({
                           url:'/download',
@@ -1227,7 +1227,7 @@ function viewpost(pids,char,newsData){
                             console.log("file data:");
                             console.log(data);
                             if(data.file){
-                              var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                              var postid = element.uid+""+element.eid+""+element.pid;
                               $.each($("div."+postid),function(index, element){
                                 $(element).find(".fileArea").html("<a href='"+data.file+"' download='file.zip'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;width:96%;'/></a>");
                               });
@@ -1242,7 +1242,7 @@ function viewpost(pids,char,newsData){
                           }
                         });
                       }else{
-                        $.each(result.post.fileids, function(index, fileId){
+                        $.each(element.fileids, function(index, fileId){
                           var fileData  = {};
                           fileData.session_key = localStorage.session_key;
                           fileData.uid = localStorage.uid;
