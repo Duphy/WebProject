@@ -488,39 +488,140 @@ function createPost(data){
         $('#floatingBarsG-post').hide();
         $("#contentBody").find(".well").hide();
         $("#postSubmit").removeAttr("disabled");
-        if(result.post.picids && result.post.picids.length > 0){
-          var pictureData  = {};
-          pictureData.session_key = localStorage.session_key;
-          pictureData.uid = localStorage.uid;
 
-          //TO DO: to be changed to support multiple pictures in one post.
-          pictureData.picid = result.post.picids[0];
-          pictureData.index = 0;
-          console.log("created picture pids:");
+        //retrieve the pics of the element if any.
+        if(result.post.picids){
+          console.log("create post picture picids:");
           console.log(result.post.picids);
-          $.ajax({
-            url:'/getpicture',
-            data:JSON.stringify(pictureData),      
-            type:"POST",
-            contentType:"application/json",
-            success:function(data){
-              if(data.pics){
-                var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
-                $.each($("div."+postid),function(index, element){
-                  $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
-                });
-                $('#pictureCancel').removeAttr("disabled");
-                $('#floatingBarsG-picture').hide();
-                $('#pictureDescArea').val("");
-                $("#pictureTags").tagsinput('removeAll');
-                $("#previewImageArea").hide();
-                $("#pictureNotice").hide();
-                $("#pictureCancel").trigger('click');
-              }else{
-                console.log("failed to get the picture of this post");
+          if(result.post.picids.length == 1){
+            var pictureData  = {};
+            pictureData.session_key = localStorage.session_key;
+            pictureData.uid = localStorage.uid;
+            pictureData.picid = result.post.picids[0];
+            pictureData.index = 0;
+            $.ajax({
+              url:'/getpicture',
+              data:JSON.stringify(pictureData),
+              type:"POST",
+              contentType:"application/json",
+              success:function(data){
+                console.log("picture data:");
+                console.log(data);
+                if(data.pics){
+                  var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                  $.each($("div."+postid),function(index, element){
+                    $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                  });
+                }else{
+                  console.log("failed to get the picture of this post");
+                }
+              },
+              error:function(jqXHR, textStatus, errorThrown){
+                if(textStatus == "timeout"){
+                  $("#timeoutModal").modal("show");
+                }
               }
-            }
-          });
+            });
+          }else{
+            $.each(result.post.picids, function(index, pictureId){
+              var pictureData  = {};
+              pictureData.session_key = localStorage.session_key;
+              pictureData.uid = localStorage.uid;
+              pictureData.picid = pictureId;
+              pictureData.index = index;
+              $.ajax({
+                url:'/getpicture',
+                data:JSON.stringify(pictureData),
+                type:"POST",
+                contentType:"application/json",
+                success:function(data){
+                  console.log(data);
+                  if(data.pics){
+                    var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                    var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                    var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                    if(data.index == 0){
+                      $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                      $(inner).append('<div class="active item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
+                    }else{
+                      $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                      $(inner).append('<div class="item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
+                    }
+                  }else{
+                    console.log("failed to get the picture of this post");
+                  }
+                }
+              });
+            });
+          }
+        }
+
+        //retrieve the files of the element if any.
+        if(result.post.fileids){
+          console.log("create post file ids:");
+          console.log(result.post.fileids);
+          if(result.post.fileids.length == 1){
+            var fileData  = {};
+            fileData.session_key = localStorage.session_key;
+            fileData.uid = localStorage.uid;
+            fileData.fileid = result.post.fileids[0];
+            fileData.index = 0;
+            $.ajax({
+              url:'/download',
+              data:JSON.stringify(fileData),
+              type:"POST",
+              contentType:"application/json",
+              success:function(data){
+                console.log("file data:");
+                console.log(data);
+                if(data.file){
+                  var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                  $.each($("div."+postid),function(index, element){
+                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='file.zip'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;width:96%;'/></a>");
+                  });
+                }else{
+                  console.log("failed to get the picture of this post");
+                }
+              },
+              error:function(jqXHR, textStatus, errorThrown){
+                if(textStatus == "timeout"){
+                  $("#timeoutModal").modal("show");
+                }
+              }
+            });
+          }else{
+            $.each(result.post.fileids, function(index, fileId){
+              var fileData  = {};
+              fileData.session_key = localStorage.session_key;
+              fileData.uid = localStorage.uid;
+              fileData.fileid = fileId;
+              fileData.index = index;
+              $.ajax({
+                url:'/downloadfile',
+                data:JSON.stringify(fileData),
+                type:"POST",
+                contentType:"application/json",
+                success:function(data){
+                  console.log("file data:");
+                  console.log(data);
+                  if(data.file){
+                    var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                    var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                    var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                    if(data.index == 0){
+                      $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                      $(inner).append('<div class="active item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/></a></div>');
+                    }else{
+                      $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                      $(inner).append('<div class="item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/></a></div>');
+                    }
+                  }else{
+                    console.log("failed to get the picture of this post");
+                  }
+                }
+              });
+            });
+          }
         }
       }
     },
@@ -1105,6 +1206,14 @@ function viewpost(pids,char,newsData){
                             }
                           });
                         });
+                      }
+                    }
+                    //retrieve the files of the element if any.
+                    if(element.fileids){
+                      if(element.fileids.elngth == 1){
+
+                      }else{
+
                       }
                     }
                     //retrieve the avatar of the poster
@@ -1709,7 +1818,6 @@ function getMorePosts(char,newsData){
                       $.ajax({
                         url:'/getpicture',
                         data:JSON.stringify(pictureData),
-                        
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){

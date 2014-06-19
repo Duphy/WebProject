@@ -1071,15 +1071,19 @@ exports.viewPictures = function(req,res){
 	// 	);
 	// }
 }
+
 exports.downloadFile = function(req, res){
 	var output;
 	var pack = lib.createDownloadFilePack(req.body.session_key,
 		parseInt(req.body.uid),helper.decToHex(req.body.fileid));
 	helper.connectAndSend(pack, function(data){
 		var pkg = lib.resolvPack(data);
+		console.log("file pkg:");
+		console.log(pkg);
 		output = {
 			"status" : "successful",
-		    "files" : pkg[1][1]
+		    "file" : pkg[1][1],
+		    "index" : req.index
 		};
 		res.send(output);
 	    }, function() {
@@ -1554,7 +1558,7 @@ exports.viewEventSmallAvarta = function(req, res) {
 
 }
 // helper functions to view the post(posts) content
-exports.viewPostContent = function(req, res) {
+/*exports.viewPostContent = function(req, res) {
     var pack = lib.createViewPostingPack(req.body.session_key,
 	    parseInt(req.body.uid), parseInt(req.body.view_uid), helper.decToHex(req.body.eid),
 	    req.body.pid);
@@ -1606,7 +1610,8 @@ exports.viewPostContent = function(req, res) {
 	    status : "timeout"
 	});
     });
-}
+}*/
+
 exports.viewPostsContent = function(req, res) {
     var counter = 0;
     var pidList = req.body.pidList;
@@ -1657,9 +1662,8 @@ exports.viewPostsContent = function(req, res) {
 		    "replies_no" : reply_set.length,
 		    "replies" : replies, 
 		    "picids": pkg[1][11],
+		    "fileids":pkg[1][12]
 		};
-		console.log("post pkg:");
-		console.log(pkg[1])
 		counter++;
 		if (counter == pidList.length)
 		    res.send({
