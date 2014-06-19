@@ -1656,8 +1656,10 @@ exports.viewPostsContent = function(req, res) {
 		    "tags" : parseTags(pkg[1][9]),
 		    "replies_no" : reply_set.length,
 		    "replies" : replies, 
-		    "picids": pkg[1][11]
+		    "picids": pkg[1][11],
 		};
+		console.log("post pkg:");
+		console.log(pkg[1])
 		counter++;
 		if (counter == pidList.length)
 		    res.send({
@@ -1667,19 +1669,17 @@ exports.viewPostsContent = function(req, res) {
 		else {
 		    pack = lib.createViewPostingPack(req.body.session_key,
 			    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
-		   // console.log(pack);
 		    helper.connectAndSend(pack, f, function() {
-			res.send({
-			    status : "timeout"
-			});
+				res.send({
+				    status : "timeout"
+				});
 		    });
 		}
     };
-    //console.log(pack);
     helper.connectAndSend(pack, f, function() {
-	res.send({
-	    status : "timeout"
-	});
+		res.send({
+		    status : "timeout"
+		});
     });
 }
 
