@@ -740,3 +740,8 @@ background-color:#FFFFFF}
 hr{
 	margin:0 0 10px 0 !important;
 }
+
+.fileName{
+	text-align:center;
+	margin-top: 10px;
+}

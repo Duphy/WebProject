@@ -577,7 +577,7 @@ function createPost(data){
                 if(data.file){
                   var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
                   $.each($("div."+postid),function(index, element){
-                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='file.zip'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;width:96%;'/></a>");
+                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='file.zip'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;width:96%;'/><p class = 'fileName'>file.zip</p></a>");
                   });
                 }else{
                   console.log("failed to get the picture of this post");
@@ -610,10 +610,10 @@ function createPost(data){
                     var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
                     if(data.index == 0){
                       $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
-                      $(inner).append('<div class="active item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/></a></div>');
+                      $(inner).append('<div class="active item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/><p class = "fileName">file.zip</p></a></div>');
                     }else{
                       $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
-                      $(inner).append('<div class="item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/></a></div>');
+                      $(inner).append('<div class="item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/><p class = "fileName">file.zip</p></a></div>');
                     }
                   }else{
                     console.log("failed to get the picture of this post");
@@ -1231,7 +1231,7 @@ function viewpost(pids,char,newsData){
                             if(data.file){
                               var postid = element.uid+""+element.eid+""+element.pid;
                               $.each($("div."+postid),function(index, element){
-                                $(element).find(".fileArea").html("<a href='"+data.file+"' download='file.zip'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;width:96%;'/></a>");
+                                $(element).find(".fileArea").html("<a href='"+data.file+"' download='file.zip'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;width:96%;'/><p class = 'fileName'>file.zip</p></a>");
                               });
                             }else{
                               console.log("failed to get the picture of this post");
@@ -1264,10 +1264,10 @@ function viewpost(pids,char,newsData){
                                 var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
                                 if(data.index == 0){
                                   $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
-                                  $(inner).append('<div class="active item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/></a></div>');
+                                  $(inner).append('<div class="active item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/><p class = "fileName">file.zip</p></a></div>');
                                 }else{
                                   $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
-                                  $(inner).append('<div class="item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/></a></div>');
+                                  $(inner).append('<div class="item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;width:96%;"/><p class = "fileName">file.zip</p></a></div>');
                                 }
                               }else{
                                 console.log("failed to get the picture of this post");
