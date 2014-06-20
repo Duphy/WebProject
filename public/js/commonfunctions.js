@@ -1171,8 +1171,6 @@ function viewpost(pids,char,newsData){
            type:"POST",
            contentType: 'application/json',
            success:function(result){
-           //console.log("posts content:");
-           //console.log(result);
             if(result.status == "successful"){
               $("#contentBody").find(".well").hide();
               console.log(result.source);
@@ -2031,6 +2029,8 @@ function getMorePosts(char,newsData){
                         fileData.uid = localStorage.uid;
                         fileData.fileid = element.fileids[0];
                         fileData.index = 0;
+                        console.log("download file data:");
+                        console.log(fileData);
                         $.ajax({
                           url:'/downloadfile',
                           data:JSON.stringify(fileData),
@@ -2042,7 +2042,20 @@ function getMorePosts(char,newsData){
                             if(data.file){
                               var postid = element.uid+""+element.eid+""+element.pid;
                               $.each($("div."+postid),function(index, element){
-                                $(element).find(".fileArea").html("<a href='"+data.file+"' download='file.zip'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>file.zip</p></a>");
+                                switch(data.filetype){
+                                  case "zip":{
+                                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                                  }
+                                  break;
+                                  case "pdf":{
+                                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                                  }
+                                  break;
+                                  default:{
+                                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                                  }
+                                  break;
+                                }
                               });
                             }else{
                               console.log("failed to get the picture of this post");
@@ -2075,10 +2088,36 @@ function getMorePosts(char,newsData){
                                 var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
                                 if(data.index == 0){
                                   $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
-                                  $(inner).append('<div class="active item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;"/><p class = "fileName">file.zip</p></a></div>');
+                                  switch(data.filetype){
+                                    case "zip":{
+                                      $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    case "pdf":{
+                                      $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    default:{
+                                      $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                  }
                                 }else{
                                   $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
-                                  $(inner).append('<div class="item"><a href="'+data.file+'" download="file.zip"><img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;"/><p class = "fileName">file.zip</p></a></div>');
+                                  switch(data.filetype){
+                                    case "zip":{
+                                      $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    case "pdf":{
+                                      $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    default:{
+                                      $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                  }                                
                                 }
                               }else{
                                 console.log("failed to get the picture of this post");

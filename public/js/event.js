@@ -373,6 +373,136 @@ $(document).ready(function(){
     }
   });
 
+  $("#fileFileupload").fileupload({
+    url:"/uploadpostfile",
+    type:"POST",
+    dataType:"json",
+    maxFileSize:10000000,
+    acceptFileTypes: /\.(pdf|zip)$/i,
+    formData: {
+      uid: localStorage.uid,
+      session_key: localStorage.session_key
+    },
+    progress: function(e, data){
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#fileProgress .bar').css(
+            'width',
+            progress + '%'
+        );
+    },
+    add: function(e, data){
+        data.submit().success(function(result, textStatus, jqXHR){
+          console.log("file upload feedback:");
+          console.log(result);
+          if(result.status == "successful"){
+            setTimeout(function(){
+              $('#fileProgress').hide();
+              $('#fileNotice').html("finished! Uploaded your file already.").css("color",'green');
+              $('#fileProgress .bar').css(
+                  'width',
+                  '0%'
+              );
+              $('#fileCancel').removeAttr("disabled");
+              $('#fileSubmit').removeAttr("disabled");
+              $('#fileDescArea').show();
+              $('#fileTags').parent().show();
+              if(!localStorage.fileids){
+                localStorage.fileids = result.fileids;
+              }else{
+                var originalFileIds = localStorage.fileids.split(",");
+                localStorage.fileids = originalFileIds.concat(result.fileids);
+              } 
+              console.log("upload files urls:");
+              console.log(data.files);
+              $.each(data.files,function(index,element){
+                $('#previewFileArea').append(
+                    '<li class="span3">'+
+                      '<div href="#" class="thumbnail" style = "background:white;">'+
+                        '<img src="/img/default.png" style = "margin-left:auto;margin-right:auto;display:block;padding-top: 10px;"/>'+
+                        '<h3 style = "text-align:center;">'+data.files[0].name+'</h3>'+
+                      '</div>'+
+                    '</li>');
+              });
+              $('#previewFileArea').show();
+            },1000);
+          }
+        }).error(function(jqXHR, textStatus, errorThrown){
+          $('#fileSubmit').removeAttr("disabled");
+          $('#fileCancel').removeAttr("disabled");
+          $('#fileProgress').hide();
+          $('#fileProgress .bar').css(
+              'width',
+              '0%'
+          );
+          $('#fileNotice').show().html("failed!").css("color","#B94A48");
+        });
+    },
+    start:function(e, data){
+        $('#fileProgress').show();
+        $('#fileNotice').show().html("uploading...");
+        $('#fileSubmit').attr("disabled","disabled");
+        $('#fileCancel').attr("disabled","disabled");
+        $('#fileFileupload').attr("disabled","disabled");
+    },
+    fail:function(e, data){
+        $('#fileNotice').show().html("failed!").css("color","#B94A48");
+        $('#fileSubmit').removeAttr("disabled");
+        $('#fileCancel').removeAttr("disabled");
+        $('#fileFileupload').removeAttr("disabled");
+        $('#fileProgress .bar').css(
+            'width',
+            '0%'
+        );
+    },
+    done:function(e, data){  
+        console.log("upload done.");
+        $("#fileFileupload").removeAttr("disabled");
+    }
+  });
+
+  $("#fileSubmit").click(function(){
+    $(this).attr("disabled","disabled");
+    $('#fileCancel').attr("disabled","disabled");
+    var description = $("#fileDescArea").val();
+    var tags = $('#fileTags').tagsinput('items');
+    if(tags==""){
+      tags=[];
+    }
+    var eid = view_eid;
+    var visibility = 0;
+    var tags = tags;
+    var data = {};
+    var d = new Date();
+    data.content = description;
+    data.eid = eid;
+    data.visibility = visibility;
+    data.tags = tags;
+    data.date = d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+    data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
+    data.session_key = localStorage.session_key;
+    data.uid = localStorage.uid;
+
+    data.pics = [];
+
+    data.files = localStorage.fileids.split(",");
+    console.log("file ids: ");
+    console.log(data.files);
+    
+    $("#floatingBarsG-file").show();
+    createPost(data);
+    return false;
+  });
+
+  $("#fileCancel").click(function(){
+    $("#fileDescArea").val("").hide();
+    $("#fileTags").tagsinput("removeAll");
+    $('#fileTags').parent().hide();
+    $("#previewFileArea").html("");
+    $("#fileNotice").hide();
+    $('#fileSubmit').attr("disabled", "disabled");
+    localStorage.removeItem("fileids");
+  });
+
   $("#pictureFileupload").fileupload({
     url:"/uploadpostpicture",
     type:"POST",
@@ -485,8 +615,7 @@ $(document).ready(function(){
     console.log("picture ids: ");
     console.log(data.pics);
 
-    //TO DO: fake file ids
-    //data.fields = [];
+    data.files = [];
     
     $("#floatingBarsG-picture").show();
     createPost(data);
@@ -524,7 +653,6 @@ $(document).ready(function(){
     $.ajax({
         url:"/getpostscontent",
         data:JSON.stringify(data),
-        ,
         type:"POST",
         contentType: 'application/json',
         success:function(result){
