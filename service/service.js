@@ -1082,7 +1082,7 @@ exports.downloadFile = function(req, res){
 		parseInt(req.body.uid),req.body.fileid);
 	helper.connectAndSend(pack, function(data){
 		var pkg = lib.resolvPack(data);
-		magic.detectFile(pkg[1][1], function(err, result) {
+		magic.detectFile("../public/"+pkg[1][1], function(err, result) {
 		if (err) throw err;
 			console.log("file pkg type:");
 			console.log(result);
