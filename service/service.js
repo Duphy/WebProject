@@ -1078,28 +1078,46 @@ exports.viewPictures = function(req,res){
 }
 
 exports.downloadFile = function(req, res){
-	var output;
 	var pack = lib.createDownloadFilePack(req.body.session_key,
 		parseInt(req.body.uid),req.body.fileid);
 	helper.connectAndSend(pack, function(data){
 		var pkg = lib.resolvPack(data);
-		magic.detectFile(__dirname.replace("service","") + "public/"+pkg[1][1], function(err, result) {
-		if (err) throw err;
-			console.log("file pkg type:");
-			console.log(result);
+		magic.detectFile(__dirname.replace("service","") + "public/"+pkg[1][1], function(err, fileType) {
+			if (err){
+				console.log("error happens when detecting the file type!");
+			}else{
+				console.log("file pkg type:");
+				console.log(fileType);
+				var output = {
+					"status" : "successful",
+				    "file" : pkg[1][1],
+				    "index" : req.index
+				};
+				switch(fileType){
+					case "application/zip":{
+						output.filetype = "zip";
+						output.filename = "file.zip";
+					}
+					break;
+					case "application/pdf":{
+						output.filetype = "pdf";
+						output.filename = "file.pdf";	
+					}
+					break;
+					default:{
+						output.filetype = "file";
+						output.filename = "file";
+					}
+					break;
+				}
+				res.send(output);
+			}
 		});
-		output = {
-			"status" : "successful",
-		    "file" : pkg[1][1],
-		    "index" : req.index
-		};
-		res.send(output);
-	    }, function() {
+	}, function() {
 			res.send({
 			    "status" : "timeout"
 			});
-	   }
-	);
+	});
 }
 exports.viewCommonFriends = function(req,res){
 	var pack = createViewUserPack(9, req.body.session_key,
