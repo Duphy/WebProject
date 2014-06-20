@@ -846,7 +846,6 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/deletepost",
       data:JSON.stringify(data),
-      ,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
