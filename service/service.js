@@ -1,4 +1,5 @@
 var max_pid = "7fffffffffffffff";
+var magic = require('mmmagic').Magic;
 exports.lib = require("../node_modules/lib");
 var lib = exports.lib;
 exports.helper = require("./helper");
@@ -1078,8 +1079,11 @@ exports.downloadFile = function(req, res){
 		parseInt(req.body.uid),req.body.fileid);
 	helper.connectAndSend(pack, function(data){
 		var pkg = lib.resolvPack(data);
-		console.log("file pkg:");
-		console.log(pkg);
+		magic.detectFile(pkg[1][1], function(err, result) {
+		if (err) throw err;
+			console.log("file pkg type:");
+			console.log(result);
+		});
 		output = {
 			"status" : "successful",
 		    "file" : pkg[1][1],
