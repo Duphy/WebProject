@@ -727,7 +727,6 @@ $("body").delegate(".memberItem", 'click', function() {
 });
 
   $("#left").click(function(){
-    console.log("shaobi");
    $('#contentBody').toggleClass('cbp-spmenu-push-toright').removeClass('cbp-spmenu-push-toleft');
    $('#cbp-spmenu-s1').toggleClass('cbp-spmenu-open');
    $('#cbp-spmenu-s2').removeClass('cbp-spmenu-open');
@@ -1139,7 +1138,6 @@ $("body").delegate(".memberItem", 'click', function() {
 
   $("#notification").hover(function(){
     $(this).tooltip('show');
-    console.log("first");
     setTimeout(function(){$('#notification').tooltip('hide')},2000);
   });
 
