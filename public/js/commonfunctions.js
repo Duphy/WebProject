@@ -493,6 +493,10 @@ function createPost(data){
         if(result.post.picids){
           console.log("create post picture picids:");
           console.log(result.post.picids);
+          $('#pictureCancel').removeAttr("disabled");
+          $('#pictureSubmit').removeAttr("disabled");
+          $('#floatingBarsG-picture').hide();
+          $('#pictureCancel').trigger("click");
           if(result.post.picids.length == 1){
             var pictureData  = {};
             pictureData.session_key = localStorage.session_key;
@@ -560,6 +564,10 @@ function createPost(data){
         if(result.post.fileids){
           console.log("create post file ids:");
           console.log(result.post.fileids);
+          $('#fileCancel').removeAttr("disabled");
+          $('#fileSubmit').removeAttr("disabled");
+          $('#floatingBarsG-file').hide();
+          $('#fileCancel').trigger("click");
           if(result.post.fileids.length == 1){
             var fileData  = {};
             fileData.session_key = localStorage.session_key;

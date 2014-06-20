@@ -438,7 +438,7 @@ $(document).ready(function(){
                 $('#previewFileArea').append(
                     '<li class="span3">'+
                       '<div href="#" class="thumbnail" style = "background:white;">'+
-                        '<img src="/img/zip.png" style = "margin-left:auto;margin-right:auto;display:block;padding-top: 10px;"/>'+
+                        '<img src="/img/default.png" style = "margin-left:auto;margin-right:auto;display:block;padding-top: 10px;"/>'+
                         '<h3 style = "text-align:center;">'+data.files[0].name+'</h3>'+
                       '</div>'+
                     '</li>');
