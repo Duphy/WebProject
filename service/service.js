@@ -1,5 +1,8 @@
 var max_pid = "7fffffffffffffff";
-var magic = require('mmmagic').Magic;
+
+var Magic = require('mmmagic').Magic;
+var magic = new Magic();
+
 exports.lib = require("../node_modules/lib");
 var lib = exports.lib;
 exports.helper = require("./helper");
