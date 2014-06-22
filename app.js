@@ -49,15 +49,15 @@ app.get('/',routes.login);
 app.get('/user',routes.user);
 app.get('/event',routes.event);
 app.get('/home',routes.home);
-app.get('/updateuserinfo',routes.updateUserInfo);
-app.get('/editevent',routes.updateEventInfo);
 app.get('/search',routes.search);
-app.get('/newevent', routes.createevent);
 app.get('/eventmanage',routes.eventmanage);
-app.get('/eventnews',routes.eventnews);
-app.get('/profile',routes.profile);
-app.get('/userprofile',routes.userprofile);
-app.get('/eventprofile',routes.eventprofile);
+//app.get('/newevent', routes.createevent);
+// app.get('/updateuserinfo',routes.updateUserInfo);
+// app.get('/editevent',routes.updateEventInfo);
+// app.get('/eventnews',routes.eventnews);
+// app.get('/profile',routes.profile);
+// app.get('/userprofile',routes.userprofile);
+// app.get('/eventprofile',routes.eventprofile);
 // app.get("/scheduling",routes.scheduling);
 
 
@@ -72,8 +72,6 @@ app.post('/logout',express.bodyParser(),service.logout);
 app.post('/createpost',express.bodyParser(),service.createPost);
 app.post('/createreply',express.bodyParser(),service.createReply);
 app.post('/createevent',express.bodyParser(),service.createEvent);
-app.post('/createschedule', express.bodyParser(),service.createSchedule);
-//app.post('/createeventschedule', express.bodyParser(),service.createEventSchedule);
 
 //View Information
 app.post('/getselfinfo',express.bodyParser(),service.viewSelfInfo);
@@ -97,7 +95,6 @@ app.post('/getselfsmallavarta',express.bodyParser(),service.viewSelfSmallAvarta)
 app.post('/geteventavarta',express.bodyParser(),service.viewEventAvarta);
 app.post('/geteventsmallavarta',express.bodyParser(),service.viewEventSmallAvarta);
 app.post('/getusercircatags',express.bodyParser(),service.viewUserCircatags);
-//app.post('/getpostcontent',express.bodyParser(),service.viewPostContent);
 app.post('/getpostscontent',express.bodyParser(),service.viewPostsContent);
 app.post('/geteventinfo',express.bodyParser(),service.viewEventInfo);
 app.post('/geteventsinfo',express.bodyParser(),service.viewEventsInfo);
@@ -110,6 +107,8 @@ app.post('/getselfschedule',express.bodyParser(),service.viewSelfSchedule);
 
 app.post('/getusernews',express.bodyParser(),service.viewUserNews);
 app.post('/geteventnews',express.bodyParser(),service.viewEventNews);
+
+app.post('/downloadfile',express.bodyParser(),service.downloadFile);
 //Search
 app.post('/searchuserbyfilter',express.bodyParser(), service.searchUserByFilter);
 app.post('/searchuserbyid', express.bodyParser(), service.searchUserById);
@@ -153,6 +152,7 @@ app.post('/responsetonotification', express.bodyParser(), service.responseNoti);
 
 //upload Avarta
 app.post('/uploadpostpicture',service.uploadPicture);
+app.post('/uploadpostfile',service.uploadFile);
 app.post('/uploadavarta',service.uploadAvarta);
 /*************** End *****************/
 

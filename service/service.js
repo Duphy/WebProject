@@ -1,4 +1,9 @@
 var max_pid = "7fffffffffffffff";
+
+  var mmm = require('mmmagic'),
+      Magic = mmm.Magic;
+  var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+
 exports.lib = require("../node_modules/lib");
 var lib = exports.lib;
 exports.helper = require("./helper");
@@ -147,85 +152,177 @@ exports.createEvent = function(req, res) {
 	});
     });
 }
+
 exports.uploadPicture = function(req,res){
-	fs.readFile(req.files.image.path, function(err, data){
-		var imageName = req.files.image.name;
-		var imgsize =1;
-		/// If there's an error
-		if(!imageName){
-			console.log("There was an error.")
-			res.send({status:"unsuccessful"});
-		}else{
-			var path = dataPath +req.body.uid+"/tmp/";
-			console.log("path: "+path);
-			fs.readdir(path, function(err){
-				if(err){
-					console.log("not exists");
-					fs.mkdir(path,function(err){
-						if(!err){
-							console.log("created dir");
-							var imagePath = path + imageName;
-							fs.writeFile(imagePath, data, function(){
-								//upload the picture(s)
-								var pack = lib.createUploadPicturePack(req.body.session_key,
-								    parseInt(req.body.uid), imagePath);
-							    helper.connectAndSend(pack, 
-							    	function(data){
-										var pkg = lib.resolvPack(data);
-										var output = {};
-									    if(pkg[1].length > 0){
-									        output = {
-									        	"status": "successful",
-											    "picid" : pkg[1][0]
-										    };
-									    }
-										res.send(output);
-									}, 
-								    function(){
-										res.send({
-									    	status : "timeout"
-										});
-							    	}
-							    );
-							});	
-						}else{
-							//res.send({status:"unsuccessful"});
-						}
-					});
-				}else{
-					console.log("exists");
-					var imagePath = path + imageName;
-					console.log(imagePath);
-					fs.writeFile(imagePath, data, function(){
-						//upload the picture(s)
-						var pack = lib.createUploadPicturePack(req.body.session_key,
-								    parseInt(req.body.uid), imagePath);
-					    helper.connectAndSend(pack, 
-					    	function(data){
-								var pkg = lib.resolvPack(data);
-								var output = {};
-							    if(pkg[1].length > 0){
-							        output = {
-							        	"status": "successful",
-									    "picid" : pkg[1][0]
-								    };
-							    }
-								res.send(output);
-							}, 
-						    function(){
-								res.send({
-							    	status : "timeout"
-								});
-					    	}
-					    );
-					});
+	var images = [];
+	if(!Array.isArray(req.files.image)) {
+	    images = [req.files.image];
+	}else{
+		images = req.files.image;
+	}
+	console.log("images: ");
+	console.log(images);
+	var pictureNumber = images.length;
+	var pictureCounter = 0;
+	var picIds = [];
+	for(var i = 0;i < pictureNumber;i++){
+		var pack = lib.createUploadPicturePack(req.body.session_key,
+		    parseInt(req.body.uid), (images[i]).path);
+	    helper.connectAndSend(pack, 
+	    	function(data){
+				var pkg = lib.resolvPack(data);
+				pictureCounter++;
+				if(pkg[1].length > 0){
+					picIds.push(pkg[1][0]);
 				}
-			});
-		}
-	});
+				if(pictureCounter == pictureNumber){
+				   	res.send({
+			        	"status": "successful",
+					    "picids" : picIds
+				    });
+		    	}
+			}, 
+		    function(){
+				res.send({
+			    	status : "timeout"
+				});
+	    	}
+	    );
+	}
 }
 
 exports.uploadFile = function(req,res){
+	var files = [];
+	if(!Array.isArray(req.files.file)) {
+	    files = [req.files.file];
+	}else{
+		files = req.files.file;
+	}
+	console.log("files: ");
+	console.log(files);
+	var fileNumber = files.length;
+	var fileCounter = 0;
+	var fileIds = [];
+	for(var i = 0;i < fileNumber;i++){
+		var pack = lib.createUploadFilePack(req.body.session_key,
+		    parseInt(req.body.uid), (files[i]).path);
+	    helper.connectAndSend(pack, 
+	    	function(data){
+	    		console.log("upload successfully!");
+				var pkg = lib.resolvPack(data);
+				fileCounter++;
+				if(pkg[1].length > 0){
+					fileIds.push(pkg[1][0]);
+				}
+				if(fileCounter == fileNumber){
+				   	res.send({
+			        	"status": "successful",
+					    "fileids" : fileIds
+				    });
+		    	}
+			}, 
+		    function(){
+				res.send({
+			    	status : "timeout"
+				});
+	    	}
+	    );
+	}
+}
+
+/*exports.uploadPicture = function(req,res){
+	var images = req.files.image;
+	var pictureNumber = req.files.image.length;
+	var pictureCounter = 0;
+	var picIds = [];
+	for(var i = 0;i < images.length;i++){
+		var imageData = images[i];
+		console.log("imageData is:");
+		console.log(imageData);
+		fs.readFile(imageData.path, function(err, data){
+			var imageName = imageData.name;
+			console.log("imageName is:"+ imageName);
+			/// If there's an error
+			if(!imageName){
+				console.log("There was an error.")
+				res.send({status:"unsuccessful"});
+			}else{
+				var path = dataPath +req.body.uid+"/tmp/";
+				console.log("path: "+path);
+				fs.readdir(path, function(err){
+					if(err){
+						console.log("not exists");
+						fs.mkdir(path,function(err){
+							if(!err){
+								console.log("created dir");
+								var imagePath = path + imageName;
+								fs.writeFile(imagePath, data, function(){
+									//upload the picture(s)
+									var pack = lib.createUploadPicturePack(req.body.session_key,
+									    parseInt(req.body.uid), imagePath);
+								    helper.connectAndSend(pack, 
+								    	function(data){
+											var pkg = lib.resolvPack(data);
+											pictureCounter++;
+											if(pkg[1].length > 0){
+												picIds.push(pkg[1][0]);
+											}
+											if(pictureCounter == pictureNumber){
+											   	res.send({
+										        	"status": "successful",
+												    "picids" : picIds
+											    });
+									    	}
+										}, 
+									    function(){
+											res.send({
+										    	status : "timeout"
+											});
+								    	}
+								    );
+								});	
+							}else{
+								//res.send({status:"unsuccessful"});
+							}
+						});
+					}else{
+						console.log("exists");
+						var imagePath = path + imageName;
+						console.log(imagePath);
+						fs.writeFile(imagePath, data, function(){
+							//upload the picture(s)
+							var pack = lib.createUploadPicturePack(req.body.session_key,
+									    parseInt(req.body.uid), imagePath);
+						    helper.connectAndSend(pack, 
+						    	function(data){
+									var pkg = lib.resolvPack(data);
+									pictureCounter++;
+									if(pkg[1].length > 0){
+										picIds.push(pkg[1][0]);
+									}
+									if(pictureCounter == pictureNumber){
+									   	res.send({
+								        	"status": "successful",
+										    "picids" : picIds
+									    });
+							    	}
+								}, 
+							    function(){
+									res.send({
+								    	status : "timeout"
+									});
+						    	}
+						    );
+						});
+					}
+				});
+			}
+		});
+	}
+	
+}*/
+
+/*exports.uploadFile = function(req,res){
 	fs.readFile(req.files.file.path, function(err, data){
 		var fileName = req.files.file.name;
 		var filesize =1;
@@ -301,7 +398,8 @@ exports.uploadFile = function(req,res){
 			});
 		}
 	});
-}
+}*/
+
 /*
 exports.createPost_old = function(req, res) {
     console.log("creater uid: " + req.body.uid);
@@ -382,8 +480,10 @@ exports.createPost_old = function(req, res) {
 */
 exports.createPost = function(req, res) {
     console.log("creater uid: " + req.body.uid);
+    console.log(req.body.pics);
     var picids = req.body.pics;
-    var fileids = [];
+    console.log(picids);
+    var fileids = req.body.files;
 
     var pack = lib.createCreatePostingPack(req.body.session_key,
 	    parseInt(req.body.uid), helper.decToHex(req.body.eid), req.body.content,
@@ -943,14 +1043,15 @@ exports.viewPicture = function(req, res){
 		var pkg = lib.resolvPack(data);
 		output = {
 			"status" : "successful",
-		    "pics" : pkg[1][1]
+		    "pics" : pkg[1][1],
+		    "index": req.body.index
 		};
 		res.send(output);
 	    }, function() {
 			res.send({
 			    "status" : "timeout"
 			});
-	   }
+	    }
 	);
 }
 
@@ -975,23 +1076,48 @@ exports.viewPictures = function(req,res){
 	// 	);
 	// }
 }
+
 exports.downloadFile = function(req, res){
-	var output;
 	var pack = lib.createDownloadFilePack(req.body.session_key,
-		parseInt(req.body.uid),helper.decToHex(req.body.fileid));
+		parseInt(req.body.uid),req.body.fileid);
 	helper.connectAndSend(pack, function(data){
 		var pkg = lib.resolvPack(data);
-		output = {
-			"status" : "successful",
-		    "files" : pkg[1][1]
-		};
-		res.send(output);
-	    }, function() {
+		magic.detectFile(__dirname.replace("service","") + "public/"+pkg[1][1], function(err, fileType) {
+			if (err){
+				console.log("error happens when detecting the file type!");
+			}else{
+				console.log("file pkg type:");
+				console.log(fileType);
+				var output = {
+					"status" : "successful",
+				    "file" : pkg[1][1],
+				    "index" : req.index
+				};
+				switch(fileType){
+					case "application/zip":{
+						output.filetype = "zip";
+						output.filename = "file.zip";
+					}
+					break;
+					case "application/pdf":{
+						output.filetype = "pdf";
+						output.filename = "file.pdf";	
+					}
+					break;
+					default:{
+						output.filetype = "file";
+						output.filename = "file";
+					}
+					break;
+				}
+				res.send(output);
+			}
+		});
+	}, function() {
 			res.send({
 			    "status" : "timeout"
 			});
-	   }
-	);
+	});
 }
 exports.viewCommonFriends = function(req,res){
 	var pack = createViewUserPack(9, req.body.session_key,
@@ -1458,7 +1584,7 @@ exports.viewEventSmallAvarta = function(req, res) {
 
 }
 // helper functions to view the post(posts) content
-exports.viewPostContent = function(req, res) {
+/*exports.viewPostContent = function(req, res) {
     var pack = lib.createViewPostingPack(req.body.session_key,
 	    parseInt(req.body.uid), parseInt(req.body.view_uid), helper.decToHex(req.body.eid),
 	    req.body.pid);
@@ -1510,7 +1636,8 @@ exports.viewPostContent = function(req, res) {
 	    status : "timeout"
 	});
     });
-}
+}*/
+
 exports.viewPostsContent = function(req, res) {
     var counter = 0;
     var pidList = req.body.pidList;
@@ -1521,11 +1648,6 @@ exports.viewPostsContent = function(req, res) {
     //console.log("Num of pids are: " + pidList.length);
 
     var counter = 0;
-    console.log(pidList);
-    console.log(uidList);
-    console.log("!!!!!!!!!!!!!!!eid list:");
-    console.log(eidList);
-    console.log("counter is "+counter);
     pack = lib.createViewPostingPack(req.body.session_key,
 	    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
     var f = function(data){
@@ -1565,7 +1687,8 @@ exports.viewPostsContent = function(req, res) {
 		    "tags" : parseTags(pkg[1][9]),
 		    "replies_no" : reply_set.length,
 		    "replies" : replies, 
-		    "picids": pkg[1][11]
+		    "picids": pkg[1][11],
+		    "fileids":pkg[1][12]
 		};
 		counter++;
 		if (counter == pidList.length)
@@ -1576,19 +1699,17 @@ exports.viewPostsContent = function(req, res) {
 		else {
 		    pack = lib.createViewPostingPack(req.body.session_key,
 			    parseInt(req.body.uid), parseInt(uidList[counter]), helper.decToHex(eidList[counter]), pidList[counter]);
-		   // console.log(pack);
 		    helper.connectAndSend(pack, f, function() {
-			res.send({
-			    status : "timeout"
-			});
+				res.send({
+				    status : "timeout"
+				});
 		    });
 		}
     };
-    //console.log(pack);
     helper.connectAndSend(pack, f, function() {
-	res.send({
-	    status : "timeout"
-	});
+		res.send({
+		    status : "timeout"
+		});
     });
 }
 

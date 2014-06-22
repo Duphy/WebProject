@@ -45,6 +45,8 @@ function UserSocket(host, port) {
 			self.retry_count = 0;
 			if (self.timeout_handle != null)
 				self.timeout_handle();
+			else if (timeout_handle != null)
+				timeout_handle(self.uid);
 			self.msg = null;
 			self.nextTask();
 		} else
@@ -122,11 +124,13 @@ function UserSocket(host, port) {
 	this.conn.on("end", function() {
 		console.log("socket ended, session_key: " + self.session_key
 			+ ", uid: " + self.uid);
+		self.conn.destroy();
 		self.connected = false;
 	});
 	this.conn.on("close", function() {
 		console.log("socket closed, session_key: " + self.session_key
 			+ ", uid: " + self.uid);
+		self.conn.destroy();
 		self.connected = false;
 	});
 }

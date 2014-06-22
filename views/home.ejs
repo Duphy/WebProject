@@ -151,17 +151,19 @@
 	<div id="pictureModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
 	  <div class="modal-body">
 	  	<div class = "well" style = "width:92%;border-radius:0px;">
-			<p class = "warning" style = "text-align:center;maring-bottom:0px;">(avatar size is required to be smaller than <strong style = "color:#B94A48;">1M</strong>.)</p>
+			<p class = "warning" style = "text-align:center;maring-bottom:0px;">(Image size is required to be smaller than <strong style = "color:#B94A48;">1M</strong>.)</p>
 			<span class="file-wrapper">
-			  <input type="file" name="image" id="pictureFileupload"/>
-			  <span class="btn btn-success button btn-large"><img src = "/img/picture.png" style = "margin-top:-5px;margin-right:5px;"> Choose a Photo</span>
+			  <input type="file" name="image" id="pictureFileupload" multiple/>
+			  <span class="btn btn-success button btn-large"><img src = "/img/picture.png" style = "margin-top:-5px;margin-right:5px;"> Choose Photo(s)</span>
 			</span>
 			<div id="pictureProgress" class = "progress progress-striped active" style = "display:none;">
 			    <div class="bar" style="width: 0%;"></div>
 			</div>
 			<p id = "pictureNotice" style = "text-align:center;display:none;"></p>
-			<div id = "previewImageArea" style = "max-width:100%;"></div>
-			<!-- <img id = "preloading" src = "#" style = "height:50px;width:50px;display:none;"> -->
+			<div style = "max-width:100%;">
+				<ul class="thumbnails" id = "previewImageArea" style = "margin-left: -1%;">
+                </ul>
+			</div>
 		</div>
 		<textarea rows="3" id = "pictureDescArea" placeholder="Photo Description..." style = "width:97%;display:none;max-height:200px;" class = "disableRoundCorner"></textarea>
 	    <div style = "border-radius:0px;margin-left:-5px;display:none;">
@@ -193,6 +195,57 @@
 		</div>
 	    <button id = "pictureSubmit" class="btn btn-success button" disabled>Submit</button>
 	   	<button class="btn button" data-dismiss="modal" id = "pictureCancel" aria-hidden="true">Cancel</button>
+	  </div>
+	  </div>
+	</div>
+
+	<div id="fileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style = "border-radius:0px;">
+	  <div class="modal-body">
+	  	<div class = "well" style = "width:92%;border-radius:0px;">
+			<p class = "warning" style = "text-align:center;maring-bottom:0px;">(File size is required to be smaller than <strong style = "color:#B94A48;">1M</strong>.)</p>
+			<span class="file-wrapper">
+			  <input type="file" name="file" id="fileFileupload"/>
+			  <span class="btn btn-primary button btn-large"><img src = "/img/file.png" style = "margin-top:-5px;margin-right:5px;"> Choose a File</span>
+			</span>
+			<div id="fileProgress" class = "progress progress-striped active" style = "display:none;">
+			    <div class="bar" style="width: 0%;"></div>
+			</div>
+			<p id = "fileNotice" style = "text-align:center;display:none;"></p>
+			<div style = "max-width:100%;">
+				<ul class="thumbnails" id = "previewFileArea" style = "margin-left: -1%;">
+                </ul>
+			</div>
+		</div>
+		<textarea rows="3" id = "fileDescArea" placeholder="File Description..." style = "width:97%;display:none;max-height:200px;" class = "disableRoundCorner"></textarea>
+	    <div style = "border-radius:0px;margin-left:-5px;display:none;">
+  			<input type="text" id = "fileTags" value="" data-role="tagsinput"/>
+  			<i class = "icon-question-sign" style = "margin-top:-5px;"></i>
+	    </div>
+	  </div>
+	  <div class="modal-footer">
+	  	<div class = "row-fluid">
+	  	<div class = "span8">
+	  	<div id="floatingBarsG-file" class = "pull-right">
+			<div class="blockG rotateG_01">
+			</div>
+			<div class="blockG rotateG_02">
+			</div>
+			<div class="blockG rotateG_03">
+			</div>
+			<div class="blockG rotateG_04">
+			</div>
+			<div class="blockG rotateG_05">
+			</div>
+			<div class="blockG rotateG_06">
+			</div>
+			<div class="blockG rotateG_07">
+			</div>
+			<div class="blockG rotateG_08">
+			</div>
+		</div>
+		</div>
+	    <button id = "fileSubmit" class="btn btn-success button" disabled>Submit</button>
+	   	<button class="btn button" data-dismiss="modal" id = "fileCancel" aria-hidden="true">Cancel</button>
 	  </div>
 	  </div>
 	</div>

@@ -36,7 +36,6 @@ socket.on("event membership request",function(name,uid, pid, eventName,eid,actio
 	$.ajax({
 	    url:"/geteventinfo",
 	    data:JSON.stringify(eventData),
-	    timeout:10000,
 	    type:"POST",
 	    contentType: 'application/json',
 	    success:function(data){
@@ -60,7 +59,6 @@ socket.on("event membership request",function(name,uid, pid, eventName,eid,actio
 	$.ajax({
 	    url:"/getuserinfo",
 	    data:JSON.stringify(userData),
-	    timeout:10000,
 	    type:"POST",
 	    contentType: 'application/json',
 	    success:function(data){
@@ -110,7 +108,6 @@ socket.on("reply posting",function(name, uid, eid, pid, seq, nid){
 	$.ajax({
 		url:"/getpostscontent",
 	    data:JSON.stringify(postsData),
-	    timeout:10000,
 	    type:"POST",
 	    contentType: 'application/json',
 	    success:function(data){
@@ -124,7 +121,6 @@ socket.on("reply posting",function(name, uid, eid, pid, seq, nid){
 	    			$.ajax({
 						url:"/getpostscontent",
 					    data:JSON.stringify(postsData),
-					    timeout:10000,
 					    type:"POST",
 					    contentType: 'application/json',
 		    			success:function(data){
@@ -135,10 +131,10 @@ socket.on("reply posting",function(name, uid, eid, pid, seq, nid){
 								pictureData.session_key = localStorage.session_key;
 								pictureData.uid = localStorage.uid;
 								pictureData.picid = data.source[0].picids[0];
+								pictureData.index = 0;
 							    $.ajax({
 				                    url:'/getpicture',
 				                    data:JSON.stringify(pictureData),
-				                    timeout:10000,
 				                    type:"POST",
 				                    contentType:"application/json",
 				                    success:function(avatarData){
@@ -173,7 +169,6 @@ socket.on("reply posting",function(name, uid, eid, pid, seq, nid){
 						        $.ajax({
 						          url:'/getusersmallavarta',
 						          data:JSON.stringify(userData),
-						          timeout:10000,
 						          type:"POST",
 						          contentType:"application/json",
 						          success:function(result){
@@ -198,7 +193,6 @@ socket.on("reply posting",function(name, uid, eid, pid, seq, nid){
 								        $.ajax({
 								          url:'/getuseravarta',
 								          data:JSON.stringify(userAvartaData),
-								          timeout:10000,
 								          type:"POST",
 								          contentType:"application/json",
 								          success:function(avatarData){
@@ -298,7 +292,6 @@ socket.on("receive event chat",function(eid, s_uid, message, date, time){
 			        $.ajax({
 			          url:'/getusersmallavarta',
 			          data:JSON.stringify(data),
-			          timeout:10000,
 			          type:"POST",
 			          contentType:"application/json",
 			          success:function(result){

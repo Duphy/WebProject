@@ -51,7 +51,7 @@ $(document).ready(function(){
   $.ajax({
    url:'/geteventinfo',
    data:JSON.stringify(view_auth_data),
-   timeout:10000,
+   
    type:"POST",
    contentType:"application/json",
    success:function(data){
@@ -99,7 +99,7 @@ $(document).ready(function(){
   $.ajax({
     url:"/geteventavarta",
     data:JSON.stringify(eventAvartaData),
-    timeout:10000,
+    
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -123,7 +123,7 @@ $(document).ready(function(){
     $.ajax({
      url:"/geteventpost",
      data:JSON.stringify(newsData),
-     timeout:10000,
+     
      type:"POST",
      contentType: 'application/json',
      success:function(data){
@@ -146,7 +146,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/geteventmanagers",
       data:JSON.stringify(view_auth_data),
-      timeout:10000,
+      
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -176,7 +176,7 @@ $(document).ready(function(){
     $.ajax({
       url:"/geteventmembers",
       data:JSON.stringify(view_auth_data),
-      timeout:10000,
+      
       type:"POST",
       contentType: 'application/json',
       success:function(data){
@@ -313,7 +313,7 @@ $(document).ready(function(){
         $.ajax({
             url:'/updateevent',
             data:JSON.stringify(data),
-            timeout:10000,
+            
             type:'POST',
             contentType: 'application/json',
             success:function(data){
@@ -373,6 +373,136 @@ $(document).ready(function(){
     }
   });
 
+  $("#fileFileupload").fileupload({
+    url:"/uploadpostfile",
+    type:"POST",
+    dataType:"json",
+    maxFileSize:10000000,
+    acceptFileTypes: /\.(pdf|zip)$/i,
+    formData: {
+      uid: localStorage.uid,
+      session_key: localStorage.session_key
+    },
+    progress: function(e, data){
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#fileProgress .bar').css(
+            'width',
+            progress + '%'
+        );
+    },
+    add: function(e, data){
+        data.submit().success(function(result, textStatus, jqXHR){
+          console.log("file upload feedback:");
+          console.log(result);
+          if(result.status == "successful"){
+            setTimeout(function(){
+              $('#fileProgress').hide();
+              $('#fileNotice').html("finished! Uploaded your file already.").css("color",'green');
+              $('#fileProgress .bar').css(
+                  'width',
+                  '0%'
+              );
+              $('#fileCancel').removeAttr("disabled");
+              $('#fileSubmit').removeAttr("disabled");
+              $('#fileDescArea').show();
+              $('#fileTags').parent().show();
+              if(!localStorage.fileids){
+                localStorage.fileids = result.fileids;
+              }else{
+                var originalFileIds = localStorage.fileids.split(",");
+                localStorage.fileids = originalFileIds.concat(result.fileids);
+              } 
+              console.log("upload files urls:");
+              console.log(data.files);
+              $.each(data.files,function(index,element){
+                $('#previewFileArea').append(
+                    '<li class="span3">'+
+                      '<div href="#" class="thumbnail" style = "background:white;">'+
+                        '<img src="/img/default.png" style = "margin-left:auto;margin-right:auto;display:block;padding-top: 10px;"/>'+
+                        '<h3 style = "text-align:center;">'+data.files[0].name+'</h3>'+
+                      '</div>'+
+                    '</li>');
+              });
+              $('#previewFileArea').show();
+            },1000);
+          }
+        }).error(function(jqXHR, textStatus, errorThrown){
+          $('#fileSubmit').removeAttr("disabled");
+          $('#fileCancel').removeAttr("disabled");
+          $('#fileProgress').hide();
+          $('#fileProgress .bar').css(
+              'width',
+              '0%'
+          );
+          $('#fileNotice').show().html("failed!").css("color","#B94A48");
+        });
+    },
+    start:function(e, data){
+        $('#fileProgress').show();
+        $('#fileNotice').show().html("uploading...");
+        $('#fileSubmit').attr("disabled","disabled");
+        $('#fileCancel').attr("disabled","disabled");
+        $('#fileFileupload').attr("disabled","disabled");
+    },
+    fail:function(e, data){
+        $('#fileNotice').show().html("failed!").css("color","#B94A48");
+        $('#fileSubmit').removeAttr("disabled");
+        $('#fileCancel').removeAttr("disabled");
+        $('#fileFileupload').removeAttr("disabled");
+        $('#fileProgress .bar').css(
+            'width',
+            '0%'
+        );
+    },
+    done:function(e, data){  
+        console.log("upload done.");
+        $("#fileFileupload").removeAttr("disabled");
+    }
+  });
+
+  $("#fileSubmit").click(function(){
+    $(this).attr("disabled","disabled");
+    $('#fileCancel').attr("disabled","disabled");
+    var description = $("#fileDescArea").val();
+    var tags = $('#fileTags').tagsinput('items');
+    if(tags==""){
+      tags=[];
+    }
+    var eid = view_eid;
+    var visibility = 0;
+    var tags = tags;
+    var data = {};
+    var d = new Date();
+    data.content = description;
+    data.eid = eid;
+    data.visibility = visibility;
+    data.tags = tags;
+    data.date = d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+    data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
+    data.session_key = localStorage.session_key;
+    data.uid = localStorage.uid;
+
+    data.pics = [];
+
+    data.files = localStorage.fileids.split(",");
+    console.log("file ids: ");
+    console.log(data.files);
+    
+    $("#floatingBarsG-file").show();
+    createPost(data);
+    return false;
+  });
+
+  $("#fileCancel").click(function(){
+    $("#fileDescArea").val("").hide();
+    $("#fileTags").tagsinput("removeAll");
+    $('#fileTags').parent().hide();
+    $("#previewFileArea").html("");
+    $("#fileNotice").hide();
+    $('#fileSubmit').attr("disabled", "disabled");
+    localStorage.removeItem("fileids");
+  });
+
   $("#pictureFileupload").fileupload({
     url:"/uploadpostpicture",
     type:"POST",
@@ -406,9 +536,23 @@ $(document).ready(function(){
               $('#pictureSubmit').removeAttr("disabled");
               $('#pictureDescArea').show();
               $('#pictureTags').parent().show();
-              $('#pictureSubmit').attr("pictureid",result.picid);
-              $('#previewImageArea').html("");
-              $('#previewImageArea').show().append('<img src="' + URL.createObjectURL(data.files[0]) + '" style = "margin-left:auto;margin-right:auto;display:block;"/>');
+              if(!localStorage.pictureids){
+                localStorage.pictureids = result.picids;
+              }else{
+                var originalPictureIds = localStorage.pictureids.split(",");
+                localStorage.pictureids = originalPictureIds.concat(result.picids);
+              } 
+              console.log("upload picture urls:");
+              console.log(data.files);
+              $.each(data.files,function(index,element){
+                $('#previewImageArea').append(
+                  '<li class="span3">'+
+                    '<a href="#" class="thumbnail">'+
+                      '<img src="' + URL.createObjectURL(element) + '" style = "margin-left:auto;margin-right:auto;display:block;height:300px;"/>'+
+                    '</a>'+
+                  '</li>');
+              });
+              $('#previewImageArea').show();
             },1000);
           }
         }).error(function(jqXHR, textStatus, errorThrown){
@@ -466,12 +610,12 @@ $(document).ready(function(){
     data.time = d.getHours()*10000+d.getMinutes()*100;+d.getSeconds();
     data.session_key = localStorage.session_key;
     data.uid = localStorage.uid;
-    data.pics = [$(this).attr("pictureid")];
+
+    data.pics = localStorage.pictureids.split(",");
     console.log("picture ids: ");
     console.log(data.pics);
 
-    //TO DO: fake file ids
-    //data.fields = [];
+    data.files = [];
     
     $("#floatingBarsG-picture").show();
     createPost(data);
@@ -479,12 +623,12 @@ $(document).ready(function(){
   });
 
   $("#pictureCancel").click(function(){
-    //TO DO: remove the picture just uploaded.
     $("#pictureDescArea").val("");
     $("#pictureTags").tagsinput("removeAll");
     $("#pictureSubmit").attr("picturename","");
-    $("#previewImageArea").hide();
+    $("#previewImageArea").html("");
     $("#pictureNotice").hide();
+    localStorage.removeItem("pictureids");
   });
 
   $('body').delegate('.postImage','click',function(){
@@ -509,7 +653,6 @@ $(document).ready(function(){
     $.ajax({
         url:"/getpostscontent",
         data:JSON.stringify(data),
-        timeout: 10000,
         type:"POST",
         contentType: 'application/json',
         success:function(result){
@@ -538,7 +681,7 @@ $("body").delegate("#settingJoinEvent",'click',function(){
   $.ajax({
     url:"/joinevent",
     data:JSON.stringify(data),
-    timeout:10000,
+    
     type:"POST",
     contentType: 'application/json',
     success:function(result){
@@ -584,7 +727,6 @@ $("body").delegate(".memberItem", 'click', function() {
 });
 
   $("#left").click(function(){
-    console.log("shaobi");
    $('#contentBody').toggleClass('cbp-spmenu-push-toright').removeClass('cbp-spmenu-push-toleft');
    $('#cbp-spmenu-s1').toggleClass('cbp-spmenu-open');
    $('#cbp-spmenu-s2').removeClass('cbp-spmenu-open');
@@ -628,7 +770,7 @@ $("body").delegate(".memberItem", 'click', function() {
       $.ajax({
              url:"/geteventmembers",
              data:JSON.stringify(view_auth_data),
-             timeout:10000,
+             
              type:"POST",
              contentType: 'application/json',
              success:function(data){
@@ -689,32 +831,36 @@ $("body").delegate(".memberItem", 'click', function() {
 
   $('body').delegate('.removePost','click',function(){
     var context = $(this).closest('.postRoot');
-    $("#removePostConfirm").attr("postId",$(this).closest(".postRoot").attr("id")).attr('postUid',$(context).attr('posterUid')).attr('postEid',$(context).attr('postEid')).attr('postPid',$(context).attr('postPid'));
+    $(context).addClass("PostToBeRemoved");
+    $("#removePostConfirm").attr('postUid',$(context).attr('posterUid')).attr('postEid',$(context).attr('postEid')).attr('postPid',$(context).attr('postPid'));
   });
 
   $('#removePostConfirm').click(function(){
     $("#floatingBarsG-removePost").show();
     $("#removePostConfirm").attr("disabled","disabled");
     var data = auth_data;
-    var id = $(this).attr('postId');
     data.id = $(this).attr('postUid');
     data.eid = $(this).attr('postEid');
     data.pid = $(this).attr('postPid');
     $.ajax({
       url:"/deletepost",
       data:JSON.stringify(data),
-      timeout:10000,
       type:"POST",
       contentType: 'application/json',
       success:function(data){
         console.log(data);
         if(data.status=="successful"){
-          $('#'+id).remove();
+          // BUG!! did not remove the post!
+          $('.PostToBeRemoved')[0].remove();
           if($("#left-column").html() == "" && $("#right-column").html() == ""){
             $("#contentBody").find(".well").show();
           }
+        }else{
+          $('.PostToBeRemoved')[0].removeClass("PostToBeRemoved");
+          console.log("post was not removed successfully!");
         }
         $("#removePostConfirm").removeAttr("disabled");
+        $("#removePostConfirm").removeAttr("postUid").removeAttr("postEid").removeAttr("postPid");
         $("#floatingBarsG-removePost").hide();
         $("#removePostCancel").trigger("click");
       },
@@ -727,7 +873,9 @@ $("body").delegate(".memberItem", 'click', function() {
   });
 
   $('body').delegate('.removereply','click',function(){
-    $("#removeReplyConfirm").attr("replyId",$(this).closest(".replyBody").attr("id")).attr("postId",$(this).closest(".postRoot").attr("id"));
+    console.log("removereply click");
+    var postId = $(this).closest(".postRoot").attr("posterUid")+""+$(this).closest(".postRoot").attr("postEid")+""+$(this).closest(".postRoot").attr("postPid");
+    $("#removeReplyConfirm").attr("replyId",$(this).closest(".replyBody").attr("replyId")).attr("postId",postId);
   });
 
   $("#removeReplyConfirm").click(function(){
@@ -735,36 +883,41 @@ $("body").delegate(".memberItem", 'click', function() {
       $("#removeReplyConfirm").attr("disabled","disabled");
       var postId = $(this).attr("postId");
       var replyId = $(this).attr("replyId");
-      var context = $("#"+postId);
+      var context = $("div."+postId).first();
       var data = auth_data;
-      data.id = context.attr('posterUid');
-      data.eid = context.attr('postEid');
-      data.pid = context.attr('postPid');
-      var reply = $("#"+replyId);
-      var repliesArea = context.find('.repliesArea');
+      data.id = $(context).attr('posterUid');
+      data.eid = $(context).attr('postEid');
+      data.pid = $(context).attr('postPid');
+      var reply = $("li[replyId='"+replyId+"']").first();
       data.rid = $(reply).attr("rid");
-      console.log($(reply));
-      console.log("rid "+data.rid);
+      console.log(data);
       $.ajax({
             url:"/deletereply",
             data:JSON.stringify(data),
-            timeout:10000,
+            
             type:"POST",
             contentType: 'application/json',
             success:function(data){
               console.log(data);
-              if(context.attr("repliesNumber") == 1){
-                repliesArea.remove();
-              }else{
-                reply.remove();
-                var repliesNumber = parseInt(context.attr("repliesNumber"));
-                context.attr("repliesNumber",(repliesNumber - 1));
-                if(repliesNumber == 2){
-                  repliesArea.find(".accordion-toggle").html('1 reply');
+              $.each($("li[replyId='"+replyId+"']"),function(index,element){
+                if(!$(element).closest("#imageModal").length && !$(element).closest("#popPostModal").length){
+                  var repliesArea = $(element).closest(".repliesArea");
+                  if($(element).attr("repliesNumber") == 1){
+                    $(repliesArea).remove();
+                  }else{
+                    var repliesNumber = parseInt($(element).closest(".postRoot").attr("repliesNumber"));
+                    $(element).closest(".postRoot").attr("repliesNumber",(repliesNumber - 1));
+                    $(element).remove();
+                    if(repliesNumber == 2){
+                      $(repliesArea).find(".accordion-toggle").html('1 reply');
+                    }else{
+                      $(repliesArea).find(".accordion-toggle").html((repliesNumber - 1)+' replies');
+                    }
+                  }
                 }else{
-                  repliesArea.find(".accordion-toggle").html((repliesNumber - 1)+' replies');
+                  $(element).remove();
                 }
-              }
+              });
               $("#removeReplyConfirm").removeAttr("disabled");
               $("#floatingBarsG-removeReply").hide();
               $("#removeReplyCancel").trigger("click");
@@ -811,7 +964,7 @@ $("body").delegate(".memberItem", 'click', function() {
                      $.ajax({
                             url:"/createreply",
                             data:JSON.stringify(data),
-                            timeout:10000,
+                            
                             type:"POST",
                             contentType: 'application/json',
                             success:function(result){
@@ -921,7 +1074,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/quitevent",
       data:JSON.stringify(data),
-      timeout:10000,
+      
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -985,7 +1138,6 @@ $("body").delegate(".memberItem", 'click', function() {
 
   $("#notification").hover(function(){
     $(this).tooltip('show');
-    console.log("first");
     setTimeout(function(){$('#notification').tooltip('hide')},2000);
   });
 
@@ -1022,7 +1174,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout:10000,
+      
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -1054,7 +1206,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout:10000,
+      
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -1100,7 +1252,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout:10000,
+      
       type:"POST",
       contentType: 'application/json',
       success:function(result){
@@ -1127,7 +1279,7 @@ $("body").delegate(".memberItem", 'click', function() {
     $.ajax({
       url:"/responsetonotification",
       data:JSON.stringify(data),
-      timeout:10000,
+      
       type:"POST",
       contentType: 'application/json',
       success:function(result){

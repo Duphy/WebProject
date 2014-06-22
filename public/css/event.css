@@ -660,3 +660,8 @@ background-color:#FFFFFF}
 	border: none;
 	padding: 0;
 }
+
+.fileName{
+	text-align:center;
+	margin-top: 10px;
+}

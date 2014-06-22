@@ -279,7 +279,7 @@ function renderPopPost(post){
     $.ajax({
       url:'/getusersmallavarta',
       data:JSON.stringify(userAvartaData),
-      timeout:10000,
+      
       type:"POST",
       contentType:"application/json",
       success:function(avatarData){
@@ -335,9 +335,36 @@ function renderPost(post){
     '<div class = "offset1 span10 offset2">'+
     '<pre class = "length-limited" style = "font-family: \'Lato\', sans-serif;font-weight:300;">'+post.postContent+'</pre>'+
     '</div>'+
-    '</div>'+
-    '<div class="row-fluid pictureArea" style = "margin-left:2%;">'+
-    '</div>'+
+    '</div>';
+    if(post.picids){
+      html = html + '<div class="row-fluid pictureArea" style = "margin-left:2%;">';
+      if(post.picids.length > 1){
+        html = html + '<div id="'+post.id+'PictureCarousel" class="carousel slide" style = "min-height:200px;width:96%;">'+
+          '<ol class="carousel-indicators">'+
+          '</ol>'+
+          '<div class="carousel-inner">'+
+          '</div>'+
+          '<a class="carousel-control left" href="#'+post.id+'PictureCarousel" data-slide="prev">&lsaquo;</a>'+
+          '<a class="carousel-control right" href="#'+post.id+'PictureCarousel" data-slide="next">&rsaquo;</a>'+
+        '</div>';
+      }
+      html = html + '</div>';
+    }
+    if(post.fileids){
+      html = html + '<div class="row-fluid fileArea" style = "margin-left:2%;">';
+      if(post.fileids.length > 1){
+        html = html + '<div id="'+post.id+'FileCarousel" class="carousel slide" style = "height:300px;">'+
+          '<ol class="carousel-indicators">'+
+          '</ol>'+
+          '<div class="carousel-inner">'+
+          '</div>'+
+          '<a class="carousel-control left" href="#'+post.id+'Carousel" data-slide="prev">&lsaquo;</a>'+
+          '<a class="carousel-control right" href="#'+post.id+'Carousel" data-slide="next">&rsaquo;</a>'+
+        '</div>';
+      }
+      html = html + '</div>';
+    }
+    html = html +
     '<div class = "row-fluid shareButtons" style = "margin-top:10px;">'+
       /*'<div class = "offset1 span1"><button class = "btn button" style = "width:50px;"><i class = "icon-thumbs-up"></i>0</button></div>'+
       '<div class = "span1"><button class = "btn button" style = "width:50px;margin-left:10px;"><i class = "icon-share"></i></button></div>';
@@ -443,7 +470,6 @@ function createPost(data){
   $.ajax({
     url:"/createpost",
     data:JSON.stringify(data),
-    timeout:10000,
     type:"POST",
     contentType: 'application/json',
     success:function(result){
@@ -462,37 +488,187 @@ function createPost(data){
         $('#floatingBarsG-post').hide();
         $("#contentBody").find(".well").hide();
         $("#postSubmit").removeAttr("disabled");
-        if(result.post.picids && result.post.picids.length > 0){
-          var pictureData  = {};
-          pictureData.session_key = localStorage.session_key;
-          pictureData.uid = localStorage.uid;
 
-          //TO DO: to be changed to support multiple pictures in one post.
-          pictureData.picid = result.post.picids[0];
-          $.ajax({
-            url:'/getpicture',
-            data:JSON.stringify(pictureData),
-            timeout:10000,
-            type:"POST",
-            contentType:"application/json",
-            success:function(data){
-              if(data.pics){
-                var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
-                $.each($("div."+postid),function(index, element){
-                  $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
-                });
-                $('#pictureCancel').removeAttr("disabled");
-                $('#floatingBarsG-picture').hide();
-                $('#pictureDescArea').val("");
-                $("#pictureTags").tagsinput('removeAll');
-                $("#previewImageArea").hide();
-                $("#pictureNotice").hide();
-                $("#pictureCancel").trigger('click');
-              }else{
-                console.log("failed to get the picture of this post");
+        //retrieve the pics of the element if any.
+        if(result.post.picids){
+          console.log("create post picture picids:");
+          console.log(result.post.picids);
+          $('#pictureCancel').removeAttr("disabled");
+          $('#pictureSubmit').removeAttr("disabled");
+          $('#floatingBarsG-picture').hide();
+          $('#pictureCancel').trigger("click");
+          if(result.post.picids.length == 1){
+            var pictureData  = {};
+            pictureData.session_key = localStorage.session_key;
+            pictureData.uid = localStorage.uid;
+            pictureData.picid = result.post.picids[0];
+            pictureData.index = 0;
+            $.ajax({
+              url:'/getpicture',
+              data:JSON.stringify(pictureData),
+              type:"POST",
+              contentType:"application/json",
+              success:function(data){
+                console.log("picture data:");
+                console.log(data);
+                if(data.pics){
+                  var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                  $.each($("div."+postid),function(index, element){
+                    $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                  });
+                }else{
+                  console.log("failed to get the picture of this post");
+                }
+              },
+              error:function(jqXHR, textStatus, errorThrown){
+                if(textStatus == "timeout"){
+                  $("#timeoutModal").modal("show");
+                }
               }
-            }
-          });
+            });
+          }else{
+            $.each(result.post.picids, function(index, pictureId){
+              var pictureData  = {};
+              pictureData.session_key = localStorage.session_key;
+              pictureData.uid = localStorage.uid;
+              pictureData.picid = pictureId;
+              pictureData.index = index;
+              $.ajax({
+                url:'/getpicture',
+                data:JSON.stringify(pictureData),
+                type:"POST",
+                contentType:"application/json",
+                success:function(data){
+                  console.log(data);
+                  if(data.pics){
+                    var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                    var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                    var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                    if(data.index == 0){
+                      $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                      $(inner).append('<div class="active item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
+                    }else{
+                      $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                      $(inner).append('<div class="item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
+                    }
+                  }else{
+                    console.log("failed to get the picture of this post");
+                  }
+                }
+              });
+            });
+          }
+        }
+
+        //retrieve the files of the element if any.
+        if(result.post.fileids){
+          console.log("create post file ids:");
+          console.log(result.post.fileids);
+          $('#fileCancel').removeAttr("disabled");
+          $('#fileSubmit').removeAttr("disabled");
+          $('#floatingBarsG-file').hide();
+          $('#fileCancel').trigger("click");
+          if(result.post.fileids.length == 1){
+            var fileData  = {};
+            fileData.session_key = localStorage.session_key;
+            fileData.uid = localStorage.uid;
+            fileData.fileid = result.post.fileids[0];
+            fileData.index = 0;
+            $.ajax({
+              url:'/downloadfile',
+              data:JSON.stringify(fileData),
+              type:"POST",
+              contentType:"application/json",
+              success:function(data){
+                console.log("file data:");
+                console.log(data);
+                if(data.file){
+                  var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                  $.each($("div."+postid),function(index, element){
+                    switch(data.filetype){
+                      case "zip":{
+                        $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                      }
+                      break;
+                      case "pdf":{
+                        $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                      }
+                      break;
+                      default:{
+                        $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                      }
+                      break;
+                    }                 
+                  });
+                }else{
+                  console.log("failed to get the picture of this post");
+                }
+              },
+              error:function(jqXHR, textStatus, errorThrown){
+                if(textStatus == "timeout"){
+                  $("#timeoutModal").modal("show");
+                }
+              }
+            });
+          }else{
+            $.each(result.post.fileids, function(index, fileId){
+              var fileData  = {};
+              fileData.session_key = localStorage.session_key;
+              fileData.uid = localStorage.uid;
+              fileData.fileid = fileId;
+              fileData.index = index;
+              $.ajax({
+                url:'/downloadfile',
+                data:JSON.stringify(fileData),
+                type:"POST",
+                contentType:"application/json",
+                success:function(data){
+                  console.log("file data:");
+                  console.log(data);
+                  if(data.file){
+                    var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                    var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                    var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                    if(data.index == 0){
+                      $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                      switch(data.filetype){
+                        case "zip":{
+                          $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                        }
+                        break;
+                        case "pdf":{
+                          $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                        }
+                        break;
+                        default:{
+                          $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                        }
+                        break;
+                      }                    
+                    }else{
+                      $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                      switch(data.filetype){
+                        case "zip":{
+                          $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                        }
+                        break;
+                        case "pdf":{
+                          $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                        }
+                        break;
+                        default:{
+                          $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                        }
+                        break;
+                      }                    
+                    }
+                  }else{
+                    console.log("failed to get the picture of this post");
+                  }
+                }
+              });
+            });
+          }
         }
       }
     },
@@ -512,7 +688,7 @@ function member(member,type){
   $.ajax({
     url:'/getusersmallavarta',
     data:JSON.stringify(userAvartaData),
-    timeout:10000,
+    
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -566,7 +742,7 @@ function userlist(usersData,type){
     $.ajax({
            url:"/getusersinfo",
            data:JSON.stringify(usersData),
-           timeout:10000,
+           
            type:"POST",
            contentType:'application/json',
            success:function(result){
@@ -592,7 +768,7 @@ function userlist(usersData,type){
                     $.ajax({
                       url:'/getusersmallavarta',
                       data:JSON.stringify(userAvartaData),
-                      timeout:10000,
+                      
                       type:"POST",
                       contentType:"application/json",
                       success:function(data){
@@ -617,7 +793,7 @@ function userlist(usersData,type){
                         $.ajax({
                           url:'/getusersmallavarta',
                           data:JSON.stringify(userAvartaData),
-                          timeout:10000,
+                          
                           type:"POST",
                           contentType:"application/json",
                           success:function(data){
@@ -653,7 +829,7 @@ function eventlist(eventData){
   $.ajax({
     url:"/geteventsinfo",
     data:JSON.stringify(eventData),
-    timeout:10000,
+    
     type:"POST",
     contentType:'application/json',
     success:function(result){
@@ -673,7 +849,7 @@ function eventlist(eventData){
               $.ajax({
                 url:'/geteventavarta',
                 data:JSON.stringify(eventAvartaData),
-                timeout:10000,
+                
                 type:"POST",
                 contentType:"application/json",
                 success:function(data){
@@ -991,12 +1167,10 @@ function viewpost(pids,char,newsData){
         $.ajax({
            url:"/getpostscontent",
            data:JSON.stringify(postData),
-           timeout:10000,
+           
            type:"POST",
            contentType: 'application/json',
            success:function(result){
-           //console.log("posts content:");
-           //console.log(result);
             if(result.status == "successful"){
               $("#contentBody").find(".well").hide();
               console.log(result.source);
@@ -1014,43 +1188,184 @@ function viewpost(pids,char,newsData){
                       $('#left-column').append(renderPost(element));
                     }
                     //retrieve the pics of the element if any.
-                    if(element.picids && element.picids.length > 0){
-                      console.log("element:");
-                      console.log(element);
+                    if(element.picids){
+                      console.log("view post picture picids:");
                       console.log(element.picids);
-                      console.log(element.picids.length);
-                      var pictureData  = {};
-                      pictureData.session_key = localStorage.session_key;
-                      pictureData.uid = localStorage.uid;
-                      pictureData.picid = element.picids[0];
-                      $.ajax({
-                        url:'/getpicture',
-                        data:JSON.stringify(pictureData),
-                        timeout:10000,
-                        type:"POST",
-                        contentType:"application/json",
-                        success:function(data){
-                          if(data.pics){
-                            var postid = element.uid+""+element.eid+""+element.pid;
-                            $.each($("div."+postid),function(index, element){
-                              $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
-                            });
-                          }else{
-                            console.log("failed to get the picture of this post");
+                      if(element.picids.length == 1){
+                        var pictureData  = {};
+                        pictureData.session_key = localStorage.session_key;
+                        pictureData.uid = localStorage.uid;
+                        pictureData.picid = element.picids[0];
+                        pictureData.index = 0;
+                        $.ajax({
+                          url:'/getpicture',
+                          data:JSON.stringify(pictureData),
+                          type:"POST",
+                          contentType:"application/json",
+                          success:function(data){
+                            console.log("picture data:");
+                            console.log(data);
+                            if(data.pics){
+                              var postid = element.uid+""+element.eid+""+element.pid;
+                              $.each($("div."+postid),function(index, element){
+                                $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                              });
+                            }else{
+                              console.log("failed to get the picture of this post");
+                            }
+                          },
+                          error:function(jqXHR, textStatus, errorThrown){
+                            if(textStatus == "timeout"){
+                              $("#timeoutModal").modal("show");
+                            }
                           }
-                        },
-                        error:function(jqXHR, textStatus, errorThrown){
-                          if(textStatus == "timeout"){
-                            $("#timeoutModal").modal("show");
+                        });
+                      }else{
+                        $.each(element.picids, function(index, pictureId){
+                          var pictureData  = {};
+                          pictureData.session_key = localStorage.session_key;
+                          pictureData.uid = localStorage.uid;
+                          pictureData.picid = pictureId;
+                          pictureData.index = index;
+                          $.ajax({
+                            url:'/getpicture',
+                            data:JSON.stringify(pictureData),
+                            type:"POST",
+                            contentType:"application/json",
+                            success:function(data){
+                              console.log(data);
+                              if(data.pics){
+                                var postid = element.uid+""+element.eid+""+element.pid;
+                                var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                                var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                                if(data.index == 0){
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                                  $(inner).append('<div class="active item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
+                                }else{
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                                  $(inner).append('<div class="item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
+                                }
+                              }else{
+                                console.log("failed to get the picture of this post");
+                              }
+                            }
+                          });
+                        });
+                      }
+                    }
+                    //retrieve the files of the element if any.
+                    if(element.fileids){
+                      console.log("view post file ids:");
+                      console.log(element.fileids);
+                      if(element.fileids.length == 1){
+                        var fileData  = {};
+                        fileData.session_key = localStorage.session_key;
+                        fileData.uid = localStorage.uid;
+                        fileData.fileid = element.fileids[0];
+                        fileData.index = 0;
+                        console.log("download file data:");
+                        console.log(fileData);
+                        $.ajax({
+                          url:'/downloadfile',
+                          data:JSON.stringify(fileData),
+                          type:"POST",
+                          contentType:"application/json",
+                          success:function(data){
+                            console.log("file data:");
+                            console.log(data);
+                            if(data.file){
+                              var postid = element.uid+""+element.eid+""+element.pid;
+                              $.each($("div."+postid),function(index, element){
+                                switch(data.filetype){
+                                  case "zip":{
+                                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                                  }
+                                  break;
+                                  case "pdf":{
+                                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                                  }
+                                  break;
+                                  default:{
+                                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                                  }
+                                  break;
+                                }
+                              });
+                            }else{
+                              console.log("failed to get the picture of this post");
+                            }
+                          },
+                          error:function(jqXHR, textStatus, errorThrown){
+                            if(textStatus == "timeout"){
+                              $("#timeoutModal").modal("show");
+                            }
                           }
-                        }
-                      });
+                        });
+                      }else{
+                        $.each(element.fileids, function(index, fileId){
+                          var fileData  = {};
+                          fileData.session_key = localStorage.session_key;
+                          fileData.uid = localStorage.uid;
+                          fileData.fileid = fileId;
+                          fileData.index = index;
+                          $.ajax({
+                            url:'/downloadfile',
+                            data:JSON.stringify(fileData),
+                            type:"POST",
+                            contentType:"application/json",
+                            success:function(data){
+                              console.log("file data:");
+                              console.log(data);
+                              if(data.file){
+                                var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                                var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                                var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                                if(data.index == 0){
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                                  switch(data.filetype){
+                                    case "zip":{
+                                      $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    case "pdf":{
+                                      $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    default:{
+                                      $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                  }
+                                }else{
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                                  switch(data.filetype){
+                                    case "zip":{
+                                      $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    case "pdf":{
+                                      $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    default:{
+                                      $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                  }                                
+                                }
+                              }else{
+                                console.log("failed to get the picture of this post");
+                              }
+                            }
+                          });
+                        });
+                      }
                     }
                     //retrieve the avatar of the poster
                     $.ajax({
                         url:'/getusersmallavarta',
                         data:JSON.stringify(postAvartaData),
-                        timeout:10000,
+                        
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
@@ -1070,7 +1385,7 @@ function viewpost(pids,char,newsData){
                       $.ajax({
                           url:'/getusersmallavarta',
                           data:JSON.stringify(replyAvartaData),
-                          timeout:10000,
+                          
                           type:"POST",
                           contentType:"application/json",
                           success:function(data){
@@ -1090,7 +1405,7 @@ function viewpost(pids,char,newsData){
               $("#loadMoreButton").show();
               $("#circularG").hide();
               $(window).scroll(function(){
-                console.log(loadingFlag);
+                //console.log(loadingFlag);
                 if($(window).scrollTop() + $(window).height() >= $(document).height() && loadingFlag){
                   loadingFlag = false;
                   getMorePosts(char,newsData);
@@ -1116,7 +1431,7 @@ function searchUser(searchData,loadOrder){
   $.ajax({
     url:"/searchuserbyfilter",
     data:JSON.stringify(searchData),
-    timeout:10000,
+    
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -1141,7 +1456,7 @@ function searchUser(searchData,loadOrder){
         $.ajax({
           url:"/getusersinfo",
           data:JSON.stringify(friendsData),
-          timeout:10000,
+          
           type:"POST",
           contentType:'application/json',
           success:function(result){
@@ -1167,7 +1482,7 @@ function searchUser(searchData,loadOrder){
                 $.ajax({
                   url:'/getusersmallavarta',
                   data:JSON.stringify(userAvartaData),
-                  timeout:10000,
+                  
                   type:"POST",
                   contentType:"application/json",
                   success:function(data){
@@ -1222,7 +1537,7 @@ function searchEvents(searchData,loadOrder){
   $.ajax({
     url:"/searcheventbyfilter",
     data:JSON.stringify(searchData),
-    timeout:10000,
+    
     type:"POST",
     contentType: 'application/json',
     success:function(data){
@@ -1244,7 +1559,7 @@ function searchEvents(searchData,loadOrder){
         $.ajax({
           url:"/geteventsinfo",
           data:JSON.stringify(eventsData),
-          timeout:10000,
+          
           type:"POST",
           contentType:'application/json',
           success:function(result){
@@ -1498,7 +1813,7 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
   $.ajax({
     url:'/getuserinfo',
     data:JSON.stringify(userData),
-    timeout:10000,
+    
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -1515,7 +1830,7 @@ function openFriendsChatBox(session_key, selfUid, friendUid, chatBoxNumber){
   $.ajax({
     url:'/getusersmallavarta', 
     data:JSON.stringify(userData),
-    timeout:10000,
+    
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -1544,7 +1859,7 @@ function openEventsChatBox(session_key, selfUid, eventEid, chatBoxNumber){
   $.ajax({
     url:'/geteventinfo',
     data:JSON.stringify(eventData),
-    timeout:10000,
+    
     type:"POST",
     contentType:"application/json",
     success:function(data){
@@ -1598,7 +1913,7 @@ function getMorePosts(char,newsData){
       $.ajax({
         url:posturl,
         data:JSON.stringify(newsData),
-        timeout:10000,
+        
         type:"POST",
         contentType: 'application/json',
         success:function(data){
@@ -1619,7 +1934,7 @@ function getMorePosts(char,newsData){
           $.ajax({
                url:"/getpostscontent",
                data:JSON.stringify(postData),
-               timeout:10000,
+               
                type:"POST",
                contentType: 'application/json',
                 success:function(result){
@@ -1639,38 +1954,183 @@ function getMorePosts(char,newsData){
                       $('#left-column').append(renderPost(element));
                     }
                     //retrieve the pics of the element if any.
-                    if(element.picids && element.picids.length > 0){
-                      var pictureData  = {};
-                      pictureData.session_key = localStorage.session_key;
-                      pictureData.uid = localStorage.uid;
-                      pictureData.picid = element.picids[0];
-                      $.ajax({
-                        url:'/getpicture',
-                        data:JSON.stringify(pictureData),
-                        timeout:10000,
-                        type:"POST",
-                        contentType:"application/json",
-                        success:function(data){
-                          if(data.pics){
-                            var postid = element.uid+""+element.eid+""+element.pid;
-                            $.each($("div."+postid),function(index, element){
-                              $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
-                            });
-                          }else{
-                            console.log("failed to get the picture of this post");
+                    if(element.picids){
+                      console.log("view post picture picids:");
+                      console.log(element.picids);
+                      if(element.picids.length == 1){
+                        var pictureData  = {};
+                        pictureData.session_key = localStorage.session_key;
+                        pictureData.uid = localStorage.uid;
+                        pictureData.picid = element.picids[0];
+                        pictureData.index = 0;
+                        $.ajax({
+                          url:'/getpicture',
+                          data:JSON.stringify(pictureData),
+                          type:"POST",
+                          contentType:"application/json",
+                          success:function(data){
+                            console.log("picture data:");
+                            console.log(data);
+                            if(data.pics){
+                              var postid = element.uid+""+element.eid+""+element.pid;
+                              $.each($("div."+postid),function(index, element){
+                                $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
+                              });
+                            }else{
+                              console.log("failed to get the picture of this post");
+                            }
+                          },
+                          error:function(jqXHR, textStatus, errorThrown){
+                            if(textStatus == "timeout"){
+                              $("#timeoutModal").modal("show");
+                            }
                           }
-                        },
-                        error:function(jqXHR, textStatus, errorThrown){
-                          if(textStatus == "timeout"){
-                            $("#timeoutModal").modal("show");
+                        });
+                      }else{
+                        $.each(element.picids, function(index, pictureId){
+                          var pictureData  = {};
+                          pictureData.session_key = localStorage.session_key;
+                          pictureData.uid = localStorage.uid;
+                          pictureData.picid = pictureId;
+                          pictureData.index = index;
+                          $.ajax({
+                            url:'/getpicture',
+                            data:JSON.stringify(pictureData),
+                            type:"POST",
+                            contentType:"application/json",
+                            success:function(data){
+                              console.log(data);
+                              if(data.pics){
+                                var postid = element.uid+""+element.eid+""+element.pid;
+                                var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                                var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                                if(data.index == 0){
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                                  $(inner).append('<div class="active item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
+                                }else{
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                                  $(inner).append('<div class="item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
+                                }
+                              }else{
+                                console.log("failed to get the picture of this post");
+                              }
+                            }
+                          });
+                        });
+                      }
+                    }
+                    //retrieve the files of the element if any.
+                    if(element.fileids){
+                      console.log("view post file ids:");
+                      console.log(element.fileids);
+                      if(element.fileids.length == 1){
+                        var fileData  = {};
+                        fileData.session_key = localStorage.session_key;
+                        fileData.uid = localStorage.uid;
+                        fileData.fileid = element.fileids[0];
+                        fileData.index = 0;
+                        console.log("download file data:");
+                        console.log(fileData);
+                        $.ajax({
+                          url:'/downloadfile',
+                          data:JSON.stringify(fileData),
+                          type:"POST",
+                          contentType:"application/json",
+                          success:function(data){
+                            console.log("file data:");
+                            console.log(data);
+                            if(data.file){
+                              var postid = element.uid+""+element.eid+""+element.pid;
+                              $.each($("div."+postid),function(index, element){
+                                switch(data.filetype){
+                                  case "zip":{
+                                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                                  }
+                                  break;
+                                  case "pdf":{
+                                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                                  }
+                                  break;
+                                  default:{
+                                    $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                                  }
+                                  break;
+                                }
+                              });
+                            }else{
+                              console.log("failed to get the picture of this post");
+                            }
+                          },
+                          error:function(jqXHR, textStatus, errorThrown){
+                            if(textStatus == "timeout"){
+                              $("#timeoutModal").modal("show");
+                            }
                           }
-                        }
-                      });
+                        });
+                      }else{
+                        $.each(element.fileids, function(index, fileId){
+                          var fileData  = {};
+                          fileData.session_key = localStorage.session_key;
+                          fileData.uid = localStorage.uid;
+                          fileData.fileid = fileId;
+                          fileData.index = index;
+                          $.ajax({
+                            url:'/downloadfile',
+                            data:JSON.stringify(fileData),
+                            type:"POST",
+                            contentType:"application/json",
+                            success:function(data){
+                              console.log("file data:");
+                              console.log(data);
+                              if(data.file){
+                                var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                                var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                                var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                                if(data.index == 0){
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                                  switch(data.filetype){
+                                    case "zip":{
+                                      $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    case "pdf":{
+                                      $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    default:{
+                                      $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                  }
+                                }else{
+                                  $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                                  switch(data.filetype){
+                                    case "zip":{
+                                      $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    case "pdf":{
+                                      $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                    default:{
+                                      $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                                    }
+                                    break;
+                                  }                                
+                                }
+                              }else{
+                                console.log("failed to get the picture of this post");
+                              }
+                            }
+                          });
+                        });
+                      }
                     }
                     $.ajax({
                         url:'/getusersmallavarta',
                         data:JSON.stringify(postAvartaData),
-                        timeout:10000,
+                        
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
@@ -1689,7 +2149,7 @@ function getMorePosts(char,newsData){
                         $.ajax({
                             url:'/getusersmallavarta',
                             data:JSON.stringify(replyAvartaData),
-                            timeout:10000,
+                            
                             type:"POST",
                             contentType:"application/json",
                             success:function(data){
@@ -1730,7 +2190,7 @@ function getMorePosts(char,newsData){
       $.ajax({
            url:"/getpostscontent",
            data:JSON.stringify(postData),
-           timeout:10000,
+           
            type:"POST",
            contentType: 'application/json',
             success:function(result){
@@ -1754,14 +2214,16 @@ function getMorePosts(char,newsData){
                   pictureData.session_key = localStorage.session_key;
                   pictureData.uid = localStorage.uid;
                   pictureData.picid = element.picids[0];
+                  pictureData.index = 0;
                   $.ajax({
                     url:'/getpicture',
                     data:JSON.stringify(pictureData),
-                    timeout:10000,
+                    
                     type:"POST",
                     contentType:"application/json",
                     success:function(data){
                       if(data.pics){
+                        console.log("pic url is :" + data.pics);
                         var postid = element.uid+""+element.eid+""+element.pid;
                         $.each($("div."+postid),function(index, element){
                           $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
@@ -1780,7 +2242,7 @@ function getMorePosts(char,newsData){
                 $.ajax({
                     url:'/getusersmallavarta',
                     data:JSON.stringify(postAvartaData),
-                    timeout:10000,
+                    
                     type:"POST",
                     contentType:"application/json",
                     success:function(data){
@@ -1799,7 +2261,7 @@ function getMorePosts(char,newsData){
                     $.ajax({
                         url:'/getusersmallavarta',
                         data:JSON.stringify(replyAvartaData),
-                        timeout:10000,
+                        
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
@@ -1852,7 +2314,7 @@ function getMoreUsers(){
     $.ajax({
       url:"/getusersinfo",
       data:JSON.stringify(friendsData),
-      timeout:10000,
+      
       type:"POST",
       contentType:'application/json',
       success:function(result){
@@ -1880,7 +2342,7 @@ function getMoreUsers(){
             $.ajax({
               url:'/getusersmallavarta',
               data:JSON.stringify(userAvartaData),
-              timeout:10000,
+              
               type:"POST",
               contentType:"application/json",
               success:function(data){
@@ -1932,7 +2394,7 @@ function getMoreEvents(){
     $.ajax({
       url:"/geteventsinfo",
       data:JSON.stringify(eventsData),
-      timeout:10000,
+      
       type:"POST",
       contentType:'application/json',
       success:function(result){
