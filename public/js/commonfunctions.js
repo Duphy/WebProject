@@ -373,7 +373,7 @@ function renderPost(post){
     //   '"img_hover_icon" : "icon-2-1.png"'+
     //   '};'+
     // '</script>'+
-    
+
     // '<script type="text/javascript" src="http://widget.renren.com/js/forward.js" async="true"></script>'+
       /*'<div class = "offset1 span1"><button class = "btn button" style = "width:50px;"><i class = "icon-thumbs-up"></i>0</button></div>'+
       '<div class = "span1"><button class = "btn button" style = "width:50px;margin-left:10px;"><i class = "icon-share"></i></button></div>';
@@ -2195,28 +2195,32 @@ function getMorePosts(char,newsData){
     }else{
       postCounter = Math.min(postCounter+6,pidsets.length);
       $.ajax({
-           url:"/getpostscontent",
-           data:JSON.stringify(postData),
-           
-           type:"POST",
-           contentType: 'application/json',
-            success:function(result){
-            if(result.status == "successful"){
-            $.each(result.source,function(index,element){
-                var postAvartaData = {};
-                postAvartaData.session_key = localStorage.session_key;
-                postAvartaData.uid = localStorage.uid;
-                postAvartaData.view_uid = element.uid;
-                var replyAvartaData = {};
-                replyAvartaData.session_key = localStorage.session_key;
-                replyAvartaData.uid = localStorage.uid;
-                if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
-                  $('#right-column').append(renderPost(element));
-                }else{
-                  $('#left-column').append(renderPost(element));
-                }
-                //retrieve the pics of the element if any.
-                if(element.picids && element.picids.length > 0){
+        url:"/getpostscontent",
+        data:JSON.stringify(postData),
+        type:"POST",
+        contentType: 'application/json',
+        success:function(result){
+          console.log("new post data:");
+          console.log(result);
+          if(result.status == "successful"){
+          $.each(result.source,function(index,element){
+              var postAvartaData = {};
+              postAvartaData.session_key = localStorage.session_key;
+              postAvartaData.uid = localStorage.uid;
+              postAvartaData.view_uid = element.uid;
+              var replyAvartaData = {};
+              replyAvartaData.session_key = localStorage.session_key;
+              replyAvartaData.uid = localStorage.uid;
+              if(parseInt($('#left-column').css('height'),10) > parseInt($('#right-column').css('height'),10)){
+                $('#right-column').append(renderPost(element));
+              }else{
+                $('#left-column').append(renderPost(element));
+              }
+              //retrieve the pics of the element if any.
+              if(element.picids){
+                console.log("view post picture picids:");
+                console.log(element.picids);
+                if(element.picids.length == 1){
                   var pictureData  = {};
                   pictureData.session_key = localStorage.session_key;
                   pictureData.uid = localStorage.uid;
@@ -2225,12 +2229,12 @@ function getMorePosts(char,newsData){
                   $.ajax({
                     url:'/getpicture',
                     data:JSON.stringify(pictureData),
-                    
                     type:"POST",
                     contentType:"application/json",
                     success:function(data){
+                      console.log("picture data:");
+                      console.log(data);
                       if(data.pics){
-                        console.log("pic url is :" + data.pics);
                         var postid = element.uid+""+element.eid+""+element.pid;
                         $.each($("div."+postid),function(index, element){
                           $(element).find(".pictureArea").html("<img class = 'postImage' href = '#imageModal' data-toggle='modal' src = '"+data.pics+"' style = 'width:96%;'/>");
@@ -2245,57 +2249,195 @@ function getMorePosts(char,newsData){
                       }
                     }
                   });
+                }else{
+                  $.each(element.picids, function(index, pictureId){
+                    var pictureData  = {};
+                    pictureData.session_key = localStorage.session_key;
+                    pictureData.uid = localStorage.uid;
+                    pictureData.picid = pictureId;
+                    pictureData.index = index;
+                    $.ajax({
+                      url:'/getpicture',
+                      data:JSON.stringify(pictureData),
+                      type:"POST",
+                      contentType:"application/json",
+                      success:function(data){
+                        console.log(data);
+                        if(data.pics){
+                          var postid = element.uid+""+element.eid+""+element.pid;
+                          var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                          var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                          if(data.index == 0){
+                            $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                            $(inner).append('<div class="active item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
+                          }else{
+                            $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                            $(inner).append('<div class="item"><img src="'+data.pics+'" alt="" style = "width:100%;"></div>');
+                          }
+                        }else{
+                          console.log("failed to get the picture of this post");
+                        }
+                      }
+                    });
+                  });
                 }
-                $.ajax({
-                    url:'/getusersmallavarta',
-                    data:JSON.stringify(postAvartaData),
-                    
+              }
+              //retrieve the files of the element if any.
+              if(element.fileids){
+                console.log("view post file ids:");
+                console.log(element.fileids);
+                if(element.fileids.length == 1){
+                  var fileData  = {};
+                  fileData.session_key = localStorage.session_key;
+                  fileData.uid = localStorage.uid;
+                  fileData.fileid = element.fileids[0];
+                  fileData.index = 0;
+                  console.log("download file data:");
+                  console.log(fileData);
+                  $.ajax({
+                    url:'/downloadfile',
+                    data:JSON.stringify(fileData),
                     type:"POST",
                     contentType:"application/json",
                     success:function(data){
-                        $("#post_user_avarta"+element.pid).attr("src",data.avarta);
+                      console.log("file data:");
+                      console.log(data);
+                      if(data.file){
+                        var postid = element.uid+""+element.eid+""+element.pid;
+                        $.each($("div."+postid),function(index, element){
+                          switch(data.filetype){
+                            case "zip":{
+                              $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                            }
+                            break;
+                            case "pdf":{
+                              $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                            }
+                            break;
+                            default:{
+                              $(element).find(".fileArea").html("<a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a>");
+                            }
+                            break;
+                          }
+                        });
+                      }else{
+                        console.log("failed to get the picture of this post");
+                      }
                     },
                     error:function(jqXHR, textStatus, errorThrown){
                       if(textStatus == "timeout"){
                         $("#timeoutModal").modal("show");
                       }
                     }
-                });
-                $.each(element.replies,function(replyIndex,reply){
-                    replyAvartaData.view_uid = reply.replier_uid;
-                    replyAvartaData.time = 0000//getCurrentTime();
-                    replyAvartaData.date = 00000000//getCurrentDate();
+                  });
+                }else{
+                  $.each(element.fileids, function(index, fileId){
+                    var fileData  = {};
+                    fileData.session_key = localStorage.session_key;
+                    fileData.uid = localStorage.uid;
+                    fileData.fileid = fileId;
+                    fileData.index = index;
                     $.ajax({
-                        url:'/getusersmallavarta',
-                        data:JSON.stringify(replyAvartaData),
-                        
-                        type:"POST",
-                        contentType:"application/json",
-                        success:function(data){
-                            $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
-                        },
-                        error:function(jqXHR, textStatus, errorThrown){
-                          if(textStatus == "timeout"){
-                            $("#timeoutModal").modal("show");
+                      url:'/downloadfile',
+                      data:JSON.stringify(fileData),
+                      type:"POST",
+                      contentType:"application/json",
+                      success:function(data){
+                        console.log("file data:");
+                        console.log(data);
+                        if(data.file){
+                          var postid = result.post.uid+""+result.post.eid+""+result.post.pid;
+                          var indicator = $("#"+postid+"PictureCarousel").find(".carousel-indicators").first();
+                          var inner = $("#"+postid+"PictureCarousel").find(".carousel-inner").first();
+                          if(data.index == 0){
+                            $(indicator).append('<li data-target="#myCarousel" data-slide-to="0" class="active"></li>');
+                            switch(data.filetype){
+                              case "zip":{
+                                $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                              }
+                              break;
+                              case "pdf":{
+                                $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                              }
+                              break;
+                              default:{
+                                $(element).find(".fileArea").html("<div class='active item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                              }
+                              break;
+                            }
+                          }else{
+                            $(indicator).append('<li data-target="#myCarousel" data-slide-to="'+data.index+'"></li>');
+                            switch(data.filetype){
+                              case "zip":{
+                                $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/zip.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                              }
+                              break;
+                              case "pdf":{
+                                $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/pdf.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                              }
+                              break;
+                              default:{
+                                $(element).find(".fileArea").html("<div class='item'><a href='"+data.file+"' download='"+data.filename+"'><img src='/img/default.png' style = 'margin-left:auto;margin-right:auto;display:block;'/><p class = 'fileName'>"+data.filename+"</p></a></div>");
+                              }
+                              break;
+                            }                                
                           }
+                        }else{
+                          console.log("failed to get the picture of this post");
                         }
+                      }
                     });
-                });
-            });
-            $(".tagsGroup a").hide();
-            $('.tagHead').show();
-            adjustTags();
-            $("#loadMoreButton").show();
-            $("#circularG").hide();
-            loadingFlag = true;
-            console.log(loadingFlag);
-            }
-            },
-            error:function(jqXHR, textStatus, errorThrown){
-              if(textStatus == "timeout"){
-                $("#timeoutModal").modal("show");
+                  });
+                }
               }
+              $.ajax({
+                  url:'/getusersmallavarta',
+                  data:JSON.stringify(postAvartaData),
+                  type:"POST",
+                  contentType:"application/json",
+                  success:function(data){
+                      $("#post_user_avarta"+element.pid).attr("src",data.avarta);
+                  },
+                  error:function(jqXHR, textStatus, errorThrown){
+                    if(textStatus == "timeout"){
+                      $("#timeoutModal").modal("show");
+                    }
+                  }
+              });
+              $.each(element.replies,function(replyIndex,reply){
+                  replyAvartaData.view_uid = reply.replier_uid;
+                  replyAvartaData.time = 0000//getCurrentTime();
+                  replyAvartaData.date = 00000000//getCurrentDate();
+                  $.ajax({
+                      url:'/getusersmallavarta',
+                      data:JSON.stringify(replyAvartaData),
+                      
+                      type:"POST",
+                      contentType:"application/json",
+                      success:function(data){
+                          $("#replyAvarta"+element.pid+""+reply.rid).attr("src",data.avarta);
+                      },
+                      error:function(jqXHR, textStatus, errorThrown){
+                        if(textStatus == "timeout"){
+                          $("#timeoutModal").modal("show");
+                        }
+                      }
+                  });
+              });
+          });
+          $(".tagsGroup a").hide();
+          $('.tagHead').show();
+          adjustTags();
+          $("#loadMoreButton").show();
+          $("#circularG").hide();
+          loadingFlag = true;
+          }
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            if(textStatus == "timeout"){
+              $("#timeoutModal").modal("show");
             }
+          }
       });
     }
   }
