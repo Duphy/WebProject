@@ -1407,6 +1407,7 @@ function viewpost(pids,char,newsData){
               $(window).scroll(function(){
                 //console.log(loadingFlag);
                 if($(window).scrollTop() + $(window).height() >= $(document).height() && loadingFlag){
+                  console.log("loading more posts ....");
                   loadingFlag = false;
                   getMorePosts(char,newsData);
                 }
