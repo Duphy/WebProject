@@ -1913,7 +1913,6 @@ function getMorePosts(char,newsData){
       $.ajax({
         url:posturl,
         data:JSON.stringify(newsData),
-        
         type:"POST",
         contentType: 'application/json',
         success:function(data){
@@ -1928,19 +1927,19 @@ function getMorePosts(char,newsData){
               pidsets.push(data.pidsets[j]);
             }
           }
-          console.log(postCounter);
+          /*console.log(postCounter);
           console.log(pidsets.length);
-          console.log("Post Conter is "+postCounter);
+          console.log("Post Conter is "+postCounter);*/
           $.ajax({
                url:"/getpostscontent",
                data:JSON.stringify(postData),
-               
                type:"POST",
                contentType: 'application/json',
                 success:function(result){
+                console.log("new post data:");
+                consoel.log(result);
                 if(result.status == "successful"){
                 $.each(result.source,function(index,element){
-                    console.log("here");
                     var postAvartaData = {};
                     postAvartaData.session_key = localStorage.session_key;
                     postAvartaData.uid = localStorage.uid;
@@ -2130,7 +2129,6 @@ function getMorePosts(char,newsData){
                     $.ajax({
                         url:'/getusersmallavarta',
                         data:JSON.stringify(postAvartaData),
-                        
                         type:"POST",
                         contentType:"application/json",
                         success:function(data){
@@ -2168,7 +2166,6 @@ function getMorePosts(char,newsData){
                 adjustTags();
                 $("#loadMoreButton").show();
                 $("#circularG").hide();
-                console.log("here");
                 loadingFlag = true;
                 }
                 },
