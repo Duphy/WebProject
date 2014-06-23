@@ -1937,7 +1937,7 @@ function getMorePosts(char,newsData){
                contentType: 'application/json',
                 success:function(result){
                 console.log("new post data:");
-                consoel.log(result);
+                console.log(result);
                 if(result.status == "successful"){
                 $.each(result.source,function(index,element){
                     var postAvartaData = {};
