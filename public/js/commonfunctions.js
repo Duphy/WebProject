@@ -366,6 +366,14 @@ function renderPost(post){
     }
     html = html +
     '<div class = "row-fluid shareButtons" style = "margin-top:10px;">'+
+    '<script type="text/javascript">'+
+      'window.__fwdCfg = {'+
+      '"api_key" : "5b61c2fe9c4d4b7c9db328127acc54ee",'+
+      '"text_hover_icon" : "icon-3-1.png",'+
+      '"img_hover_icon" : "icon-2-1.png"'+
+      '};'+
+    '</script>'+
+    '<script type="text/javascript" src="http://widget.renren.com/js/forward.js" async="true"></script>'+
       /*'<div class = "offset1 span1"><button class = "btn button" style = "width:50px;"><i class = "icon-thumbs-up"></i>0</button></div>'+
       '<div class = "span1"><button class = "btn button" style = "width:50px;margin-left:10px;"><i class = "icon-share"></i></button></div>';
       html=html+*/
