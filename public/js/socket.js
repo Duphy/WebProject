@@ -1,4 +1,7 @@
+
+/*********** Alert: Change to "www.circatag.com" on official site ********/
 var socket = io.connect('localhost');
+//var socket = io.connect('www.circatag.com');
 console.log("client socket connected!");
 socket.emit("uid",localStorage.uid);
 socket.on("friend request",function(name, uid, eid, pid, action, seq, nid){

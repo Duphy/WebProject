@@ -17,11 +17,6 @@ var rimraf = require("rimraf");
 var fs = require('fs');
 
 var app = express();
-//var redis = require('redis');
-// redisClient = redis.createClient();
-// redisClient.on("error", function (err) {
-//     console.log("Error " + err);
-// });
 
 // all environments
 app.set('port', process.env.PORT || 3000);
